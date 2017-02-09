@@ -3,7 +3,8 @@ package config
 import (
     "os"
     "io"
-    "log"
+    //"log"
+    "bytes"
 )
 
 type Config struct {
@@ -11,9 +12,12 @@ type Config struct {
 }
 
 type parserState struct {
-    lastByte        byte
-    commentLevel    uint8
-    inComment       bool
+    lastByte            byte            // previous byte
+    commentLevel        uint8           // comment level
+    inComment           bool            // true if in a comment
+    escaped             bool            // true if the current byte is escaped
+    variableNameBuf     *bytes.Buffer   // variable name buffer
+    variableValueBuf    *bytes.Buffer   // variable value buffer
 }
 
 // increase block comment level
@@ -72,7 +76,13 @@ func (conf *Config) Parse() error {
 }
 
 func (conf *Config) handleCharacter(state parserState, b byte) error {
-    log.Println(string(b))
+
+    // this character is escaped
+    if state.escaped {
+        b = 0
+        state.escaped = false
+    }
+
     switch b {
 
     // comment entrance
@@ -90,6 +100,10 @@ func (conf *Config) handleCharacter(state parserState, b byte) error {
             break
         }
         fallthrough
+
+    // escape
+    case '\\':
+        state.escaped = true
 
     default:
 
