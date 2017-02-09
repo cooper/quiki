@@ -1,127 +1,215 @@
 package config
 
 import (
-    "os"
-    "io"
-    //"log"
-    "bytes"
+	"bytes"
+	"errors"
+	"io"
+	"log"
+	"os"
 )
 
 type Config struct {
-    Path    string
+	Path string
 }
 
+const (
+	NO_BUF    = iota // no buffer
+	VAR_NAME  = iota // variable name
+	VAR_VALUE = iota // string variable value
+)
+
 type parserState struct {
-    lastByte            byte            // previous byte
-    commentLevel        uint8           // comment level
-    inComment           bool            // true if in a comment
-    escaped             bool            // true if the current byte is escaped
-    variableNameBuf     *bytes.Buffer   // variable name buffer
-    variableValueBuf    *bytes.Buffer   // variable value buffer
+	lastByte     byte          // previous byte
+	commentLevel uint8         // comment level
+	inComment    bool          // true if in a comment
+	escaped      bool          // true if the current byte is escaped
+	buffer       *bytes.Buffer // current buffer
+	buffType     uint8         // type of buffer
 }
 
 // increase block comment level
-func (state parserState) increaseCommentLevel() {
-    state.commentLevel++
-    state.inComment = true
+func (state *parserState) increaseCommentLevel() {
+	state.removeLastCharacter()
+	state.commentLevel++
+	state.inComment = true
 }
 
 // decrease block comment level
-func (state parserState) decreaseCommentLevel() {
-    if state.commentLevel <= 0 {
-        return
-    }
-    state.commentLevel--
-    state.inComment = state.commentLevel != 0
+func (state *parserState) decreaseCommentLevel() {
+	state.removeLastCharacter()
+	if state.commentLevel <= 0 {
+		return
+	}
+	state.commentLevel--
+	state.inComment = state.commentLevel != 0
+}
+
+func (state *parserState) removeLastCharacter() {
+	if state.buffer == nil || state.buffer.Len() < 1 {
+		return
+	}
+	state.buffer.Truncate(state.buffer.Len() - 1)
+}
+
+// start a new buffer
+func (state *parserState) startBuffer(t uint8) {
+	state.buffer = new(bytes.Buffer)
+	state.buffType = t
+}
+
+// destroy a buffer
+func (state *parserState) endBuffer() string {
+	str := state.buffer.String()
+	state.buffer = nil
+	state.buffType = NO_BUF
+	return str
 }
 
 func New(path string) *Config {
-    return &Config{Path: path}
+	return &Config{Path: path}
 }
 
 func (conf *Config) Parse() error {
 
-    // open the config
-    file, err := os.Open(conf.Path)
-    defer file.Close()
-    if err != nil {
-        return err
-    }
+	// open the config
+	file, err := os.Open(conf.Path)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
 
-    state := parserState{}
-    for {
-        b := make([]byte, 1)
-        _, err := file.Read(b)
+	state := &parserState{}
+	for {
+		b := make([]byte, 1)
+		_, err := file.Read(b)
 
-        // eof
-        if err == io.EOF {
-            break
-        }
+		// eof
+		if err == io.EOF {
+			break
+		}
 
-        // some other error
-        if err != nil {
-            return err
-        }
+		// some other error
+		if err != nil {
+			return err
+		}
 
-        // handle the character
-        err = conf.handleCharacter(state, b[0])
+		// handle the character
+		err = conf.handleCharacter(state, b[0])
 
-        // character error
-        if err != nil {
-            return err
-        }
-    }
+		// character error
+		if err != nil {
+			return err
+		}
+	}
 
-    return nil
+	return nil
 }
 
-func (conf *Config) handleCharacter(state parserState, b byte) error {
+func (conf *Config) handleCharacter(state *parserState, b byte) error {
 
-    // this character is escaped
-    if state.escaped {
-        b = 0
-        state.escaped = false
-    }
+	// this character is escaped
+	if state.escaped {
+		b = 0
+		state.escaped = false
+	}
 
-    switch b {
+BYTE:
+	switch b {
 
-    // comment entrance
-    case '*':
-        if state.lastByte == '/' {
-            state.increaseCommentLevel()
-            break
-        }
-        fallthrough
+	// comment entrance
+	case '*':
+		if state.lastByte == '/' {
+			state.increaseCommentLevel()
+			break
+		}
+		fallthrough
 
-    // comment closure
-    case '/':
-        if state.lastByte == '*' {
-            state.decreaseCommentLevel()
-            break
-        }
-        fallthrough
+	// comment closure
+	case '/':
+		if state.lastByte == '*' && state.inComment {
+			state.decreaseCommentLevel()
+			break
+		}
+		fallthrough
 
-    // escape
-    case '\\':
-        state.escaped = true
+	// escape
+	case '\\':
+		state.escaped = true
 
-    default:
+	// start of a variable
+	case '@':
 
-        // we're in a comment; ignore this
-        if state.inComment {
-            break
-        }
-    }
-    return nil
+		// we're already in a variable name
+		if state.buffType == VAR_NAME {
+			return errors.New("Invalid @ in variable name @" + state.buffer.String())
+		}
+
+		// we're not in a value, so this starts a variable
+		if state.buffType == 0 {
+			log.Println("Starting variable name")
+			state.startBuffer(VAR_NAME)
+			break
+		}
+
+		fallthrough
+
+	// end of variable name
+	case ':':
+
+		// we're in the var name, so terminate it
+		if state.buffType == VAR_NAME {
+			name := state.endBuffer()
+			log.Println("Got variable name: @" + name)
+			state.startBuffer(VAR_VALUE)
+			break
+		}
+
+		fallthrough
+
+	// end of a variable definition
+	case ';':
+
+		switch state.buffType {
+
+		// terminating a boolean
+		case VAR_NAME:
+			state.endBuffer()
+			log.Println("Got boolean")
+			break BYTE
+
+		// terminating a string
+		case VAR_VALUE:
+			str := state.endBuffer()
+			log.Println("Got string: " + str)
+			break BYTE
+		}
+
+		fallthrough
+
+	default:
+
+		// we're in a comment; ignore this
+		if state.inComment {
+			break
+		}
+
+		// otherwise, write this to the current buffer
+		if state.buffer != nil {
+			state.buffer.WriteByte(b)
+		}
+	}
+
+	state.lastByte = b
+	return nil
 }
 
 func (conf *Config) Get(varName string) string {
-    return ""
+	return ""
 }
 
 func (conf *Config) GetBool(varName string) bool {
-    if str := conf.Get(varName); str == "" {
-        return false
-    }
-    return true
+	if str := conf.Get(varName); str == "" {
+		return false
+	}
+	return true
 }
