@@ -17,8 +17,8 @@ const (
 )
 
 type Config struct {
-	Path string
-    vars map[string]interface{}
+	path string
+	vars map[string]interface{}
 }
 
 // parser state info
@@ -29,6 +29,7 @@ type parserState struct {
 	escaped      bool          // true if the current byte is escaped
 	buffer       *bytes.Buffer // current buffer
 	buffType     uint8         // type of buffer
+    varName      string        // current variable name
 }
 
 // increase block comment level
@@ -72,21 +73,20 @@ func (state *parserState) endBuffer() string {
 // new config
 func New(path string) *Config {
 	return &Config{
-        Path: path,
-        vars: make(map[string]interface{}),
-    }
+		path: path,
+		vars: make(map[string]interface{}),
+	}
 }
-
 
 // parse config
 func (conf *Config) Parse() error {
 
 	// open the config
-	file, err := os.Open(conf.Path)
+	file, err := os.Open(conf.path)
 	if err != nil {
 		return err
 	}
-    defer file.Close()
+	defer file.Close()
 
 	state := &parserState{}
 	for {
@@ -128,14 +128,12 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 	if state.lastByte == '/' && b == '*' {
 
 		// comment entrance
-		log.Println("Increasing comment level")
 		state.increaseCommentLevel()
 		return nil
 
 	} else if state.lastByte == '*' && b == '/' {
 
 		// comment closure
-		log.Println("Decreasing comment level")
 		state.decreaseCommentLevel()
 		return nil
 
@@ -163,7 +161,6 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 		if state.buffType != NO_BUF {
 			goto realDefault
 		}
-		log.Println("Starting variable name")
 		state.startBuffer(VAR_NAME)
 
 	// end of variable name
@@ -173,8 +170,7 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 		if state.buffType != VAR_NAME {
 			goto realDefault
 		}
-		name := state.endBuffer()
-		log.Println("Got variable name: @" + name)
+		state.varName = state.endBuffer()
 		state.startBuffer(VAR_VALUE)
 
 	// end of a variable definition
@@ -184,13 +180,13 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 
 			// terminating a boolean
 			state.endBuffer()
-			log.Println("Got boolean")
+			conf.Set(state.varName, "1")
 
 		} else if state.buffType == VAR_VALUE {
 
 			// terminating a string
-			str := strings.TrimSpace(state.endBuffer())
-			log.Println("Got string: " + str)
+			value := strings.TrimSpace(state.endBuffer())
+			conf.Set(state.varName, value)
 
 		} else {
 			goto realDefault
@@ -220,55 +216,81 @@ realDefault:
 }
 
 // return the map
-func getWhere(where map[string]interface{}, name string) map[string]interface{} {
+func (conf *Config) getWhere(varName string, createAsNeeded bool) (map[string]interface{}, string) {
 
-    // find interface
-    iface := where[name]
-    if iface == nil {
-        return nil
-    }
+    // split up into parts
+	var parts = strings.Split(varName, ".")
+	if len(parts) == 0 {
+		return nil, ""
+	}
 
-    // find map
-    switch aMap := iface.(type) {
-    case map[string]interface{}:
-        return aMap
-    }
+	// the last one is the final variable name
+	lastPart, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
-    return nil
+	// start with the main map
+	where := conf.vars
+
+	// for each part, fetch the map inside
+	for _, part := range parts {
+
+        // find interface
+    	iface := where[part]
+    	if iface == nil {
+            if !createAsNeeded {
+                return nil, ""
+            }
+
+            // maybe create a map
+            iface = make(map[string]interface{})
+            where[part] = iface
+    	}
+
+    	// find map
+    	switch aMap := iface.(type) {
+    	case map[string]interface{}:
+    		where = aMap
+
+        // nothing there; give up
+        default:
+            return nil, ""
+    	}
+	}
+
+	return where, lastPart
 }
 
 // get string value
 func (conf *Config) Get(varName string) string {
 
-    // split up into parts
-    var parts = strings.Split(varName, ".")
-    if len(parts) == 0 {
+    // get the map
+    where, lastPart := conf.getWhere(varName, false)
+    if where == nil {
+        log.Println("config: Could not Get @" + varName)
         return ""
     }
 
-    // the last one is the final variable name
-    lastPart, parts := parts[len(parts)-1], parts[:len(parts)-1]
-
-    // start with the main map
-    where := conf.vars
-
-    // for each part, fetch the map inside
-    for _, part := range parts {
-        where = getWhere(where, part)
-        log.Println("PART: " + part, " -> ", where)
-
-        // nothing there, give up
-        if where == nil {
-            return ""
-        }
+	// get the string value
+	iface := where[lastPart]
+    switch str := iface.(type) {
+    case string:
+        return str
     }
 
-    // get the string value
-    iface := where[lastPart]
-    if iface == nil {
-        return ""
+    log.Println("config: @" + varName + "is not a string")
+	return ""
+}
+
+func (conf *Config) Set(varName string, value string) {
+
+    // get the map
+    where, lastPart := conf.getWhere(varName, true)
+    if where == nil {
+        log.Println("config: Could not Set @" + varName)
+        return
     }
-	return iface.(string)
+
+	// set the string value
+    where[lastPart] = value
 }
 
 // get bool value
