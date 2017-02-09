@@ -22,5 +22,12 @@ func main() {
 	log.Println("Map of strings:", conf.GetStringMap("server.wiki.testwiki"))
 
 	http.Handle("/image/", http.StripPrefix("/image/", http.FileServer(http.Dir("."))))
-	log.Fatal(http.ListenAndServe(":12345", nil))
+
+	// port not configured
+	port := conf.Get("server.http.port")
+	if port == "" {
+		log.Fatal("Please configure @server.http.port")
+	}
+
+	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
 }

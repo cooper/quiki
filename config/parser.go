@@ -2,7 +2,10 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -48,12 +51,18 @@ func (conf *Config) Parse() error {
 		}
 	}
 
+	state.line = 0
 	return nil
 }
 
 // produce a warning
 func (conf *Config) warn(msg string) {
-	log.Printf("%s:%d: %s\n", conf.path, *conf.line, msg)
+	line := *conf.line
+	if line == 0 {
+		log.Printf("%s: %s\n", conf.path, msg)
+		return
+	}
+	log.Printf("%s:%d: %s\n", conf.path, line, msg)
 }
 
 // handle one byte

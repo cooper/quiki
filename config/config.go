@@ -1,12 +1,5 @@
 package config
 
-import (
-	"errors"
-	"fmt"
-	"io"
-	"os"
-)
-
 // configuration, fetch conf values with conf.Get()
 type Config struct {
 	path string                 // file path
@@ -83,6 +76,7 @@ func (conf *Config) GetStringMap(varName string) map[string]string {
 	return stringMap
 }
 
+// set string value
 func (conf *Config) Set(varName string, value string) {
 
 	// get the map
