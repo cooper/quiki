@@ -19,6 +19,7 @@ func main() {
 	}
 	log.Println(conf)
 	log.Println("Get:", conf.Get("server.wiki.testwiki.config"))
+	log.Println("Map of strings:", conf.GetStringMap("server.wiki.testwiki"))
 
 	http.Handle("/image/", http.StripPrefix("/image/", http.FileServer(http.Dir("."))))
 	log.Fatal(http.ListenAndServe(":12345", nil))

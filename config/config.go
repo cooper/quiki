@@ -100,7 +100,7 @@ func (state *parserState) startBuffer(t buffType) {
 // destroy a buffer, returning its contents
 func (state *parserState) endBuffer() string {
 
-	// there are no buffers
+	// there are no buffers; this is a bug
 	if len(state.buffers) == 0 {
 		log.Fatal("config: endBuffer() called with no buffers")
 	}
@@ -414,10 +414,48 @@ func (conf *Config) Get(varName string) string {
 		return str
 	case nil:
 		return ""
+	default:
+		conf.warn("@" + varName + " is not a string")
 	}
 
-	conf.warn("@" + varName + " is not a string")
 	return ""
+}
+
+// get map
+func (conf *Config) GetMap(varName string) map[string]interface{} {
+
+	// get the location
+	where, lastPart := conf.getWhere(varName, false)
+	if where == nil {
+		conf.warn("could not GetMap @" + varName)
+		return nil
+	}
+
+	// get the map value
+	iface := where[lastPart]
+	switch aMap := iface.(type) {
+	case map[string]interface{}:
+		return aMap
+	case nil:
+		return nil
+	default:
+		conf.warn("@" + varName + " is not a map")
+	}
+
+	return nil
+}
+
+// get map with only string values
+func (conf *Config) GetStringMap(varName string) map[string]string {
+	aMap := conf.GetMap(varName)
+	stringMap := make(map[string]string, len(aMap))
+	for key, iface := range aMap {
+		switch str := iface.(type) {
+		case string:
+			stringMap[key] = str
+		}
+	}
+	return stringMap
 }
 
 func (conf *Config) Set(varName string, value string) {
