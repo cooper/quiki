@@ -10,27 +10,35 @@ import (
 )
 
 // buffer types
+type buffType uint8
+
 const (
 	NO_BUF    = iota // no buffer
 	VAR_NAME  = iota // variable name
 	VAR_VALUE = iota // string variable value
 )
 
+// configuration, fetch conf values with conf.Get()
 type Config struct {
 	path string
 	vars map[string]interface{}
 }
 
+// defines a buffer and its type
+type bufferInfo struct {
+	buffer   *bytes.Buffer
+	buffType buffType
+}
+
 // parser state info
 type parserState struct {
-	lastByte     byte          // previous byte
-	commentLevel uint8         // comment level
-	inComment    bool          // true if in a comment
-	escaped      bool          // true if the current byte is escaped
-	buffer       *bytes.Buffer // current buffer
-	buffType     uint8         // type of buffer
-	varName      string        // current variable name
-	varPercent   bool          // true if current variable is a %var
+	lastByte     byte         // previous byte
+	commentLevel buffType     // comment level
+	inComment    bool         // true if in a comment
+	escaped      bool         // true if the current byte is escaped
+	buffers      []bufferInfo // buffers
+	varName      string       // current variable name
+	varPercent   bool         // true if current variable is a %var
 }
 
 // increase block comment level
@@ -51,24 +59,54 @@ func (state *parserState) decreaseCommentLevel() {
 
 // remove the last N bytes from the buffer
 func (state *parserState) removeLastNBytes(n int) {
-	if state.buffer == nil || state.buffer.Len() < n {
+	if state.buffer() == nil || state.buffer().Len() < n {
 		return
 	}
-	state.buffer.Truncate(state.buffer.Len() - n)
+	state.buffer().Truncate(state.buffer().Len() - n)
+}
+
+// get the current buffer
+func (state *parserState) buffer() *bytes.Buffer {
+
+	// there are no buffers
+	if len(state.buffers) == 0 {
+		return nil
+	}
+
+	return state.buffers[len(state.buffers)-1].buffer
+}
+
+// get the current buffer type
+func (state *parserState) buffType() buffType {
+
+	// there are no buffers
+	if len(state.buffers) == 0 {
+		return NO_BUF
+	}
+
+	return state.buffers[len(state.buffers)-1].buffType
 }
 
 // start a new buffer
-func (state *parserState) startBuffer(t uint8) {
-	state.buffer = new(bytes.Buffer)
-	state.buffType = t
+func (state *parserState) startBuffer(t buffType) {
+	buff := bufferInfo{new(bytes.Buffer), t}
+	state.buffers = append(state.buffers, buff)
 }
 
 // destroy a buffer, returning its contents
 func (state *parserState) endBuffer() string {
-	str := state.buffer.String()
-	state.buffer = nil
-	state.buffType = NO_BUF
-	return str
+
+	// there are no buffers
+	if len(state.buffers) == 0 {
+		log.Fatal("config: endBuffer() called with no buffers")
+	}
+
+	// pop the last buffer
+	buffs := state.buffers
+	buff, buffs := buffs[len(buffs)-1], buffs[:len(buffs)-1]
+	state.buffers = buffs
+
+	return buff.buffer.String()
 }
 
 // destroy the current variable state, returning the variable name
@@ -97,7 +135,9 @@ func (conf *Config) Parse() error {
 	}
 	defer file.Close()
 
-	state := &parserState{}
+	state := &parserState{
+		buffers: make([]bufferInfo, 3),
+	}
 	for {
 		b := make([]byte, 1)
 		_, err := file.Read(b)
@@ -162,40 +202,52 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 	case '@', '%':
 
 		// we're already in a variable name
-		if state.buffType == VAR_NAME {
-			return errors.New("Already in variable name @" + state.buffer.String())
+		if state.buffType() == VAR_NAME {
+			return errors.New("Already in variable name @" + state.endBuffer())
 		}
 
-		// we're not in a value, so this starts a variable
-		if state.buffType != NO_BUF {
+		// this is only allowed at the top level
+		if state.buffType() != NO_BUF {
 			goto realDefault
 		}
+
+		// we're not in a value, so this starts a variable name
 		state.varPercent = b == '%'
 		state.startBuffer(VAR_NAME)
 
-	// end of variable name
+	// end of variable name, start of string value
 	case ':':
 
-		// we're in the var name, so terminate it
-		if state.buffType != VAR_NAME {
+		// not in a variable name
+		if state.buffType() != VAR_NAME {
 			goto realDefault
 		}
+
+		// we're in the var name, so terminate it
 		state.varName = state.endBuffer()
 		state.startBuffer(VAR_VALUE)
+
+	case '[':
+
+		// we aren't in a variable value, or maybe
+		// the current variable does not allow interpolation
+		if state.buffType() != VAR_VALUE || state.varPercent {
+			goto realDefault
+		}
 
 	// end of a variable definition
 	case ';':
 
-		if state.buffType == VAR_NAME {
+		if state.buffType() == VAR_NAME {
 
 			// terminating a boolean
 			state.endBuffer()
 			conf.Set(state.getVariable(), "1")
 
-		} else if state.buffType == VAR_VALUE {
+		} else if state.buffType() == VAR_VALUE {
 
 			// terminating a string
-			value := conf.parseFormatting(state, state.endBuffer())
+			value := strings.TrimSpace(state.endBuffer())
 			conf.Set(state.getVariable(), value)
 
 		} else {
@@ -218,8 +270,8 @@ realDefault:
 	}
 
 	// otherwise, write this to the current buffer
-	if state.buffer != nil {
-		state.buffer.WriteByte(b)
+	if state.buffer() != nil {
+		state.buffer().WriteByte(b)
 	}
 
 	return nil
@@ -267,20 +319,6 @@ func (conf *Config) getWhere(varName string, createAsNeeded bool) (map[string]in
 	}
 
 	return where, lastPart
-}
-
-// parse formatted text
-func (conf *Config) parseFormatting(state *parserState, format string) string {
-
-	// trim whitespace before anything else
-	format = strings.TrimSpace(format)
-
-	// this is a %var, so we shouldn't format it
-	if state.varPercent {
-		return format
-	}
-
-	return "TODO"
 }
 
 // get string value
