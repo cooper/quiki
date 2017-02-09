@@ -3,6 +3,7 @@ package config
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -13,15 +14,17 @@ import (
 type buffType uint8
 
 const (
-	NO_BUF    = iota // no buffer
-	VAR_NAME  = iota // variable name
-	VAR_VALUE = iota // string variable value
+	NO_BUF     = iota // no buffer
+	VAR_NAME   = iota // variable name
+	VAR_VALUE  = iota // string variable value
+	VAR_FORMAT = iota // formatted text in between square brackets
 )
 
 // configuration, fetch conf values with conf.Get()
 type Config struct {
-	path string
-	vars map[string]interface{}
+	path string                 // file path
+	vars map[string]interface{} // root variable map
+	line *uint                  // current line for warnings and errors
 }
 
 // defines a buffer and its type
@@ -39,6 +42,7 @@ type parserState struct {
 	buffers      []bufferInfo // buffers
 	varName      string       // current variable name
 	varPercent   bool         // true if current variable is a %var
+	line         uint         // line number
 }
 
 // increase block comment level
@@ -89,8 +93,8 @@ func (state *parserState) buffType() buffType {
 
 // start a new buffer
 func (state *parserState) startBuffer(t buffType) {
-	buff := bufferInfo{new(bytes.Buffer), t}
-	state.buffers = append(state.buffers, buff)
+	buf := bufferInfo{new(bytes.Buffer), t}
+	state.buffers = append(state.buffers, buf)
 }
 
 // destroy a buffer, returning its contents
@@ -102,11 +106,11 @@ func (state *parserState) endBuffer() string {
 	}
 
 	// pop the last buffer
-	buffs := state.buffers
-	buff, buffs := buffs[len(buffs)-1], buffs[:len(buffs)-1]
-	state.buffers = buffs
+	bufs := state.buffers
+	buf, bufs := bufs[len(bufs)-1], bufs[:len(bufs)-1]
+	state.buffers = bufs
 
-	return buff.buffer.String()
+	return buf.buffer.String()
 }
 
 // destroy the current variable state, returning the variable name
@@ -135,9 +139,13 @@ func (conf *Config) Parse() error {
 	}
 	defer file.Close()
 
+	// initial state
 	state := &parserState{
-		buffers: make([]bufferInfo, 3),
+		line:    1,
+		buffers: make([]bufferInfo, 0, 3),
 	}
+	conf.line = &state.line
+
 	for {
 		b := make([]byte, 1)
 		_, err := file.Read(b)
@@ -156,13 +164,19 @@ func (conf *Config) Parse() error {
 		err = conf.handleByte(state, b[0])
 		state.lastByte = b[0]
 
-		// acter error
+		// byte error
 		if err != nil {
+			err = errors.New(fmt.Sprintf("%s:%d: %s", conf.path, *conf.line, err.Error()))
 			return err
 		}
 	}
 
 	return nil
+}
+
+// produce a warning
+func (conf *Config) warn(msg string) {
+	log.Printf("%s:%d: %s\n", conf.path, *conf.line, msg)
 }
 
 // handle one byte
@@ -227,13 +241,46 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 		state.varName = state.endBuffer()
 		state.startBuffer(VAR_VALUE)
 
+		// start of a text format
 	case '[':
+
+		// we're already in a text format.
+		// this is supported by wikifier but not here
+		if state.buffType() == VAR_FORMAT {
+			return errors.New("Square brackets in format not yet supported")
+		}
 
 		// we aren't in a variable value, or maybe
 		// the current variable does not allow interpolation
 		if state.buffType() != VAR_VALUE || state.varPercent {
 			goto realDefault
 		}
+
+		// otherwise, this starts a formatting token
+		state.startBuffer(VAR_FORMAT)
+
+	// end of a text format
+	case ']':
+
+		// not in a format
+		if state.buffType() != VAR_FORMAT {
+			goto realDefault
+		}
+
+		// otherwise, this terminates a formatting token
+		tok := state.endBuffer()
+
+		// parse the formatting token
+		err, newVal := conf.getFormattingToken(tok, false)
+		if err != nil {
+			return err
+		}
+		if newVal == "" {
+			conf.warn("[" + tok + "] yields empty string")
+		}
+
+		// add the value returned by it to the variable value buffer
+		state.buffer().WriteString(newVal)
 
 	// end of a variable definition
 	case ';':
@@ -253,7 +300,10 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 		} else {
 			goto realDefault
 		}
-		break
+
+	case '\n':
+		state.line++
+		goto realDefault
 
 	default:
 		goto realDefault
@@ -275,6 +325,32 @@ realDefault:
 	}
 
 	return nil
+}
+
+// return the value of a formatting token
+func (conf *Config) getFormattingToken(tok string, disableVars bool) (error, string) {
+
+	// normal variable
+	if strings.HasPrefix(tok, "@") {
+		if disableVars {
+			goto badVariable
+		}
+		return nil, conf.Get(strings.TrimPrefix(tok, "@"))
+	}
+
+	// interpolable variable
+	if strings.HasPrefix(tok, "%") {
+		if disableVars {
+			goto badVariable
+		}
+		val := strings.TrimPrefix("tok", "%")
+		return conf.getFormattingToken(val, true)
+	}
+
+	return errors.New("Unknown formatting token [" + tok + "]"), ""
+
+badVariable:
+	return errors.New("Recursive variable " + tok + " detected"), ""
 }
 
 // return the map and attribute name for a variable name
@@ -327,7 +403,7 @@ func (conf *Config) Get(varName string) string {
 	// get the map
 	where, lastPart := conf.getWhere(varName, false)
 	if where == nil {
-		log.Println("config: Could not Get @" + varName)
+		conf.warn("could not Get @" + varName)
 		return ""
 	}
 
@@ -336,9 +412,11 @@ func (conf *Config) Get(varName string) string {
 	switch str := iface.(type) {
 	case string:
 		return str
+	case nil:
+		return ""
 	}
 
-	log.Println("config: @" + varName + "is not a string")
+	conf.warn("@" + varName + " is not a string")
 	return ""
 }
 
@@ -347,7 +425,7 @@ func (conf *Config) Set(varName string, value string) {
 	// get the map
 	where, lastPart := conf.getWhere(varName, true)
 	if where == nil {
-		log.Println("config: Could not Set @" + varName)
+		conf.warn("could not Set @" + varName)
 		return
 	}
 
