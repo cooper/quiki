@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -29,7 +30,7 @@ type parserState struct {
 
 // increase block comment level
 func (state *parserState) increaseCommentLevel() {
-	state.removeLastCharacter()
+	state.removeLastNBytes(1)
 	state.commentLevel++
 	state.inComment = true
 }
@@ -43,11 +44,12 @@ func (state *parserState) decreaseCommentLevel() {
 	state.inComment = state.commentLevel != 0
 }
 
-func (state *parserState) removeLastCharacter() {
-	if state.buffer == nil || state.buffer.Len() < 1 {
+// remove the last N bytes from the buffer
+func (state *parserState) removeLastNBytes(n int) {
+	if state.buffer == nil || state.buffer.Len() < n {
 		return
 	}
-	state.buffer.Truncate(state.buffer.Len() - 1)
+	state.buffer.Truncate(state.buffer.Len() - n)
 }
 
 // start a new buffer
@@ -168,13 +170,18 @@ func (conf *Config) handleCharacter(state *parserState, b byte) error {
 	// end of a variable definition
 	case ';':
 
-		// terminating a boolean
 		if state.buffType == VAR_NAME {
+
+			// terminating a boolean
 			state.endBuffer()
 			log.Println("Got boolean")
+
 		} else if state.buffType == VAR_VALUE {
-			str := state.endBuffer()
+
+			// terminating a string
+			str := strings.TrimSpace(state.endBuffer())
 			log.Println("Got string: " + str)
+
 		} else {
 			goto realDefault
 		}
@@ -202,13 +209,19 @@ realDefault:
 	return nil
 }
 
+// get string value
 func (conf *Config) Get(varName string) string {
 	return ""
 }
 
+// get bool value
 func (conf *Config) GetBool(varName string) bool {
-	if str := conf.Get(varName); str == "" {
-		return false
+	return isTrueString(conf.Get(varName))
+}
+
+func isTrueString(str string) bool {
+	if str == "" || str == "0" {
+		return true
 	}
-	return true
+	return false
 }
