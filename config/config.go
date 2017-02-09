@@ -29,7 +29,8 @@ type parserState struct {
 	escaped      bool          // true if the current byte is escaped
 	buffer       *bytes.Buffer // current buffer
 	buffType     uint8         // type of buffer
-    varName      string        // current variable name
+	varName      string        // current variable name
+	varPercent   bool          // true if current variable is a %var
 }
 
 // increase block comment level
@@ -62,12 +63,20 @@ func (state *parserState) startBuffer(t uint8) {
 	state.buffType = t
 }
 
-// destroy a buffer
+// destroy a buffer, returning its contents
 func (state *parserState) endBuffer() string {
 	str := state.buffer.String()
 	state.buffer = nil
 	state.buffType = NO_BUF
 	return str
+}
+
+// destroy the current variable state, returning the variable name
+func (state *parserState) getVariable() string {
+	name := state.varName
+	state.varName = ""
+	state.varPercent = false
+	return name
 }
 
 // new config
@@ -149,18 +158,19 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 	case '\\':
 		state.escaped = true
 
-	// start of a variable
-	case '@':
+		// start of a variable
+	case '@', '%':
 
 		// we're already in a variable name
 		if state.buffType == VAR_NAME {
-			return errors.New("Invalid @ in variable name @" + state.buffer.String())
+			return errors.New("Already in variable name @" + state.buffer.String())
 		}
 
 		// we're not in a value, so this starts a variable
 		if state.buffType != NO_BUF {
 			goto realDefault
 		}
+		state.varPercent = b == '%'
 		state.startBuffer(VAR_NAME)
 
 	// end of variable name
@@ -180,13 +190,13 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 
 			// terminating a boolean
 			state.endBuffer()
-			conf.Set(state.varName, "1")
+			conf.Set(state.getVariable(), "1")
 
 		} else if state.buffType == VAR_VALUE {
 
 			// terminating a string
-			value := strings.TrimSpace(state.endBuffer())
-			conf.Set(state.varName, value)
+			value := conf.parseFormatting(state, state.endBuffer())
+			conf.Set(state.getVariable(), value)
 
 		} else {
 			goto realDefault
@@ -215,10 +225,10 @@ realDefault:
 	return nil
 }
 
-// return the map
+// return the map and attribute name for a variable name
 func (conf *Config) getWhere(varName string, createAsNeeded bool) (map[string]interface{}, string) {
 
-    // split up into parts
+	// split up into parts
 	var parts = strings.Split(varName, ".")
 	if len(parts) == 0 {
 		return nil, ""
@@ -233,64 +243,78 @@ func (conf *Config) getWhere(varName string, createAsNeeded bool) (map[string]in
 	// for each part, fetch the map inside
 	for _, part := range parts {
 
-        // find interface
-    	iface := where[part]
-    	if iface == nil {
-            if !createAsNeeded {
-                return nil, ""
-            }
+		// find interface
+		iface := where[part]
+		if iface == nil {
+			if !createAsNeeded {
+				return nil, ""
+			}
 
-            // maybe create a map
-            iface = make(map[string]interface{})
-            where[part] = iface
-    	}
+			// maybe create a map
+			iface = make(map[string]interface{})
+			where[part] = iface
+		}
 
-    	// find map
-    	switch aMap := iface.(type) {
-    	case map[string]interface{}:
-    		where = aMap
+		// find map
+		switch aMap := iface.(type) {
+		case map[string]interface{}:
+			where = aMap
 
-        // nothing there; give up
-        default:
-            return nil, ""
-    	}
+		// nothing there; give up
+		default:
+			return nil, ""
+		}
 	}
 
 	return where, lastPart
 }
 
+// parse formatted text
+func (conf *Config) parseFormatting(state *parserState, format string) string {
+
+	// trim whitespace before anything else
+	format = strings.TrimSpace(format)
+
+	// this is a %var, so we shouldn't format it
+	if state.varPercent {
+		return format
+	}
+
+	return "TODO"
+}
+
 // get string value
 func (conf *Config) Get(varName string) string {
 
-    // get the map
-    where, lastPart := conf.getWhere(varName, false)
-    if where == nil {
-        log.Println("config: Could not Get @" + varName)
-        return ""
-    }
+	// get the map
+	where, lastPart := conf.getWhere(varName, false)
+	if where == nil {
+		log.Println("config: Could not Get @" + varName)
+		return ""
+	}
 
 	// get the string value
 	iface := where[lastPart]
-    switch str := iface.(type) {
-    case string:
-        return str
-    }
+	switch str := iface.(type) {
+	case string:
+		return str
+	}
 
-    log.Println("config: @" + varName + "is not a string")
+	log.Println("config: @" + varName + "is not a string")
 	return ""
 }
 
 func (conf *Config) Set(varName string, value string) {
 
-    // get the map
-    where, lastPart := conf.getWhere(varName, true)
-    if where == nil {
-        log.Println("config: Could not Set @" + varName)
-        return
-    }
+	// get the map
+	where, lastPart := conf.getWhere(varName, true)
+	if where == nil {
+		log.Println("config: Could not Set @" + varName)
+		return
+	}
 
 	// set the string value
-    where[lastPart] = value
+	where[lastPart] = value
 }
 
 // get bool value
