@@ -9,16 +9,19 @@ import (
 	"strings"
 )
 
-type Config struct {
-	Path string
-}
-
+// buffer types
 const (
 	NO_BUF    = iota // no buffer
 	VAR_NAME  = iota // variable name
 	VAR_VALUE = iota // string variable value
 )
 
+type Config struct {
+	Path string
+    vars map[string]interface{}
+}
+
+// parser state info
 type parserState struct {
 	lastByte     byte          // previous byte
 	commentLevel uint8         // comment level
@@ -66,18 +69,24 @@ func (state *parserState) endBuffer() string {
 	return str
 }
 
+// new config
 func New(path string) *Config {
-	return &Config{Path: path}
+	return &Config{
+        Path: path,
+        vars: make(map[string]interface{}),
+    }
 }
 
+
+// parse config
 func (conf *Config) Parse() error {
 
 	// open the config
 	file, err := os.Open(conf.Path)
-	defer file.Close()
 	if err != nil {
 		return err
 	}
+    defer file.Close()
 
 	state := &parserState{}
 	for {
@@ -95,10 +104,10 @@ func (conf *Config) Parse() error {
 		}
 
 		// handle the character
-		err = conf.handleCharacter(state, b[0])
+		err = conf.handleByte(state, b[0])
 		state.lastByte = b[0]
 
-		// character error
+		// acter error
 		if err != nil {
 			return err
 		}
@@ -107,7 +116,8 @@ func (conf *Config) Parse() error {
 	return nil
 }
 
-func (conf *Config) handleCharacter(state *parserState, b byte) error {
+// handle one byte
+func (conf *Config) handleByte(state *parserState, b byte) error {
 
 	// this character is escaped
 	if state.escaped {
@@ -209,9 +219,56 @@ realDefault:
 	return nil
 }
 
+// return the map
+func getWhere(where map[string]interface{}, name string) map[string]interface{} {
+
+    // find interface
+    iface := where[name]
+    if iface == nil {
+        return nil
+    }
+
+    // find map
+    switch aMap := iface.(type) {
+    case map[string]interface{}:
+        return aMap
+    }
+
+    return nil
+}
+
 // get string value
 func (conf *Config) Get(varName string) string {
-	return ""
+
+    // split up into parts
+    var parts = strings.Split(varName, ".")
+    if len(parts) == 0 {
+        return ""
+    }
+
+    // the last one is the final variable name
+    lastPart, parts := parts[len(parts)-1], parts[:len(parts)-1]
+
+    // start with the main map
+    where := conf.vars
+
+    // for each part, fetch the map inside
+    for _, part := range parts {
+        where = getWhere(where, part)
+        log.Println("PART: " + part, " -> ", where)
+
+        // nothing there, give up
+        if where == nil {
+            return ""
+        }
+    }
+
+    // get the string value
+    iface := where[lastPart]
+    if iface == nil {
+        return ""
+    }
+	return iface.(string)
 }
 
 // get bool value
@@ -219,6 +276,7 @@ func (conf *Config) GetBool(varName string) bool {
 	return isTrueString(conf.Get(varName))
 }
 
+// string variable value is true or no?
 func isTrueString(str string) bool {
 	if str == "" || str == "0" {
 		return true

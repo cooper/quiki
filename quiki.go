@@ -18,6 +18,7 @@ func main() {
 		log.Fatal("Configuration error: ", err)
 	}
 	log.Println(conf)
+    log.Println("Get:", conf.Get("server.wiki.testwiki.config"))
 
 	http.Handle("/image/", http.StripPrefix("/image/", http.FileServer(http.Dir("."))))
 	log.Fatal(http.ListenAndServe(":12345", nil))
