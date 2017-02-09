@@ -36,7 +36,6 @@ func (state *parserState) increaseCommentLevel() {
 
 // decrease block comment level
 func (state *parserState) decreaseCommentLevel() {
-	state.removeLastCharacter()
 	if state.commentLevel <= 0 {
 		return
 	}
@@ -95,7 +94,7 @@ func (conf *Config) Parse() error {
 
 		// handle the character
 		err = conf.handleCharacter(state, b[0])
-        state.lastByte = b[0]
+		state.lastByte = b[0]
 
 		// character error
 		if err != nil {
@@ -114,23 +113,27 @@ func (conf *Config) handleCharacter(state *parserState, b byte) error {
 		state.escaped = false
 	}
 
-	switch b {
+	if state.lastByte == '/' && b == '*' {
 
-	// comment entrance
-	case '*':
-		if state.lastByte != '/' {
-			goto realDefault
-		}
+		// comment entrance
 		log.Println("Increasing comment level")
 		state.increaseCommentLevel()
+		return nil
 
-	// comment closure
-	case '/':
-		if state.lastByte != '*' || !state.inComment {
-			goto realDefault
-		}
+	} else if state.lastByte == '*' && b == '/' {
+
+		// comment closure
 		log.Println("Decreasing comment level")
 		state.decreaseCommentLevel()
+		return nil
+
+	} else if state.inComment {
+
+		// we're in a comment currently
+		return nil
+	}
+
+	switch b {
 
 	// escape
 	case '\\':
@@ -181,7 +184,7 @@ func (conf *Config) handleCharacter(state *parserState, b byte) error {
 		goto realDefault
 	}
 
-    // this is skipped if going to realDefault
+	// this is skipped if going to realDefault
 	return nil
 
 realDefault:
