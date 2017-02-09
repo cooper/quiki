@@ -1,0 +1,5 @@
+.goutputstream*
+*~
+*.old
+quiki
+quiki.conf
