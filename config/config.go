@@ -95,6 +95,7 @@ func (conf *Config) Parse() error {
 
 		// handle the character
 		err = conf.handleCharacter(state, b[0])
+        state.lastByte = b[0]
 
 		// character error
 		if err != nil {
@@ -113,24 +114,23 @@ func (conf *Config) handleCharacter(state *parserState, b byte) error {
 		state.escaped = false
 	}
 
-BYTE:
 	switch b {
 
 	// comment entrance
 	case '*':
-		if state.lastByte == '/' {
-			state.increaseCommentLevel()
-			break
+		if state.lastByte != '/' {
+			goto realDefault
 		}
-		fallthrough
+		log.Println("Increasing comment level")
+		state.increaseCommentLevel()
 
 	// comment closure
 	case '/':
-		if state.lastByte == '*' && state.inComment {
-			state.decreaseCommentLevel()
-			break
+		if state.lastByte != '*' || !state.inComment {
+			goto realDefault
 		}
-		fallthrough
+		log.Println("Decreasing comment level")
+		state.decreaseCommentLevel()
 
 	// escape
 	case '\\':
@@ -145,61 +145,57 @@ BYTE:
 		}
 
 		// we're not in a value, so this starts a variable
-		if state.buffType == 0 {
-			log.Println("Starting variable name")
-			state.startBuffer(VAR_NAME)
-			break
+		if state.buffType != NO_BUF {
+			goto realDefault
 		}
-
-		fallthrough
+		log.Println("Starting variable name")
+		state.startBuffer(VAR_NAME)
 
 	// end of variable name
 	case ':':
 
 		// we're in the var name, so terminate it
-		if state.buffType == VAR_NAME {
-			name := state.endBuffer()
-			log.Println("Got variable name: @" + name)
-			state.startBuffer(VAR_VALUE)
-			break
+		if state.buffType != VAR_NAME {
+			goto realDefault
 		}
-
-		fallthrough
+		name := state.endBuffer()
+		log.Println("Got variable name: @" + name)
+		state.startBuffer(VAR_VALUE)
 
 	// end of a variable definition
 	case ';':
 
-		switch state.buffType {
-
 		// terminating a boolean
-		case VAR_NAME:
+		if state.buffType == VAR_NAME {
 			state.endBuffer()
 			log.Println("Got boolean")
-			break BYTE
-
-		// terminating a string
-		case VAR_VALUE:
+		} else if state.buffType == VAR_VALUE {
 			str := state.endBuffer()
 			log.Println("Got string: " + str)
-			break BYTE
+		} else {
+			goto realDefault
 		}
-
-		fallthrough
+		break
 
 	default:
-
-		// we're in a comment; ignore this
-		if state.inComment {
-			break
-		}
-
-		// otherwise, write this to the current buffer
-		if state.buffer != nil {
-			state.buffer.WriteByte(b)
-		}
+		goto realDefault
 	}
 
-	state.lastByte = b
+    // this is skipped if going to realDefault
+	return nil
+
+realDefault:
+
+	// we're in a comment; ignore this
+	if state.inComment {
+		return nil
+	}
+
+	// otherwise, write this to the current buffer
+	if state.buffer != nil {
+		state.buffer.WriteByte(b)
+	}
+
 	return nil
 }
 
