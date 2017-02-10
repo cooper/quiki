@@ -24,10 +24,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// port not configured
-	port := conf.Get("quiki.http.port")
-	if port == "" {
-		log.Fatal("@quiki.http.port is required")
+	// port is required
+	port, err := conf.Require("quiki.http.port")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// setup the transport
