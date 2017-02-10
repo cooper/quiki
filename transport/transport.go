@@ -1,3 +1,4 @@
+// Copyright (c) 2017, Mitchell Cooper
 package transport
 
 import (
