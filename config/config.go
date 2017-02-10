@@ -1,5 +1,8 @@
 package config
 
+import "errors"
+
+// the singleton instance, set in main
 var Conf *Config
 
 // configuration, fetch conf values with conf.Get()
@@ -97,10 +100,29 @@ func (conf *Config) GetBool(varName string) bool {
 	return isTrueString(conf.Get(varName))
 }
 
+// same as Get() except it returns an error if the value is missing
+func (conf *Config) Require(varName string) (string, error) {
+	val := conf.Get(varName)
+	if !isTrueString(val) {
+		return "", errors.New(conf.getWarn("@" + varName + " is required"))
+	}
+	return val, nil
+}
+
+// return an error if any of the passed variables are missing
+func (conf *Config) RequireMany(varNames ...string) error {
+	for _, varName := range varNames {
+		if _, err := conf.Require(varName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // string variable value is true or no?
 func isTrueString(str string) bool {
 	if str == "" || str == "0" {
-		return true
+		return false
 	}
-	return false
+	return true
 }
