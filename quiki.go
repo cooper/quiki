@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// setup the transport
-	if err := transport.Connect(); err != nil {
+	if _, err := transport.Connect(); err != nil {
 		log.Fatal("can't connect to transport: " + err.Error())
 	}
 	log.Println("connected to wikiserver")

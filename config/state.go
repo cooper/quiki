@@ -10,10 +10,10 @@ import (
 type buffType uint8
 
 const (
-	NO_BUF     = iota // no buffer
-	VAR_NAME   = iota // variable name
-	VAR_VALUE  = iota // string variable value
-	VAR_FORMAT = iota // formatted text in between square brackets
+	NO_BUF     buffType = iota // no buffer
+	VAR_NAME                   // variable name
+	VAR_VALUE                  // string variable value
+	VAR_FORMAT                 // formatted text in between square brackets
 )
 
 // defines a buffer and its type

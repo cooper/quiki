@@ -7,25 +7,24 @@ import (
 )
 
 var conf *config.Config
-var transportFunctions = map[string]func() error{
-	"unix": connectUnix,
+
+type Transport interface {
 }
 
-func Connect() error {
+func Connect() (Transport, error) {
 	conf = config.Conf
-
-	// find sock type, defaulting to unix
 	sockType := conf.Get("server.socket.type")
-	if sockType == "" {
-		sockType = "unix"
+	switch sockType {
+
+	// unix socket, this is default
+	case "unix", "":
+		path, err := conf.Require("server.socket.path")
+		if err != nil {
+			return nil, err
+		}
+		return connectUnix(path)
 	}
 
-	// we don't know this sock type
-	aFunc, ok := transportFunctions[sockType]
-	if !ok {
-		return errors.New("unsupported @server.socket.type: " + sockType)
-	}
-
-	// call the transport function
-	return aFunc()
+	// not sure
+	return nil, errors.New("unsupported @server.socket.type: " + sockType)
 }

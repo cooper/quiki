@@ -3,20 +3,15 @@ package transport
 
 import "net"
 
-func connectUnix() error {
+type unixTransport struct {
+	conn net.Conn
+}
 
-	// get sock path
-	path, err := conf.Require("server.socket.path")
-	if err != nil {
-		return err
-	}
-
-	// connect
+func connectUnix(path string) (*unixTransport, error) {
 	conn, err := net.Dial("unix", path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	conn.Close()
-	return nil
+	transport := &unixTransport{conn}
+	return transport, nil
 }
