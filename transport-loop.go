@@ -6,6 +6,7 @@ import (
 	"github.com/cooper/quiki/transport"
 	"github.com/cooper/quiki/wikiclient"
 	"log"
+	"time"
 )
 
 var tr transport.Transport
@@ -41,8 +42,14 @@ func transportLoop() {
 			panic("no transport?")
 		}
 		select {
+
+		// some error occured. let's reinitialize the transport
 		case err := <-tr.Errors():
-			log.Println(err)
+			log.Println("transport error:", err)
+			tr = nil
+			time.Sleep(5 * time.Second)
+			initTransport()
+
 		case msg := <-tr.ReadMessages():
 			log.Println(msg)
 		}
