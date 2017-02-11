@@ -45,11 +45,9 @@ func transportLoop() {
 
 		// some error occured. let's reinitialize the transport
 		case err := <-tr.Errors():
-			log.Println("transport error:", err)
-			tr = nil
-			err = initTransport()
 			for err != nil {
 				time.Sleep(5 * time.Second)
+				log.Println("transport error:", err)
 				err = initTransport()
 			}
 			return
