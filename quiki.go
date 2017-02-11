@@ -3,8 +3,6 @@ package main
 
 import (
 	"github.com/cooper/quiki/config"
-	"github.com/cooper/quiki/transport"
-	"github.com/cooper/quiki/wikiclient"
 	"log"
 	"net/http"
 	"os"
@@ -32,19 +30,9 @@ func main() {
 	}
 
 	// setup the transport
-	tr, err := transport.New()
-	if err != nil {
+	if err := initTransport(); err != nil {
 		log.Fatal("can't initialize transport: " + err.Error())
 	}
-	if err := tr.Connect(); err != nil {
-		log.Fatal("can't connect to transport: " + err.Error())
-	}
-
-	log.Println("connected to wikifier")
-	tr.WriteMessage(wikiclient.NewMessage("wiki", map[string]interface{}{
-		"name":     "notroll",
-		"password": "hi",
-	}))
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

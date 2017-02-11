@@ -11,27 +11,10 @@ var conf *config.Config
 
 // used outside of transport
 type Transport interface {
+	Errors() chan error
+	ReadMessages() chan wikiclient.Message
 	WriteMessage(msg wikiclient.Message) error
 	Connect() error // connect to wikiserver
-}
-
-// base for all transports
-type transport struct {
-	readMessages  chan wikiclient.Message
-	writeMessages chan wikiclient.Message
-}
-
-// create transport base
-func createTransport() *transport {
-	return &transport{
-		make(chan wikiclient.Message),
-		make(chan wikiclient.Message),
-	}
-}
-
-func (tr *transport) WriteMessage(msg wikiclient.Message) error {
-	tr.writeMessages <- msg
-	return nil
 }
 
 func New() (Transport, error) {
