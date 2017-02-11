@@ -31,10 +31,16 @@ func main() {
 	}
 
 	// setup the transport
-	if _, err := transport.Connect(); err != nil {
+	tr, err := transport.New()
+	if err != nil {
+		log.Fatal("can't initialize transport: " + err.Error())
+	}
+	if err := tr.Connect(); err != nil {
 		log.Fatal("can't connect to transport: " + err.Error())
 	}
-	log.Println("connected to wikiserver")
+
+	tr.StartLoop()
+	log.Println("started loop")
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

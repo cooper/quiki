@@ -4,25 +4,41 @@ package transport
 import (
 	"errors"
 	"github.com/cooper/quiki/config"
+	// "log"
 )
 
 var conf *config.Config
 
+type wikiclientMessage int // will change
+
+// used outside of transport
 type Transport interface {
+	StartLoop()
+	Connect() error // connect to wikiserver
 }
 
-func Connect() (Transport, error) {
+// base for all transports
+type transport struct {
+	readMessages  chan wikiclientMessage
+	writeMessages chan wikiclientMessage
+}
+
+// create transport base
+func createTransport() *transport {
+	return &transport{
+		make(chan wikiclientMessage),
+		make(chan wikiclientMessage),
+	}
+}
+
+func New() (Transport, error) {
 	conf = config.Conf
 	sockType := conf.Get("server.socket.type")
 	switch sockType {
 
 	// unix socket, this is default
 	case "unix", "":
-		path, err := conf.Require("server.socket.path")
-		if err != nil {
-			return nil, err
-		}
-		return connectUnix(path)
+		return createUnix()
 	}
 
 	// not sure
