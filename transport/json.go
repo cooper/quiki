@@ -3,6 +3,7 @@ package transport
 
 import (
 	"bufio"
+	"github.com/cooper/quiki/wikiclient"
 	"io"
 	"log"
 	"time"
@@ -23,7 +24,7 @@ func createJson() *jsonTransport {
 		make(chan []byte),
 		make(chan error),
 		nil,
-        nil,
+		nil,
 	}
 }
 
@@ -62,22 +63,18 @@ func (jsonTr *jsonTransport) mainLoop() {
 		select {
 		case msg := <-jsonTr.writeMessages:
 			log.Println("found a message to write:", msg)
-			data := append(wikiclientMessageToJson(msg), '\n')
+			data := append(msg.ToJson(), '\n')
 			if _, err := jsonTr.writer.Write(data); err != nil {
-				log.Println("error writing! ", err)
+				log.Println("error writing!", err)
 			}
 		case json := <-jsonTr.incoming:
 			log.Println("found some data to handle:", string(json))
-			msg := jsonToWikiclientMessage(json)
+			msg, err := wikiclient.MessageFromJson(json)
+			if err != nil {
+				log.Println("error creating message:", err)
+				continue
+			}
 			jsonTr.readMessages <- msg
 		}
 	}
-}
-
-func wikiclientMessageToJson(msg wikiclientMessage) []byte {
-	return []byte(string(msg))
-}
-
-func jsonToWikiclientMessage(json []byte) wikiclientMessage {
-	return 0
 }

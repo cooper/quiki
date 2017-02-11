@@ -4,34 +4,32 @@ package transport
 import (
 	"errors"
 	"github.com/cooper/quiki/config"
-	// "log"
+	"github.com/cooper/quiki/wikiclient"
 )
 
 var conf *config.Config
 
-type wikiclientMessage int // will change
-
 // used outside of transport
 type Transport interface {
-	WriteMessage(msg wikiclientMessage) error
+	WriteMessage(msg wikiclient.Message) error
 	Connect() error // connect to wikiserver
 }
 
 // base for all transports
 type transport struct {
-	readMessages  chan wikiclientMessage
-	writeMessages chan wikiclientMessage
+	readMessages  chan wikiclient.Message
+	writeMessages chan wikiclient.Message
 }
 
 // create transport base
 func createTransport() *transport {
 	return &transport{
-		make(chan wikiclientMessage),
-		make(chan wikiclientMessage),
+		make(chan wikiclient.Message),
+		make(chan wikiclient.Message),
 	}
 }
 
-func (tr *transport) WriteMessage(msg wikiclientMessage) error {
+func (tr *transport) WriteMessage(msg wikiclient.Message) error {
 	tr.writeMessages <- msg
 	return nil
 }

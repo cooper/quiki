@@ -34,7 +34,7 @@ func (unixTr *unixTransport) Connect() error {
 	}
 	unixTr.conn = conn
 	unixTr.reader = bufio.NewReader(conn)
-    unixTr.writer = conn
+	unixTr.writer = conn
 	unixTr.startLoops()
 	return nil
 }

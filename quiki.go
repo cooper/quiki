@@ -40,7 +40,10 @@ func main() {
 	}
 
 	log.Println("connected to wikifier")
-	tr.WriteMessage(0)
+	tr.WriteMessage(wikiclient.Message{"wiki", map[string]interface{}{
+		"name":     "notroll",
+		"password": "hi",
+	}})
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))
