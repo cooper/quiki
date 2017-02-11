@@ -12,6 +12,10 @@ type Message struct {
 	id      uint
 }
 
+func NewMessage(cmd string, args map[string]interface{}, id uint) Message {
+	return Message{cmd, args, id}
+}
+
 // this is ugly, but I don't think there's a nicer way to do it since we use
 // a JSON array and not an object?
 func MessageFromJson(data []byte) (msg Message, err error) {

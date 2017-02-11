@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/cooper/quiki/config"
 	"github.com/cooper/quiki/transport"
+	"github.com/cooper/quiki/wikiclient"
 	"log"
 	"net/http"
 	"os"
@@ -40,10 +41,10 @@ func main() {
 	}
 
 	log.Println("connected to wikifier")
-	tr.WriteMessage(wikiclient.Message{"wiki", map[string]interface{}{
+	tr.WriteMessage(wikiclient.NewMessage("wiki", map[string]interface{}{
 		"name":     "notroll",
 		"password": "hi",
-	}})
+	}, 0))
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))
