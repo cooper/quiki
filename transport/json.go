@@ -6,14 +6,11 @@ import (
 	"errors"
 	"github.com/cooper/quiki/wikiclient"
 	"io"
-	"log"
-	"time"
 )
 
 type jsonTransport struct {
 	*transport
 	incoming chan []byte
-	err      chan error
 	writer   io.Writer
 	reader   *bufio.Reader
 }
@@ -23,7 +20,6 @@ func createJson() *jsonTransport {
 	return &jsonTransport{
 		createTransport(),
 		make(chan []byte),
-		make(chan error),
 		nil,
 		nil,
 	}
@@ -36,12 +32,11 @@ func (jsonTr *jsonTransport) startLoops() {
 }
 
 func (jsonTr *jsonTransport) readLoop() {
-	log.Println("readLoop")
 	for {
 
 		// not ready
 		if jsonTr.reader == nil {
-			jsonTr.err <- errors.New("reader is not available")
+			jsonTr.errors <- errors.New("reader is not available")
 			return
 		}
 
@@ -50,7 +45,7 @@ func (jsonTr *jsonTransport) readLoop() {
 
 		// some error occurred
 		if err != nil {
-			jsonTr.err <- err
+			jsonTr.errors <- err
 			return
 		}
 
@@ -62,31 +57,22 @@ func (jsonTr *jsonTransport) mainLoop() {
 	for {
 		select {
 
-		// read error
-		case err := <-jsonTr.err:
-			log.Println("error reading!", err)
-			go func() {
-				time.Sleep(5 * time.Second)
-				jsonTr.readLoop()
-			}()
-
-			// outgoing messages
+		// outgoing messages
 		case msg := <-jsonTr.writeMessages:
-			log.Println("found a message to write:", msg)
 			data := append(msg.ToJson(), '\n')
 			if _, err := jsonTr.writer.Write(data); err != nil {
-				log.Println("error writing!", err)
+				jsonTr.errors <- err
 			}
 
-			// incoming json data
+		// incoming json data
 		case json := <-jsonTr.incoming:
-			log.Println("found some data to handle:", string(json))
 			msg, err := wikiclient.MessageFromJson(json)
 			if err != nil {
-				log.Println("error creating message:", err)
-				continue
+				jsonTr.errors <- errors.New("error creating message: " + err.Error())
+				break
 			}
 			jsonTr.readMessages <- msg
+
 		}
 	}
 }
