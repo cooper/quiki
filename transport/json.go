@@ -1,15 +1,19 @@
 // Copyright (c) 2017, Mitchell Cooper
 package transport
 
-import "bufio"
-import "time"
-import "log"
+import (
+	"bufio"
+	"io"
+	"log"
+	"time"
+)
 
 type jsonTransport struct {
 	*transport
 	incoming chan []byte
 	err      chan error
-	rw       *bufio.ReadWriter
+	writer   io.Writer
+	reader   *bufio.Reader
 }
 
 // create json transport base
@@ -19,6 +23,7 @@ func createJson() *jsonTransport {
 		make(chan []byte),
 		make(chan error),
 		nil,
+        nil,
 	}
 }
 
@@ -33,14 +38,14 @@ func (jsonTr *jsonTransport) readLoop() {
 		log.Println("readLoop")
 
 		// not ready
-		if jsonTr.rw == nil {
-			log.Println("not ready")
+		if jsonTr.reader == nil {
+			log.Println("reader not ready")
 			time.Sleep(5 * time.Second)
 			continue
 		}
 
 		// read a full line
-		data, err := jsonTr.rw.ReadBytes('\n')
+		data, err := jsonTr.reader.ReadBytes('\n')
 
 		// some error occurred
 		if err != nil {
@@ -58,8 +63,7 @@ func (jsonTr *jsonTransport) mainLoop() {
 		case msg := <-jsonTr.writeMessages:
 			log.Println("found a message to write:", msg)
 			data := append(wikiclientMessageToJson(msg), '\n')
-            jsonTr.rw.WriteString("does this even work?\n")
-			if _, err := jsonTr.rw.Write(data); err != nil {
+			if _, err := jsonTr.writer.Write(data); err != nil {
 				log.Println("error writing! ", err)
 			}
 		case json := <-jsonTr.incoming:
