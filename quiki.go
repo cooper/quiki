@@ -44,7 +44,7 @@ func main() {
 	tr.WriteMessage(wikiclient.NewMessage("wiki", map[string]interface{}{
 		"name":     "notroll",
 		"password": "hi",
-	}, 0))
+	}))
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

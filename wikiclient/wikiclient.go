@@ -6,13 +6,22 @@ import (
 	"errors"
 )
 
+type messageArgs map[string]interface{}
+
+var idCounter uint
+
 type Message struct {
 	command string
-	args    map[string]interface{}
+	args    messageArgs
 	id      uint
 }
 
-func NewMessage(cmd string, args map[string]interface{}, id uint) Message {
+func NewMessage(cmd string, args messageArgs) Message {
+	idCounter++
+	return NewMessageWithID(cmd, args, idCounter)
+}
+
+func NewMessageWithID(cmd string, args messageArgs, id uint) Message {
 	return Message{cmd, args, id}
 }
 
@@ -41,7 +50,7 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 	}
 
 	// second element must be object
-	args, ok := ary[1].(map[string]interface{})
+	args, ok := ary[1].(messageArgs)
 	if !ok {
 		err = errors.New("Message content must be a JSON object")
 		return
@@ -54,7 +63,7 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 		return
 	}
 
-	return Message{cmd, args, uint(id)}, nil
+	return NewMessageWithID(cmd, args, uint(id)), nil
 }
 
 func (msg Message) ToJson() []byte {
