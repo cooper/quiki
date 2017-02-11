@@ -13,7 +13,6 @@ type wikiclientMessage int // will change
 
 // used outside of transport
 type Transport interface {
-	StartLoop()
 	Connect() error // connect to wikiserver
 }
 

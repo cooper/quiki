@@ -39,8 +39,7 @@ func main() {
 		log.Fatal("can't connect to transport: " + err.Error())
 	}
 
-	tr.StartLoop()
-	log.Println("started loop")
+	log.Println("connected to wikifier")
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

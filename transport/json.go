@@ -23,7 +23,7 @@ func createJson() *jsonTransport {
 }
 
 // start the loop
-func (jsonTr *jsonTransport) StartLoop() {
+func (jsonTr *jsonTransport) startLoops() {
 	go jsonTr.readLoop()
 	go jsonTr.mainLoop()
 }
