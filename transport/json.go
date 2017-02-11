@@ -58,6 +58,7 @@ func (jsonTr *jsonTransport) mainLoop() {
 		case msg := <-jsonTr.writeMessages:
 			log.Println("found a message to write:", msg)
 			data := append(wikiclientMessageToJson(msg), '\n')
+            jsonTr.rw.WriteString("does this even work?\n")
 			if _, err := jsonTr.rw.Write(data); err != nil {
 				log.Println("error writing! ", err)
 			}
