@@ -1,8 +1,10 @@
 // Copyright (c) 2017, Mitchell Cooper
 package transport
 
-import "net"
-import "bufio"
+import (
+	"bufio"
+	"net"
+)
 
 type unixTransport struct {
 	*jsonTransport

@@ -40,6 +40,7 @@ func main() {
 	}
 
 	log.Println("connected to wikifier")
+	tr.WriteMessage(0)
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

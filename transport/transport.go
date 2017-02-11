@@ -13,6 +13,7 @@ type wikiclientMessage int // will change
 
 // used outside of transport
 type Transport interface {
+	WriteMessage(msg wikiclientMessage) error
 	Connect() error // connect to wikiserver
 }
 
@@ -28,6 +29,11 @@ func createTransport() *transport {
 		make(chan wikiclientMessage),
 		make(chan wikiclientMessage),
 	}
+}
+
+func (tr *transport) WriteMessage(msg wikiclientMessage) error {
+	tr.writeMessages <- msg
+	return nil
 }
 
 func New() (Transport, error) {
