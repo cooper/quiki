@@ -75,7 +75,7 @@ func (jsonTr *jsonTransport) mainLoop() {
 }
 
 func wikiclientMessageToJson(msg wikiclientMessage) []byte {
-	return []byte{byte(msg)}
+	return []byte(string(msg))
 }
 
 func jsonToWikiclientMessage(json []byte) wikiclientMessage {
