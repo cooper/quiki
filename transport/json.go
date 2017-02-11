@@ -3,6 +3,7 @@ package transport
 
 import (
 	"bufio"
+	"errors"
 	"github.com/cooper/quiki/wikiclient"
 	"io"
 	"log"
@@ -35,14 +36,13 @@ func (jsonTr *jsonTransport) startLoops() {
 }
 
 func (jsonTr *jsonTransport) readLoop() {
+	log.Println("readLoop")
 	for {
-		log.Println("readLoop")
 
 		// not ready
 		if jsonTr.reader == nil {
-			log.Println("reader not ready")
-			time.Sleep(5 * time.Second)
-			continue
+			jsonTr.err <- errors.New("reader is not available")
+			return
 		}
 
 		// read a full line
@@ -51,7 +51,7 @@ func (jsonTr *jsonTransport) readLoop() {
 		// some error occurred
 		if err != nil {
 			jsonTr.err <- err
-			break
+			return
 		}
 
 		jsonTr.incoming <- data
@@ -65,7 +65,10 @@ func (jsonTr *jsonTransport) mainLoop() {
 		// read error
 		case err := <-jsonTr.err:
 			log.Println("error reading!", err)
-			go jsonTr.readLoop()
+			go func() {
+				time.Sleep(5 * time.Second)
+				jsonTr.readLoop()
+			}()
 
 			// outgoing messages
 		case msg := <-jsonTr.writeMessages:
