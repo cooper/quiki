@@ -56,10 +56,10 @@ func (jsonTr *jsonTransport) mainLoop() {
 	for {
 		select {
 		case msg := <-jsonTr.writeMessages:
-			log.Println("found a message to write: ", msg)
-			jsonTr.rw.Write(wikiclientMessageToJson(msg))
+			log.Println("found a message to write:", msg)
+			jsonTr.rw.Write(append(wikiclientMessageToJson(msg), '\n'))
 		case json := <-jsonTr.incoming:
-			log.Println("found some data to handle: ", string(json))
+			log.Println("found some data to handle:", string(json))
 			msg := jsonToWikiclientMessage(json)
 			jsonTr.readMessages <- msg
 		}
