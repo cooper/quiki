@@ -47,11 +47,12 @@ func transportLoop() {
 		case err := <-tr.Errors():
 			log.Println("transport error:", err)
 			tr = nil
-			anotherErr := initTransport()
-			if anotherErr != nil {
-				log.Println("can't initialize transport:", err)
+			err = initTransport()
+			for err != nil {
 				time.Sleep(5 * time.Second)
+				err = initTransport()
 			}
+			return
 
 		case msg := <-tr.ReadMessages():
 			log.Println(msg)
