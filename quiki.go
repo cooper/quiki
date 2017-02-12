@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/cooper/quiki/config"
 	"log"
 	"net/http"
@@ -34,6 +35,14 @@ func main() {
 	if err := initTransport(); err != nil {
 		log.Fatal("can't initialize transport: " + err.Error())
 	}
+
+	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+		if transportDead {
+			fmt.Fprint(w, "the transport is dead")
+			return
+		}
+		fmt.Fprint(w, "The transport is alive")
+	})
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))

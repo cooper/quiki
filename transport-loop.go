@@ -9,6 +9,7 @@ import (
 )
 
 var tr wikiclient.Transport
+var transportDead bool
 
 func newTransport() (wikiclient.Transport, error) {
 	sockType := conf.Get("server.socket.type")
@@ -62,10 +63,12 @@ func transportLoop() {
 		// some error occured. let's reinitialize the transport
 		case err := <-tr.Errors():
 			for err != nil {
+				transportDead = true
 				log.Println("transport error:", err)
 				time.Sleep(5 * time.Second)
 				err = initTransport()
 			}
+			transportDead = false
 			return
 
 		case msg := <-tr.ReadMessages():
