@@ -11,9 +11,9 @@ type messageArgs map[string]interface{}
 var idCounter uint
 
 type Message struct {
-	command string
-	args    messageArgs
-	id      uint
+	Command string
+	Args    messageArgs
+	ID      uint
 }
 
 func NewMessage(cmd string, args messageArgs) Message {
@@ -67,7 +67,7 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 }
 
 func (msg Message) ToJson() []byte {
-	ary := [...]interface{}{msg.command, msg.args, msg.id}
+	ary := [...]interface{}{msg.Command, msg.Args, msg.ID}
 	json, _ := json.Marshal(ary)
 	return json
 }

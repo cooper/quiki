@@ -43,10 +43,6 @@ func initTransport() (err error) {
 	}
 
 	log.Println("connected to wikifier")
-	tr.WriteMessage(wikiclient.NewMessage("wiki", map[string]interface{}{
-		"name":     "notroll",
-		"password": "hi",
-	}))
 
 	// start the loop
 	go transportLoop()

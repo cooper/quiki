@@ -4,9 +4,11 @@ package main
 import (
 	"fmt"
 	"github.com/cooper/quiki/config"
+	"github.com/cooper/quiki/wikiclient"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 var conf *config.Config
@@ -36,12 +38,18 @@ func main() {
 		log.Fatal("can't initialize transport: " + err.Error())
 	}
 
+	sess := wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
 	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		if tr.Dead() {
-			fmt.Fprint(w, "the transport is dead")
+		c := wikiclient.Client{tr, sess, 3 * time.Second}
+		res, err := c.Request(wikiclient.NewMessage("wiki", map[string]interface{}{
+			"name":     sess.WikiName,
+			"password": sess.WikiPassword,
+		}))
+		if err != nil {
+			fmt.Fprint(w, "some error happended", err)
 			return
 		}
-		fmt.Fprint(w, "the transport is alive")
+		fmt.Fprint(w, res)
 	})
 
 	// listen
