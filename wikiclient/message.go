@@ -50,7 +50,7 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 	}
 
 	// second element must be object
-	args, ok := ary[1].(messageArgs)
+	args, ok := ary[1].(map[string]interface{})
 	if !ok {
 		err = errors.New("Message content must be a JSON object")
 		return
