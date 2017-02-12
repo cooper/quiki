@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+var conf *config.Config
+
 func main() {
 
 	// find config file
@@ -17,8 +19,7 @@ func main() {
 	}
 
 	// parse configuration
-	conf := config.New(os.Args[1])
-	config.Conf = conf
+	conf = config.New(os.Args[1])
 	if err := conf.Parse(); err != nil {
 		log.Fatal(err)
 	}

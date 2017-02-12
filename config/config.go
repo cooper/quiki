@@ -3,9 +3,6 @@ package config
 
 import "errors"
 
-// the singleton instance, set in main
-var Conf *Config
-
 // configuration, fetch conf values with conf.Get()
 type Config struct {
 	path string                 // file path
