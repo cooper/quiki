@@ -8,18 +8,16 @@ import (
 
 // a client is formed by pairing a transport with a session
 type Client struct {
-	Transport   Transport     // wikiclient transport
-	Session     Session       // wikiclient session
-	Timeout     time.Duration // how long to waits on requests
-	ReadAccess  bool          // true if authenticated for reading
-	WriteAccess bool          // true if authenticated for writing
+	Transport Transport     // wikiclient transport
+	Session   *Session      // wikiclient session
+	Timeout   time.Duration // how long to waits on requests
 }
 
 // send a message and block until we get its response
-func (c *Client) Request(req Message) (res Message, err error) {
+func (c Client) Request(req Message) (res Message, err error) {
 
 	// the transport is not authenticated
-	if !c.ReadAccess {
+	if !c.Session.ReadAccess {
 		err = c.sendMessage(NewMessage("wiki", map[string]interface{}{
 			"name":     c.Session.WikiName,
 			"password": c.Session.WikiPassword,
@@ -27,7 +25,7 @@ func (c *Client) Request(req Message) (res Message, err error) {
 		if err != nil {
 			return
 		}
-		c.ReadAccess = true
+		c.Session.ReadAccess = true
 	}
 
 	// TODO: if the transport is not write authenticated and we have
@@ -57,7 +55,7 @@ func (c *Client) Request(req Message) (res Message, err error) {
 }
 
 // send a message to the transport, but do not await reply
-func (c *Client) sendMessage(msg Message) error {
+func (c Client) sendMessage(msg Message) error {
 
 	// the transport is dead!
 	if c.Transport.Dead() {

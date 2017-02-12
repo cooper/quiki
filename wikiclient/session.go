@@ -14,4 +14,7 @@ type Session struct {
 	// session ID used for write reauthentication
 	// perhaps we can generate this automatically
 	sessionID string
+
+	ReadAccess  bool // true if authenticated for reading
+	WriteAccess bool // true if authenticated for writing
 }

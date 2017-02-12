@@ -38,9 +38,9 @@ func main() {
 		log.Fatal("can't initialize transport: " + err.Error())
 	}
 
-	sess := wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
+	sess := &wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
 	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		c := &wikiclient.Client{
+		c := wikiclient.Client{
 			Transport: tr,
 			Session:   sess,
 			Timeout:   3 * time.Second,
