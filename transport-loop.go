@@ -66,9 +66,9 @@ func transportLoop() {
 			}
 			transportDead = false
 			return
-
-		case msg := <-tr.ReadMessages():
-			log.Println(msg)
+			//
+			// case msg := <-tr.ReadMessages():
+			// 	log.Println(msg)
 		}
 	}
 }
