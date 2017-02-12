@@ -16,7 +16,7 @@ type Client struct {
 }
 
 // send a message and block until we get its response
-func (c *Client) Request(req Message) (msg Message, err error) {
+func (c *Client) Request(req Message) (res Message, err error) {
 
 	// the transport is not authenticated
 	if !c.ReadAccess {
@@ -34,16 +34,15 @@ func (c *Client) Request(req Message) (msg Message, err error) {
 	// credentials in the session, send them now
 
 	// send
-	if err = c.sendMessage(msg); err != nil {
+	if err = c.sendMessage(req); err != nil {
 		return
 	}
 
 	select {
-	case res := <-c.Transport.ReadMessages():
+	case res = <-c.Transport.ReadMessages():
 
 		// this is the correct ID
 		if res.ID == req.ID {
-			msg = res
 			return
 		}
 
