@@ -40,13 +40,16 @@ func main() {
 
 	sess := wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
 	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		c := wikiclient.Client{tr, sess, 3 * time.Second}
-		res, err := c.Request(wikiclient.NewMessage("wiki", map[string]interface{}{
-			"name":     sess.WikiName,
-			"password": sess.WikiPassword,
+		c := &wikiclient.Client{
+			Transport: tr,
+			Session:   sess,
+			Timeout:   3 * time.Second,
+		}
+		res, err := c.Request(wikiclient.NewMessage("page", map[string]interface{}{
+			"name": "hi.page",
 		}))
 		if err != nil {
-			fmt.Fprint(w, "some error happended", err)
+			fmt.Fprint(w, "some error happended: ", err)
 			return
 		}
 		fmt.Fprint(w, res)

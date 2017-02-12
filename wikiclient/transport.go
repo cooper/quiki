@@ -3,11 +3,11 @@ package wikiclient
 
 // used outside of transport
 type Transport interface {
-	Errors() chan error
-	ReadMessages() chan Message
-	WriteMessage(msg Message) error
-	Connect() error // connect to wikiserver
-	Dead() bool
+	Errors() chan error             // error channel
+	ReadMessages() chan Message     // messages read channel
+	WriteMessage(msg Message) error // write a message
+	Connect() error                 // connect to wikiserver
+	Dead() bool                     // true if not connected
 }
 
 // base for all transports
