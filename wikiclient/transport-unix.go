@@ -28,6 +28,7 @@ func (tr *UnixTransport) Connect() error {
 	if err != nil {
 		return err
 	}
+	tr.connected = true
 	tr.conn = conn
 	tr.reader = bufio.NewReader(conn)
 	tr.writer = conn

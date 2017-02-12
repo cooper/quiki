@@ -37,11 +37,11 @@ func main() {
 	}
 
 	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		if transportDead {
+		if tr.Dead() {
 			fmt.Fprint(w, "the transport is dead")
 			return
 		}
-		fmt.Fprint(w, "The transport is alive")
+		fmt.Fprint(w, "the transport is alive")
 	})
 
 	// listen
