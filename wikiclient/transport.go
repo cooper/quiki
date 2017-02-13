@@ -4,18 +4,18 @@ package wikiclient
 // used outside of transport
 type Transport interface {
 	Errors() chan error             // error channel
-	ReadMessages() chan Message     // messages read channel
-	WriteMessage(msg Message) error // write a message
+	readMessages() chan Message     // messages read channel
+	writeMessage(msg Message) error // write a message
 	Connect() error                 // connect to wikiserver
 	Dead() bool                     // true if not connected
 }
 
 // base for all transports
 type transport struct {
-	errors        chan error
-	readMessages  chan Message
-	writeMessages chan Message
-	connected     bool
+	errors    chan error
+	readChan  chan Message
+	writeChan chan Message
+	connected bool
 }
 
 // create transport base
@@ -34,8 +34,12 @@ func (tr *transport) criticalError(err error) {
 	tr.connected = false
 }
 
-func (tr *transport) WriteMessage(msg Message) error {
-	tr.writeMessages <- msg
+func (tr *transport) readMessages() chan Message {
+	return tr.readChan
+}
+
+func (tr *transport) writeMessage(msg Message) error {
+	tr.writeChan <- msg
 	return nil
 }
 
@@ -45,8 +49,4 @@ func (tr *transport) Errors() chan error {
 
 func (tr *transport) Dead() bool {
 	return !tr.connected
-}
-
-func (tr *transport) ReadMessages() chan Message {
-	return tr.readMessages
 }

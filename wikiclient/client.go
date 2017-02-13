@@ -37,7 +37,7 @@ func (c Client) Request(req Message) (res Message, err error) {
 	}
 
 	select {
-	case res = <-c.Transport.ReadMessages():
+	case res = <-c.Transport.readMessages():
 
 		// this is the correct ID
 		if res.ID == req.ID {
@@ -62,5 +62,5 @@ func (c Client) sendMessage(msg Message) error {
 		return errors.New("transport is dead")
 	}
 
-	return c.Transport.WriteMessage(msg)
+	return c.Transport.writeMessage(msg)
 }

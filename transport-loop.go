@@ -9,7 +9,6 @@ import (
 )
 
 var tr wikiclient.Transport
-var transportDead bool
 
 func newTransport() (wikiclient.Transport, error) {
 	sockType := conf.Get("server.socket.type")
@@ -28,6 +27,7 @@ func newTransport() (wikiclient.Transport, error) {
 	return nil, errors.New("unsupported @server.socket.type: " + sockType)
 }
 
+// create and connect the transport
 func initTransport() (err error) {
 
 	// setup the transport
@@ -49,26 +49,16 @@ func initTransport() (err error) {
 	return
 }
 
+// loop for errors
 func transportLoop() {
-	for {
-		if tr == nil {
-			panic("no transport?")
-		}
-		select {
-
-		// some error occured. let's reinitialize the transport
-		case err := <-tr.Errors():
-			for err != nil {
-				transportDead = true
-				log.Println("transport error:", err)
-				time.Sleep(5 * time.Second)
-				err = initTransport()
-			}
-			transportDead = false
-			return
-			//
-			// case msg := <-tr.ReadMessages():
-			// 	log.Println(msg)
-		}
+	if tr == nil {
+		panic("no transport?")
 	}
+	err := <-tr.Errors()
+	for err != nil {
+		log.Println("transport error:", err)
+		time.Sleep(5 * time.Second)
+		err = initTransport()
+	}
+	return
 }

@@ -57,7 +57,7 @@ func (tr *jsonTransport) mainLoop() {
 		select {
 
 		// outgoing messages
-		case msg := <-tr.writeMessages:
+		case msg := <-tr.writeChan:
 			data := append(msg.ToJson(), '\n')
 			if _, err := tr.writer.Write(data); err != nil {
 				tr.errors <- err
@@ -70,7 +70,7 @@ func (tr *jsonTransport) mainLoop() {
 				tr.errors <- errors.New("error creating message: " + err.Error())
 				break
 			}
-			tr.readMessages <- msg
+			tr.readChan <- msg
 		}
 	}
 }
