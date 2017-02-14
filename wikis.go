@@ -85,7 +85,7 @@ func setupWiki(wiki wikiInfo) error {
 		if !strings.HasPrefix(root, wikiRoot) {
 			wiki.conf.Warn(fmt.Sprintf(
 				"@root.%s (%s) is configured outside of @root.wiki (%s); assuming %s%s",
-				rootType, root, wikiRoot, wikiRoot+root,
+				rootType, root, wikiRoot, wikiRoot, root,
 			))
 			root = wikiRoot + root
 		}
