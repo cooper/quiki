@@ -81,6 +81,11 @@ func setupWiki(wiki wikiInfo) error {
 	if templateName == "" {
 		templateName = "default"
 	}
+	template, err := getTemplate(templateName)
+	if err != nil {
+		return err
+	}
+	wiki.template = template
 
 	// find the wiki root. if not configured, use the wiki name
 	var wikiRoot = wiki.conf.Get("root.wiki")

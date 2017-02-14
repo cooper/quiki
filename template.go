@@ -2,8 +2,8 @@
 package main
 
 import (
+	"github.com/cooper/quiki/wikiclient"
 	"html/template"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,11 +16,12 @@ type wikiTemplate struct {
 	template *template.Template
 }
 
-func getTemplate(path string) wikiTemplate {
+func getTemplate(path string) (wikiTemplate, error) {
+	var t wikiTemplate
 
 	// template is already cached
 	if t, ok := templates[path]; ok {
-		return t
+		return t, nil
 	}
 
 	// parse HTML templates
@@ -33,13 +34,13 @@ func getTemplate(path string) wikiTemplate {
 		}
 		return err
 	}); err != nil {
-		log.Fatal(err)
+		return t, err
 	}
 
 	// cache the template
-	t := wikiTemplate{path, tmpl}
+	t = wikiTemplate{path, tmpl}
 	templates[path] = t
-	return t
+	return t, nil
 }
 
 type wikiPage struct {
@@ -51,8 +52,8 @@ type wikiPage struct {
 	Title      string
 	WikiTitle  string
 
-	// HTML page content
-	Content string
+	// response
+	Res wikiclient.Message
 
 	// path to static/ directory within the template
 	StaticRoot string

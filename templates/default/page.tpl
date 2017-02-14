@@ -1,3 +1,3 @@
 {{ template "header.tpl" . }}
-{{.Content}}
+{{.Res.Content}}
 {{ template "footer.tpl" . }}
