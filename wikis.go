@@ -55,7 +55,10 @@ func initializeWikis() error {
 	return nil
 }
 
-var wikiRoots = [...]string{"page", "image"}
+var wikiRoots = map[string]func(root string, w http.ResponseWriter, r *http.Request){
+	"page":  handlePage,
+	"image": handleImage,
+}
 
 // initialize a wiki
 func setupWiki(wiki wikiInfo) error {
@@ -74,7 +77,7 @@ func setupWiki(wiki wikiInfo) error {
 	}
 
 	// setup handlers
-	for _, rootType := range wikiRoots {
+	for rootType, handler := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
 		if err != nil {
 			return err
@@ -90,9 +93,8 @@ func setupWiki(wiki wikiInfo) error {
 		}
 
 		root += "/"
-		realRootType := rootType
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			handler(realRootType, root, w, r)
+			handler(root, w, r)
 		})
 	}
 

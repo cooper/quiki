@@ -4,6 +4,10 @@ package main
 import "net/http"
 import "log"
 
-func handler(rootType, root string, w http.ResponseWriter, r *http.Request) {
-	log.Println(rootType, root)
+func handlePage(root string, w http.ResponseWriter, r *http.Request) {
+	log.Println(r)
+}
+
+func handleImage(root string, w http.ResponseWriter, r *http.Request) {
+	log.Println(r)
 }
