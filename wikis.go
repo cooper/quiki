@@ -25,6 +25,7 @@ func initializeWikis() error {
 	}
 
 	// set up each wiki
+	wikis = make(map[string]wikiInfo, len(wikiMap))
 	for wikiName := range wikiMap {
 
 		// get wiki config path and password
