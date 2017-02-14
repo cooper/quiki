@@ -79,7 +79,7 @@ func setupWiki(wiki wikiInfo) error {
 	// find the template. if not configured, use default
 	templatePath := conf.Get("server.wiki." + wiki.name + ".template")
 	if templatePath == "" {
-		templatePath = "templates/default"
+		templatePath = "default"
 	}
 	template, err := getTemplate(templatePath)
 	if err != nil {
