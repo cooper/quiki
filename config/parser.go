@@ -72,10 +72,10 @@ func (conf *Config) getWarn(msg string) string {
 func (conf *Config) getWarnf(msg string, i ...interface{}) (res string) {
 	line := *conf.line
 	if line == 0 {
-		res = fmt.Sprintf("%s: %s", conf.path, msg, i)
+		res = fmt.Sprintf("%s: "+msg, conf.path, i)
 		return
 	}
-	res = fmt.Sprintf("%s:%d: %s", conf.path, line, msg, i)
+	res = fmt.Sprintf("%s:%d: "+msg, conf.path, line, i)
 	return
 }
 
