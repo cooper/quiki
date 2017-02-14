@@ -68,9 +68,9 @@ func setupWiki(wiki wikiInfo) error {
 	}
 
 	// find the wiki root. if not configured, use the wiki name
-	var wikiRoot = wiki.conf.Get("root.wiki") + "/"
-	if wikiRoot == "/" {
-		wikiRoot = wiki.name + "/"
+	var wikiRoot = wiki.conf.Get("root.wiki")
+	if wikiRoot == "" {
+		wikiRoot = "/" + wiki.name
 		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
 	}
 
