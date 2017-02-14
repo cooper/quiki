@@ -8,6 +8,7 @@ package wikiclient
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 type messageArgs map[string]interface{}
@@ -79,11 +80,7 @@ func (msg Message) String(arg string) string {
 	if !ok {
 		return ""
 	}
-	str, ok := iface.(string)
-	if !ok {
-		return ""
-	}
-	return str
+	return fmt.Sprintf("%v", iface)
 }
 
 // translates the Message to JSON
