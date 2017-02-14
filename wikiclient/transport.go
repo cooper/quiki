@@ -12,10 +12,10 @@ type Transport interface {
 
 // base for all transports
 type transport struct {
-	errors    chan error
-	read      chan Message
-	write     chan Message
-	connected bool
+	errors    chan error   // transport errors
+	read      chan Message // read messages waiting to be processed
+	write     chan Message // messages waiting to be written
+	connected bool         // transport is active
 }
 
 // create transport base

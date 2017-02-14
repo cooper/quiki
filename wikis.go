@@ -111,8 +111,7 @@ func setupWiki(wiki wikiInfo) error {
 
 			// the transport is not connected
 			if tr.Dead() {
-				w.WriteHeader(http.StatusServiceUnavailable)
-				w.Write([]byte("503 service unavailable"))
+				http.Error(w, "503 service unavailable", http.StatusServiceUnavailable)
 				return
 			}
 

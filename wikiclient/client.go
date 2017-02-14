@@ -13,8 +13,16 @@ type Client struct {
 	Timeout   time.Duration // how long to waits on requests
 }
 
+func (c Client) DisplayPage(pageName string) (Message, error) {
+	return c.Request("page", map[string]interface{}{"name": pageName})
+}
+
+func (c Client) Request(command string, args messageArgs) (Message, error) {
+	return c.RequestMessage(NewMessage(command, args))
+}
+
 // send a message and block until we get its response
-func (c Client) Request(req Message) (res Message, err error) {
+func (c Client) RequestMessage(req Message) (res Message, err error) {
 
 	// the transport is not authenticated
 	if !c.Session.ReadAccess {

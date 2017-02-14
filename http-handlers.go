@@ -8,9 +8,7 @@ import (
 )
 
 func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
-	res, err := c.Request(wikiclient.NewMessage("page", map[string]interface{}{
-		"name": relPath,
-	}))
+	res, err := c.DisplayPage(relPath)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
