@@ -2,13 +2,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/cooper/quiki/config"
-	"github.com/cooper/quiki/wikiclient"
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 var conf *config.Config
