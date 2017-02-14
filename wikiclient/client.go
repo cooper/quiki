@@ -13,8 +13,18 @@ type Client struct {
 	Timeout   time.Duration // how long to waits on requests
 }
 
+// display a page
 func (c Client) DisplayPage(pageName string) (Message, error) {
 	return c.Request("page", map[string]interface{}{"name": pageName})
+}
+
+// display an image
+func (c Client) DisplayImage(imageName string, width, height int) (Message, error) {
+	return c.Request("image", map[string]interface{}{
+		"name":   imageName,
+		"width":  string(width),
+		"height": string(height),
+	})
 }
 
 func (c Client) Request(command string, args messageArgs) (Message, error) {
