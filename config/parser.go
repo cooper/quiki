@@ -57,7 +57,7 @@ func (conf *Config) Parse() error {
 }
 
 // produce a warning
-func (conf *Config) warn(msg string) {
+func (conf *Config) Warn(msg string) {
 	log.Printf(conf.getWarn(msg))
 }
 
@@ -168,7 +168,7 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 			return err
 		}
 		if newVal == "" {
-			conf.warn("[" + tok + "] yields empty string")
+			conf.Warn("[" + tok + "] yields empty string")
 		}
 
 		// add the value returned by it to the variable value buffer

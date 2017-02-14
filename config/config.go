@@ -24,7 +24,7 @@ func (conf *Config) Get(varName string) string {
 	// get the map
 	where, lastPart := conf.getWhere(varName, false)
 	if where == nil {
-		conf.warn("could not Get @" + varName)
+		conf.Warn("could not Get @" + varName)
 		return ""
 	}
 
@@ -36,7 +36,7 @@ func (conf *Config) Get(varName string) string {
 	case nil:
 		return ""
 	default:
-		conf.warn("@" + varName + " is not a string")
+		conf.Warn("@" + varName + " is not a string")
 	}
 
 	return ""
@@ -48,7 +48,7 @@ func (conf *Config) GetMap(varName string) map[string]interface{} {
 	// get the location
 	where, lastPart := conf.getWhere(varName, false)
 	if where == nil {
-		conf.warn("could not GetMap @" + varName)
+		conf.Warn("could not GetMap @" + varName)
 		return nil
 	}
 
@@ -60,7 +60,7 @@ func (conf *Config) GetMap(varName string) map[string]interface{} {
 	case nil:
 		return nil
 	default:
-		conf.warn("@" + varName + " is not a map")
+		conf.Warn("@" + varName + " is not a map")
 	}
 
 	return nil
@@ -85,7 +85,7 @@ func (conf *Config) Set(varName string, value string) {
 	// get the map
 	where, lastPart := conf.getWhere(varName, true)
 	if where == nil {
-		conf.warn("could not Set @" + varName)
+		conf.Warn("could not Set @" + varName)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/cooper/quiki/config"
 	"net/http"
+	"strings"
 )
 
 type wikiInfo struct {
@@ -54,7 +55,7 @@ func initializeWikis() error {
 	return nil
 }
 
-var wikiRoots = [...]string{"wiki", "page", "image"}
+var wikiRoots = [...]string{"page", "image"}
 
 // initialize a wiki
 func setupWiki(wiki wikiInfo) error {
@@ -65,16 +66,26 @@ func setupWiki(wiki wikiInfo) error {
 		return err
 	}
 
-	// setup the handlers
+	// find the wiki root. if not configured, use the wiki name
+	var wikiRoot = wiki.conf.Get("root.wiki") + "/"
+	if wikiRoot == "/" {
+		wikiRoot = wiki.name + "/"
+		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
+	}
+
+	// setup handlers
 	for _, rootType := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
 		if err != nil {
-			// @root.wiki is optional
-			if rootType != "wiki" {
-				return err
-			}
-			continue
+			return err
 		}
+
+		// if it doesn't already have the wiki root as the prefix, add it
+		if !strings.HasPrefix(root, wikiRoot) {
+			wiki.conf.Warn("@root." + rootType + " is configured outside of @root.wiki")
+			root = wikiRoot + root
+		}
+
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			handler(rootType, root, w, r)
 		})
