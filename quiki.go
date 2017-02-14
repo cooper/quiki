@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// port is required
-	port, err := conf.Require("quiki.http.port")
+	port, err := conf.Require("server.http.port")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,5 +43,5 @@ func main() {
 	}
 
 	// listen
-	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))
+	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
 }
