@@ -3,7 +3,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/cooper/quiki/config"
 	"net/http"
 	"strings"
@@ -83,10 +82,10 @@ func setupWiki(wiki wikiInfo) error {
 
 		// if it doesn't already have the wiki root as the prefix, add it
 		if !strings.HasPrefix(root, wikiRoot) {
-			wiki.conf.Warn(fmt.Sprintf(
+			wiki.conf.Warnf(
 				"@root.%s (%s) is configured outside of @root.wiki (%s); assuming %s%s",
 				rootType, root, wikiRoot, wikiRoot, root,
-			))
+			)
 			root = wikiRoot + root
 		}
 

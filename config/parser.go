@@ -58,7 +58,11 @@ func (conf *Config) Parse() error {
 
 // produce a warning
 func (conf *Config) Warn(msg string) {
-	log.Printf(conf.getWarn(msg))
+	log.Println(conf.getWarn(msg))
+}
+
+func (conf *Config) Warnf(msg string, i ...interface{}) {
+	log.Printf(conf.getWarn(msg), i)
 }
 
 func (conf *Config) getWarn(msg string) (res string) {
