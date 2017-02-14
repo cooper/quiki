@@ -3,8 +3,8 @@ package wikiclient
 
 // used outside of transport
 type Transport interface {
-	Errors() chan error             // error channel
-	readMessages() chan Message     // messages read channel
+	Errors() <-chan error           // error channel
+	readMessages() <-chan Message   // messages read channel
 	writeMessage(msg Message) error // write a message
 	Connect() error                 // connect to wikiserver
 	Dead() bool                     // true if not connected
@@ -34,7 +34,7 @@ func (tr *transport) criticalError(err error) {
 	tr.connected = false
 }
 
-func (tr *transport) readMessages() chan Message {
+func (tr *transport) readMessages() <-chan Message {
 	return tr.read
 }
 
@@ -43,7 +43,7 @@ func (tr *transport) writeMessage(msg Message) error {
 	return nil
 }
 
-func (tr *transport) Errors() chan error {
+func (tr *transport) Errors() <-chan error {
 	return tr.errors
 }
 
