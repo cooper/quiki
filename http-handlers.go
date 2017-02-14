@@ -13,11 +13,9 @@ func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *h
 		"name": relPath,
 	}))
 	if err != nil {
-		fmt.Fprint(w, err)
 		log.Println(err)
 		return
 	}
-	fmt.Fprint(w, res)
 	log.Println(res)
 }
 
