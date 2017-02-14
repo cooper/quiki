@@ -19,3 +19,6 @@ func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *h
 func handleImage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, relPath, c, r)
 }
+
+func handleError(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
+}

@@ -27,6 +27,17 @@ func (c Client) DisplayImage(imageName string, width, height int) (Message, erro
 	})
 }
 
+// display category posts
+func (c Client) DisplayCategoryPosts(categoryName string, pageN int) (Message, error) {
+	if pageN <= 0 {
+		pageN = 1
+	}
+	return c.Request("cat_posts", map[string]interface{}{
+		"name":   categoryName,
+		"page_n": string(pageN),
+	})
+}
+
 func (c Client) Request(command string, args messageArgs) (Message, error) {
 	return c.RequestMessage(NewMessage(command, args))
 }
