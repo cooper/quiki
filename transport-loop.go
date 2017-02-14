@@ -1,4 +1,5 @@
 // Copyright (c) 2017, Mitchell Cooper
+// transport-loop.go - maintain a connection to the wikiserver
 package main
 
 import (
@@ -8,8 +9,10 @@ import (
 	"time"
 )
 
+// the transport instance
 var tr wikiclient.Transport
 
+// create the transport based on the configuration
 func newTransport() (wikiclient.Transport, error) {
 	sockType := conf.Get("server.socket.type")
 	switch sockType {

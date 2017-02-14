@@ -34,19 +34,23 @@ func (tr *transport) criticalError(err error) {
 	tr.connected = false
 }
 
+// returns a channel of read messages waiting to be handled
 func (tr *transport) readMessages() <-chan Message {
 	return tr.read
 }
 
+// adds a message to the write buffer
 func (tr *transport) writeMessage(msg Message) error {
 	tr.write <- msg
 	return nil
 }
 
+// returns a channel of read/write errors
 func (tr *transport) Errors() <-chan error {
 	return tr.errors
 }
 
+// true if the transport is not connected
 func (tr *transport) Dead() bool {
 	return !tr.connected
 }

@@ -1,6 +1,17 @@
 // Copyright (c) 2017, Mitchell Cooper
 package wikiclient
 
+// jsonTransport is a base type for all JSON stream transports.
+// with this type of transport, each message is represented by a JSON
+// array and is terminated with a newline. the message format is
+//
+// [ command, arguments, ID ]
+//
+// where command is the string message type, arguments is a JSON object of
+// message parameters, and ID is an optional integer message identifier which
+// will reappear in the message response.
+//
+
 import (
 	"bufio"
 	"errors"
@@ -9,9 +20,19 @@ import (
 
 type jsonTransport struct {
 	*transport
+
+	// a channel of incoming line data waiting to be parsed
 	incoming chan []byte
-	writer   io.Writer
-	reader   *bufio.Reader
+
+	// messages written to the transport with WriteMessage() or 'write' channel
+	// will be translated to JSON by the jsonTransport main loop. the resultant
+	// JSON will be written to this writer.
+	writer io.Writer
+
+	// the jsonTransport will read data from this buffer line-by-line, parsing
+	// it as JSON and creating wikiclient messages. the created messages will
+	// be sent to the 'read' channel.
+	reader *bufio.Reader
 }
 
 // create json transport base
@@ -30,6 +51,7 @@ func (tr *jsonTransport) startLoops() {
 	go tr.mainLoop()
 }
 
+// read data loop
 func (tr *jsonTransport) readLoop() {
 	for {
 
@@ -52,6 +74,7 @@ func (tr *jsonTransport) readLoop() {
 	}
 }
 
+// main loop
 func (tr *jsonTransport) mainLoop() {
 	for {
 		select {

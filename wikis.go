@@ -1,4 +1,5 @@
 // Copyright (c) 2017, Mitchell Cooper
+// wikis.go - manage the wikis served by this quiki
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"time"
 )
 
+// represents a wiki
 type wikiInfo struct {
 	name     string         // wiki name
 	password string         // wiki password for read authentication
@@ -17,6 +19,7 @@ type wikiInfo struct {
 	conf     *config.Config // wiki config instance
 }
 
+// all wikis served by this quiki
 var wikis map[string]wikiInfo
 
 // initialize all the wikis in the configuration
@@ -57,6 +60,7 @@ func initializeWikis() error {
 	return nil
 }
 
+// wiki roots mapped to handler functions
 var wikiRoots = map[string]func(wikiclient.Client, string, http.ResponseWriter, *http.Request){
 	"page":  handlePage,
 	"image": handleImage,

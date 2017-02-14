@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// page request
 func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
 	res, err := c.DisplayPage(relPath)
 	if err != nil {
@@ -16,9 +17,10 @@ func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *h
 	fmt.Fprint(w, res)
 }
 
+// image request
 func handleImage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, relPath, c, r)
 }
 
-func handleError(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
+func handleError(w http.ResponseWriter, r *http.Request) {
 }

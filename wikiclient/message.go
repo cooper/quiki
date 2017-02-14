@@ -1,6 +1,10 @@
 // Copyright (c) 2017, Mitchell Cooper
 package wikiclient
 
+// a Message represents a wikiserver message. the Message struct is used both
+// for outgoing messages (client requests) and incoming messages (replies from
+// the wikiserver).
+
 import (
 	"encoding/json"
 	"errors"
@@ -11,20 +15,23 @@ type messageArgs map[string]interface{}
 var idCounter uint
 
 type Message struct {
-	Command string
-	Args    messageArgs
-	ID      uint
+	Command string      // message type
+	Args    messageArgs // message arguments
+	ID      uint        // message ID
 }
 
+// creates a new Message with an automatically-generated ID
 func NewMessage(cmd string, args messageArgs) Message {
 	idCounter++
 	return NewMessageWithID(cmd, args, idCounter)
 }
 
+// creates a new Message with the specified ID
 func NewMessageWithID(cmd string, args messageArgs, id uint) Message {
 	return Message{cmd, args, id}
 }
 
+// creates a new Message from JSON data
 // this is ugly, but I don't think there's a nicer way to do it since we use
 // a JSON array and not an object?
 func MessageFromJson(data []byte) (msg Message, err error) {
@@ -66,6 +73,7 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 	return NewMessageWithID(cmd, args, uint(id)), nil
 }
 
+// translates the Message to JSON
 func (msg Message) ToJson() []byte {
 	ary := [...]interface{}{msg.Command, msg.Args, msg.ID}
 	json, _ := json.Marshal(ary)

@@ -1,6 +1,9 @@
 // Copyright (c) 2017, Mitchell Cooper
 package wikiclient
 
+// UnixTransport is a unix socket transport.
+// it is based on the JSON stream transport.
+
 import (
 	"bufio"
 	"net"

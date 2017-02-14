@@ -1,4 +1,5 @@
 // Copyright (c) 2017, Mitchell Cooper
+// quiki - a standalone web server for wikifier
 package main
 
 import (
@@ -8,6 +9,7 @@ import (
 	"os"
 )
 
+// wikiserver config instance
 var conf *config.Config
 
 func main() {

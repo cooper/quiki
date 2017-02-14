@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// a client is formed by pairing a transport with a session
+// a Client is formed by pairing a transport with a session
 type Client struct {
 	Transport Transport     // wikiclient transport
 	Session   *Session      // wikiclient session
@@ -65,6 +65,7 @@ func (c Client) RequestMessage(req Message) (res Message, err error) {
 		return
 	}
 
+	// await the response, or give up after the timeout
 	select {
 	case res = <-c.Transport.readMessages():
 
