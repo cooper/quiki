@@ -16,6 +16,7 @@ type wikiInfo struct {
 	name     string         // wiki name
 	password string         // wiki password for read authentication
 	confPath string         // path to wiki configuration
+	template wikiTemplate   // template
 	conf     *config.Config // wiki config instance
 }
 
@@ -73,6 +74,12 @@ func setupWiki(wiki wikiInfo) error {
 	wiki.conf = config.New(wiki.confPath)
 	if err := wiki.conf.Parse(); err != nil {
 		return err
+	}
+
+	// find the template. if not configured, use default
+	templateName := conf.Get("server.wiki." + wiki.name + ".template")
+	if templateName == "" {
+		templateName = "default"
 	}
 
 	// find the wiki root. if not configured, use the wiki name
