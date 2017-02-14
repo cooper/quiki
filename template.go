@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+var templateDir string
 var templates = make(map[string]wikiTemplate)
 
 type wikiTemplate struct {
@@ -18,6 +19,7 @@ type wikiTemplate struct {
 
 func getTemplate(path string) (wikiTemplate, error) {
 	var t wikiTemplate
+	path = templateDir + "/" + path
 
 	// template is already cached
 	if t, ok := templates[path]; ok {

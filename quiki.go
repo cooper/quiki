@@ -26,10 +26,15 @@ func main() {
 	}
 
 	// port is required
-	port, err := conf.Require("server.http.port")
-	if err != nil {
+	var port string
+	if err := conf.RequireMany(map[string]*string{
+		"server.http.port":    &port,
+		"server.dir.template": &templateDir,
+	}); err != nil {
 		log.Fatal(err)
 	}
+
+	//
 
 	// set up wikis
 	if err := initializeWikis(); err != nil {
