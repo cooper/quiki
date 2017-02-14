@@ -9,17 +9,18 @@ import (
 )
 
 func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
-	log.Println(relPath, c, r)
 	res, err := c.Request(wikiclient.NewMessage("page", map[string]interface{}{
 		"name": relPath,
 	}))
 	if err != nil {
 		fmt.Fprint(w, err)
+		log.Println(err)
 		return
 	}
 	fmt.Fprint(w, res)
+	log.Println(res)
 }
 
 func handleImage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *http.Request) {
-	log.Println(relPath, c, r)
+	fmt.Fprint(w, relPath, c, r)
 }
