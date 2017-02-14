@@ -13,8 +13,8 @@ type Transport interface {
 // base for all transports
 type transport struct {
 	errors    chan error
-	readChan  chan Message
-	writeChan chan Message
+	read      chan Message
+	write     chan Message
 	connected bool
 }
 
@@ -35,11 +35,11 @@ func (tr *transport) criticalError(err error) {
 }
 
 func (tr *transport) readMessages() chan Message {
-	return tr.readChan
+	return tr.read
 }
 
 func (tr *transport) writeMessage(msg Message) error {
-	tr.writeChan <- msg
+	tr.write <- msg
 	return nil
 }
 

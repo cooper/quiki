@@ -11,7 +11,15 @@ import (
 	"time"
 )
 
+type wikiInfo struct {
+	name     string         // wiki name
+	password string         // wiki password for read authentication
+	confPath string         // path to wiki configuration
+	conf     *config.Config // wiki config instance
+}
+
 var conf *config.Config
+var wikis map[string]wikiInfo
 
 func main() {
 
@@ -25,6 +33,37 @@ func main() {
 	conf = config.New(os.Args[1])
 	if err := conf.Parse(); err != nil {
 		log.Fatal(err)
+	}
+
+	// parse configuration for each wiki
+	wikis := conf.GetMap("server.wiki")
+	for wikiName := range wikis {
+
+		// wiki configuration path
+		wikiConfPath, err := conf.Require("server.wiki." + wikiName + ".config")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// wiki password for read authentication
+		wikiPassword, err := conf.Require("server.wiki." + wikiName + ".password")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// parse the wiki configuration
+		wikiConf := config.New(wikiConfPath)
+		if err := wikiConf.Parse(); err != nil {
+			log.Fatal(err)
+		}
+
+		// store the wiki info
+		wikis[wikiName] = wikiInfo{
+			name:     wikiName,
+			password: wikiPassword,
+			confPath: wikiConfPath,
+			conf:     wikiConf,
+		}
 	}
 
 	// port is required
