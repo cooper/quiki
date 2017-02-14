@@ -105,6 +105,7 @@ func setupWiki(wiki wikiInfo) error {
 
 		// add the real handler
 		root += "/"
+		realHandler := handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			c := wikiclient.Client{tr, readSess, 3 * time.Second}
 
@@ -122,7 +123,7 @@ func setupWiki(wiki wikiInfo) error {
 				return
 			}
 
-			handler(c, relPath, w, r)
+			realHandler(c, relPath, w, r)
 		})
 	}
 
