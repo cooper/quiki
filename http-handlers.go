@@ -28,6 +28,8 @@ func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.Header().Set("Content-Type", res.String("mime"))
+	w.Header().Set("Content-Length", res.String("length"))
+	w.Header().Set("Last-Modified", res.String("modified"))
 	w.Write([]byte(res.String("content")))
 }
 
