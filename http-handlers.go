@@ -23,7 +23,7 @@ func handleImage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *
 }
 
 func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
-	if res.Command == "error" {
+	if res.String("type") == "not found" {
 		handleError(res, w, r)
 		return
 	}
