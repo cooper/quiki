@@ -62,16 +62,16 @@ func (conf *Config) Warn(msg string) {
 }
 
 func (conf *Config) Warnf(msg string, i ...interface{}) {
-	log.Printf(conf.getWarn(msg), i)
+	log.Printf(conf.getWarn(msg)+"\n", i)
 }
 
 func (conf *Config) getWarn(msg string) (res string) {
 	line := *conf.line
 	if line == 0 {
-		res = fmt.Sprintf("%s: %s\n", conf.path, msg)
+		res = fmt.Sprintf("%s: %s", conf.path, msg)
 		return
 	}
-	res = fmt.Sprintf("%s:%d: %s\n", conf.path, line, msg)
+	res = fmt.Sprintf("%s:%d: %s", conf.path, line, msg)
 	return
 }
 
