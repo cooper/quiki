@@ -90,6 +90,7 @@ func setupWiki(wiki wikiInfo) error {
 			root = wikiRoot + root
 		}
 
+		root += "/"
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			handler(rootType, root, w, r)
 		})
