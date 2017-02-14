@@ -11,15 +11,7 @@ import (
 	"time"
 )
 
-type wikiInfo struct {
-	name     string         // wiki name
-	password string         // wiki password for read authentication
-	confPath string         // path to wiki configuration
-	conf     *config.Config // wiki config instance
-}
-
 var conf *config.Config
-var wikis map[string]wikiInfo
 
 func main() {
 
@@ -35,43 +27,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// parse configuration for each wiki
-	wikis := conf.GetMap("server.wiki")
-	for wikiName := range wikis {
-
-        // get wiki config path and password
-		var wikiConfPath, wikiPassword string
-		if err := conf.RequireMany(map[string]*string{
-			"server.wiki." + wikiName + ".config":   &wikiConfPath,
-			"server.wiki." + wikiName + ".password": &wikiPassword,
-		}); err != nil {
-			log.Fatal(err)
-		}
-
-		// parse the wiki configuration
-		wikiConf := config.New(wikiConfPath)
-		if err := wikiConf.Parse(); err != nil {
-			log.Fatal(err)
-		}
-
-		// store the wiki info
-		wikis[wikiName] = wikiInfo{
-			name:     wikiName,
-			password: wikiPassword,
-			confPath: wikiConfPath,
-			conf:     wikiConf,
-		}
-	}
-
 	// port is required
 	port, err := conf.Require("quiki.http.port")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// set up wikis
+	if err := initializeWikis(); err != nil {
+		log.Fatal(err)
+	}
+
 	// setup the transport
 	if err := initTransport(); err != nil {
-		log.Fatal("can't initialize transport: " + err.Error())
+		log.Fatal(err)
 	}
 
 	sess := &wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
@@ -89,6 +58,8 @@ func main() {
 			return
 		}
 		fmt.Fprint(w, res)
+	})
+	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// listen
