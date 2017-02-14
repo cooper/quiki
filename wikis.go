@@ -69,7 +69,11 @@ func setupWiki(wiki wikiInfo) error {
 	for _, rootType := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
 		if err != nil {
-			return err
+			// @root.wiki is optional
+			if rootType != "wiki" {
+				return err
+			}
+			continue
 		}
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			handler(rootType, root, w, r)
