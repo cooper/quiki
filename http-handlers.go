@@ -14,7 +14,7 @@ func handlePage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *h
 		fmt.Fprint(w, err)
 		return
 	}
-	fmt.Fprint(w, res)
+	handleResponse(res, w, r)
 }
 
 // image request
@@ -22,5 +22,14 @@ func handleImage(c wikiclient.Client, relPath string, w http.ResponseWriter, r *
 	fmt.Fprint(w, relPath, c, r)
 }
 
-func handleError(w http.ResponseWriter, r *http.Request) {
+func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
+	if res.Command == "error" {
+		handleError(res, w, r)
+		return
+	}
+	w.Header().Set("Content-Type", res.String("mime"))
+	w.Write([]byte(res.String("content")))
+}
+
+func handleError(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
 }

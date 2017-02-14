@@ -73,6 +73,19 @@ func MessageFromJson(data []byte) (msg Message, err error) {
 	return NewMessageWithID(cmd, args, uint(id)), nil
 }
 
+// fetch an arguments as a string
+func (msg Message) String(arg string) string {
+	iface, ok := msg.Args[arg]
+	if !ok {
+		return ""
+	}
+	str, ok := iface.(string)
+	if !ok {
+		return ""
+	}
+	return str
+}
+
 // translates the Message to JSON
 func (msg Message) ToJson() []byte {
 	ary := [...]interface{}{msg.Command, msg.Args, msg.ID}
