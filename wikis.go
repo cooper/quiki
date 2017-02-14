@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"github.com/cooper/quiki/config"
+	"github.com/cooper/quiki/wikiclient"
 	"net/http"
 	"strings"
 )
@@ -55,7 +56,7 @@ func initializeWikis() error {
 	return nil
 }
 
-var wikiRoots = map[string]func(root string, w http.ResponseWriter, r *http.Request){
+var wikiRoots = map[string]func(c wikiclient.Client, w http.ResponseWriter, r *http.Request){
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -74,6 +75,12 @@ func setupWiki(wiki wikiInfo) error {
 	if wikiRoot == "" {
 		wikiRoot = "/" + wiki.name
 		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
+	}
+
+	// make a generic session used for read access for this wiki
+	readSess := &wikiclient.Session{
+		WikiName:     wiki.name,
+		WikiPassword: wiki.password,
 	}
 
 	// setup handlers
@@ -98,7 +105,15 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		root += "/"
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			handler(root, w, r)
+			c := wikiclient.Client{tr, readSess, 3}
+
+			// the transport is not connected
+			if tr.Dead() {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			}
+
+			handler(c, w, r)
 		})
 	}
 

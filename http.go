@@ -1,13 +1,16 @@
 // Copyright (c) 2017, Mitchell Cooper
 package main
 
-import "net/http"
-import "log"
+import (
+	"github.com/cooper/quiki/wikiclient"
+	"log"
+	"net/http"
+)
 
-func handlePage(root string, w http.ResponseWriter, r *http.Request) {
-	log.Println(r)
+func handlePage(c wikiclient.Client, w http.ResponseWriter, r *http.Request) {
+	log.Println(c, r)
 }
 
-func handleImage(root string, w http.ResponseWriter, r *http.Request) {
-	log.Println(r)
+func handleImage(c wikiclient.Client, w http.ResponseWriter, r *http.Request) {
+	log.Println(c, r)
 }

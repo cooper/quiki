@@ -118,54 +118,54 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 	case '@', '%':
 
 		// we're already in a variable name
-		if state.buffType() == VAR_NAME {
+		if state.buffType() == bufVarName {
 			return errors.New("Already in variable name @" + state.endBuffer())
 		}
 
 		// this is only allowed at the top level
-		if state.buffType() != NO_BUF {
+		if state.buffType() != bufNone {
 			goto realDefault
 		}
 
 		// we're not in a value, so this starts a variable name
 		state.varPercent = b == '%'
-		state.startBuffer(VAR_NAME)
+		state.startBuffer(bufVarName)
 
 	// end of variable name, start of string value
 	case ':':
 
 		// not in a variable name
-		if state.buffType() != VAR_NAME {
+		if state.buffType() != bufVarName {
 			goto realDefault
 		}
 
 		// we're in the var name, so terminate it
 		state.varName = state.endBuffer()
-		state.startBuffer(VAR_VALUE)
+		state.startBuffer(bufVarValue)
 
 		// start of a text format
 	case '[':
 
 		// we're already in a text format.
 		// this is supported by wikifier but not here
-		if state.buffType() == VAR_FORMAT {
+		if state.buffType() == bufVarFormat {
 			return errors.New("Square brackets in format not yet supported")
 		}
 
 		// we aren't in a variable value, or maybe
 		// the current variable does not allow interpolation
-		if state.buffType() != VAR_VALUE || state.varPercent {
+		if state.buffType() != bufVarValue || state.varPercent {
 			goto realDefault
 		}
 
 		// otherwise, this starts a formatting token
-		state.startBuffer(VAR_FORMAT)
+		state.startBuffer(bufVarFormat)
 
 	// end of a text format
 	case ']':
 
 		// not in a format
-		if state.buffType() != VAR_FORMAT {
+		if state.buffType() != bufVarFormat {
 			goto realDefault
 		}
 
@@ -187,13 +187,13 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 	// end of a variable definition
 	case ';':
 
-		if state.buffType() == VAR_NAME {
+		if state.buffType() == bufVarName {
 
 			// terminating a boolean
 			state.endBuffer()
 			conf.Set(state.getVariable(), "1")
 
-		} else if state.buffType() == VAR_VALUE {
+		} else if state.buffType() == bufVarValue {
 
 			// terminating a string
 			value := strings.TrimSpace(state.endBuffer())

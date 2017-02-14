@@ -10,10 +10,10 @@ import (
 type buffType uint8
 
 const (
-	NO_BUF     buffType = iota // no buffer
-	VAR_NAME                   // variable name
-	VAR_VALUE                  // string variable value
-	VAR_FORMAT                 // formatted text in between square brackets
+	bufNone      buffType = iota // no buffer
+	bufVarName                   // variable name
+	bufVarValue                  // string variable value
+	bufVarFormat                 // formatted text in between square brackets
 )
 
 // defines a buffer and its type
@@ -74,7 +74,7 @@ func (state *parserState) buffType() buffType {
 
 	// there are no buffers
 	if len(state.buffers) == 0 {
-		return NO_BUF
+		return bufNone
 	}
 
 	return state.buffers[len(state.buffers)-1].buffType
