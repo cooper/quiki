@@ -7,6 +7,7 @@ import (
 	"github.com/cooper/quiki/wikiclient"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type wikiInfo struct {
@@ -105,11 +106,12 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		root += "/"
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			c := wikiclient.Client{tr, readSess, 3}
+			c := wikiclient.Client{tr, readSess, 3 * time.Second}
 
 			// the transport is not connected
 			if tr.Dead() {
 				w.WriteHeader(http.StatusServiceUnavailable)
+				w.Write([]byte("503 service unavailable"))
 				return
 			}
 
