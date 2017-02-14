@@ -57,7 +57,7 @@ func initializeWikis() error {
 	return nil
 }
 
-var wikiRoots = map[string]func(c wikiclient.Client, w http.ResponseWriter, r *http.Request){
+var wikiRoots = map[string]func(wikiclient.Client, string, http.ResponseWriter, *http.Request){
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -115,7 +115,10 @@ func setupWiki(wiki wikiInfo) error {
 				return
 			}
 
-			handler(c, w, r)
+			// determine the path relative to the root
+			relPath := strings.TrimPrefix(r.URL.Path, root)
+
+			handler(c, relPath, w, r)
 		})
 	}
 
