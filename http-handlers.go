@@ -34,4 +34,5 @@ func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Reque
 }
 
 func handleError(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
+	http.NotFound(w, r)
 }
