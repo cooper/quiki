@@ -39,15 +39,12 @@ func main() {
 	wikis := conf.GetMap("server.wiki")
 	for wikiName := range wikis {
 
-		// wiki configuration path
-		wikiConfPath, err := conf.Require("server.wiki." + wikiName + ".config")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// wiki password for read authentication
-		wikiPassword, err := conf.Require("server.wiki." + wikiName + ".password")
-		if err != nil {
+        // get wiki config path and password
+		var wikiConfPath, wikiPassword string
+		if err := conf.RequireMany(map[string]*string{
+			"server.wiki." + wikiName + ".config":   &wikiConfPath,
+			"server.wiki." + wikiName + ".password": &wikiPassword,
+		}); err != nil {
 			log.Fatal(err)
 		}
 

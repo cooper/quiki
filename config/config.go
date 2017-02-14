@@ -108,11 +108,13 @@ func (conf *Config) Require(varName string) (string, error) {
 }
 
 // return an error if any of the passed variables are missing
-func (conf *Config) RequireMany(varNames ...string) error {
-	for _, varName := range varNames {
-		if _, err := conf.Require(varName); err != nil {
+func (conf *Config) RequireMany(variables map[string]*string) error {
+	for varName, ptr := range variables {
+		val, err := conf.Require(varName)
+		if err != nil {
 			return err
 		}
+		*ptr = val
 	}
 	return nil
 }
