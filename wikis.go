@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"github.com/cooper/quiki/config"
+	"net/http"
 )
 
 type wikiInfo struct {
@@ -53,6 +54,8 @@ func initializeWikis() error {
 	return nil
 }
 
+var wikiRoots = [...]string{"wiki", "page", "image"}
+
 // initialize a wiki
 func setupWiki(wiki wikiInfo) error {
 
@@ -60,6 +63,17 @@ func setupWiki(wiki wikiInfo) error {
 	wiki.conf = config.New(wiki.confPath)
 	if err := wiki.conf.Parse(); err != nil {
 		return err
+	}
+
+	// setup the handlers
+	for _, rootType := range wikiRoots {
+		root, err := wiki.conf.Require("root." + rootType)
+		if err != nil {
+			return err
+		}
+		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
+			handler(rootType, root, w, r)
+		})
 	}
 
 	// store the wiki info
