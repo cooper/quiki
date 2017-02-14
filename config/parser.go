@@ -62,7 +62,7 @@ func (conf *Config) Warn(msg string) {
 }
 
 func (conf *Config) Warnf(msg string, i ...interface{}) {
-	conf.Warn(conf.getWarnf(msg, i))
+	conf.Warn(conf.getWarnf(msg, i...))
 }
 
 func (conf *Config) getWarn(msg string) string {
@@ -72,10 +72,12 @@ func (conf *Config) getWarn(msg string) string {
 func (conf *Config) getWarnf(msg string, i ...interface{}) (res string) {
 	line := *conf.line
 	if line == 0 {
-		res = fmt.Sprintf("%s: "+msg, conf.path, i)
+		i = append([]interface{}{conf.path}, i)
+		res = fmt.Sprintf("%s: "+msg, i...)
 		return
 	}
-	res = fmt.Sprintf("%s:%d: "+msg, conf.path, line, i)
+	i = append([]interface{}{conf.path, line}, i)
+	res = fmt.Sprintf("%s:%d: "+msg, i...)
 	return
 }
 
