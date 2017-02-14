@@ -43,25 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	sess := &wikiclient.Session{WikiName: "notroll", WikiPassword: "hi"}
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		c := wikiclient.Client{
-			Transport: tr,
-			Session:   sess,
-			Timeout:   3 * time.Second,
-		}
-		res, err := c.Request(wikiclient.NewMessage("page", map[string]interface{}{
-			"name": "hi.page",
-		}))
-		if err != nil {
-			fmt.Fprint(w, "some error happended: ", err)
-			return
-		}
-		fmt.Fprint(w, res)
-	})
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-	})
-
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("quiki.http.bind")+":"+port, nil))
 }
