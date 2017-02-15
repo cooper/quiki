@@ -71,3 +71,7 @@ func (p wikiPage) VisibleTitle() string {
 func (p wikiPage) PageCSS() string {
 	return ""
 }
+
+func (p wikiPage) Content() string {
+	return p.Res.String("content")
+}
