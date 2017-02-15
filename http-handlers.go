@@ -10,12 +10,7 @@ import (
 // page request
 func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	res, err := wiki.client.DisplayPage(relPath)
-	if err != nil {
-		fmt.Fprint(w, err)
-		return
-	}
-	if res.String("type") == "not found" {
-		handleError(res, w, r)
+	if handleError(err, w, r) || handleError(res, w, r) {
 		return
 	}
 	renderTemplate(wiki, w, "page", wikiPage{
@@ -28,6 +23,11 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 
 // image request
 func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	res, err := wiki.client.DisplayImage(relPath, 0, 0)
+	if handleError(err, w, r) || handleError(res, w, r) {
+		return
+	}
+	fmt.Fprint(w, res)
 }
 
 // func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
@@ -41,8 +41,19 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 // 	w.Write([]byte(res.String("content")))
 // }
 
-func handleError(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
-	http.NotFound(w, r)
+func handleError(errMaybe interface{}, w http.ResponseWriter, r *http.Request) bool {
+	var msg string
+	switch err := errMaybe.(type) {
+	case nil:
+		return false
+	case wikiclient.Message:
+		if err.String("type") != "not found" {
+			return false
+		}
+		msg = err.String("error")
+	}
+	http.Error(w, msg, http.StatusNotFound)
+	return true
 }
 
 func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, p wikiPage) {
