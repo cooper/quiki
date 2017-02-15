@@ -5,9 +5,9 @@
     <title>{{.VisibleTitle}}</title>
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/style.css" />
     <link rel="stylesheet" type="text/css" href="/styles/wiki.css" />
-    {{if .PageCSS}}
+    {{with .PageCSS}}
     <style type="text/css">
-    {{.PageCSS}}
+    {{.}}
     </style>
     {{end}}
 </head>
