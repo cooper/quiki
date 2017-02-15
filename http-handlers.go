@@ -22,7 +22,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 		Title:      res.String("title"),
 		WikiTitle:  wiki.name,
 		Res:        res,
-		StaticRoot: "TODO",
+		StaticRoot: wiki.template.staticRoot,
 	})
 }
 

@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/cooper/quiki/wikiclient"
 	"html/template"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,13 +17,12 @@ type wikiTemplate struct {
 	path       string             // template directory path
 	template   *template.Template // master HTML template
 	staticPath string             // static file directory path, if any
+	staticRoot string             // static file directory HTTP root, if any
 }
 
-func getTemplate(path string) (wikiTemplate, error) {
+func getTemplate(name string) (wikiTemplate, error) {
 	var t wikiTemplate
-	var staticPath string
-
-	path = templateDir + "/" + path
+	path := templateDir + "/" + name
 
 	// template is already cached
 	if t, ok := templates[path]; ok {
@@ -42,7 +42,10 @@ func getTemplate(path string) (wikiTemplate, error) {
 
 		// static content directory
 		if info.IsDir() && info.Name() == "static" {
-			staticPath = path
+			t.staticPath = path
+			t.staticRoot = "/tmpl/" + name
+			fileServer := http.FileServer(http.Dir(path))
+			http.Handle(t.staticRoot+"/", fileServer)
 		}
 
 		return err
@@ -51,7 +54,8 @@ func getTemplate(path string) (wikiTemplate, error) {
 	}
 
 	// cache the template
-	t = wikiTemplate{path, tmpl, staticPath}
+	t.path = path
+	t.template = tmpl
 	templates[path] = t
 	return t, nil
 }

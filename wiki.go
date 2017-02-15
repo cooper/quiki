@@ -96,13 +96,6 @@ func setupWiki(wiki wikiInfo) error {
 	}
 	wiki.template = template
 
-	// if the template has a static file directory, serve it
-	if template.staticPath != "" {
-		fileServer := http.FileServer(http.Dir(template.staticPath))
-		pfx := wikiRoot + "/static/"
-		http.Handle(pfx, http.StripPrefix(pfx, fileServer))
-	}
-
 	// make a generic session used for read access for this wiki
 	readSess := &wikiclient.Session{
 		WikiName:     wiki.name,
