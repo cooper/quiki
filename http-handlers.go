@@ -46,7 +46,7 @@ func handleError(res wikiclient.Message, w http.ResponseWriter, r *http.Request)
 }
 
 func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, p wikiPage) {
-	err := wiki.template.template.ExecuteTemplate(w, templateName+".tpl", p)
+	err := wiki.template.template.ExecuteTemplate(w, templateName+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
