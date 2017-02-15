@@ -45,7 +45,8 @@ func getTemplate(name string) (wikiTemplate, error) {
 			t.staticPath = path
 			t.staticRoot = "/tmpl/" + name
 			fileServer := http.FileServer(http.Dir(path))
-			http.Handle(t.staticRoot+"/", fileServer)
+			pfx := t.staticRoot + "/"
+			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
 		}
 
 		return err
