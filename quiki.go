@@ -39,13 +39,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// we might be able to get the wikifier path from here
+	wikifierPath = conf.Get("server.dir.wikifier")
+
 	// set up wikis
 	if err := initializeWikis(); err != nil {
 		log.Fatal(err)
 	}
 
-	// we hopefully found the wikifier somehow
-	if err := setupStyles(); err != nil {
+	// setup static files from wikifier
+	if err := setupStatic(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -58,9 +61,11 @@ func main() {
 	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
 }
 
-func setupStyles() error {
+func setupStatic() error {
 	if wikifierPath == "" {
-		return errors.New("can't find wikifier; at least one configured wiki needs @dir.wikifier")
+		return errors.New("can't find wikifier. set @server.dir.wikifier; " +
+			"otherwise at least one configured wiki needs @dir.wikifier",
+		)
 	} else if stat, err := os.Stat(wikifierPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
@@ -72,7 +77,7 @@ func setupStyles() error {
 		)
 		return errors.New(errStr)
 	}
-	fileServer := http.FileServer(http.Dir(wikifierPath + "/interfaces/styles"))
-	http.Handle("/styles/", http.StripPrefix("/styles/", fileServer))
+	fileServer := http.FileServer(http.Dir(wikifierPath + "/static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 	return nil
 }

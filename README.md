@@ -55,7 +55,7 @@ will not start.
 ### server.wiki.[name].template
 
 _Optional_. Specifies the template to be used on the wiki by the name of
-`[name]`. This is relative to `server.dir.template`.
+`[name]`. This is relative to [`server.dir.template`](#serverwikinametemplate).
 
 If you do not specify, the [default template](templates/default) will be
 assumed.
