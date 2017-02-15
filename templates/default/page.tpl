@@ -1,3 +1,3 @@
 {{ template "header.tpl" . }}
-{{.Content}}
+{{.HTMLContent}}
 {{ template "footer.tpl" . }}

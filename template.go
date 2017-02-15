@@ -72,6 +72,6 @@ func (p wikiPage) PageCSS() string {
 	return ""
 }
 
-func (p wikiPage) Content() string {
-	return p.Res.String("content")
+func (p wikiPage) HTMLContent() template.HTML {
+	return template.HTML(p.Res.String("content"))
 }
