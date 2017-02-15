@@ -13,11 +13,12 @@ import (
 
 // represents a wiki
 type wikiInfo struct {
-	name     string         // wiki name
-	password string         // wiki password for read authentication
-	confPath string         // path to wiki configuration
-	template wikiTemplate   // template
-	conf     *config.Config // wiki config instance
+	name     string            // wiki name
+	password string            // wiki password for read authentication
+	confPath string            // path to wiki configuration
+	template wikiTemplate      // template
+	client   wikiclient.Client // client, only available in handlers
+	conf     *config.Config    // wiki config instance
 }
 
 // all wikis served by this quiki
@@ -62,7 +63,7 @@ func initializeWikis() error {
 }
 
 // wiki roots mapped to handler functions
-var wikiRoots = map[string]func(wikiclient.Client, string, http.ResponseWriter, *http.Request){
+var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Request){
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -123,7 +124,7 @@ func setupWiki(wiki wikiInfo) error {
 		root += "/"
 		realHandler := handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			c := wikiclient.Client{tr, readSess, 3 * time.Second}
+			wiki.client = wikiclient.Client{tr, readSess, 3 * time.Second}
 
 			// the transport is not connected
 			if tr.Dead() {
@@ -138,7 +139,7 @@ func setupWiki(wiki wikiInfo) error {
 				return
 			}
 
-			realHandler(c, relPath, w, r)
+			realHandler(wiki, relPath, w, r)
 		})
 	}
 
