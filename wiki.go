@@ -4,8 +4,8 @@ package main
 
 import (
 	"errors"
+	wikiclient "github.com/cooper/go-wikiclient"
 	"github.com/cooper/quiki/config"
-	"github.com/cooper/quiki/wikiclient"
 	"net/http"
 	"strings"
 	"time"

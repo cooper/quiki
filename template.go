@@ -2,7 +2,7 @@
 package main
 
 import (
-	"github.com/cooper/quiki/wikiclient"
+	wikiclient "github.com/cooper/go-wikiclient"
 	"html/template"
 	"net/http"
 	"os"

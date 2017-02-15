@@ -4,7 +4,7 @@ package main
 
 import (
 	"errors"
-	"github.com/cooper/quiki/wikiclient"
+	wikiclient "github.com/cooper/go-wikiclient"
 	"log"
 	"time"
 )
