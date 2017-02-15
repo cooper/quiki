@@ -11,12 +11,9 @@
     </style>
     {{end}}
     <script type="text/javascript" src="{{.StaticRoot}}/retina.min.js"></script>
-    <script type="text/javascript">
-        window.addEventListener('domready', retinajs);
-    </script>
 </head>
 
-<body>
+<body onload="retinajs()">
 <div id="container">
 
     <div id="header">
