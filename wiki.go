@@ -78,6 +78,11 @@ func setupWiki(wiki wikiInfo) error {
 		return err
 	}
 
+	// maybe we can get the wikifier path from this
+	if wikifierPath == "" {
+		wikifierPath = wiki.conf.Get("dir.wikifier")
+	}
+
 	// find the wiki root. if not configured, use the wiki name
 	var wikiRoot = wiki.conf.Get("root.wiki")
 	if wikiRoot == "" {
