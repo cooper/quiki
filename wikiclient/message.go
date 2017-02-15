@@ -80,6 +80,12 @@ func (msg Message) String(arg string) string {
 	if !ok {
 		return ""
 	}
+	switch val := iface.(type) {
+	case nil:
+		return ""
+	case string:
+		return val
+	}
 	return fmt.Sprintf("%v", iface)
 }
 
