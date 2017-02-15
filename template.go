@@ -18,6 +18,7 @@ type wikiTemplate struct {
 	template   *template.Template // master HTML template
 	staticPath string             // static file directory path, if any
 	staticRoot string             // static file directory HTTP root, if any
+	logo       string             // path for logo file, if any
 }
 
 func getTemplate(name string) (wikiTemplate, error) {
@@ -49,6 +50,11 @@ func getTemplate(name string) (wikiTemplate, error) {
 			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
 		}
 
+		// found a logo
+		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticRoot+"/logo.") {
+			t.logo = t.staticRoot + "/" + info.Name()
+		}
+
 		return err
 	}); err != nil {
 		return t, err
@@ -65,7 +71,7 @@ type wikiPage struct {
 	WholeTitle string             // optional, shown in <title> as-is
 	Title      string             // page title
 	WikiTitle  string             // wiki title
-    WikiLogo   string             // path to wiki logo image
+	WikiLogo   string             // path to wiki logo image
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
 }
