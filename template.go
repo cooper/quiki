@@ -85,12 +85,7 @@ func (p wikiPage) VisibleTitle() string {
 }
 
 func (p wikiPage) PageCSS() template.CSS {
-	css := p.Res.String("css")
-	if css == "" {
-		return ""
-	}
-	css = `<style type="text/css">` + "\n" + css + "\n" + `</style>`
-	return template.CSS(css)
+	return template.CSS(p.Res.String("css"))
 }
 
 func (p wikiPage) HTMLContent() template.HTML {
