@@ -190,7 +190,7 @@ func (conf *Config) handleByte(state *parserState, b byte) error {
 		if state.buffType() == bufVarName {
 
 			// terminating a boolean
-			state.endBuffer()
+			state.varName = state.endBuffer()
 			conf.Set(state.getVariable(), "1")
 
 		} else if state.buffType() == bufVarValue {
