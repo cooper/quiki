@@ -3,6 +3,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"github.com/cooper/quiki/config"
 	"log"
 	"net/http"
@@ -11,6 +13,9 @@ import (
 
 // wikiserver config instance
 var conf *config.Config
+
+// wikifier directory path
+var wikifierPath string
 
 func main() {
 
@@ -25,7 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// port is required
+	// these are required
 	var port string
 	if err := conf.RequireMany(map[string]*string{
 		"server.http.port":    &port,
@@ -34,10 +39,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//
-
 	// set up wikis
 	if err := initializeWikis(); err != nil {
+		log.Fatal(err)
+	}
+
+	// we hopefully found the wikifier somehow
+	if err := setupStyles(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -48,4 +56,23 @@ func main() {
 
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
+}
+
+func setupStyles() error {
+	if wikifierPath == "" {
+		return errors.New("can't find wikifier; at least one configured wiki needs @dir.wikifier")
+	} else if stat, err := os.Stat(wikifierPath); err != nil || !stat.IsDir() {
+		if err == nil {
+			err = errors.New("not a directory")
+		}
+		errStr := fmt.Sprintf(
+			"@dir.wikifier (%s) error: %v\n",
+			wikifierPath,
+			err.Error(),
+		)
+		return errors.New(errStr)
+	}
+	fileServer := http.FileServer(http.Dir(wikifierPath + "/interfaces/styles"))
+	http.Handle("/styles/", http.StripPrefix("/styles/", fileServer))
+	return nil
 }
