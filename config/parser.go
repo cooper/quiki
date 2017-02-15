@@ -47,7 +47,7 @@ func (conf *Config) Parse() error {
 
 		// byte error
 		if err != nil {
-			err = errors.New(fmt.Sprintf("%s:%d: %s", conf.path, *conf.line, err.Error()))
+			err = errors.New(conf.getWarn(err.Error()))
 			return err
 		}
 	}

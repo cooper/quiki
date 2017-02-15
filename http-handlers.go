@@ -4,7 +4,10 @@ package main
 import (
 	"github.com/cooper/quiki/wikiclient"
 	"net/http"
+	"regexp"
 )
+
+var imageRegex = regexp.MustCompile("")
 
 // page request
 func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
@@ -26,7 +29,7 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 	if handleError(err, w, r) || handleError(res, w, r) {
 		return
 	}
-    http.ServeFile(w, r, res.String("path"))
+	http.ServeFile(w, r, res.String("path"))
 }
 
 // func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {

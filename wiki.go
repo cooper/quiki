@@ -30,19 +30,22 @@ func initializeWikis() error {
 
 	// find wikis
 	wikiMap := conf.GetMap("server.wiki")
-	if len(wikiMap) == 0 {
-		return errors.New("no wikis configured")
-	}
 
 	// set up each wiki
 	wikis = make(map[string]wikiInfo, len(wikiMap))
 	for wikiName := range wikiMap {
+		configPfx := "server.wiki." + wikiName
+
+		// not enabled
+		if !conf.GetBool(configPfx + ".quiki") {
+			continue
+		}
 
 		// get wiki config path and password
 		var wikiConfPath, wikiPassword string
 		if err := conf.RequireMany(map[string]*string{
-			"server.wiki." + wikiName + ".config":   &wikiConfPath,
-			"server.wiki." + wikiName + ".password": &wikiPassword,
+			configPfx + ".config":   &wikiConfPath,
+			configPfx + ".password": &wikiPassword,
 		}); err != nil {
 			return err
 		}
@@ -58,6 +61,14 @@ func initializeWikis() error {
 		if err := setupWiki(wiki); err != nil {
 			return err
 		}
+	}
+
+	// no wikis?
+	if len(wikis) == 0 {
+		if len(wikiMap) == 0 {
+			return errors.New("no wikis configured")
+		}
+		return errors.New("none of the configured wikis are enabled")
 	}
 
 	return nil
@@ -83,12 +94,8 @@ func setupWiki(wiki wikiInfo) error {
 		wikifierPath = wiki.conf.Get("dir.wikifier")
 	}
 
-	// find the wiki root. if not configured, use the wiki name
+	// find the wiki root
 	var wikiRoot = wiki.conf.Get("root.wiki")
-	if wikiRoot == "" {
-		wikiRoot = "/" + wiki.name
-		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
-	}
 
 	// find the template. if not configured, use default
 	templatePath := conf.Get("server.wiki." + wiki.name + ".template")
