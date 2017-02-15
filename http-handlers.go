@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/cooper/quiki/wikiclient"
 	"net/http"
 )
@@ -27,7 +26,7 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 	if handleError(err, w, r) || handleError(res, w, r) {
 		return
 	}
-	fmt.Fprint(w, res)
+    http.ServeFile(w, r, res.String("path"))
 }
 
 // func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
