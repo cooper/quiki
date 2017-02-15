@@ -51,7 +51,7 @@ func getTemplate(name string) (wikiTemplate, error) {
 		}
 
 		// found a logo
-		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticRoot+"/logo.") {
+		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
 			t.logo = t.staticRoot + "/" + info.Name()
 		}
 
