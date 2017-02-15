@@ -13,10 +13,10 @@ import (
 
 // represents a wiki
 type wikiInfo struct {
-	name     string            // wiki name
+	name     string            // wiki shortname
+	title    string            // wiki title from @name in the wiki config
 	password string            // wiki password for read authentication
 	confPath string            // path to wiki configuration
-	root     string            // HTTP root for the wiki, without trailing slash
 	template wikiTemplate      // template
 	client   wikiclient.Client // client, only available in handlers
 	conf     *config.Config    // wiki config instance
@@ -125,7 +125,6 @@ func setupWiki(wiki wikiInfo) error {
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		http.HandleFunc(root, http.NotFound)
-		wiki.root = root
 		root += "/"
 
 		// add the real handler
@@ -151,6 +150,7 @@ func setupWiki(wiki wikiInfo) error {
 	}
 
 	// store the wiki info
+	wiki.title = wiki.conf.Get("name")
 	wikis[wiki.name] = wiki
 	return nil
 }

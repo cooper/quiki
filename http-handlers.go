@@ -20,7 +20,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 	}
 	renderTemplate(wiki, w, "page", wikiPage{
 		Title:      res.String("title"),
-		WikiTitle:  wiki.name,
+		WikiTitle:  wiki.title,
 		Res:        res,
 		StaticRoot: wiki.template.staticRoot,
 	})
