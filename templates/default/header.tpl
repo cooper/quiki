@@ -21,7 +21,11 @@
             <li><a href="/">Main page</a></li>
         </ul>
         <a href="/">
-            <img src="/file/logo.png" alt="Wiki" />
+            {{with .WikiLogo}}
+            <img src="{{.}}" alt="Wiki" />
+            {{else}}
+            <h1>{{.WikiTitle}}</h1>
+            {{end}}
         </a>
     </div>
 

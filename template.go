@@ -62,19 +62,12 @@ func getTemplate(name string) (wikiTemplate, error) {
 }
 
 type wikiPage struct {
-
-	// titles -
-	// need to provide either WholeTitle (by itself)
-	// or Title (the page title) and WikiTitle (the wiki name) together
-	WholeTitle string
-	Title      string
-	WikiTitle  string
-
-	// response
-	Res wikiclient.Message
-
-	// path to static/ directory within the template
-	StaticRoot string
+	WholeTitle string             // optional, shown in <title> as-is
+	Title      string             // page title
+	WikiTitle  string             // wiki title
+    WikiLogo   string             // path to wiki logo image
+	Res        wikiclient.Message // response
+	StaticRoot string             // path to static resources
 }
 
 func (p wikiPage) VisibleTitle() string {
