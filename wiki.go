@@ -30,6 +30,9 @@ func initializeWikis() error {
 
 	// find wikis
 	wikiMap := conf.GetMap("server.wiki")
+    if len(wikiMap) == 0 {
+        return errors.New("no wikis configured")
+    }
 
 	// set up each wiki
 	wikis = make(map[string]wikiInfo, len(wikiMap))
@@ -63,11 +66,8 @@ func initializeWikis() error {
 		}
 	}
 
-	// no wikis?
+	// still no wikis?
 	if len(wikis) == 0 {
-		if len(wikiMap) == 0 {
-			return errors.New("no wikis configured")
-		}
 		return errors.New("none of the configured wikis are enabled")
 	}
 
