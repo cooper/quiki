@@ -29,7 +29,7 @@ func getTemplate(path string) (wikiTemplate, error) {
 	// parse HTML templates
 	tmpl := template.New("")
 	if err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
-		if strings.HasSuffix(filePath, ".html") {
+		if strings.HasSuffix(filePath, ".tpl") {
 			if _, err := tmpl.ParseFiles(filePath); err != nil {
 				return err
 			}

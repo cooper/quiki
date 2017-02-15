@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>{{.VisibleTitle()}}</title>
+    <title>{{.VisibleTitle}}</title>
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/style.css" />
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/wiki.css" />
-    {{.PageCSS()}}
+    {{.PageCSS}}
 </head>
 
 <body>
