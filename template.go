@@ -22,16 +22,16 @@ type wikiTemplate struct {
 
 func getTemplate(name string) (wikiTemplate, error) {
 	var t wikiTemplate
-	path := templateDir + "/" + name
+	templatePath := templateDir + "/" + name
 
 	// template is already cached
-	if t, ok := templates[path]; ok {
+	if t, ok := templates[templatePath]; ok {
 		return t, nil
 	}
 
 	// parse HTML templates
 	tmpl := template.New("")
-	if err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
 
 		// a template
 		if strings.HasSuffix(filePath, ".tpl") {
@@ -42,9 +42,9 @@ func getTemplate(name string) (wikiTemplate, error) {
 
 		// static content directory
 		if info.IsDir() && info.Name() == "static" {
-			t.staticPath = path
+			t.staticPath = filePath
 			t.staticRoot = "/tmpl/" + name
-			fileServer := http.FileServer(http.Dir(path))
+			fileServer := http.FileServer(http.Dir(filePath))
 			pfx := t.staticRoot + "/"
 			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
 		}
@@ -55,9 +55,9 @@ func getTemplate(name string) (wikiTemplate, error) {
 	}
 
 	// cache the template
-	t.path = path
+	t.path = templatePath
 	t.template = tmpl
-	templates[path] = t
+	templates[templatePath] = t
 	return t, nil
 }
 
