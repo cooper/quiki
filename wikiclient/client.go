@@ -3,6 +3,7 @@ package wikiclient
 
 import (
 	"errors"
+	"strconv"
 	"time"
 )
 
@@ -22,8 +23,8 @@ func (c Client) DisplayPage(pageName string) (Message, error) {
 func (c Client) DisplayImage(imageName string, width, height int) (Message, error) {
 	return c.Request("image", map[string]interface{}{
 		"name":   imageName,
-		"width":  string(width),
-		"height": string(height),
+		"width":  strconv.Itoa(width),
+		"height": strconv.Itoa(height),
 	})
 }
 
