@@ -14,6 +14,12 @@ type Client struct {
 	Timeout   time.Duration // how long to waits on requests
 }
 
+// create a client and clean the session if necessary
+func NewClient(tr Transport, sess *Session, timeout time.Duration) Client {
+	sess.Clean(tr)
+	return Client{tr, sess, timeout}
+}
+
 // display a page
 func (c Client) DisplayPage(pageName string) (Message, error) {
 	return c.Request("page", map[string]interface{}{"name": pageName})

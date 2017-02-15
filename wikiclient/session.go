@@ -20,10 +20,26 @@ type Session struct {
 	UserName     string
 	UserPassword string
 
+	ReadAccess  bool // true if authenticated for reading
+	WriteAccess bool // true if authenticated for writing
+
 	// session ID used for write reauthentication
 	// perhaps we can generate this automatically
 	sessionID string
 
-	ReadAccess  bool // true if authenticated for reading
-	WriteAccess bool // true if authenticated for writing
+	// ID of the transport at the last clean
+	transportID uint
+}
+
+// prepares the session for use with the given transport
+func (sess *Session) Clean(tr Transport) {
+
+	// nothing has changed
+	if sess.transportID == tr.ID() {
+		return
+	}
+
+	sess.transportID = tr.ID()
+	sess.ReadAccess = false
+	sess.WriteAccess = false
 }

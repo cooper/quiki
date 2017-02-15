@@ -137,7 +137,7 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		realHandler := handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			wiki.client = wikiclient.Client{tr, readSess, 3 * time.Second}
+			wiki.client = wikiclient.NewClient(tr, readSess, 3*time.Second)
 
 			// the transport is not connected
 			if tr.Dead() {

@@ -1,6 +1,8 @@
 // Copyright (c) 2017, Mitchell Cooper
 package wikiclient
 
+var transportID uint
+
 // used outside of transport
 type Transport interface {
 	Errors() <-chan error           // error channel
@@ -8,6 +10,7 @@ type Transport interface {
 	writeMessage(msg Message) error // write a message
 	Connect() error                 // connect to wikiserver
 	Dead() bool                     // true if not connected
+	ID() uint                       // transport identifier
 }
 
 // base for all transports
@@ -16,15 +19,18 @@ type transport struct {
 	read      chan Message // read messages waiting to be processed
 	write     chan Message // messages waiting to be written
 	connected bool         // transport is active
+	id        uint
 }
 
 // create transport base
 func createTransport() *transport {
+	transportID++
 	return &transport{
 		make(chan error),
 		make(chan Message),
 		make(chan Message),
 		false,
+		transportID,
 	}
 }
 
@@ -53,4 +59,9 @@ func (tr *transport) Errors() <-chan error {
 // true if the transport is not connected
 func (tr *transport) Dead() bool {
 	return !tr.connected
+}
+
+// transport identifier
+func (tr *transport) ID() uint {
+	return tr.id
 }
