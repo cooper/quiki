@@ -13,12 +13,15 @@ var templateDir string
 var templates = make(map[string]wikiTemplate)
 
 type wikiTemplate struct {
-	path     string
-	template *template.Template
+	path       string             // template directory path
+	template   *template.Template // master HTML template
+	staticPath string             // static file directory path, if any
 }
 
 func getTemplate(path string) (wikiTemplate, error) {
 	var t wikiTemplate
+	var staticPath string
+
 	path = templateDir + "/" + path
 
 	// template is already cached
@@ -29,18 +32,26 @@ func getTemplate(path string) (wikiTemplate, error) {
 	// parse HTML templates
 	tmpl := template.New("")
 	if err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+
+		// a template
 		if strings.HasSuffix(filePath, ".tpl") {
 			if _, err := tmpl.ParseFiles(filePath); err != nil {
 				return err
 			}
 		}
+
+		// static content directory
+		if info.IsDir() && info.Name() == "static" {
+			staticPath = path
+		}
+
 		return err
 	}); err != nil {
 		return t, err
 	}
 
 	// cache the template
-	t = wikiTemplate{path, tmpl}
+	t = wikiTemplate{path, tmpl, staticPath}
 	templates[path] = t
 	return t, nil
 }

@@ -16,6 +16,7 @@ type wikiInfo struct {
 	name     string            // wiki name
 	password string            // wiki password for read authentication
 	confPath string            // path to wiki configuration
+	root     string            // HTTP root for the wiki, without trailing slash
 	template wikiTemplate      // template
 	client   wikiclient.Client // client, only available in handlers
 	conf     *config.Config    // wiki config instance
@@ -77,6 +78,13 @@ func setupWiki(wiki wikiInfo) error {
 		return err
 	}
 
+	// find the wiki root. if not configured, use the wiki name
+	var wikiRoot = wiki.conf.Get("root.wiki")
+	if wikiRoot == "" {
+		wikiRoot = "/" + wiki.name
+		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
+	}
+
 	// find the template. if not configured, use default
 	templatePath := conf.Get("server.wiki." + wiki.name + ".template")
 	if templatePath == "" {
@@ -88,11 +96,11 @@ func setupWiki(wiki wikiInfo) error {
 	}
 	wiki.template = template
 
-	// find the wiki root. if not configured, use the wiki name
-	var wikiRoot = wiki.conf.Get("root.wiki")
-	if wikiRoot == "" {
-		wikiRoot = "/" + wiki.name
-		wiki.conf.Warn("@root.wiki not configured; using wiki name: " + wikiRoot)
+	// if the template has a static file directory, serve it
+	if template.staticPath != "" {
+		fileServer := http.FileServer(http.Dir(template.staticPath))
+		pfx := wikiRoot + "/static/"
+		http.Handle(pfx, http.StripPrefix(pfx, fileServer))
 	}
 
 	// make a generic session used for read access for this wiki
@@ -119,9 +127,10 @@ func setupWiki(wiki wikiInfo) error {
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		http.HandleFunc(root, http.NotFound)
+		wiki.root = root
+		root += "/"
 
 		// add the real handler
-		root += "/"
 		realHandler := handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = wikiclient.Client{tr, readSess, 3 * time.Second}
