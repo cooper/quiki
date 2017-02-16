@@ -118,10 +118,7 @@ func setupWiki(wiki wikiInfo) error {
 	// setup handlers
 	for rootType, handler := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
-		if err != nil {
-			if rootType == "wiki" {
-				continue
-			}
+		if err != nil && rootType != "wiki" {
 			return err
 		}
 
