@@ -135,7 +135,9 @@ func setupWiki(wiki wikiInfo) error {
 		}
 
 		// normally 'something/' handles 'something' as well; this prevents that
-		http.HandleFunc(root, http.NotFound)
+		if root != "" {
+			http.HandleFunc(root, http.NotFound)
+		}
 		root += "/"
 
 		// add the real handler
