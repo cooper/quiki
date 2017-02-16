@@ -150,6 +150,10 @@ func setupWiki(wiki wikiInfo) error {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
+			if relPath == "" {
+				http.NotFound(w, r)
+				return
+			}
 
 			realHandler(wiki, relPath, w, r)
 		})
