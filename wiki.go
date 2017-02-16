@@ -139,6 +139,7 @@ func setupWiki(wiki wikiInfo) error {
 
 		// add the real handler
 		realHandler := handler
+		realRootType := rootType
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = wikiclient.NewClient(tr, readSess, 3*time.Second)
 
@@ -150,7 +151,7 @@ func setupWiki(wiki wikiInfo) error {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
-			if relPath == "" && rootType != "wiki" {
+			if relPath == "" && realRootType != "wiki" {
 				http.NotFound(w, r)
 				return
 			}
