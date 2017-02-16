@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"regexp"
@@ -20,7 +21,7 @@ func handleWikiRoot(wiki wikiInfo, relPath string, w http.ResponseWriter, r *htt
 	}
 
 	// anything else is a 404
-	http.NotFound(w, r)
+	http.Error(w, fmt.Sprintf("relPath = %s; mainPage = %s", relPath, mainPage), http.StatusNotFound)
 }
 
 // page request
