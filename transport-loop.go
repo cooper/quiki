@@ -45,7 +45,7 @@ func initTransport() (err error) {
 		return
 	}
 
-	log.Println("connected to wikifier")
+	log.Println("connected to wikiserver")
 
 	// start the loop
 	go transportLoop()
