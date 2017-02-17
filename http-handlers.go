@@ -31,7 +31,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 	}
 	renderTemplate(wiki, w, "page", wikiPage{
 		Res:        res,
-		Title:      res.String("title"),
+		Title:      res.Get("title"),
 		WikiTitle:  wiki.title,
 		WikiLogo:   wiki.template.logo,
 		StaticRoot: wiki.template.staticRoot,
@@ -44,18 +44,18 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 	if handleError(err, w, r) || handleError(res, w, r) {
 		return
 	}
-	http.ServeFile(w, r, res.String("path"))
+	http.ServeFile(w, r, res.Get("path"))
 }
 
 // func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
-// 	if res.String("type") == "not found" {
+// 	if res.Get("type") == "not found" {
 // 		handleError(res, w, r)
 // 		return
 // 	}
-// 	w.Header().Set("Content-Type", res.String("mime"))
-// 	w.Header().Set("Content-Length", res.String("length"))
-// 	w.Header().Set("Last-Modified", res.String("modified"))
-// 	w.Write([]byte(res.String("content")))
+// 	w.Header().Set("Content-Type", res.Get("mime"))
+// 	w.Header().Set("Content-Length", res.Get("length"))
+// 	w.Header().Set("Last-Modified", res.Get("modified"))
+// 	w.Write([]byte(res.Get("content")))
 // }
 
 func handleError(errMaybe interface{}, w http.ResponseWriter, r *http.Request) bool {
@@ -64,10 +64,10 @@ func handleError(errMaybe interface{}, w http.ResponseWriter, r *http.Request) b
 	case nil:
 		return false
 	case wikiclient.Message:
-		if err.String("type") != "not found" {
+		if err.Get("type") != "not found" {
 			return false
 		}
-		msg = err.String("error")
+		msg = err.Get("error")
 	}
 	http.Error(w, msg, http.StatusNotFound)
 	return true
