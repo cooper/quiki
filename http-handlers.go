@@ -12,19 +12,25 @@ var imageRegex = regexp.MustCompile("")
 // master handler for the wiki root
 func handleWikiRoot(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 
-	// main page
-	mainPage := wiki.conf.Get("main_page")
-	if relPath == "" && mainPage != "" {
-		handlePage(wiki, mainPage, w, r)
-		return
-	}
-
 	// anything else is a 404
 	http.NotFound(w, r)
 }
 
 // page request
 func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+
+	// main page
+	if relPath == "" {
+		mainPage, err := wiki.conf.Require("main_page")
+		if err != nil {
+			handleError("No main page configured", w, r)
+			return
+		}
+		handlePage(wiki, mainPage, w, r)
+		return
+	}
+
+	// other page
 	res, err := wiki.client.DisplayPage(relPath)
 	if handleError(err, w, r) || handleError(res, w, r) {
 		return
@@ -63,6 +69,8 @@ func handleError(errMaybe interface{}, w http.ResponseWriter, r *http.Request) b
 	switch err := errMaybe.(type) {
 	case nil:
 		return false
+	case string:
+		msg = err
 	case wikiclient.Message:
 		if err.Get("type") != "not found" {
 			return false

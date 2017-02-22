@@ -76,7 +76,7 @@ func initializeWikis() error {
 
 // wiki roots mapped to handler functions
 var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Request){
-	"wiki":  handleWikiRoot,
+	"wiki":  handlePage,
 	"page":  handlePage,
 	"image": handleImage,
 }
