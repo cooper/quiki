@@ -75,9 +75,8 @@ func initializeWikis() error {
 }
 
 // wiki roots mapped to handler functions
-var didHandler = make(map[string]bool)
 var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Request){
-	"wiki":  handlePage, // main page
+	"wiki":  handleWikiRoot,
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -131,12 +130,6 @@ func setupWiki(wiki wikiInfo) error {
 			)
 			root = wikiRoot + root
 		}
-
-		// we already did this one
-		if didHandler[root] {
-			continue
-		}
-		didHandler[root] = true
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		if root != "" {
