@@ -75,8 +75,9 @@ func initializeWikis() error {
 }
 
 // wiki roots mapped to handler functions
+var didHandler = make(map[string]bool)
 var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Request){
-	"wiki":  handlePage,
+	"wiki":  handlePage, // main page
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -131,6 +132,12 @@ func setupWiki(wiki wikiInfo) error {
 			root = wikiRoot + root
 		}
 
+		// we already did this one
+		if didHandler[root] {
+			continue
+		}
+		didHandler[root] = true
+
 		// normally 'something/' handles 'something' as well; this prevents that
 		if root != "" {
 			http.HandleFunc(root, http.NotFound)
@@ -138,8 +145,7 @@ func setupWiki(wiki wikiInfo) error {
 		root += "/"
 
 		// add the real handler
-		realHandler := handler
-		realRootType := rootType
+		rootType, handler := rootType, handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = wikiclient.NewClient(tr, readSess, 3*time.Second)
 
@@ -151,12 +157,12 @@ func setupWiki(wiki wikiInfo) error {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
-			if relPath == "" && realRootType != "wiki" {
+			if relPath == "" && rootType != "wiki" {
 				http.NotFound(w, r)
 				return
 			}
 
-			realHandler(wiki, relPath, w, r)
+			handler(wiki, relPath, w, r)
 		})
 	}
 
