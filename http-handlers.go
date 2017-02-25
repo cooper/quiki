@@ -26,7 +26,7 @@ func handleWikiRoot(wiki wikiInfo, relPath string, w http.ResponseWriter, r *htt
 // page request
 func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	res, err := wiki.client.DisplayPage(relPath)
-	if handleError(err, w, r) || handleError(res, w, r) {
+	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
 		return
 	}
 	renderTemplate(wiki, w, "page", wikiPage{
@@ -41,36 +41,52 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 // image request
 func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	res, err := wiki.client.DisplayImage(relPath, 0, 0)
-	if handleError(err, w, r) || handleError(res, w, r) {
+	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
 		return
 	}
 	http.ServeFile(w, r, res.Get("path"))
 }
 
-// func handleResponse(res wikiclient.Message, w http.ResponseWriter, r *http.Request) {
-// 	if res.Get("type") == "not found" {
-// 		handleError(res, w, r)
-// 		return
-// 	}
-// 	w.Header().Set("Content-Type", res.Get("mime"))
-// 	w.Header().Set("Content-Length", res.Get("length"))
-// 	w.Header().Set("Last-Modified", res.Get("modified"))
-// 	w.Write([]byte(res.Get("content")))
-// }
+// this is set true when calling handlePage for the error page. this way, if an
+// error occurs when trying to display the error page, we don't infinitely loop
+// between handleError and handlePage
+var useLowLevelError bool
 
-func handleError(errMaybe interface{}, w http.ResponseWriter, r *http.Request) bool {
-	var msg string
+func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) bool {
+	msg := "An unknown error has occurred"
 	switch err := errMaybe.(type) {
+
+	// if there's no error, stop
 	case nil:
 		return false
-	case string:
-		msg = err
+
+		// message of type "not found" is an error; otherwise, stop
 	case wikiclient.Message:
 		if err.Get("type") != "not found" {
 			return false
 		}
 		msg = err.Get("error")
+
+		// string
+	case string:
+		msg = err
+
+		// error
+	case error:
+		msg = err.Error()
+
 	}
+
+	// if we have an error page, use it
+	errorPage := wiki.conf.Get("error_page")
+	if !useLowLevelError && errorPage != "" {
+		useLowLevelError = true
+		handlePage(wiki, errorPage, w, r)
+		useLowLevelError = false
+		return true
+	}
+
+	// generic error response
 	http.Error(w, msg, http.StatusNotFound)
 	return true
 }
