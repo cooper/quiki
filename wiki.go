@@ -146,7 +146,7 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		rootType, handler := rootType, handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			defaultClient.Clean()
+			defaultClient.Connect()
 			wiki.client = defaultClient
 			wiki.conf.Vars = defaultSess.Config
 
