@@ -18,7 +18,9 @@
 
     <div id="header">
         <ul id="navigation">
-            <li><a href="/">Main page</a></li>
+            {{range $display, $link := .Navigation}}
+            <li><a href="{{$link}}">{{$display}}</a></li>
+            {{end}}
         </ul>
         <a href="/">
             {{with .WikiLogo}}

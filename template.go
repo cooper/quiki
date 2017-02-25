@@ -74,6 +74,7 @@ type wikiPage struct {
 	WikiLogo   string             // path to wiki logo image
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
+	Navigation map[string]string  // visible-to-url wiki navigation
 }
 
 func (p wikiPage) VisibleTitle() string {
