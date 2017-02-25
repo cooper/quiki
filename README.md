@@ -125,6 +125,27 @@ quiki uses this in the `<title>` tag on most pages and possibly other places.
 @main_page: some_page;
 ```
 
+Wiki extended option
+[`main_page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#main_page).
+
 Name of the main page. This should not be the page's title but rather a
 filename, relative to [`dir.page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
 The `.page` extension is not necessary.
+
+### navigation
+
+```
+@navigation: map {
+    Main page: /page/welcome;
+    Rules: /page/rules;
+};
+```
+
+Wiki extended option
+[`navigation`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#navigation).
+
+Map of navigation items. Keys are the displayed text; values are the URL. The
+URLs are relative to the current page (i.e., they are used unchanged as the
+`href` attribute).
+
+Currently quiki only supports top-level navigation items.
