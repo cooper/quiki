@@ -42,6 +42,11 @@ func main() {
 	// we might be able to get the wikifier path from here
 	wikifierPath = conf.Get("server.dir.wikifier")
 
+	// setup the transport
+	if err := initTransport(); err != nil {
+		log.Fatal(err)
+	}
+
 	// set up wikis
 	if err := initializeWikis(); err != nil {
 		log.Fatal(err)
@@ -49,11 +54,6 @@ func main() {
 
 	// setup static files from wikifier
 	if err := setupStatic(); err != nil {
-		log.Fatal(err)
-	}
-
-	// setup the transport
-	if err := initTransport(); err != nil {
 		log.Fatal(err)
 	}
 
