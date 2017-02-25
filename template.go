@@ -74,7 +74,12 @@ type wikiPage struct {
 	WikiLogo   string             // path to wiki logo image
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
-	Navigation map[string]string  // visible-to-url wiki navigation
+	navigation []interface{}      // slice of nav items [display, url]
+}
+
+type navItem struct {
+	Display string
+	Link    string
 }
 
 func (p wikiPage) VisibleTitle() string {
@@ -90,4 +95,17 @@ func (p wikiPage) PageCSS() template.CSS {
 
 func (p wikiPage) HTMLContent() template.HTML {
 	return template.HTML(p.Res.Get("content"))
+}
+
+func (p wikiPage) Navigation() []navItem {
+	displays := p.navigation[0].([]interface{})
+	urls := p.navigation[1].([]interface{})
+	items := make([]navItem, len(displays))
+	for i := 0; i <= len(items); i++ {
+		items[i] = navItem{
+			displays[i].(string),
+			urls[i].(string),
+		}
+	}
+	return items
 }

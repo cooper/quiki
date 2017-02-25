@@ -35,7 +35,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 		WikiTitle:  wiki.title,
 		WikiLogo:   wiki.template.logo,
 		StaticRoot: wiki.template.staticRoot,
-		Navigation: wiki.navigation,
+		navigation: wiki.conf.GetSlice("navigation"),
 	})
 }
 

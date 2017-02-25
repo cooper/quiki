@@ -18,8 +18,8 @@
 
     <div id="header">
         <ul id="navigation">
-            {{range $display, $link := .Navigation}}
-            <li><a href="{{$link}}">{{$display}}</a></li>
+            {{.Navigation}}
+            <li><a href="{{.Link}}">{{.Display}}</a></li>
             {{end}}
         </ul>
         <a href="/">
