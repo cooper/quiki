@@ -5,18 +5,24 @@ import "errors"
 
 // configuration, fetch conf values with conf.Get()
 type Config struct {
-	path      string                 // file path
-	vars      map[string]interface{} // root variable map
-	foundVars map[string]bool
-	line      *uint // current line for warnings and errors
+	path string                 // file path
+	vars map[string]interface{} // root variable map
+	line *uint                  // current line for warnings and errors
 }
 
 // new config
 func New(path string) *Config {
 	return &Config{
-		path:      path,
-		foundVars: make(map[string]bool),
-		vars:      make(map[string]interface{}),
+		path: path,
+		vars: make(map[string]interface{}),
+	}
+}
+
+// new config with predetermined values
+func NewFromMap(aMap map[string]interface{}) *Config {
+	return &Config{
+		path: "(map)",
+		vars: aMap,
 	}
 }
 
@@ -92,7 +98,6 @@ func (conf *Config) Set(varName string, value string) {
 	}
 
 	// set the string value
-	conf.foundVars[varName] = true
 	where[lastPart] = value
 }
 
@@ -106,15 +111,6 @@ func (conf *Config) Require(varName string) (string, error) {
 	val := conf.Get(varName)
 	if !isTrueString(val) {
 		return "", errors.New(conf.getWarn("@" + varName + " is required"))
-	}
-	return val, nil
-}
-
-// like Require(), except empty strings are OK.
-func (conf *Config) RequireExists(varName string) (string, error) {
-	val, err := conf.Require(varName)
-	if err != nil && !conf.foundVars[varName] {
-		return "", err
 	}
 	return val, nil
 }

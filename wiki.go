@@ -84,11 +84,22 @@ var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Req
 // initialize a wiki
 func setupWiki(wiki wikiInfo) error {
 
-	// parse the wiki configuration
-	wiki.conf = config.New(wiki.confPath)
-	if err := wiki.conf.Parse(); err != nil {
+	// make a generic session and client used for read access for this wiki
+	defaultSess := &wikiclient.Session{
+		WikiName:     wiki.name,
+		WikiPassword: wiki.password,
+	}
+	defaultClient := wikiclient.NewClient(tr, defaultSess, 3*time.Second)
+
+	// connect the client, so that we can get config info
+	if err := defaultClient.Connect(); err != nil {
 		return err
 	}
+
+	// Safe point - we are authenticated for read access
+
+	// create a configuration from the response
+	wiki.conf = config.NewFromMap(defaultSess.Config)
 
 	// maybe we can get the wikifier path from this
 	if wikifierPath == "" {
@@ -103,21 +114,16 @@ func setupWiki(wiki wikiInfo) error {
 	if templatePath == "" {
 		templatePath = "default"
 	}
+
 	template, err := getTemplate(templatePath)
 	if err != nil {
 		return err
 	}
 	wiki.template = template
 
-	// make a generic session used for read access for this wiki
-	readSess := &wikiclient.Session{
-		WikiName:     wiki.name,
-		WikiPassword: wiki.password,
-	}
-
 	// setup handlers
 	for rootType, handler := range wikiRoots {
-		root, err := wiki.conf.RequireExists("root." + rootType)
+		root, err := wiki.conf.Require("root." + rootType)
 		if err != nil {
 			return err
 		}
@@ -140,7 +146,7 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		rootType, handler := rootType, handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
-			wiki.client = wikiclient.NewClient(tr, readSess, 3*time.Second)
+			wiki.client = defaultClient
 
 			// the transport is not connected
 			if tr.Dead() {
