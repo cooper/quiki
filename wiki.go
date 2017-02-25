@@ -13,13 +13,14 @@ import (
 
 // represents a wiki
 type wikiInfo struct {
-	name     string            // wiki shortname
-	title    string            // wiki title from @name in the wiki config
-	password string            // wiki password for read authentication
-	confPath string            // path to wiki configuration
-	template wikiTemplate      // template
-	client   wikiclient.Client // client, only available in handlers
-	conf     *config.Config    // wiki config instance
+	name       string            // wiki shortname
+	title      string            // wiki title from @name in the wiki config
+	password   string            // wiki password for read authentication
+	confPath   string            // path to wiki configuration
+	template   wikiTemplate      // template
+	client     wikiclient.Client // client, only available in handlers
+	conf       *config.Config    // wiki config instance
+	navigation map[string]string // visible-to-url wiki navigation
 }
 
 // all wikis served by this quiki
@@ -114,12 +115,19 @@ func setupWiki(wiki wikiInfo) error {
 	if templatePath == "" {
 		templatePath = "default"
 	}
-
 	template, err := getTemplate(templatePath)
 	if err != nil {
 		return err
 	}
 	wiki.template = template
+
+	// prepare the navigation
+	nav := wiki.conf.GetStringMap("navigation")
+	wiki.navigation = make(map[string]string, len(nav))
+	for display, url := range nav {
+		display = strings.Replace(display, "_", " ", -1)
+		wiki.navigation[display] = url
+	}
 
 	// setup handlers
 	for rootType, handler := range wikiRoots {
