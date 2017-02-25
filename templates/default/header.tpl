@@ -18,7 +18,7 @@
 
     <div id="header">
         <ul id="navigation">
-            {{.Navigation}}
+            {{range .Navigation}}
             <li><a href="{{.Link}}">{{.Display}}</a></li>
             {{end}}
         </ul>
