@@ -147,6 +147,7 @@ func setupWiki(wiki wikiInfo) error {
 		rootType, handler := rootType, handler
 		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = defaultClient
+			wiki.conf.Vars = defaultSess.Config
 
 			// the transport is not connected
 			if tr.Dead() {

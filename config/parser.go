@@ -268,7 +268,7 @@ func (conf *Config) getWhere(varName string, createAsNeeded bool) (map[string]in
 	lastPart, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
 	// start with the main map
-	where := conf.vars
+	where := conf.Vars
 
 	// for each part, fetch the map inside
 	for _, part := range parts {
