@@ -26,7 +26,7 @@ type wikiInfo struct {
 var wikis map[string]wikiInfo
 
 // initialize all the wikis in the configuration
-func initializeWikis() error {
+func initWikis() error {
 
 	// find wikis
 	wikiMap := conf.GetMap("server.wiki")

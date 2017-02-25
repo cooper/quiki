@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// set up wikis
-	if err := initializeWikis(); err != nil {
+	if err := initWikis(); err != nil {
 		log.Fatal(err)
 	}
 
