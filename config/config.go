@@ -91,6 +91,30 @@ func (conf *Config) GetStringMap(varName string) map[string]string {
 	return stringMap
 }
 
+// get slice
+func (conf *Config) GetSlice(varName string) []interface{} {
+
+	// get the location
+	where, lastPart := conf.getWhere(varName, false)
+	if where == nil {
+		conf.Warn("could not GetSlice @" + varName)
+		return nil
+	}
+
+	// get the slice value
+	iface := where[lastPart]
+	switch aSlice := iface.(type) {
+	case []interface{}:
+		return aSlice
+	case nil:
+		return nil
+	default:
+		conf.Warn("@" + varName + " is not a slice")
+	}
+
+	return nil
+}
+
 // set string value
 func (conf *Config) Set(varName string, value string) {
 
