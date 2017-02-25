@@ -21,9 +21,9 @@ func New(path string) *Config {
 var alwaysZero uint
 
 // new config with predetermined values
-func NewFromMap(aMap map[string]interface{}) *Config {
+func NewFromMap(desc string, aMap map[string]interface{}) *Config {
 	return &Config{
-		path: "(map)",
+		path: desc, // generic description shown in warnings/errors
 		vars: aMap,
 		line: &alwaysZero,
 	}

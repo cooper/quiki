@@ -99,7 +99,7 @@ func setupWiki(wiki wikiInfo) error {
 	// Safe point - we are authenticated for read access
 
 	// create a configuration from the response
-	wiki.conf = config.NewFromMap(defaultSess.Config)
+	wiki.conf = config.NewFromMap("("+wiki.name+")", defaultSess.Config)
 
 	// maybe we can get the wikifier path from this
 	if wikifierPath == "" {
@@ -124,7 +124,7 @@ func setupWiki(wiki wikiInfo) error {
 	// setup handlers
 	for rootType, handler := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
-		if err != nil {
+		if err != nil && rootType != "wiki" {
 			return err
 		}
 
