@@ -18,11 +18,14 @@ func New(path string) *Config {
 	}
 }
 
+var alwaysZero uint
+
 // new config with predetermined values
 func NewFromMap(aMap map[string]interface{}) *Config {
 	return &Config{
 		path: "(map)",
 		vars: aMap,
+		line: &alwaysZero,
 	}
 }
 
