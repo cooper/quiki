@@ -101,7 +101,7 @@ func (p wikiPage) Navigation() []navItem {
 	displays := p.navigation[0].([]interface{})
 	urls := p.navigation[1].([]interface{})
 	items := make([]navItem, len(displays))
-	for i := 0; i <= len(items); i++ {
+	for i := 0; i < len(items); i++ {
 		items[i] = navItem{
 			displays[i].(string),
 			urls[i].(string),
