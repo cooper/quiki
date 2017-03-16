@@ -98,6 +98,9 @@ func (p wikiPage) HTMLContent() template.HTML {
 }
 
 func (p wikiPage) Navigation() []navItem {
+	if len(p.navigation) != 2 {
+		return nil
+	}
 	displays := p.navigation[0].([]interface{})
 	urls := p.navigation[1].([]interface{})
 	items := make([]navItem, len(displays))
