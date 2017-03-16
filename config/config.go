@@ -116,7 +116,7 @@ func (conf *Config) GetSlice(varName string) []interface{} {
 }
 
 // set string value
-func (conf *Config) Set(varName string, value string) {
+func (conf *Config) Set(varName, value string) {
 
 	// get the map
 	where, lastPart := conf.getWhere(varName, true)
