@@ -108,7 +108,7 @@ func setupWiki(wiki wikiInfo) error {
 
 	// find the wiki root
 	quikiRoot := wiki.conf.Get("root.quiki")
-	wikiRoot := quikiRoot + wiki.conf.Get("root.wiki")
+	wikiRoot := wiki.conf.Get("root.wiki")
 
 	// find the template. if not configured, use default
 	templatePath := wiki.conf.Get("template")
@@ -132,7 +132,6 @@ func setupWiki(wiki wikiInfo) error {
 		}
 
 		// if it doesn't already have the wiki root as the prefix, add it
-		root = quikiRoot + root
 		if !strings.HasPrefix(root, wikiRoot) {
 			wiki.conf.Warnf(
 				"@root.%s (%s) is configured outside of @root.wiki (%s); assuming %s%s",
@@ -140,6 +139,9 @@ func setupWiki(wiki wikiInfo) error {
 			)
 			root = wikiRoot + root
 		}
+
+		// add the quiki root
+		root = quikiRoot + root
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		if root != "" {
