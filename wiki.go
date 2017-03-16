@@ -108,10 +108,7 @@ func setupWiki(wiki wikiInfo) error {
 
 	// find the wiki root
 	quikiRoot := wiki.conf.Get("root.quiki")
-	wikiRoot := strings.Join([]string{
-		quikiRoot,
-		wiki.conf.Get("root.wiki"),
-	}, "/")
+	wikiRoot := quikiRoot + wiki.conf.Get("root.wiki")
 
 	// find the template. if not configured, use default
 	templatePath := wiki.conf.Get("template")
