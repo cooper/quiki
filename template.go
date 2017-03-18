@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var templateDir string
+var templateDirs string
 var templates = make(map[string]wikiTemplate)
 
 type wikiTemplate struct {
@@ -23,51 +23,74 @@ type wikiTemplate struct {
 
 func getTemplate(name string) (wikiTemplate, error) {
 	var t wikiTemplate
-	templatePath := templateDir + "/" + name
 
 	// template is already cached
-	if t, ok := templates[templatePath]; ok {
+	if t, ok := templates[name]; ok {
 		return t, nil
 	}
 
-	// parse HTML templates
-	tmpl := template.New("")
-	if err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
+	var notFoundErr error
+	for _, templateDir := range strings.Split(templateDirs, ",") {
+		var tryNextTemplateDir bool
+		templatePath := templateDir + "/" + name
 
-		// a template
-		if strings.HasSuffix(filePath, ".tpl") {
-			if _, err := tmpl.ParseFiles(filePath); err != nil {
+		// parse HTML templates
+		tmpl := template.New("")
+		err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
+
+			// walk error, probably missing template
+			if err != nil {
+				tryNextTemplateDir = true
+				if notFoundErr == nil {
+					notFoundErr = err
+				}
 				return err
 			}
+
+			// found template file
+			if strings.HasSuffix(filePath, ".tpl") {
+				if _, err := tmpl.ParseFiles(filePath); err != nil {
+					return err
+				}
+			}
+
+			// found static content directory
+			if info.IsDir() && info.Name() == "static" {
+				t.staticPath = filePath
+				t.staticRoot = "/tmpl/" + name
+				fileServer := http.FileServer(http.Dir(filePath))
+				pfx := t.staticRoot + "/"
+				http.Handle(pfx, http.StripPrefix(pfx, fileServer))
+			}
+
+			// found logo
+			if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
+				t.logo = t.staticRoot + "/" + info.Name()
+			}
+
+			return err
+		})
+
+		// not found error
+		if tryNextTemplateDir {
+			continue
 		}
 
-		// static content directory
-		if info.IsDir() && info.Name() == "static" {
-			t.staticPath = filePath
-			t.staticRoot = "/tmpl/" + name
-			fileServer := http.FileServer(http.Dir(filePath))
-			pfx := t.staticRoot + "/"
-			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
+		// some other error
+		if err != nil {
+			return t, err
 		}
 
-		// found a logo
-		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
-			t.logo = t.staticRoot + "/" + info.Name()
-		}
+		// cache the template
+		t.path = templatePath
+		t.template = tmpl
+		templates[templatePath] = t
 
-		return err
-	}); err != nil {
-		return t, err
+		return t, nil
 	}
 
-	// cache the template
-	t.path = templatePath
-	t.template = tmpl
-	templates[templatePath] = t
-	return t, nil
+	// never found a template
+	return t, notFoundErr
 }
 
 type wikiPage struct {

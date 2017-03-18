@@ -34,7 +34,7 @@ func main() {
 	var port string
 	if err := conf.RequireMany(map[string]*string{
 		"server.http.port":    &port,
-		"server.dir.template": &templateDir,
+		"server.dir.template": &templateDirs,
 	}); err != nil {
 		log.Fatal(err)
 	}
