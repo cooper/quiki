@@ -110,14 +110,14 @@ quiki uses this in the `<title>` tag on most pages and possibly other places.
 ### template
 
 ```
-@server.wiki.mywiki.template: default;
+@template: default;
 ```
 
 Wiki extended option
-[`main_page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#template).
+[`template`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#template).
 
-Specifies the template to be used on the wiki by the name of
-`[name]`. This is relative to [`server.dir.template`](#serverdirtemplate).
+Specifies the template to be used on the wiki. This is relative to
+[`server.dir.template`](#serverdirtemplate).
 
 If you do not specify, the [default template](templates/default) will be
 assumed.
