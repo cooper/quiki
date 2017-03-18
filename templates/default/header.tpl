@@ -22,7 +22,7 @@
                 <li><a href="{{.Link}}">{{.Display}}</a></li>
             {{end}}
         </ul>
-        <a href="/">
+        <a href="{{.WikiRoot}}">
             {{with .WikiLogo}}
                 <img src="{{.}}" alt="Wiki" />
             {{else}}

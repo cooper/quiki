@@ -98,6 +98,7 @@ type wikiPage struct {
 	Title      string             // page title
 	WikiTitle  string             // wiki title
 	WikiLogo   string             // path to wiki logo image
+	wikiRoot   string             // wiki HTTP root
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
 	navigation []interface{}      // slice of nav items [display, url]
@@ -142,4 +143,11 @@ func (p wikiPage) Navigation() []navItem {
 	}
 
 	return items
+}
+
+func (p wikiPage) WikiRoot() template.URL {
+	if p.wikiRoot == "" {
+		return "/"
+	}
+	return template.URL(p.wikiRoot)
 }
