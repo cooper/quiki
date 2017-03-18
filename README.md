@@ -10,9 +10,9 @@ a standalone web server for [wikifier](https://github.com/cooper/wikifier)
   * [server\.dir\.template](#serverdirtemplate)
   * [server\.dir\.wikifier](#serverdirwikifier)
   * [server\.wiki\.[name]\.quiki](#serverwikinamequiki)
-  * [server\.wiki\.[name]\.template](#serverwikinametemplate)
 * [wiki configuration](#wiki-configuration)
   * [name](#name)
+  * [template](#template)
   * [main\_page](#main_page)
 
 ## install
@@ -72,8 +72,8 @@ If you are using a template packaged with quiki, do something like this:
 _Optional_. Absolute path to the [wikifier](https://github.com/cooper/wikifier).
 
 quiki needs this to serve the static resources bundled with wikifier. While
-optional, quiki will not start if it cannot find the wikifier by other means
-([`dir.wikifier`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir)).
+optional, quiki will not start if it cannot find the wikifier by
+[other means](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
 
 
 ### server.wiki.[name].quiki
@@ -91,18 +91,6 @@ do not collide. Since quiki shares a configuration with the wikiserver, this
 option tells quiki which wikis it should serve. If no wikis are enabled, quiki
 will not start.
 
-### server.wiki.[name].template
-
-```
-@server.wiki.mywiki.template: default;
-```
-
-_Optional_. Specifies the template to be used on the wiki by the name of
-`[name]`. This is relative to [`server.dir.template`](#serverwikinametemplate).
-
-If you do not specify, the [default template](templates/default) will be
-assumed.
-
 ## wiki configuration
 
 quiki reads the wiki configuration files associated with each enabled wiki.
@@ -118,6 +106,21 @@ Wiki option
 [`name`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#name).
 
 quiki uses this in the `<title>` tag on most pages and possibly other places.
+
+### template
+
+```
+@server.wiki.mywiki.template: default;
+```
+
+Wiki extended option
+[`main_page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#template).
+
+Specifies the template to be used on the wiki by the name of
+`[name]`. This is relative to [`server.dir.template`](#serverdirtemplate).
+
+If you do not specify, the [default template](templates/default) will be
+assumed.
 
 ### main_page
 
