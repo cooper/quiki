@@ -107,7 +107,6 @@ func setupWiki(wiki wikiInfo) error {
 	}
 
 	// find the wiki root
-	quikiRoot := wiki.conf.Get("root.quiki")
 	wikiRoot := wiki.conf.Get("root.wiki")
 
 	// find the template. if not configured, use default
@@ -139,9 +138,6 @@ func setupWiki(wiki wikiInfo) error {
 			)
 			root = wikiRoot + root
 		}
-
-		// add the quiki root
-		root = quikiRoot + root
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		if root != "" {
