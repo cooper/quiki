@@ -33,6 +33,9 @@ func getTemplate(name string) (wikiTemplate, error) {
 	// parse HTML templates
 	tmpl := template.New("")
 	if err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 
 		// a template
 		if strings.HasSuffix(filePath, ".tpl") {
@@ -98,9 +101,13 @@ func (p wikiPage) HTMLContent() template.HTML {
 }
 
 func (p wikiPage) Navigation() []navItem {
+
+	// no navigation
 	if len(p.navigation) != 2 {
 		return nil
 	}
+
+	// first item is ordered keys, second is values
 	displays := p.navigation[0].([]interface{})
 	urls := p.navigation[1].([]interface{})
 	items := make([]navItem, len(displays))
@@ -110,5 +117,6 @@ func (p wikiPage) Navigation() []navItem {
 			urls[i].(string),
 		}
 	}
+
 	return items
 }
