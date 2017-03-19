@@ -15,6 +15,7 @@ import (
 type wikiInfo struct {
 	name     string            // wiki shortname
 	title    string            // wiki title from @name in the wiki config
+	host     string            // wiki hostname
 	password string            // wiki password for read authentication
 	confPath string            // path to wiki configuration
 	template wikiTemplate      // template
@@ -44,6 +45,12 @@ func initWikis() error {
 			continue
 		}
 
+		// if it's just a one it's a boolean for /
+		wikiHost := conf.Get(configPfx + ".quiki")
+		if wikiHost == "1" {
+			wikiHost = ""
+		}
+
 		// get wiki config path and password
 		var wikiConfPath, wikiPassword string
 		if err := conf.RequireMany(map[string]*string{
@@ -55,6 +62,7 @@ func initWikis() error {
 
 		// create wiki info
 		wiki := wikiInfo{
+			host:     wikiHost,
 			name:     wikiName,
 			password: wikiPassword,
 			confPath: wikiConfPath,
@@ -141,13 +149,13 @@ func setupWiki(wiki wikiInfo) error {
 
 		// normally 'something/' handles 'something' as well; this prevents that
 		if root != "" {
-			http.HandleFunc(root, http.NotFound)
+			http.HandleFunc(wiki.host+root, http.NotFound)
 		}
 		root += "/"
 
 		// add the real handler
 		rootType, handler := rootType, handler
-		http.HandleFunc(root, func(w http.ResponseWriter, r *http.Request) {
+		http.HandleFunc(wiki.host+root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = wikiclient.NewClient(tr, defaultSess, 3*time.Second)
 			wiki.conf.Vars = defaultSess.Config
 
