@@ -32,9 +32,6 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		// host matches
 		if handleMainPage(wiki, w, r) {
 			return
-		} else {
-			delayedWiki = nil
-			break
 		}
 	}
 
@@ -57,15 +54,15 @@ func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool 
 		return false
 	}
 
-	// main page
+	// no main page configured
 	mainPage := wiki.conf.Get("main_page")
-	if mainPage != "" {
-		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-		handlePage(wiki, mainPage, w, r)
-		return true
+	if mainPage == "" {
+		return false
 	}
 
-	return false
+	wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+	handlePage(wiki, mainPage, w, r)
+	return true
 }
 
 // page request
