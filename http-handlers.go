@@ -12,34 +12,59 @@ var imageRegex = regexp.MustCompile("")
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
+	var delayedWiki *wikiInfo
 
-	// possibly the main page of a wiki
+	// try each wiki
 	for _, wiki := range wikis {
 
 		// wrong host
-		if wiki.host != r.Host && wiki.host != "" {
+		if wiki.host != r.Host {
+
+			// if the wiki host is empty, it is the fallback wiki.
+			// delay it until we've checked all other wikis.
+			if wiki.host == "" && delayedWiki == nil {
+				delayedWiki = &wiki
+			}
+
 			continue
 		}
 
-		// wrong root
-		wikiRoot := wiki.conf.Get("root.wiki")
-		if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
-			continue
-		}
-
-		// main page
-		mainPage := wiki.conf.Get("main_page")
-		if mainPage != "" {
-			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-			handlePage(wiki, mainPage, w, r)
+		// good
+		if handleMainPage(wiki, w, r) {
 			return
 		}
 
 		break
 	}
 
+	// try the delayed wiki
+	if delayedWiki != nil {
+		if handleMainPage(*delayedWiki, w, r) {
+			return
+		}
+	}
+
 	// anything else is a 404
 	http.NotFound(w, r)
+}
+
+func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool {
+
+	// wrong root
+	wikiRoot := wiki.conf.Get("root.wiki")
+	if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
+		return false
+	}
+
+	// main page
+	mainPage := wiki.conf.Get("main_page")
+	if mainPage != "" {
+		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+		handlePage(wiki, mainPage, w, r)
+		return true
+	}
+
+	return false
 }
 
 // page request
