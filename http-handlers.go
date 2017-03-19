@@ -9,8 +9,6 @@ import (
 	"strconv"
 )
 
-var imageRegex = regexp.MustCompile("")
-
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 	var delayedWiki wikiInfo
@@ -154,6 +152,7 @@ func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, p
 	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("Content-Length", strconv.FormatInt(int64(buf.Len()), 10))
 	w.Write(buf.Bytes())
