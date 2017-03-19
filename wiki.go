@@ -6,6 +6,7 @@ import (
 	"errors"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"github.com/cooper/quiki/config"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -169,6 +170,8 @@ func setupWiki(wiki wikiInfo) error {
 
 			handler(wiki, relPath, w, r)
 		})
+
+		log.Printf("[%s] registered %s root: %s", wiki.name, rootType, wiki.host+root)
 	}
 
 	// store the wiki info

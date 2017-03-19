@@ -11,7 +11,7 @@ var imageRegex = regexp.MustCompile("")
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	
+
 	// // main page
 	// mainPage := wiki.conf.Get("main_page")
 	// if relPath == "" && mainPage != "" {
