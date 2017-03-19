@@ -87,9 +87,11 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 			StaticRoot: wiki.template.staticRoot,
 			navigation: wiki.conf.GetSlice("navigation"),
 		})
-	}
 
-	http.NotFound(w, r)
+	// anything else
+	default:
+		http.NotFound(w, r)
+	}
 }
 
 // image request
