@@ -3,7 +3,6 @@ package main
 
 import (
 	wikiclient "github.com/cooper/go-wikiclient"
-	"log"
 	"net/http"
 	"regexp"
 	"time"
@@ -26,11 +25,10 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 		// wrong host
 		if wiki.host != r.Host {
-			log.Printf("wiki '%s' host mismatch: %s != %s\n", wiki.name, wiki.host, r.Host)
+
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
 			if wiki.host == "" && delayedWiki.name == "" {
-				log.Printf("wiki '%s' host is empty; delaying\n", wiki.name)
 				delayedWiki = wiki
 			}
 
@@ -38,27 +36,19 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// host matches
-		log.Printf("wiki '%s' host matched; trying it... ", wiki.name)
 		if handleMainPage(wiki, w, r) {
-			log.Printf("yep\n")
 			return
 		}
-		log.Printf("nope\n")
 	}
 
 	// try the delayed wiki
 	if delayedWiki.name != "" {
-		log.Printf("wiki '%s' was delayed; trying it... ", delayedWiki.name)
 		if handleMainPage(delayedWiki, w, r) {
-			log.Printf("yep\n")
-
 			return
 		}
-		log.Printf("nope\n")
 	}
 
 	// anything else is a 404
-	log.Println("404")
 	http.NotFound(w, r)
 }
 
