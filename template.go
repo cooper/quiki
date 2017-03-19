@@ -84,7 +84,7 @@ func getTemplate(name string) (wikiTemplate, error) {
 		// cache the template
 		t.path = templatePath
 		t.template = tmpl
-		templates[templatePath] = t
+		templates[name] = t
 
 		return t, nil
 	}
