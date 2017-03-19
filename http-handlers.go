@@ -12,12 +12,28 @@ var imageRegex = regexp.MustCompile("")
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 
-	// // main page
-	// mainPage := wiki.conf.Get("main_page")
-	// if relPath == "" && mainPage != "" {
-	// 	handlePage(wiki, mainPage, w, r)
-	// 	return
-	// }
+	// possibly the main page of a wiki
+	for _, wiki := range wikis {
+
+		// wrong host
+		if wiki.host != r.Host {
+			continue
+		}
+
+		// wrong root
+		if r.URL.Path != wiki.conf.Get("root.wiki") {
+			continue
+		}
+
+		// main page
+		mainPage := wiki.conf.Get("main_page")
+		if mainPage != "" {
+			handlePage(wiki, mainPage, w, r)
+			return
+		}
+
+		break
+	}
 
 	// anything else is a 404
 	http.NotFound(w, r)

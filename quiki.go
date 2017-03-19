@@ -59,6 +59,9 @@ func main() {
 
 	log.Println("quiki ready")
 
+	// main handler
+	http.HandleFunc("/", handleRoot)
+
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
 }
