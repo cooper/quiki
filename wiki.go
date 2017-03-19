@@ -170,7 +170,7 @@ func setupWiki(wiki wikiInfo) error {
 
 			handler(wiki, relPath, w, r)
 		})
-
+		log.Printf("N: %s\nT: %s\nH: %s\nR: %s\n", wiki.name, rootType, wiki.host, root)
 		log.Printf("[%s] registered %s root: %s", wiki.name, rootType, wiki.host+root)
 	}
 

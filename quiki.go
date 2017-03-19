@@ -57,6 +57,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println("quiki ready")
+
 	// listen
 	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
 }
