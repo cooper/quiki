@@ -68,18 +68,33 @@ func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool 
 // page request
 func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	res, err := wiki.client.DisplayPage(relPath)
+
+	// wikiclient error or 'not found' response
 	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
 		return
 	}
-	renderTemplate(wiki, w, "page", wikiPage{
-		Res:        res,
-		Title:      res.Get("title"),
-		WikiTitle:  wiki.title,
-		WikiLogo:   wiki.template.logo,
-		WikiRoot:   wiki.conf.Get("root.wiki"),
-		StaticRoot: wiki.template.staticRoot,
-		navigation: wiki.conf.GetSlice("navigation"),
-	})
+
+	// other response
+	switch res.Get("type") {
+
+	// page redirect
+	case "redirect":
+		http.Redirect(w, r, res.Get("file"), 301)
+
+	// page content
+	case "page":
+		renderTemplate(wiki, w, "page", wikiPage{
+			Res:        res,
+			Title:      res.Get("title"),
+			WikiTitle:  wiki.title,
+			WikiLogo:   wiki.template.logo,
+			WikiRoot:   wiki.conf.Get("root.wiki"),
+			StaticRoot: wiki.template.staticRoot,
+			navigation: wiki.conf.GetSlice("navigation"),
+		})
+	}
+
+	http.NotFound(w, r)
 }
 
 // image request
@@ -104,7 +119,7 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 	case nil:
 		return false
 
-		// message of type "not found" is an error; otherwise, stop
+	// message of type "not found" is an error; otherwise, stop
 	case wikiclient.Message:
 		if err.Get("type") != "not found" {
 			return false
