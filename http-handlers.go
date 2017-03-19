@@ -2,9 +2,11 @@
 package main
 
 import (
+	"bytes"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"regexp"
+	"strconv"
 )
 
 var imageRegex = regexp.MustCompile("")
@@ -148,8 +150,11 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 }
 
 func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, p wikiPage) {
-	err := wiki.template.template.ExecuteTemplate(w, templateName+".tpl", p)
+	var buf bytes.Buffer
+	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+	w.Header().Set("Content-Length", strconv.FormatInt(int64(buf.Len()), 10))
+	w.Write(buf.Bytes())
 }
