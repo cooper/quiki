@@ -4,6 +4,7 @@ package main
 import (
 	wikiclient "github.com/cooper/go-wikiclient"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -61,6 +62,7 @@ func getTemplate(name string) (wikiTemplate, error) {
 				fileServer := http.FileServer(http.Dir(filePath))
 				pfx := t.staticRoot + "/"
 				http.Handle(pfx, http.StripPrefix(pfx, fileServer))
+				log.Printf("[%s] template registered: %s", name, pfx)
 			}
 
 			// found logo
