@@ -5,7 +5,6 @@ import (
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"regexp"
-	"time"
 )
 
 var imageRegex = regexp.MustCompile("")
@@ -60,8 +59,7 @@ func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool 
 		return false
 	}
 
-	wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-	handlePage(wiki, mainPage, w, r)
+	http.Redirect(w, r, wiki.conf.Get("root.page")+"/"+mainPage, http.StatusMovedPermanently)
 	return true
 }
 
@@ -79,7 +77,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 
 	// page redirect
 	case "redirect":
-		http.Redirect(w, r, wiki.conf.Get("root.page")+"/"+res.Get("name"), 301)
+		http.Redirect(w, r, wiki.conf.Get("root.page")+"/"+res.Get("name"), http.StatusMovedPermanently)
 
 	// page content
 	case "page":
