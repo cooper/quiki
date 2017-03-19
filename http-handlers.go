@@ -13,7 +13,7 @@ var imageRegex = regexp.MustCompile("")
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	var delayedWiki *wikiInfo
+	var delayedWiki wikiInfo
 
 	// try each wiki
 	for _, wiki := range wikis {
@@ -29,9 +29,9 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 			log.Printf("wiki '%s' host mismatch: %s != %s\n", wiki.name, wiki.host, r.Host)
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
-			if wiki.host == "" && delayedWiki == nil {
+			if wiki.host == "" && delayedWiki.name == "" {
 				log.Printf("wiki '%s' host is empty; delaying\n", wiki.name)
-				delayedWiki = &wiki
+				delayedWiki = wiki
 			}
 
 			continue
@@ -47,9 +47,9 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// try the delayed wiki
-	if delayedWiki != nil {
+	if delayedWiki.name != "" {
 		log.Printf("wiki '%s' was delayed; trying it... ", delayedWiki.name)
-		if handleMainPage(*delayedWiki, w, r) {
+		if handleMainPage(delayedWiki, w, r) {
 			log.Printf("yep\n")
 
 			return
