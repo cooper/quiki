@@ -18,6 +18,12 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	// try each wiki
 	for _, wiki := range wikis {
 
+		// wrong root
+		wikiRoot := wiki.conf.Get("root.wiki")
+		if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
+			continue
+		}
+
 		// wrong host
 		if wiki.host != r.Host {
 			log.Printf("wiki '%s' host mismatch: %s != %s\n", wiki.name, wiki.host, r.Host)
@@ -57,12 +63,6 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool {
-
-	// wrong root
-	wikiRoot := wiki.conf.Get("root.wiki")
-	if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
-		return false
-	}
 
 	// no main page configured
 	mainPage := wiki.conf.Get("main_page")
