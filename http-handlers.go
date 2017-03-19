@@ -22,6 +22,12 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// no main page configured
+		mainPage := wiki.conf.Get("main_page")
+		if mainPage == "" {
+			continue
+		}
+
 		// wrong host
 		if wiki.host != r.Host {
 
@@ -35,32 +41,23 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// host matches
-		if handleMainPage(wiki, w, r) {
-			return
-		}
+		delayedWiki = wiki
+		break
 	}
 
 	// try the delayed wiki
 	if delayedWiki.name != "" {
-		if handleMainPage(delayedWiki, w, r) {
-			return
-		}
+		http.Redirect(
+			w, r,
+			delayedWiki.conf.Get("root.page")+
+				"/"+delayedWiki.conf.Get("main_page"),
+			http.StatusMovedPermanently,
+		)
+		return
 	}
 
 	// anything else is a 404
 	http.NotFound(w, r)
-}
-
-func handleMainPage(wiki wikiInfo, w http.ResponseWriter, r *http.Request) bool {
-
-	// no main page configured
-	mainPage := wiki.conf.Get("main_page")
-	if mainPage == "" {
-		return false
-	}
-
-	http.Redirect(w, r, wiki.conf.Get("root.page")+"/"+mainPage, http.StatusMovedPermanently)
-	return true
 }
 
 // page request
