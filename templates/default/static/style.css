@@ -35,6 +35,7 @@ a img {
     line-height: 70px;
     display: inline-block;
     float: left;
+    margin: 0 15px;
 }
 
 #header img {
