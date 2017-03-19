@@ -5,6 +5,7 @@ import (
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"regexp"
+	"time"
 )
 
 var imageRegex = regexp.MustCompile("")
@@ -29,6 +30,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		// main page
 		mainPage := wiki.conf.Get("main_page")
 		if mainPage != "" {
+			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
 			handlePage(wiki, mainPage, w, r)
 			return
 		}

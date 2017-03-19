@@ -14,14 +14,15 @@ import (
 
 // represents a wiki
 type wikiInfo struct {
-	name     string            // wiki shortname
-	title    string            // wiki title from @name in the wiki config
-	host     string            // wiki hostname
-	password string            // wiki password for read authentication
-	confPath string            // path to wiki configuration
-	template wikiTemplate      // template
-	client   wikiclient.Client // client, only available in handlers
-	conf     *config.Config    // wiki config instance
+	name        string              // wiki shortname
+	title       string              // wiki title from @name in the wiki config
+	host        string              // wiki hostname
+	password    string              // wiki password for read authentication
+	confPath    string              // path to wiki configuration
+	template    wikiTemplate        // template
+	client      wikiclient.Client   // client, only available in handlers
+	conf        *config.Config      // wiki config instance
+	defaultSess *wikiclient.Session // default session
 }
 
 // all wikis served by this quiki
@@ -93,11 +94,11 @@ var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Req
 func setupWiki(wiki wikiInfo) error {
 
 	// make a generic session and client used for read access for this wiki
-	defaultSess := &wikiclient.Session{
+	wiki.defaultSess = &wikiclient.Session{
 		WikiName:     wiki.name,
 		WikiPassword: wiki.password,
 	}
-	defaultClient := wikiclient.NewClient(tr, defaultSess, 3*time.Second)
+	defaultClient := wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
 
 	// connect the client, so that we can get config info
 	if err := defaultClient.Connect(); err != nil {
@@ -107,7 +108,7 @@ func setupWiki(wiki wikiInfo) error {
 	// Safe point - we are authenticated for read access
 
 	// create a configuration from the response
-	wiki.conf = config.NewFromMap("("+wiki.name+")", defaultSess.Config)
+	wiki.conf = config.NewFromMap("("+wiki.name+")", wiki.defaultSess.Config)
 
 	// maybe we can get the wikifier path from this
 	if wikifierPath == "" {
@@ -152,8 +153,8 @@ func setupWiki(wiki wikiInfo) error {
 		// add the real handler
 		rootType, handler := rootType, handler
 		http.HandleFunc(wiki.host+root, func(w http.ResponseWriter, r *http.Request) {
-			wiki.client = wikiclient.NewClient(tr, defaultSess, 3*time.Second)
-			wiki.conf.Vars = defaultSess.Config
+			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+			wiki.conf.Vars = wiki.defaultSess.Config
 
 			// the transport is not connected
 			if tr.Dead() {
