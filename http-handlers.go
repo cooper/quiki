@@ -21,7 +21,8 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// wrong root
-		if r.URL.Path != wiki.conf.Get("root.wiki") {
+		wikiRoot := wiki.conf.Get("root.wiki")
+		if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
 			continue
 		}
 
