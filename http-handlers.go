@@ -29,12 +29,13 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// good
+		// host matches
 		if handleMainPage(wiki, w, r) {
 			return
+		} else {
+			delayedWiki = nil
+			break
 		}
-
-		break
 	}
 
 	// try the delayed wiki
