@@ -84,7 +84,6 @@ func initWikis() error {
 
 // wiki roots mapped to handler functions
 var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Request){
-	"wiki":  handleWikiRoot,
 	"page":  handlePage,
 	"image": handleImage,
 }
@@ -133,8 +132,8 @@ func setupWiki(wiki wikiInfo) error {
 	for rootType, handler := range wikiRoots {
 		root, err := wiki.conf.Require("root." + rootType)
 
-		// can't be empty unless it's @dir.wiki
-		if err != nil && rootType != "wiki" {
+		// can't be empty
+		if err != nil {
 			return err
 		}
 

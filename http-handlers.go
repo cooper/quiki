@@ -9,15 +9,15 @@ import (
 
 var imageRegex = regexp.MustCompile("")
 
-// master handler for the wiki root
-func handleWikiRoot(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-
-	// main page
-	mainPage := wiki.conf.Get("main_page")
-	if relPath == "" && mainPage != "" {
-		handlePage(wiki, mainPage, w, r)
-		return
-	}
+// master handler
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	
+	// // main page
+	// mainPage := wiki.conf.Get("main_page")
+	// if relPath == "" && mainPage != "" {
+	// 	handlePage(wiki, mainPage, w, r)
+	// 	return
+	// }
 
 	// anything else is a 404
 	http.NotFound(w, r)
