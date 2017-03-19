@@ -16,7 +16,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	for _, wiki := range wikis {
 
 		// wrong host
-		if wiki.host != r.Host {
+		if wiki.host != r.Host && wiki.host != "" {
 			continue
 		}
 
