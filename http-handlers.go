@@ -5,7 +5,6 @@ import (
 	"bytes"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
-	"regexp"
 	"strconv"
 )
 
