@@ -74,7 +74,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 
 	// page redirect
 	case "redirect":
-		http.Redirect(w, r, wiki.conf.Get("root.page")+"/"+res.Get("name"), http.StatusMovedPermanently)
+		http.Redirect(w, r, res.Get("redirect"), http.StatusMovedPermanently)
 
 	// page content
 	case "page":
