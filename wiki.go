@@ -8,6 +8,7 @@ import (
 	"github.com/cooper/quiki/config"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 )
@@ -118,13 +119,24 @@ func setupWiki(wiki wikiInfo) error {
 	// find the wiki root
 	wikiRoot := wiki.conf.Get("root.wiki")
 
-	// find the template. if not configured, use default
-	templatePath := wiki.conf.Get("template")
-	if templatePath == "" {
-		templatePath = "default"
+	// if not configured, use default template
+	templateNameOrPath := wiki.conf.Get("template")
+	if templateNameOrPath == "" {
+		templateNameOrPath = "default"
 	}
 
-	template, err := getTemplate(templatePath)
+	// find the template
+	var template wikiTemplate
+	var err error
+	if strings.Contains(templateNameOrPath, "/") {
+		// if a path is given, try to load the template at this exact path
+		template, err = loadTemplate(path.Base(templateNameOrPath), templateNameOrPath)
+	} else {
+		// otherwise, search template directories
+		template, err = findTemplate(templateNameOrPath)
+	}
+
+	// couldn't find it, or an error occured in loading it
 	if err != nil {
 		return err
 	}

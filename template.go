@@ -23,7 +23,8 @@ type wikiTemplate struct {
 	logo       string             // path for logo file, if any
 }
 
-func getTemplate(name string) (wikiTemplate, error) {
+// search all template directories for a template by its name
+func findTemplate(name string) (wikiTemplate, error) {
 
 	// template is already cached
 	if t, ok := templates[name]; ok {
@@ -51,9 +52,15 @@ func getTemplate(name string) (wikiTemplate, error) {
 	return wikiTemplate{}, errors.New("unable to find template " + name)
 }
 
+// load a template from its known path
 func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 	var t wikiTemplate
 	var tryNextDirectory bool
+
+	// template is already cached
+	if t, ok := templates[name]; ok {
+		return t, nil
+	}
 
 	// parse HTML templates
 	tmpl := template.New("")
