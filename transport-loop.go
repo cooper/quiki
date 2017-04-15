@@ -17,8 +17,13 @@ func newTransport() (wikiclient.Transport, error) {
 	sockType := conf.Get("server.socket.type")
 	switch sockType {
 
-	// unix socket, this is default
-	case "unix", "":
+	// run wikiserver as a subprocess
+	// this is default
+	case "run", "":
+		return wikiclient.NewRunTransport(wikifierPath + "/wikiserver")
+
+	// unix socket
+	case "unix":
 		path, err := conf.Require("server.socket.path")
 		if err != nil {
 			return nil, err

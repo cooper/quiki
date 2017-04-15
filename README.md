@@ -146,7 +146,7 @@ The `.page` extension is not necessary.
 ### navigation
 
 ```
-@navigation: map {
+@navigation: {
     Main page: /page/welcome;
     Rules: /page/rules;
 };
