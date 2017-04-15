@@ -33,14 +33,15 @@ func main() {
 	// these are required
 	var port string
 	if err := conf.RequireMany(map[string]*string{
-		"server.http.port":    &port,
-		"server.dir.template": &templateDirs,
+		"server.http.port": &port,
 	}); err != nil {
 		log.Fatal(err)
 	}
 
 	// we might be able to get the wikifier path from here
+	// template search directories may have been specified
 	wikifierPath = conf.Get("server.dir.wikifier")
+	templateDirs = conf.Get("server.dir.template")
 
 	// setup the transport
 	if err := initTransport(); err != nil {
