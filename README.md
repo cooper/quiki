@@ -76,12 +76,9 @@ do something like this:
 @server.dir.wikifier: /home/www/wikifier;
 ```
 
-_Optional_. Absolute path to the [wikifier](https://github.com/cooper/wikifier).
+__Required__. Absolute path to the [wikifier](https://github.com/cooper/wikifier).
 
-quiki needs this to serve the static resources bundled with wikifier. While
-optional, quiki will not start if it cannot find the wikifier by
-[other means](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
-
+quiki needs this to serve the static resources bundled with wikifier.
 
 ### server.wiki.[name].quiki
 
