@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"html/template"
 	"log"
@@ -23,76 +24,90 @@ type wikiTemplate struct {
 }
 
 func getTemplate(name string) (wikiTemplate, error) {
-	var t wikiTemplate
 
 	// template is already cached
 	if t, ok := templates[name]; ok {
 		return t, nil
 	}
 
-	var notFoundErr error
 	for _, templateDir := range strings.Split(templateDirs, ",") {
-		var tryNextTemplateDir bool
 		templatePath := templateDir + "/" + name
+		t, err := loadTemplate(name, templatePath)
 
-		// parse HTML templates
-		tmpl := template.New("")
-		err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
-
-			// walk error, probably missing template
-			if err != nil {
-				tryNextTemplateDir = true
-				if notFoundErr == nil {
-					notFoundErr = err
-				}
-				return err
-			}
-
-			// found template file
-			if strings.HasSuffix(filePath, ".tpl") {
-				if _, err := tmpl.ParseFiles(filePath); err != nil {
-					return err
-				}
-			}
-
-			// found static content directory
-			if info.IsDir() && info.Name() == "static" {
-				t.staticPath = filePath
-				t.staticRoot = "/tmpl/" + name
-				fileServer := http.FileServer(http.Dir(filePath))
-				pfx := t.staticRoot + "/"
-				http.Handle(pfx, http.StripPrefix(pfx, fileServer))
-				log.Printf("[%s] template registered: %s", name, pfx)
-			}
-
-			// found logo
-			if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
-				t.logo = t.staticRoot + "/" + info.Name()
-			}
-
-			return err
-		})
-
-		// not found error
-		if tryNextTemplateDir {
-			continue
-		}
-
-		// some other error
+		// an error occurred in loading the template
 		if err != nil {
 			return t, err
 		}
 
-		// cache the template
-		t.path = templatePath
-		t.template = tmpl
-		templates[name] = t
+		// no template but no error means try the next directory
+		if t.template == nil {
+			continue
+		}
 
 		return t, nil
 	}
 
 	// never found a template
-	return t, notFoundErr
+	return wikiTemplate{}, errors.New("unable to find template " + name)
+}
+
+func loadTemplate(name, templatePath string) (wikiTemplate, error) {
+	var t wikiTemplate
+	var tryNextDirectory bool
+
+	// parse HTML templates
+	tmpl := template.New("")
+	err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
+
+		// walk error, probably missing template
+		if err != nil {
+			tryNextDirectory = true
+			return err
+		}
+
+		// found template file
+		if strings.HasSuffix(filePath, ".tpl") {
+
+			// error in parsing
+			if _, err := tmpl.ParseFiles(filePath); err != nil {
+				return err
+			}
+		}
+
+		// found static content directory
+		if info.IsDir() && info.Name() == "static" {
+			t.staticPath = filePath
+			t.staticRoot = "/tmpl/" + name
+			fileServer := http.FileServer(http.Dir(filePath))
+			pfx := t.staticRoot + "/"
+			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
+			log.Printf("[%s] template registered: %s", name, pfx)
+		}
+
+		// found logo
+		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
+			t.logo = t.staticRoot + "/" + info.Name()
+		}
+
+		return err
+	})
+
+	// not found
+	if tryNextDirectory {
+		return t, nil
+	}
+
+	// other error
+	if err != nil {
+		return t, err
+	}
+
+	// cache the template
+	t.path = templatePath
+	t.template = tmpl
+	templates[name] = t
+
+	return t, nil
 }
 
 type wikiPage struct {
