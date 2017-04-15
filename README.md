@@ -55,9 +55,16 @@ _Optional_. Host to bind to. Defaults to all available hosts.
 @server.dir.template: /home/www/wiki-templates;
 ```
 
-__Required__. Absolute path to the template directory.
+_Optional_. Template search paths.
 
-If you are using a template packaged with quiki, do something like this:
+This is a comma-separated list of paths to look for templates when they are
+specified by name in the wiki configuration. If you're running multiple wikis
+that share a template, or if you are using the default template, this optional
+is useful. Otherwise, you can just specify the absolute path to each wiki's
+template in the [template](#template) directive.
+
+If you are using a template packaged with quiki, such as the default one,
+do something like this:
 ```
 @gopath: /home/me/go;
 @server.dir.template: [@gopath]/src/github.com/cooper/quiki/templates;
@@ -116,11 +123,12 @@ quiki uses this in the `<title>` tag on most pages and possibly other places.
 Wiki extended option
 [`template`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#template).
 
-Specifies the template to be used on the wiki. This is relative to
-[`server.dir.template`](#serverdirtemplate).
+Specifies the template to be used on the wiki. This may be an absolute path to
+the template or a template name. If only a name is given, the directories in
+[`server.dir.template`](#serverdirtemplate) will be searched.
 
-If you do not specify, the [default template](templates/default) will be
-assumed.
+If you do not specify a template at all, the
+[default template](templates/default) will be assumed.
 
 ### main_page
 
