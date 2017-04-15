@@ -14,7 +14,7 @@ import (
 func (conf *Config) Parse() error {
 
 	// open the config
-	file, err := os.Open(conf.path)
+	file, err := os.Open(conf.Path)
 	if err != nil {
 		return err
 	}
@@ -72,11 +72,11 @@ func (conf *Config) getWarn(msg string) string {
 func (conf *Config) getWarnf(msg string, i ...interface{}) (res string) {
 	line := *conf.line
 	if line == 0 {
-		i = append([]interface{}{conf.path}, i...)
+		i = append([]interface{}{conf.Path}, i...)
 		res = fmt.Sprintf("%s: "+msg, i...)
 		return
 	}
-	i = append([]interface{}{conf.path, line}, i...)
+	i = append([]interface{}{conf.Path, line}, i...)
 	res = fmt.Sprintf("%s:%d: "+msg, i...)
 	return
 }

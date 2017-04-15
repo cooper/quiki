@@ -5,7 +5,7 @@ import "errors"
 
 // configuration, fetch conf values with conf.Get()
 type Config struct {
-	path string                 // file path
+	Path string                 // file path
 	Vars map[string]interface{} // root variable map
 	line *uint                  // current line for warnings and errors
 }
@@ -13,7 +13,7 @@ type Config struct {
 // new config
 func New(path string) *Config {
 	return &Config{
-		path: path,
+		Path: path,
 		Vars: make(map[string]interface{}),
 		line: &alwaysZero,
 	}
@@ -24,7 +24,7 @@ var alwaysZero uint
 // new config with predetermined values
 func NewFromMap(desc string, aMap map[string]interface{}) *Config {
 	return &Config{
-		path: desc, // generic description shown in warnings/errors
+		Path: desc, // generic description shown in warnings/errors
 		Vars: aMap,
 		line: &alwaysZero,
 	}

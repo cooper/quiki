@@ -20,7 +20,7 @@ func newTransport() (wikiclient.Transport, error) {
 	// run wikiserver as a subprocess
 	// this is default
 	case "run", "":
-		return wikiclient.NewRunTransport(wikifierPath + "/wikiserver")
+		return wikiclient.NewRunTransport(wikifierPath, conf.Path)
 
 	// unix socket
 	case "unix":
