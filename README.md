@@ -24,6 +24,8 @@ a standalone web server for [wikifier](https://github.com/cooper/wikifier)
 
 ```
 go get github.com/cooper/quiki
+cd $GOPATH/src/github.com/cooper/quiki
+git submodule update --init
 ```
 
 ## configure
@@ -36,7 +38,7 @@ nano -w quiki.conf
 ## run
 
 ```
-quiki quiki.conf
+$GOPATH/bin/quiki quiki.conf
 ```
 
 ## server configuration
