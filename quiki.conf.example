@@ -1,17 +1,18 @@
 /* QUIKI CONFIGURATION */
 
-/* path to the quiki repository. if you used the `go` tool to install quiki,
-   just set @gopath to your GOPATH, and the below @server.dir.quiki will work. */
+/* @repo, the path to the quiki repository, is used in other config options
+   below.if you used the `go` tool to install quiki, just set @gopath to your
+   GOPATH, and the below @repo will be accurate. */
 @gopath: /home/someone/go;
-@server.dir.quiki: [@gopath]/src/github.com/cooper/quiki;
+@repo: [@gopath]/src/github.com/cooper/quiki;
 
 /* path to the wikifier. if you are using the wikifier bundled with this
    repository as a submodule, leave this as it is. */
-@server.dir.wikifier: [@server.dir.quiki]/wikifier;
+@server.dir.wikifier: [@repo]/wikifier;
 
 /* template search paths, separated by commas. the one below is where the
    default template is stored, but you can add additional paths. */
-@server.dir.template: [@server.dir.quiki]/templates;
+@server.dir.template: [@repo]/templates;
 
 /* HTTP server port to listen on. @server.http.bind can also be specified for
    a bind address, but quiki will use all addresses if unspecified. */
@@ -25,6 +26,7 @@
    significantly decreases page load time. */
 @server.enable.pregeneration;
 
+
 /* WIKI CONFIGURATIONS --
    you can configure any number of wikis to be served by this quiki server.
    below is a working configuration for the included example wiki. */
@@ -37,3 +39,6 @@
    this is useful if you are running multiple wikis with clashing roots
    (e.g. trying to run two wikis on /).
 /* @server.wiki.mywiki.host: mywiki.com; */
+
+/* now, each wiki requires its own configuration. see wikis/mywiki/wiki.conf
+   for an example wiki configuration. */
