@@ -22,8 +22,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// no main page configured
-		mainPage := wiki.conf.Get("main_page")
-		if mainPage == "" {
+		if wiki.conf.Get("main_page") == "" {
 			continue
 		}
 
