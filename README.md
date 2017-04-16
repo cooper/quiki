@@ -29,9 +29,13 @@ quiki /path/to/wikiserver.conf
 
 ## server configuration
 
-quiki uses
-[the same configuration](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#wikifierserver-options)
-as the wikiserver. In addition to the existing wikiserver options, quiki adds these:
+quiki works by running a wikiserver as a subprocess and communicating with it
+via standard I/O.
+
+quiki and the underlying wikiserver share a configuration file. In addition to
+the
+[existing wikiserver options](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#wikifierserver-options),
+quiki adds these:
 
 ### server.http.port
 
@@ -78,7 +82,8 @@ do something like this:
 
 __Required__. Absolute path to the [wikifier](https://github.com/cooper/wikifier).
 
-quiki needs this to serve the static resources bundled with wikifier.
+quiki needs this to run the wikiserver and to serve the static resources bundled
+with wikifier.
 
 ### server.wiki.[name].quiki
 
