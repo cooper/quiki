@@ -22,6 +22,12 @@ a standalone web server for [wikifier](https://github.com/cooper/wikifier)
 
 ## install
 
+install wikifier dependencies
+```
+cpanm GD Git::Wrapper HTTP::Date HTML::Strip HTML::Entities JSON::XS URI::Escape
+```
+
+install quiki
 ```
 go get github.com/cooper/quiki
 cd $GOPATH/src/github.com/cooper/quiki
