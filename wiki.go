@@ -44,15 +44,12 @@ func initWikis() error {
 		configPfx := "server.wiki." + wikiName
 
 		// not enabled
-		if !conf.GetBool(configPfx + ".quiki") {
+		if !conf.GetBool(configPfx + ".enable") {
 			continue
 		}
 
-		// if it's just a one it's a boolean for /
-		wikiHost := conf.Get(configPfx + ".quiki")
-		if wikiHost == "1" {
-			wikiHost = ""
-		}
+		// host to accept (optional)
+		wikiHost := conf.Get(configPfx + ".host")
 
 		// get wiki config path and password
 		var wikiConfPath, wikiPassword string
