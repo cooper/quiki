@@ -67,11 +67,7 @@ func main() {
 }
 
 func setupStatic() error {
-	if wikifierPath == "" {
-		return errors.New("can't find wikifier. set @server.dir.wikifier; " +
-			"otherwise at least one configured wiki needs @dir.wikifier",
-		)
-	} else if stat, err := os.Stat(wikifierPath); err != nil || !stat.IsDir() {
+	if stat, err := os.Stat(wikifierPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
 		}
