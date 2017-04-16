@@ -3,6 +3,7 @@
 a standalone web server for [wikifier](https://github.com/cooper/wikifier)
 
 * [install](#install)
+* [configure](#configure)
 * [run](#run)
 * [server configuration](#server-configuration)
   * [server\.http\.port](#serverhttpport)
@@ -23,6 +24,13 @@ a standalone web server for [wikifier](https://github.com/cooper/wikifier)
 
 ```
 go get github.com/cooper/quiki
+```
+
+## configure
+
+```
+cp quiki.conf.example quiki.conf
+nano -w quiki.conf
 ```
 
 ## run

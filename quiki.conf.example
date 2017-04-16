@@ -1,7 +1,7 @@
 /* QUIKI CONFIGURATION */
 
 /* @repo, the path to the quiki repository, is used in other config options
-   below.if you used the `go` tool to install quiki, just set @gopath to your
+   below. if you used the `go` tool to install quiki, just set @gopath to your
    GOPATH, and the below @repo will be accurate. */
 @gopath: /home/someone/go;
 @repo: [@gopath]/src/github.com/cooper/quiki;
