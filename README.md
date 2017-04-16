@@ -9,7 +9,11 @@ a standalone web server for [wikifier](https://github.com/cooper/wikifier)
   * [server\.http\.bind](#serverhttpbind)
   * [server\.dir\.template](#serverdirtemplate)
   * [server\.dir\.wikifier](#serverdirwikifier)
-  * [server\.wiki\.[name]\.quiki](#serverwikinamequiki)
+  * [server\.dir\.wiki](#serverdirwiki)
+  * [server\.wiki\.[name]\.enable](#serverwikinameenable)
+  * [server\.wiki\.[name]\.host](#serverwikinamehost)
+  * [server\.wiki\.[name]\.config](#serverwikinameconfig)
+  * [server\.wiki\.[name]\.password](#serverwikinamepassword)
 * [wiki configuration](#wiki-configuration)
   * [name](#name)
   * [template](#template)
@@ -74,6 +78,17 @@ do something like this:
 @server.dir.template: [@gopath]/src/github.com/cooper/quiki/templates;
 ```
 
+### server.dir.wiki
+
+```
+@server.dir.wiki: /home/www/wikis;
+```
+
+__Required__. Directory where wikis are stored.
+
+Technically this is optional if you [provide](#serverwikinameconfig) an absolute
+path to each wiki's configuration file.
+
 ### server.dir.wikifier
 
 ```
@@ -85,20 +100,62 @@ __Required__. Absolute path to the [wikifier](https://github.com/cooper/wikifier
 quiki needs this to run the wikiserver and to serve the static resources bundled
 with wikifier.
 
-### server.wiki.[name].quiki
+### server.wiki.[name].enable
 
 ```
-@server.wiki.mywiki.quiki;
+@server.wiki.mywiki.enable;
 ```
 
-__Required__. Boolean option which enables quiki on the wiki by the name of
-`[name]`.
+Tells quiki to serve the wiki by the name of `[name]`. If no wikis are enabled,
+quiki will not start.
+
+### server.wiki.[name].host
+
+```
+@server.wiki.mywiki.host: some.host.com;
+```
+
+_Optional_. Host on which to serve the wiki by the name of `[name]`.
 
 quiki can serve any number of wikis, so long as their
 [roots](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#root)
-do not collide. Since quiki shares a configuration with the wikiserver, this
-option tells quiki which wikis it should serve. If no wikis are enabled, quiki
-will not start.
+do not collide. Specifying a host allows wikis to have same roots, since quiki
+can respect the Host header.
+
+### server.wiki.[name].config
+
+```
+@server.wiki.mywiki.config: /home/www/wikis/mywiki/wiki.conf;
+```
+
+_Optional_. Absolute path to the configuration file for the wiki by the name of
+`[name]`.
+
+This is only technically optional when [`server.dir.wiki`](#serverdirwiki) is
+set. When you do not specify the configuration file path explicitly, it is
+assumed to be at `[server.dir.wiki]/[wiki name]/wiki.conf`.
+
+If this is specified, your wiki does not necessarily have to be within the
+[`server.dir.wiki`](#serverdirwiki) directory because quiki can use the
+[`dir.wiki`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#root)
+directive to find the wiki.
+
+### server.wiki.[name].password
+
+```
+@server.wiki.mywiki.password: secret;
+```
+
+_Optional_. Password for read access to the wiki.
+
+wikiserver normally uses a password for read authentication, but since quiki
+communicates with it via standard I/O, this is bypassed. quiki does not need
+a password for each wiki unless the wikiserver runs independently of quiki and
+is reached via a UNIX socket.
+
+You may still need to
+set a password though for other things which connect to the wikiserver via
+sockets (such as [adminifier](https://github.com/cooper/adminifier)).
 
 ## wiki configuration
 
