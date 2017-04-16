@@ -1,0 +1,3 @@
+[submodule "wikifier"]
+	path = wikifier
+	url = https://github.com/cooper/wikifier.git
