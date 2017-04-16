@@ -3,7 +3,7 @@
 *.old
 quiki
 quiki.conf
-templates
+templates/*
 !templates/default
-wikis
+wikis/*
 !wikis/mywiki
