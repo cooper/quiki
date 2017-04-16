@@ -44,10 +44,8 @@ $GOPATH/bin/quiki quiki.conf
 ## server configuration
 
 quiki works by running a wikiserver as a subprocess and communicating with it
-via standard I/O.
-
-quiki and the underlying wikiserver share a configuration file. In addition to
-the
+via standard I/O. quiki and the underlying wikiserver share a configuration
+file. In addition to the
 [existing wikiserver options](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#wikifierserver-options),
 quiki adds these:
 

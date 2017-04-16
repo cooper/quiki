@@ -3,16 +3,14 @@
 /* @repo, the path to the quiki repository, is used in other config options
    below. if you used the `go` tool to install quiki, just set @gopath to your
    GOPATH, and the below @repo will be accurate. */
-@gopath: /home/someone/go;
-@repo: [@gopath]/src/github.com/cooper/quiki;
+@gopath:    /home/someone/go;
+@repo:      [@gopath]/src/github.com/cooper/quiki;
 
-/* path to the wikifier. if you are using the wikifier bundled with this
-   repository as a submodule, leave this as it is. */
-@server.dir.wikifier: [@repo]/wikifier;
-
-/* template search paths, separated by commas. the one below is where the
-   default template is stored, but you can add additional paths. */
-@server.dir.template: [@repo]/templates;
+/* directory paths. the defaults below will work as long as @repo is accurately
+   set to the path of the quiki repository. */
+@server.dir.wikifier:   [@repo]/wikifier;
+@server.dir.wiki:       [@repo]/wikis;
+@server.dir.template:   [@repo]/templates;
 
 /* HTTP server port to listen on. @server.http.bind can also be specified for
    a bind address, but quiki will use all addresses if unspecified. */
