@@ -53,11 +53,20 @@ func initWikis() error {
 
 		// get wiki config path and password
 		var wikiConfPath, wikiPassword string
-		if err := conf.RequireMany(map[string]*string{
-			configPfx + ".config":   &wikiConfPath,
-			configPfx + ".password": &wikiPassword,
-		}); err != nil {
-			return err
+		if wikiConfPath = conf.Get(configPfx + ".config"); wikiConfPath != "" {
+			// config path given, so password is required
+			pwd, err := conf.Require(configPfx + ".password")
+			if err != nil {
+				return err
+			}
+			wikiPassword = pwd
+		} else {
+			// config not specified, so use server.dir.wiki and wiki.conf
+			dirWiki, err := conf.Require("server.dir.wiki")
+			if err != nil {
+				return err
+			}
+			wikiConfPath = dirWiki + "/" + wikiName + "/wiki.conf"
 		}
 
 		// create wiki info
