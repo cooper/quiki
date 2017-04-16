@@ -24,7 +24,7 @@ go get github.com/cooper/quiki
 ## run
 
 ```
-quiki /path/to/wikiserver.conf
+quiki quiki.conf
 ```
 
 ## server configuration

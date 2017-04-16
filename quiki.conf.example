@@ -25,7 +25,6 @@
    significantly decreases page load time. */
 @server.enable.pregeneration;
 
-
 /* WIKI CONFIGURATIONS --
    you can configure any number of wikis to be served by this quiki server.
    below is a working configuration for the included example wiki. */
