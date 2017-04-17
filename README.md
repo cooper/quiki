@@ -2,10 +2,13 @@
 
 quiki is a fully-featured wiki suite and standalone web server that is
 completely file-based. instead of storing content in a database, each page is
-represented by a text file written in a clean and productive source language.
+represented by a text file written in a clean and productive
+[source language](https://github.com/cooper/wikifier/blob/master/doc/language.md).
 
 the underlying [wikifier](https://github.com/cooper/wikifier) engine offers
-image generation, category management, templates, markdown integration,
+image generation, category management,
+[templates](https://github.com/cooper/wikifier/blob/master/doc/models.md),
+[markdown integration](https://github.com/cooper/wikifier/blob/master/doc/markdown.md),
 git-based revision tracking, and much more.
 [adminifier](https://github.com/cooper/adminifier), a sister project, is a wiki
 administrative panel featuring a web-based editor.
