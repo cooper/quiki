@@ -192,7 +192,8 @@ func setupWiki(wiki wikiInfo) error {
 	dirWiki := wiki.conf.Get("dir.wiki")
 	if rootFile != "" && dirWiki != "" {
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		http.Handle(rootFile, fileServer)
+		http.Handle(wiki.host+rootFile, fileServer)
+		log.Printf("[%s] registered file root: %s", wiki.name, wiki.host+rootFile)
 	}
 
 	// store the wiki info
