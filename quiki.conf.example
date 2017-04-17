@@ -19,7 +19,7 @@
 
 /* WIKISERVER CONFIGURATION */
 
-/* if enabled, the wikiserver will watch page files for changing and generate
+/* if enabled, the wikiserver will watch page files for changes and generate
    them immediately. it is recommended that you leave this as-is because it
    significantly decreases page load time. */
 @server.enable.pregeneration;
