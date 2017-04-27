@@ -143,12 +143,11 @@ func (wiki wikiInfo) setup() error {
 	wiki.template = template
 
 	// generate logo according to template
-	logo := wiki.template.manifest.Logo
-	if logo.Width != 0 || logo.Height != 0 {
-		if logoName := wiki.logo(""); logoName != "" {
-			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-			wiki.client.DisplayImage(logoName, logo.Width, logo.Height)
-		}
+	logoInfo := wiki.template.manifest.Logo
+	logoName := wiki.conf.Get("logo")
+	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
+		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+		wiki.client.DisplayImage(logoName, logoInfo.Width, logoInfo.Height)
 	}
 
 	// setup handlers
@@ -212,6 +211,7 @@ func (wiki wikiInfo) setup() error {
 	return nil
 }
 
+// logo path passed to templates
 func (wiki wikiInfo) logo(fallback string) string {
 	if logo := wiki.conf.Get("logo"); logo != "" {
 		return wiki.conf.Get("root.image") + "/" + logo
