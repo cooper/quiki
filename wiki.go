@@ -72,7 +72,7 @@ func initWikis() error {
 		}
 
 		// set up the wiki
-		if err := setupWiki(wiki); err != nil {
+		if err := wiki.setup(); err != nil {
 			return err
 		}
 	}
@@ -92,7 +92,7 @@ var wikiRoots = map[string]func(wikiInfo, string, http.ResponseWriter, *http.Req
 }
 
 // initialize a wiki
-func setupWiki(wiki wikiInfo) error {
+func (wiki wikiInfo) setup() error {
 
 	// make a generic session and client used for read access for this wiki
 	wiki.defaultSess = &wikiclient.Session{
@@ -141,6 +141,12 @@ func setupWiki(wiki wikiInfo) error {
 		return err
 	}
 	wiki.template = template
+
+	// TODO: generate logo according to template
+	// if logo := wiki.logo(""); logo != "" {
+	// 	wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+	//
+	// }
 
 	// setup handlers
 	for rootType, handler := range wikiRoots {
@@ -201,4 +207,11 @@ func setupWiki(wiki wikiInfo) error {
 	wiki.title = wiki.conf.Get("name")
 	wikis[wiki.name] = wiki
 	return nil
+}
+
+func (wiki wikiInfo) logo(fallback string) string {
+	if logo := wiki.conf.Get("logo"); logo != "" {
+		return logo
+	}
+	return fallback
 }

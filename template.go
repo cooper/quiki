@@ -91,7 +91,7 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 			log.Printf("[%s] template registered: %s", name, pfx)
 		}
 
-		// found logo
+		// found logo. this is overriden by wiki extended option @logo
 		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
 			t.logo = t.staticRoot + "/" + info.Name()
 		}

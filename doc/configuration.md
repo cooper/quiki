@@ -14,6 +14,7 @@
   * [name](#name)
   * [template](#template)
   * [main\_page](#main_page)
+  * [logo](#logo)
 
 ## server configuration
 
@@ -201,3 +202,13 @@ URLs are relative to the current page (i.e., they are used unchanged as the
 `href` attribute).
 
 Currently quiki only supports top-level navigation items.
+
+
+### logo
+
+Wiki extended option
+[`logo`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#logo).
+
+Filename for the wiki logo, relative to [`dir.image`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
+
+quiki templates can use this to display the logo where appropriate.
