@@ -142,11 +142,14 @@ func (wiki wikiInfo) setup() error {
 	}
 	wiki.template = template
 
-	// TODO: generate logo according to template
-	// if logo := wiki.logo(""); logo != "" {
-	// 	wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-	//
-	// }
+	// generate logo according to template
+	logo := wiki.template.manifest.Logo
+	if logo.Width != 0 || logo.Height != 0 {
+		if logoName := wiki.logo(""); logoName != "" {
+			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+			wiki.client.DisplayImage(logoName, logo.Width, logo.Height)
+		}
+	}
 
 	// setup handlers
 	for rootType, handler := range wikiRoots {
