@@ -124,7 +124,7 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 		}
 
 		// found manifest
-		if filePath == "manifest.json" {
+		if info.Name() == "manifest.json" {
 
 			// couldn't read manifest
 			contents, err := ioutil.ReadFile(filePath)
