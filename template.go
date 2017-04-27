@@ -25,10 +25,10 @@ type wikiTemplate struct {
 	logo       string             // path for logo file, if any
 	manifest   struct {
 
-		// Human-readable template name
+		// human-readable template name
 		// Name   string
 
-		// Template author's name
+		// template author's name
 		// Author string
 
 		// URL to template code on the web, such as GitHub repository
@@ -37,7 +37,7 @@ type wikiTemplate struct {
 		// wiki logo info
 		Logo struct {
 
-			// filename of the, relative to the static/ directory
+			// filename of logo, relative to the static/ directory
 			// of this template. this should ONLY be specified if the
 			// template has a default logo. the template logo will override
 			// the wiki name, but it will not override a logo specified in the

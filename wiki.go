@@ -146,6 +146,7 @@ func (wiki wikiInfo) setup() error {
 	logoInfo := wiki.template.manifest.Logo
 	logoName := wiki.conf.Get("logo")
 	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
+		log.Printf("generating %s; %dx%d\n", logoName, logoInfo.Width, logoInfo.Height)
 		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
 		wiki.client.DisplayImage(logoName, logoInfo.Width, logoInfo.Height)
 	}
