@@ -211,7 +211,7 @@ func (wiki wikiInfo) setup() error {
 
 func (wiki wikiInfo) logo(fallback string) string {
 	if logo := wiki.conf.Get("logo"); logo != "" {
-		return logo
+		return wiki.conf.Get("root.image") + "/" + logo
 	}
 	return fallback
 }
