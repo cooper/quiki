@@ -7,3 +7,4 @@ templates/*
 !templates/default
 wikis/*
 !wikis/mywiki
+.DS_Store

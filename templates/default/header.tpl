@@ -10,7 +10,7 @@
         {{.}}
         </style>
     {{end}}
-    <script type="text/javascript" src="{{.StaticRoot}}/retina.min.js"></script>
+    <script type="text/javascript" src="/static/retina.min.js"></script>
 </head>
 
 <body onload="retinajs()">
