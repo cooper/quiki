@@ -170,6 +170,9 @@ func (p wikiPage) VisibleTitle() string {
 	if p.WholeTitle != "" {
 		return p.WholeTitle
 	}
+	if p.Title == p.WikiTitle {
+		return p.Title
+	}
 	return p.Title + " - " + p.WikiTitle
 }
 
