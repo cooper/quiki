@@ -218,12 +218,12 @@ func (wiki wikiInfo) setup() error {
 }
 
 // logo path passed to templates
-func (wiki wikiInfo) getLogo(fallback string) string {
+func (wiki wikiInfo) getLogo() string {
 	if logo := wiki.logo; logo != "" {
 		return wiki.conf.Get("root.image") + "/" + logo
 	}
 	if logo := wiki.conf.Get("logo"); logo != "" {
 		return wiki.conf.Get("root.image") + "/" + logo
 	}
-	return fallback
+	return ""
 }

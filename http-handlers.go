@@ -80,7 +80,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 			Res:        res,
 			Title:      res.Get("title"),
 			WikiTitle:  wiki.title,
-			WikiLogo:   wiki.getLogo(wiki.template.logo),
+			WikiLogo:   wiki.getLogo(),
 			WikiRoot:   wiki.conf.Get("root.wiki"),
 			StaticRoot: wiki.template.staticRoot,
 			navigation: wiki.conf.GetSlice("navigation"),

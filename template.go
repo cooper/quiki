@@ -22,7 +22,6 @@ type wikiTemplate struct {
 	template   *template.Template // master HTML template
 	staticPath string             // static file directory path, if any
 	staticRoot string             // static file directory HTTP root, if any
-	logo       string             // path for logo file, if any
 	manifest   struct {
 
 		// human-readable template name
@@ -37,16 +36,8 @@ type wikiTemplate struct {
 		// wiki logo info
 		Logo struct {
 
-			// filename of logo, relative to the static/ directory
-			// of this template. this should ONLY be specified if the
-			// template has a default logo. the template logo will override
-			// the wiki name, but it will not override a logo specified in the
-			// wiki configuration 'logo' directive.
-			File string
-
 			// ideally one of these dimensions will be specified and the other
-			// not. this is NOT used for the logo specified by the filename
-			// above but rather the one specified by the wiki 'logo' directive.
+			// not. used for the logo specified by the wiki 'logo' directive.
 			// usually the height is specified. if both are present, the
 			// logo will be generated in those exact dimensions.
 			Height int
@@ -136,11 +127,6 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 			if err := json.Unmarshal(contents, &t.manifest); err != nil {
 				return err
 			}
-		}
-
-		// found logo. this is overriden by wiki extended option @logo
-		if t.staticRoot != "" && strings.HasPrefix(filePath, t.staticPath+"/logo.") {
-			t.logo = t.staticRoot + "/" + info.Name()
 		}
 
 		return err
