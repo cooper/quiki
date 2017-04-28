@@ -20,6 +20,7 @@ type wikiInfo struct {
 	host        string              // wiki hostname
 	password    string              // wiki password for read authentication
 	confPath    string              // path to wiki configuration
+	logo        string              // set internally to properly-sized logo filename
 	template    wikiTemplate        // template
 	client      wikiclient.Client   // client, only available in handlers
 	conf        *config.Config      // wiki config instance
@@ -149,7 +150,10 @@ func (wiki wikiInfo) setup() error {
 		log.Printf("[%s] generating logo %s; %dx%d\n",
 			wiki.name, logoName, logoInfo.Width, logoInfo.Height)
 		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
-		wiki.client.DisplayImageOverride(logoName, logoInfo.Width, logoInfo.Height)
+		res, _ := wiki.client.DisplayImageOverride(logoName, logoInfo.Width, logoInfo.Height)
+		if file, ok := res.Args["file"].(string); ok && file != "" {
+			wiki.logo = file
+		}
 	}
 
 	// setup handlers
@@ -214,7 +218,10 @@ func (wiki wikiInfo) setup() error {
 }
 
 // logo path passed to templates
-func (wiki wikiInfo) logo(fallback string) string {
+func (wiki wikiInfo) getLogo(fallback string) string {
+	if logo := wiki.logo; logo != "" {
+		return wiki.conf.Get("root.image") + "/" + logo
+	}
 	if logo := wiki.conf.Get("logo"); logo != "" {
 		return wiki.conf.Get("root.image") + "/" + logo
 	}
