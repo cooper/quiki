@@ -23,8 +23,8 @@
             {{end}}
         </ul>
         <a href="{{.WikiRoot}}/">
-            {{with .WikiLogo}}
-                <img src="{{.}}" alt="{{.WikiTitle}}" data-rjs="3" />
+            {{if .WikiLogo}}
+                <img src="{{.WikiLogo}}" alt="{{.WikiTitle}}" data-rjs="3" />
             {{else}}
                 <h1>{{.WikiTitle}}</h1>
             {{end}}
