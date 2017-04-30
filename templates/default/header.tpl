@@ -10,10 +10,9 @@
         {{.}}
         </style>
     {{end}}
-    <script type="text/javascript" src="/static/wiki.js"></script>
-    <script type="text/javascript" src="/static/mootools.min.js"></script>
-    <script type="text/javascript" src="/static/retina.min.js"></script>
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    {{range .Scripts}}
+        <script type="text/javascript" src="{{.}}"></script>
+    {{end}}
 </head>
 
 <body onload="retinajs()">
