@@ -15,7 +15,7 @@
     {{end}}
 </head>
 
-<body onload="retinajs()">
+<body>
 <div id="container">
 
     <div id="header">
