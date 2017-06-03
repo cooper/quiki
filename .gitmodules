@@ -1,3 +1,6 @@
 [submodule "wikifier"]
 	path = wikifier
 	url = https://github.com/cooper/wikifier.git
+[submodule "wipage"]
+	path = wipage
+	url = ./wipage
