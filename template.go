@@ -151,9 +151,11 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 }
 
 type wikiPage struct {
+	File       string             // page name, with extension
+	Name       string             // page name, without extension
 	WholeTitle string             // optional, shown in <title> as-is
 	Title      string             // page title
-	WikiTitle  string             // wiki title
+	WikiTitle  string             // wiki titled
 	WikiLogo   string             // path to wiki logo image
 	WikiRoot   string             // wiki HTTP root
 	Res        wikiclient.Message // response

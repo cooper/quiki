@@ -6,6 +6,8 @@ import (
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"strconv"
+	"strings"
+	"log"
 )
 
 // master handler
@@ -76,15 +78,7 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 
 	// page content
 	case "page":
-		renderTemplate(wiki, w, "page", wikiPage{
-			Res:        res,
-			Title:      res.Get("title"),
-			WikiTitle:  wiki.title,
-			WikiLogo:   wiki.getLogo(),
-			WikiRoot:   wiki.conf.Get("root.wiki"),
-			StaticRoot: wiki.template.staticRoot,
-			navigation: wiki.conf.GetSlice("navigation"),
-		})
+		renderTemplate(wiki, w, "page", wikiPageFromRes(wiki, res))
 
 	// anything else
 	default:
@@ -99,6 +93,29 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 		return
 	}
 	http.ServeFile(w, r, res.Get("path"))
+}
+
+// topic request
+func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+
+	// extract page number from relPath
+	pageN := 0
+	catName := relPath
+	split := strings.SplitN(relPath, "/", 2)
+	if len(split) == 2 {
+		if i, err := strconv.Atoi(split[1]); err != nil {
+			catName = split[0]
+			pageN = i
+		}
+	}
+
+	// error
+	res, err := wiki.client.DisplayCategoryPosts(catName, pageN)
+	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
+		return
+	}
+
+	log.Printf("res(%+v) err(%+v)", res, err)
 }
 
 // this is set true when calling handlePage for the error page. this way, if an
@@ -145,13 +162,27 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 	return true
 }
 
-func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, p wikiPage) {
+func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, dot interface{}) {
 	var buf bytes.Buffer
-	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", p)
+	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Length", strconv.FormatInt(int64(buf.Len()), 10))
 	w.Write(buf.Bytes())
+}
+
+func wikiPageFromRes(wiki wikiInfo, res wikiclient.Message) wikiPage {
+	return wikiPage{
+		Res:        res,
+		File:       res.Get("file"),
+		Name:       res.Get("name"),
+		Title:      res.Get("title"),
+		WikiTitle:  wiki.title,
+		WikiLogo:   wiki.getLogo(),
+		WikiRoot:   wiki.conf.Get("root.wiki"),
+		StaticRoot: wiki.template.staticRoot,
+		navigation: wiki.conf.GetSlice("navigation"),
+	}
 }
