@@ -163,7 +163,7 @@ func (wiki wikiInfo) setup() error {
 
 		// can't be empty
 		if err != nil {
-			return err
+			continue
 		}
 
 		// if it doesn't already have the wiki root as the prefix, add it
