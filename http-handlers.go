@@ -103,10 +103,10 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	catName := relPath
 	split := strings.SplitN(relPath, "/", 2)
 	if len(split) == 2 {
-		catName = split[0]
-		if i, err := strconv.Atoi(split[1]); err != nil {
+		if i, err := strconv.Atoi(split[1]); err == nil {
 			pageN = i
 		}
+		catName = split[0]
 	}
 
 	// error
