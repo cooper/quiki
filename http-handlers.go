@@ -123,7 +123,7 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	}
 
 	// get the page with the requested number
-	aSlice, ok := pagesMap[strconv.Itoa(pageN)].([]map[string]interface{})
+	aSlice, ok := pagesMap[strconv.Itoa(pageN)].([]interface{})
 	if !ok {
 		log.Printf("problem: %+v", pagesMap[strconv.Itoa(pageN)])
 		handleError(wiki, "invalid page number", w, r)
@@ -133,7 +133,7 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	// add each page
 	page := wikiPageFromRes(wiki, res)
 	for _, argMap := range aSlice {
-		msg := wikiclient.Message{Args: argMap}
+		msg := wikiclient.Message{Args: argMap.(map[string]interface{})}
 		page.Pages = append(page.Pages, wikiPageFromRes(wiki, msg))
 	}
 
