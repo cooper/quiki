@@ -99,7 +99,7 @@ func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.R
 func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 
 	// extract page number from relPath
-	pageN := 0
+	pageN := 1
 	catName := relPath
 	split := strings.SplitN(relPath, "/", 2)
 	if len(split) == 2 {

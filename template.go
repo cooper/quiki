@@ -142,6 +142,16 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 		return t, err
 	}
 
+	// add functions
+	tmpl.Funcs(map[string]interface{}{
+		"even": func (i int) bool {
+			return i % 2 == 0
+		},
+		"odd": func (i int) bool {
+			return i % 2 != 0
+		},
+	})
+
 	// cache the template
 	t.path = templatePath
 	t.template = tmpl
