@@ -17,6 +17,15 @@ import (
 var templateDirs string
 var templates = make(map[string]wikiTemplate)
 
+var templateFuncs = map[string]interface{}{
+	"even": func(i int) bool {
+		return i%2 == 0
+	},
+	"odd": func(i int) bool {
+		return i%2 != 0
+	},
+}
+
 type wikiTemplate struct {
 	path       string             // template directory path
 	template   *template.Template // master HTML template
@@ -99,9 +108,13 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 		if strings.HasSuffix(filePath, ".tpl") {
 
 			// error in parsing
-			if _, err := tmpl.ParseFiles(filePath); err != nil {
+			subTmpl, err := tmpl.ParseFiles(filePath)
+			if err != nil {
 				return err
 			}
+
+			// add funcs
+			subTmpl.Funcs(templateFuncs)
 		}
 
 		// found static content directory
@@ -141,16 +154,6 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 	if err != nil {
 		return t, err
 	}
-
-	// add functions
-	tmpl.Funcs(map[string]interface{}{
-		"even": func (i int) bool {
-			return i % 2 == 0
-		},
-		"odd": func (i int) bool {
-			return i % 2 != 0
-		},
-	})
 
 	// cache the template
 	t.path = templatePath
