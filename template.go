@@ -160,6 +160,7 @@ type wikiPage struct {
 	WikiRoot   string             // wiki HTTP root
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
+	Pages      []wikiPage         // more pages for category posts
 	navigation []interface{}      // slice of nav items [display, url]
 }
 

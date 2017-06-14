@@ -3,11 +3,12 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	wikiclient "github.com/cooper/go-wikiclient"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"log"
 )
 
 // master handler
@@ -116,6 +117,29 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	}
 
 	log.Printf("res(%+v) err(%+v)", res, err)
+
+	// pages is a map of page numbers to arrays of page refs
+	pagesMap, ok := res.Args["pages"].(map[string]map[string]map[string]interface{})
+	if !ok {
+		handleError(wiki, "invalid response", w, r)
+		return
+	}
+
+	// get the page with the requested number
+	aMap, ok := pagesMap[fmt.Sprintf("%d", 2)]
+	if !ok {
+		handleError(wiki, "invalid page number", w, r)
+		return
+	}
+
+	// add each page
+	page := wikiPageFromRes(wiki, res)
+	for _, argMap := range aMap {
+		msg := wikiclient.Message{Args: argMap}
+		page.Pages = append(page.Pages, wikiPageFromRes(wiki, msg))
+	}
+
+	renderTemplate(wiki, w, "posts", page)
 }
 
 // this is set true when calling handlePage for the error page. this way, if an
@@ -162,7 +186,7 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 	return true
 }
 
-func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, dot interface{}) {
+func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
 	var buf bytes.Buffer
 	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
 	if err != nil {
