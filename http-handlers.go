@@ -7,6 +7,7 @@ import (
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"strconv"
+	"log"
 	"strings"
 )
 
@@ -125,6 +126,7 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	// get the page with the requested number
 	aMap, ok := pagesMap[fmt.Sprintf("%d", 2)].(map[string]interface{})
 	if !ok {
+		log.Printf("problem: %+v", pagesMap[fmt.Sprintf("%d", 2)])
 		handleError(wiki, "invalid page number", w, r)
 		return
 	}
