@@ -3,7 +3,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	wikiclient "github.com/cooper/go-wikiclient"
 	"net/http"
 	"strconv"
@@ -124,9 +123,9 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 	}
 
 	// get the page with the requested number
-	aMap, ok := pagesMap[fmt.Sprintf("%d", 2)].(map[string]interface{})
+	aMap, ok := pagesMap[strconv.Itoa(pageN)].(map[string]interface{})
 	if !ok {
-		log.Printf("problem: %+v", pagesMap[fmt.Sprintf("%d", 2)])
+		log.Printf("problem: %+v", pagesMap[strconv.Itoa(pageN)])
 		handleError(wiki, "invalid page number", w, r)
 		return
 	}
