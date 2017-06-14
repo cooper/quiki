@@ -186,8 +186,8 @@ func (p wikiPage) VisibleTitle() string {
 	if p.WholeTitle != "" {
 		return p.WholeTitle
 	}
-	if p.Title == p.WikiTitle {
-		return p.Title
+	if p.Title == p.WikiTitle || p.Title == "" {
+		return p.WikiTitle
 	}
 	return p.Title + " - " + p.WikiTitle
 }
@@ -202,7 +202,11 @@ func (p wikiPage) Scripts() []string {
 }
 
 func (p wikiPage) PageCSS() template.CSS {
-	return template.CSS(p.Res.Get("css"))
+	css := p.Res.Get("all_css")
+	if css == "" {
+		css = p.Res.Get("css")
+	}
+	return template.CSS(css)
 }
 
 func (p wikiPage) HTMLContent() template.HTML {
