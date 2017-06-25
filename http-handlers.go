@@ -20,12 +20,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 		// wrong root
 		wikiRoot := wiki.conf.Get("root.wiki")
-		if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
-			continue
-		}
-
-		// no main page configured
-		if wiki.conf.Get("main_page") == "" {
+		if r.URL.Path != wikiRoot && !strings.HasPrefix(r.URL.Path, wikiRoot+"/") {
 			continue
 		}
 
@@ -46,27 +41,36 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		break
 	}
 
-	// try the delayed wiki
+	// a wiki matches this
 	if delayedWiki.name != "" {
 
-		// redirect is enabled
-		if delayedWiki.conf.GetBool("main_redirect") {
-			http.Redirect(
-				w, r,
-				delayedWiki.conf.Get("root.page")+
-					"/"+delayedWiki.conf.Get("main_page"),
-				http.StatusMovedPermanently,
-			)
+		// show the main page for the delayed wiki
+		wikiRoot := delayedWiki.conf.Get("root.wiki")
+		mainPage := delayedWiki.conf.Get("main_page")
+		if mainPage != "" && (r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/") {
+
+			// main page redirect is enabled
+			if delayedWiki.conf.GetBool("main_redirect") {
+				http.Redirect(
+					w, r,
+					delayedWiki.conf.Get("root.page")+
+						"/"+mainPage,
+					http.StatusMovedPermanently,
+				)
+				return
+			}
+
+			// display main page
+			delayedWiki.client = wikiclient.NewClient(tr, delayedWiki.defaultSess, 60*time.Second)
+			handlePage(delayedWiki, mainPage, w, r)
 			return
 		}
 
-		// display main page
-		delayedWiki.client = wikiclient.NewClient(tr, delayedWiki.defaultSess, 60*time.Second)
-		handlePage(delayedWiki, delayedWiki.conf.Get("main_page"), w, r)
-		return
+		// show the 404 page for the delayed wiki
+
 	}
 
-	// anything else is a 404
+	// anything else is a generic 404
 	http.NotFound(w, r)
 }
 
