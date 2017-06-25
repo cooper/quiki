@@ -19,22 +19,27 @@ administrative panel featuring a web-based editor.
 
 ## install
 
-you need [perl](http://perl.org),
-[cpanm](https://metacpan.org/pod/App::cpanminus), and [go](http://golang.org).
-
-the wikifier engine is included as a submodule of this repository, so it does
-not need to be installed manually.
+you need [perl](http://perl.org), [go](http://golang.org), and (preferably)
+[cpanm](https://metacpan.org/pod/App::cpanminus):
+```sh
+apt-get install perl golang # or similar
+curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+```
 
 install wikifier dependencies:
-```
+```sh
+apt-get install libgd-dev # or similar
 cpanm GD Git::Wrapper HTTP::Date HTML::Strip HTML::Entities JSON::XS URI::Escape
 ```
 
-install quiki:
+install [wikifier](https://github.com/cooper/wikifier):
+```sh
+git clone https://github.com/cooper/wikifier.git
 ```
+
+install quiki:
+```sh
 go get github.com/cooper/quiki
-cd $GOPATH/src/github.com/cooper/quiki
-git submodule update --init
 ```
 
 ## configure
