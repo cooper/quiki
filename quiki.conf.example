@@ -6,9 +6,11 @@
 @gopath:    /home/someone/go;
 @repo:      [@gopath]/src/github.com/cooper/quiki;
 
-/* directory paths. the defaults below will work as long as @repo is accurately
-   set to the path of the quiki repository. */
-@server.dir.wikifier:   [@repo]/wikifier;
+/* path for the directory to which you cloned wikifier */
+@server.dir.wikifier: /home/someone/wikifier;
+
+/* other directory paths. the defaults below will work as long as @repo is
+   accurately set to the path of the quiki repository. */
 @server.dir.wiki:       [@repo]/wikis;
 @server.dir.template:   [@repo]/templates;
 
