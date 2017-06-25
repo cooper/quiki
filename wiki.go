@@ -101,7 +101,7 @@ func (wiki wikiInfo) setup() error {
 		WikiName:     wiki.name,
 		WikiPassword: wiki.password,
 	}
-	defaultClient := wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+	defaultClient := wikiclient.NewClient(tr, wiki.defaultSess, 60*time.Second)
 
 	// connect the client, so that we can get config info
 	if err := defaultClient.Connect(); err != nil {
@@ -180,7 +180,7 @@ func (wiki wikiInfo) setup() error {
 		// add the real handler
 		rootType, handler := rootType, handler
 		http.HandleFunc(wiki.host+root, func(w http.ResponseWriter, r *http.Request) {
-			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 60*time.Second)
 			wiki.conf.Vars = wiki.defaultSess.Config
 
 			// the transport is not connected
