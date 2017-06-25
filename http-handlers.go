@@ -47,12 +47,20 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 	// try the delayed wiki
 	if delayedWiki.name != "" {
-		http.Redirect(
-			w, r,
-			delayedWiki.conf.Get("root.page")+
-				"/"+delayedWiki.conf.Get("main_page"),
-			http.StatusMovedPermanently,
-		)
+
+		// redirect is enabled
+		if delayedWiki.conf.GetBool("main_redirect") {
+			http.Redirect(
+				w, r,
+				delayedWiki.conf.Get("root.page")+
+					"/"+delayedWiki.conf.Get("main_page"),
+				http.StatusMovedPermanently,
+			)
+			return
+		}
+
+		// display main page
+		handlePage(delayedWiki, delayedWiki.conf.Get("main_page"), w, r)
 		return
 	}
 
