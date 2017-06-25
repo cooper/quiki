@@ -185,6 +185,8 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 
 	}
 
+	w.WriteHeader(http.StatusNotFound)
+
 	// if we have an error page, use it
 	errorPage := wiki.conf.Get("error_page")
 	if !useLowLevelError && errorPage != "" {
