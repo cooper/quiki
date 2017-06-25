@@ -14,6 +14,7 @@
   * [name](#name)
   * [template](#template)
   * [main\_page](#main_page)
+  * [main\_redirect](#main_redirect)
   * [logo](#logo)
 
 ## server configuration
@@ -184,6 +185,18 @@ Wiki extended option
 Name of the main page. This should not be the page's title but rather a
 filename, relative to [`dir.page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
 The `.page` extension is not necessary.
+
+### main_redirect
+
+```
+@main_redirect;
+```
+
+Wiki extended option
+[`main_redirect`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#main_redirect).
+
+If enabled, the wiki root will redirect to the main page rather than just
+displaying it at the root location.
 
 ### navigation
 
