@@ -67,7 +67,8 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// show the 404 page for the delayed wiki
-		http.Error(w, "404 page not found for "+delayedWiki.name, http.StatusNotFound)
+		handleError(delayedWiki, "Page not found.", w, r)
+		return
 	}
 
 	// anything else is a generic 404
