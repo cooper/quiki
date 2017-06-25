@@ -150,7 +150,7 @@ func (wiki wikiInfo) setup() error {
 	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
 		log.Printf("[%s] generating logo %s; %dx%d\n",
 			wiki.name, logoName, logoInfo.Width, logoInfo.Height)
-		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 3*time.Second)
+		wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 10*time.Second)
 		res, _ := wiki.client.DisplayImageOverride(logoName, logoInfo.Width, logoInfo.Height)
 		if file, ok := res.Args["file"].(string); ok && file != "" {
 			wiki.logo = file

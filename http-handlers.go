@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // master handler
@@ -60,6 +61,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// display main page
+		delayedWiki.client = wikiclient.NewClient(tr, delayedWiki.defaultSess, 60*time.Second)
 		handlePage(delayedWiki, delayedWiki.conf.Get("main_page"), w, r)
 		return
 	}
