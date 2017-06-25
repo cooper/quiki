@@ -175,7 +175,7 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 		}
 		msg = err.Get("error")
 
-		// string
+	// string
 	case string:
 		msg = err
 
@@ -184,13 +184,14 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 		msg = err.Error()
 
 	}
-
-	w.WriteHeader(http.StatusNotFound)
-
+	
+	// at this point, there is indeed an error
+	
 	// if we have an error page, use it
 	errorPage := wiki.conf.Get("error_page")
 	if !useLowLevelError && errorPage != "" {
 		useLowLevelError = true
+		w.WriteHeader(http.StatusNotFound)
 		handlePage(wiki, errorPage, w, r)
 		useLowLevelError = false
 		return true
