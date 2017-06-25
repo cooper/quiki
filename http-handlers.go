@@ -184,10 +184,10 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 		msg = err.Error()
 
 	}
-	
+
 	// at this point, there is indeed an error
-	
-	// if we have an error page, use it
+
+	// if we have an error page for this wiki, use it
 	errorPage := wiki.conf.Get("error_page")
 	if !useLowLevelError && errorPage != "" {
 		useLowLevelError = true
@@ -197,7 +197,22 @@ func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *
 		return true
 	}
 
-	// generic error response
+	// if the template provides an error page, fall back to that
+
+	if errTmpl := wiki.template.template.Lookup("error.tpl"); errTmpl != nil {
+		var buf bytes.Buffer
+		w.WriteHeader(http.StatusNotFound)
+		page := wikiPageWith(wiki)
+		page.Name = "Error"
+		page.Title = "Error"
+		page.Message = msg
+		errTmpl.Execute(&buf, page)
+		w.Header().Set("Content-Length", strconv.FormatInt(int64(buf.Len()), 10))
+		w.Write(buf.Bytes())
+		return true
+	}
+
+	// finally, fall back to generic error response
 	http.Error(w, msg, http.StatusNotFound)
 	return true
 }
@@ -214,11 +229,16 @@ func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, d
 }
 
 func wikiPageFromRes(wiki wikiInfo, res wikiclient.Message) wikiPage {
+	page := wikiPageWith(wiki)
+	page.Res = res
+	page.File = res.Get("file")
+	page.Name = res.Get("name")
+	page.Title = res.Get("title")
+	return page
+}
+
+func wikiPageWith(wiki wikiInfo) wikiPage {
 	return wikiPage{
-		Res:        res,
-		File:       res.Get("file"),
-		Name:       res.Get("name"),
-		Title:      res.Get("title"),
 		WikiTitle:  wiki.title,
 		WikiLogo:   wiki.getLogo(),
 		WikiRoot:   wiki.conf.Get("root.wiki"),

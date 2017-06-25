@@ -174,6 +174,7 @@ type wikiPage struct {
 	Res        wikiclient.Message // response
 	StaticRoot string             // path to static resources
 	Pages      []wikiPage         // more pages for category posts
+	Message    string             // message for error page
 	navigation []interface{}      // slice of nav items [display, url]
 }
 
