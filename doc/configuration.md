@@ -15,6 +15,7 @@
   * [template](#template)
   * [main\_page](#main_page)
   * [main\_redirect](#main_redirect)
+  * [error\_page](#error_page)
   * [logo](#logo)
 
 ## server configuration
@@ -197,6 +198,19 @@ Wiki extended option
 
 If enabled, the wiki root will redirect to the main page rather than just
 displaying it at the root location.
+
+### error_page
+
+```
+@error_page: some_page;
+```
+
+Wiki extended option
+[`error_page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#error_page).
+
+Name of the error page. This should not be the page's title but rather a
+filename, relative to [`dir.page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
+The `.page` extension is not necessary.
 
 ### navigation
 
