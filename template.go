@@ -196,7 +196,6 @@ func (p wikiPage) VisibleTitle() string {
 func (p wikiPage) Scripts() []string {
 	return []string{
 		"/static/mootools.min.js",
-		"/static/retina.min.js",
 		"/static/wiki.js",
 		"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js",
 	}
