@@ -11,8 +11,11 @@ import (
 	"time"
 )
 
+type handler struct {
+}
+
 // master handler
-func handleRoot(w http.ResponseWriter, r *http.Request) {
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var delayedWiki wikiInfo
 
 	// try each wiki

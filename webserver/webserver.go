@@ -5,10 +5,12 @@ package webserver
 import (
 	"errors"
 	"fmt"
-	"github.com/cooper/quiki/config"
 	"log"
+	"net"
 	"net/http"
 	"os"
+
+	"github.com/cooper/quiki/config"
 )
 
 // wikiserver config instance
@@ -31,9 +33,10 @@ func Run() {
 	}
 
 	// these are required
-	var port string
+	var port, bind string
 	if err := conf.RequireMany(map[string]*string{
 		"server.http.port":    &port,
+		"server.http.bind":    &bind,
 		"server.dir.wikifier": &wikifierPath,
 	}); err != nil {
 		log.Fatal(err)
@@ -59,11 +62,20 @@ func Run() {
 
 	log.Println("quiki ready")
 
-	// main handler
-	http.HandleFunc("/", handleRoot)
+	// create server with main handler
+	server := &http.Server{Handler: handler{}}
 
 	// listen
-	log.Fatal(http.ListenAndServe(conf.Get("server.http.bind")+":"+port, nil))
+	if port == "unix" {
+		listener, err := net.Listen("unix", bind)
+		if err != nil {
+			log.Fatal(err)
+		}
+		server.Serve(listener)
+	} else {
+		server.Addr = bind + ":" + port
+		log.Fatal(server.ListenAndServe())
+	}
 }
 
 func setupStatic() error {
