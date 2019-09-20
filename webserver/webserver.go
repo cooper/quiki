@@ -21,6 +21,7 @@ var mux *http.ServeMux
 var wikifierPath string
 
 func Run() {
+	mux = http.NewServeMux()
 
 	// find config file
 	if len(os.Args) < 2 || os.Args[1] == "" {
@@ -63,7 +64,6 @@ func Run() {
 	log.Println("quiki ready")
 
 	// create server with main handler
-	mux = http.NewServeMux()
 	mux.HandleFunc("/", handleRoot)
 	server := &http.Server{Handler: mux}
 
