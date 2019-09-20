@@ -123,7 +123,7 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 			t.staticRoot = "/tmpl/" + name
 			fileServer := http.FileServer(http.Dir(filePath))
 			pfx := t.staticRoot + "/"
-			http.Handle(pfx, http.StripPrefix(pfx, fileServer))
+			mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
 			log.Printf("[%s] template registered: %s", name, pfx)
 		}
 

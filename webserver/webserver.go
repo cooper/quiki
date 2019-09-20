@@ -15,6 +15,7 @@ import (
 
 // wikiserver config instance
 var conf *config.Config
+var mux *http.ServeMux
 
 // wikifier directory path
 var wikifierPath string
@@ -62,7 +63,9 @@ func Run() {
 	log.Println("quiki ready")
 
 	// create server with main handler
-	server := &http.Server{Handler: handler{}}
+	mux = http.NewServeMux()
+	mux.HandleFunc("/", handleRoot)
+	server := &http.Server{Handler: mux}
 
 	// listen
 	bind := conf.Get("server.http.bind")
@@ -91,6 +94,6 @@ func setupStatic() error {
 		return errors.New(errStr)
 	}
 	fileServer := http.FileServer(http.Dir(wikifierPath + "/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 	return nil
 }

@@ -179,7 +179,7 @@ func (wiki wikiInfo) setup() error {
 
 		// add the real handler
 		rootType, handler := rootType, handler
-		http.HandleFunc(wiki.host+root, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(wiki.host+root, func(w http.ResponseWriter, r *http.Request) {
 			wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 60*time.Second)
 			wiki.conf.Vars = wiki.defaultSess.Config
 
@@ -208,7 +208,7 @@ func (wiki wikiInfo) setup() error {
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		http.Handle(wiki.host+rootFile, http.StripPrefix(rootFile, fileServer))
+		mux.Handle(wiki.host+rootFile, http.StripPrefix(rootFile, fileServer))
 		log.Printf("[%s] registered file root: %s (%s)", wiki.name, wiki.host+rootFile, dirWiki)
 	}
 
