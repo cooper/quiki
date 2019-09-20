@@ -33,10 +33,9 @@ func Run() {
 	}
 
 	// these are required
-	var port, bind string
+	var port string
 	if err := conf.RequireMany(map[string]*string{
 		"server.http.port":    &port,
-		"server.http.bind":    &bind,
 		"server.dir.wikifier": &wikifierPath,
 	}); err != nil {
 		log.Fatal(err)
@@ -66,6 +65,7 @@ func Run() {
 	server := &http.Server{Handler: handler{}}
 
 	// listen
+	bind := conf.Get("server.http.bind")
 	if port == "unix" {
 		listener, err := net.Listen("unix", bind)
 		if err != nil {
