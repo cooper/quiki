@@ -10,10 +10,10 @@ type parser struct {
 	line   int
 	column int
 
-	char     rune
-	nextChar rune
-	skipChar bool
-	escaped  bool
+	this    byte // current byte
+	next    byte // next byte
+	skip    bool // skip next byte
+	escaped bool
 
 	catch *parserCatch
 	block *parserBlock
@@ -23,25 +23,25 @@ type parser struct {
 	braceLevel   int
 	braceFirst   bool
 
-	lastContent []rune
+	lastContent []byte
 }
 
-func (p parser) parseLine(line []rune) error {
-	for i, c := range line {
+func (p parser) parseLine(line []byte) error {
+	for i, b := range line {
 
-		// Skip this character
-		if p.skipChar {
-			p.skipChar = false
+		// skip this byte
+		if p.skip {
+			p.skip = false
 			continue
 		}
 
 		// update column and characters
 		p.column = i
-		p.char = c
-		p.nextChar = line[i+1]
+		p.this = b
+		p.next = line[i+1]
 
 		// handle this character and give up if error occurred
-		if err := p.parseChar(c); err != nil {
+		if err := p.parseByte(b); err != nil {
 			return err
 		}
 	}
@@ -49,17 +49,17 @@ func (p parser) parseLine(line []rune) error {
 	return nil
 }
 
-func (p parser) parseChar(c rune) error {
+func (p parser) parseByte(b byte) error {
 
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
 		isFirst := p.braceFirst
 		p.braceFirst = false
 
-		if c == '{' && !isFirst {
+		if b == '{' && !isFirst {
 			// increase brace depth
 			p.braceLevel++
-		} else if c == '}' {
+		} else if b == '}' {
 			// decrease brace depth
 			p.braceLevel--
 
@@ -69,24 +69,24 @@ func (p parser) parseChar(c rune) error {
 			}
 		}
 
-		// proceed to the next character if this was the first or last brace
+		// proceed to the next byte if this was the first or last brace
 		if isFirst || p.braceLevel == 0 {
 			return nil
 		}
 
 		// otherwise, proceed to the catch
-		return charDefault(c)
+		return byteDefault(b)
 	}
 
 	// COMMENTS
 
 	// entrance
-	if c == '/' && p.nextChar == '*' {
+	if b == '/' && p.next == '*' {
 		p.ignoreLevel++
 
 		// this is escaped
 		if p.escaped {
-			return charDefault(c)
+			return byteDefault(b)
 		}
 
 		// next character
@@ -94,16 +94,16 @@ func (p parser) parseChar(c rune) error {
 	}
 
 	// exit
-	if c == '*' && p.nextChar == '/' {
+	if b == '*' && p.next == '/' {
 
 		// we weren't in a comment, so handle normally
 		if p.commentLevel == 0 {
-			return charDefault(c)
+			return byteDefault(b)
 		}
 
-		// decrease comment level and skip next character
+		// decrease comment level and skip next byte
 		p.commentLevel--
-		p.skipChar = true
+		p.skip = true
 	}
 
 	// we're inside a comment; skip to next character
@@ -113,22 +113,22 @@ func (p parser) parseChar(c rune) error {
 
 	// BLOCKS
 
-	if c == '{' {
+	if b == '{' {
 		// opens a block
 		p.ignoreLevel++
 
 		// this is escaped
 		if p.escaped {
-			return charDefault(c)
+			return byteDefault(b)
 		}
 
 		var blockClasses []string
-		var blockType, blockName []rune
+		var blockType, blockName string
 
 		// if the next char is @, this is {@some_var}
-		if p.nextChar == '@' {
-			p.skipChar = true
-			blockType = []rune("variable")
+		if p.next == '@' {
+			p.skip = true
+			blockType = "variable"
 		} else {
 			var inBlockName, charsScanned int
 
@@ -164,15 +164,15 @@ func (p parser) parseChar(c rune) error {
 				// block type/name
 				if inBlockName != 0 {
 					// we're currently in the block name
-					blockName = append([]rune{lastChar}, blockName...)
-				} else if matched, _ := regexp.Match(`[\w\-\$\.]`, []byte(string(c))); matched {
+					blockName = string(lastChar) + blockName
+				} else if matched, _ := regexp.Match(`[\w\-\$\.]`, []byte{b}); matched {
 					// this could be part of the block type
-					blockType = append([]rune{lastChar}, blockType...)
+					blockType = string(lastChar) + blockType
 					continue
 				} else if lastChar == '~' && len(blockType) != 0 {
 					// tilde terminates block type
 					break
-				} else if matched, _ := regexp.Match(`\s`, []byte(string(c))); matched && len(blockType) == 0 {
+				} else if matched, _ := regexp.Match(`\s`, []byte{b}); matched && len(blockType) == 0 {
 					// space between things
 					continue
 				} else {
@@ -186,20 +186,20 @@ func (p parser) parseChar(c rune) error {
 
 				// if the block contains dots, it has classes
 				if split := strings.Split(string(blockType), "."); len(split) > 1 {
-					blockType, blockClasses = []rune(split[0]), split[1:]
+					blockType, blockClasses = split[0], split[1:]
 				}
 			}
 
 			// if there is no type at this point, assume it is a map
 			if len(blockType) == 0 {
-				blockType = []rune("map")
+				blockType = "map"
 			}
 
 			// if the block type starts with $, it is a model
 			if blockType[0] == '$' {
 				blockType = blockType[1:]
 				blockName = blockType
-				blockType = []rune("model")
+				blockType = "model"
 			}
 
 			// create the block
@@ -221,7 +221,7 @@ func (p parser) parseChar(c rune) error {
 			p.catch = p.block.catch
 
 			// if the next char is a brace, this is a brace escaped block
-			if p.nextChar == '{' {
+			if p.next == '{' {
 				p.braceFirst = true
 				p.braceLevel++
 
@@ -229,13 +229,13 @@ func (p parser) parseChar(c rune) error {
 				// return if catch fails
 			}
 		}
-	} else if c == '}' {
+	} else if b == '}' {
 		// closes a block
 		p.ignoreLevel++
 
 		// this is escaped
 		if p.escaped {
-			return charDefault(c)
+			return byteDefault(b)
 		}
 
 		// we cannot close the main block
@@ -261,16 +261,16 @@ func (p parser) parseChar(c rune) error {
 		// TODO: clear the catch
 		p.catch.appendContent(addContents)
 
-	} else if c == '\\' {
+	} else if b == '\\' {
 		if p.escaped {
-			return charDefault(c)
+			return byteDefault(b)
 		}
 		return nil
 	}
 	return nil
 }
 
-func charDefault(c rune) error {
+func byteDefault(b byte) error {
 	return nil
 }
 
