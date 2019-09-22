@@ -23,7 +23,7 @@ func newBlock(blockType, blockName string, blockClasses []string, parent block, 
 	return newUnknownBlock(blockName, underlying)
 }
 
-func generateBlock(b block) Html {
-	b.html(&Page{}, b.el()) // FIXME: actual page
+func generateBlock(b block, page *Page) Html {
+	b.html(page, b.el()) // FIXME: actual page
 	return b.el().generate()
 }

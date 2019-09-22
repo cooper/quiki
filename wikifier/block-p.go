@@ -33,7 +33,7 @@ func (p *pBlock) html(page *Page, el *element) {
 			}
 
 			// format, then trim again
-			formatted := parseFormattedText(item)
+			formatted := page.parseFormattedText(item)
 			item = strings.TrimSpace(string(formatted))
 			if item == "" {
 				continue

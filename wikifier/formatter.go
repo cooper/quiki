@@ -199,11 +199,11 @@ type formatterOptions struct {
 	startPos    position // set internally to position of '['
 }
 
-func parseFormattedText(text string) Html {
-	return parseFormattedTextOpts(text, &formatterOptions{})
+func (page *Page) parseFormattedText(text string) Html {
+	return page.parseFormattedTextOpts(text, &formatterOptions{})
 }
 
-func parseFormattedTextOpts(text string, opts *formatterOptions) Html {
+func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Html {
 
 	// let's not waste any time here
 	if text == "" {
@@ -255,7 +255,7 @@ func parseFormattedTextOpts(text string, opts *formatterOptions) Html {
 			// marks the end of a formatting element
 			formatDepth--
 			if formatDepth == 0 {
-				items = append(items, parseFormatType(formatType, opts))
+				items = append(items, page.parseFormatType(formatType, opts))
 				opts.startPos = position{}
 				continue
 			}
@@ -303,7 +303,7 @@ func parseFormattedTextOpts(text string, opts *formatterOptions) Html {
 	return Html(final)
 }
 
-func parseFormatType(formatType string, opts *formatterOptions) Html {
+func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Html {
 
 	// static format
 	if format, exists := staticFormats[formatType]; exists {
@@ -362,7 +362,7 @@ func parseFormatType(formatType string, opts *formatterOptions) Html {
 			invalid = " invalid"
 		}
 		if !displaySame {
-			display = string(parseFormattedText(display))
+			display = string(page.parseFormattedText(display))
 		}
 		return Html(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,

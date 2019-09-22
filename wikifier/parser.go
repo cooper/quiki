@@ -46,7 +46,7 @@ func newParser() *parser {
 	return &parser{block: mb, catch: mb}
 }
 
-func (p *parser) parseLine(line []byte) error {
+func (p *parser) parseLine(line []byte, page *Page) error {
 	for i, b := range line {
 
 		// skip this byte
@@ -66,7 +66,7 @@ func (p *parser) parseLine(line []byte) error {
 		}
 
 		// handle this byte and give up if error occurred
-		if err := p.parseByte(b); err != nil {
+		if err := p.parseByte(b, page); err != nil {
 			return err
 		}
 	}
@@ -74,7 +74,7 @@ func (p *parser) parseLine(line []byte) error {
 	return nil
 }
 
-func (p *parser) parseByte(b byte) error {
+func (p *parser) parseByte(b byte, page *Page) error {
 	log.Printf("parseByte(%s, last: %s, next: %s)", string(b), string(p.last), string(p.next))
 
 	// BRACE ESCAPE
