@@ -22,6 +22,18 @@ func (b *parserBlock) String() string {
 	return fmt.Sprintf("Block<%s{}>", b.typ)
 }
 
-func (b *parserBlock) getParent() parserCatch {
+func (b *parserBlock) getParentCatch() parserCatch {
 	return b.parent
+}
+
+func (b *parserBlock) catchType() string {
+	return catchTypeBlock
+}
+
+func (b *parserBlock) byteOK(byte) bool {
+	return true
+}
+
+func (b *parserBlock) shouldSkipByte(byte) bool {
+	return false
 }

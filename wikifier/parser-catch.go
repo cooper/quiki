@@ -2,18 +2,27 @@ package wikifier
 
 import "log"
 
+const (
+	catchTypeVariableName  = "Variable name"
+	catchTypeVariableValue = "Variable value"
+	catchTypeBlock         = "Block"
+)
+
 type parserCatch interface {
-	getParent() parserCatch
+	getParentCatch() parserCatch
 	getPositionedContent() []positionedContent
+	getPositionedPrefixContent() []positionedContent
 	getContent() []interface{}
 	getPrefixContent() []interface{}
 	getLastString() string
 	setLastContent(item interface{})
 	appendContent(items []interface{}, pos parserPosition)
-	shouldSkipByte(b byte) bool
 	pushContent(item interface{}, pos parserPosition)
 	pushContents(pc []positionedContent)
 	appendString(s string, pos parserPosition)
+	byteOK(b byte) bool
+	shouldSkipByte(b byte) bool
+	catchType() string
 }
 
 type genericCatch struct {
@@ -90,12 +99,12 @@ func (c *genericCatch) pushContents(pc []positionedContent) {
 	c.positionedContent = append(c.positionedContent, pc...)
 }
 
-func (c *genericCatch) shouldSkipByte(b byte) bool {
-	return false
-}
-
 func (c *genericCatch) getPositionedContent() []positionedContent {
 	return c.positionedContent
+}
+
+func (c *genericCatch) getPositionedPrefixContent() []positionedContent {
+	return c.positionedPrefixContent
 }
 
 func (c *genericCatch) getContent() []interface{} {

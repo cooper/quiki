@@ -23,10 +23,21 @@ type parser struct {
 	commentLevel int
 	braceLevel   int
 	braceFirst   bool
+
+	varNotInterpolated bool
+	varNegated         bool
 }
 
 type parserPosition struct {
 	line, column int
+}
+
+var variableTokens = map[byte]bool{
+	'@': true,
+	'%': true,
+	':': true,
+	';': true,
+	'-': true,
 }
 
 func Parse(input string) error {
@@ -90,7 +101,7 @@ func (p *parser) parseByte(b byte) error {
 
 			// if this was the last brace, clear the brace escape catch
 			if p.braceLevel == 0 {
-				p.catch = p.catch.getParent()
+				p.catch = p.catch.getParentCatch()
 			}
 		}
 
@@ -295,15 +306,140 @@ func (p *parser) parseByte(b byte) error {
 
 		// clear the catch
 		p.block = p.block.parent
-		p.catch = p.catch.getParent()
+		p.catch = p.catch.getParentCatch()
 		p.catch.appendContent(addContents, p.pos)
 
 	} else if b == '\\' {
+		// the escape will be handled later
 		if p.escape {
 			return p.handleByte(b)
 		}
 		return p.nextByte(b)
+	} else if p.block.typ == "main" && variableTokens[b] && p.last != '[' {
+		log.Println("variable tok", string(b))
+		// variable stuffs
+		p.ignore = true
+
+		if p.escape {
+			return p.handleByte(b)
+		}
+
+		// entering a variable declaration
+		if (b == '@' || b == '%') && p.catch == p.block {
+			log.Println("variable declaration", string(b))
+
+			// disable interpolation if it's %var
+			if b == '%' {
+				p.varNotInterpolated = true
+			}
+
+			// negate the value if -@var
+			pfx := string(b)
+			if p.last == '-' {
+				pfx = string(p.last) + pfx
+				p.varNegated = true
+			}
+
+			// catch the var name
+			catch := newParserVariableName(pfx, p.pos)
+			catch.parent = p.catch
+			p.catch = catch
+
+		} else if b == ':' && p.catch.catchType() == catchTypeVariableName {
+			// starts a variable value
+
+		} else if b == ';' && (p.catch.catchType() == catchTypeVariableName || p.catch.catchType() == catchTypeVariableValue) {
+			// ends a variable name (boolean) or value
+		} else if b == '-' && (p.next == '@' || p.next == '%') {
+			// negates a boolean variable
+			// do nothing; just make sure we don't get to default
+		}
+
+		//     # catch the var name
+		//     $c->catch(
+		//         name        => 'var_name',
+		//         hr_name     => 'variable name',
+		//         valid_chars => qr/[\w\.]/,
+		//         skip_chars  => qr/\s/,
+		//         prefix      => [ $prefix, $c->pos ],
+		//         location    => $c->{var_name} = []
+		//     ) or next CHAR;
+		// }
+
+		// # starts a variable value
+		// elsif ($char eq ':' && $c->catch->{name} eq 'var_name') {
+		//     $c->clear_catch;
+
+		//     # no length? no variable name
+		//     my $var = $c->{var_name}[-1];
+		//     return $c->error("Variable has no name")
+		//         if !length $var;
+
+		//     # now catch the value
+		//     $c->{var_is_string}++;
+		//     my $hr_var = truncate_hr($var, 30);
+		//     $c->catch(
+		//         name        => 'var_value',
+		//         hr_name     => "variable \@$hr_var value",
+		//         valid_chars => qr/./s,
+		//         location    => $c->{var_value} = []
+		//     ) or next CHAR;
+		// }
+
+		// # ends a variable name (for booleans) or value
+		// elsif ($char eq ';' && $c->{catch}{name} =~ m/^var_name|var_value$/) {
+		//     $c->clear_catch;
+		//     my ($var, $val) =
+		//         _get_var_parts(delete @$c{ qw(var_name var_value) });
+		//     my ($is_string, $no_intplt, $is_negated) = delete @$c{qw(
+		//         var_is_string var_no_interpolate var_is_negated
+		//     )};
+
+		//     # more than one content? not allowed in variables
+		//     return $c->error("Variable can't contain both text and blocks")
+		//         if @$var > 1 || @$val > 1;
+		//     $var = shift @$var;
+		//     $val = shift @$val;
+
+		//     # no length? no variable name
+		//     return $c->error("Variable has no name")
+		//         if !length $var;
+
+		//     # string
+		//     if ($is_string && length $val) {
+		//         $val = $wikifier->parse_formatted_text($page, $val)
+		//             if !$no_intplt && !ref $val;
+		//     }
+
+		//     # boolean
+		//     elsif (!$is_string) {
+		//         $val = 1;
+		//     }
+
+		//     # no length and not a boolean.
+		//     # there is no value here
+		//     else {
+		//         undef $val;
+		//     }
+
+		//     # set the value
+		//     $val = !$val if $is_negated;
+		//     $val = $page->set($var => $val);
+
+		//     # run ->parse and ->html if necessary
+		//     _parse_vars($page, 'parse', $val);
+		//     _parse_vars($page, 'html',  $val);
+		// }
+
+		// # -@var
+		// elsif ($char eq '-' && $c->{next_char} =~ m/[@%]/) {
+		//     # do nothing; just prevent the - from making it to default
+		// }
+
+		// # should never reach this, but just in case
+		// else { $use_default++ }
 	}
+
 	return p.handleByte(b)
 }
 
@@ -327,33 +463,34 @@ func (p *parser) handleByte(b byte) error {
 		add = string([]byte{p.last, b})
 	}
 
-	// terminate the catch if the byte is in those to skip
+	// terminate the catch if the catch says to skip this byte
 	if p.catch.shouldSkipByte(b) {
 
-		// // fetch the stuff caught up to this point
-		// content := p.catch.getContent()
-		// position := p.catch.getPosition()
+		// fetch the stuff caught up to this point
+		pc := p.catch.getPositionedContent()
 
-		// // also, fetch prefixes if there are any
-		// if p.catch.getPrefixContent() != nil {
-		// 	content = append([]interface{}{p.catch.getPrefixContent()}, content...)
-		// 	position = append(p.catch.getPrefixPosition(), position...)
-		// }
+		// also, fetch prefixes if there are any
+		if pfx := p.catch.getPositionedPrefixContent(); pfx != nil {
+			pc = append(pfx, pc...)
+		}
 
-		// // revert to the parent catch, and add our stuff to it
-		// p.catch = p.catch.getParent()
-		// p.catch.pushContent(content, position)
+		// revert to the parent catch, and add our stuff to it
+		p.catch = p.catch.getParentCatch()
+		p.catch.pushContents(pc)
+
+	} else if !p.catch.byteOK(b) {
+		// ask the catch if this byte is acceptable
+
+		char := string(b)
+		if char == "\n" {
+			char = "\u2424"
+		}
+		err := "Invalid byte '" + char + "' in " + p.catch.catchType() + "."
+		if str := p.catch.getLastString(); str != "" {
+			err += "Partial: " + str
+		}
+		return errors.New(err)
 	}
-
-	// FIXME: make sure the char is acceptable according to valid chars
-	//     # make sure the char is acceptable according to valid_chars
-	//     elsif ($catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
-	//         my $loc = $catch->{location}[-1];
-	//         $char   = "\x{2424}" if $char eq "\n";
-	//         my $err = "Invalid byte '$char' in $$catch{hr_name}.";
-	//         $err   .= " Partial: $loc" if length $loc;
-	//         return $c->error($err);
-	//     }
 
 	// append
 	p.catch.appendString(add, p.pos)
