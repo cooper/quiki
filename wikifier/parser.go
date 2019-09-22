@@ -41,6 +41,10 @@ var variableTokens = map[byte]bool{
 	'-': true,
 }
 
+func (pos position) none() bool {
+	return pos.line == 0 && pos.column == 0
+}
+
 func newParser() *parser {
 	mb := newBlock("main", "", nil, nil, position{})
 	return &parser{block: mb, catch: mb}

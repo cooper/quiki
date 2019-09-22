@@ -2,21 +2,23 @@ package wikifier
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
 type block interface {
-	el() *element                    // returns the html element
-	parse(page *Page)                // parse contents
-	html(page *Page, el *element)    // generate html element
-	parentBlock() block              // parent block
-	blockType() string               // block type
-	close(pos position)              // closes the block at the given position
-	closed() bool                    // true when closed
-	hierarchy() string               // human-readable hierarchy
-	invisible() bool                 // true for invisible blocks (generate no html)
-	visiblePosContent() []posContent // visible text/blocks
-	catch                            // all blocks must conform to catch
+	el() *element                      // returns the html element
+	parse(page *Page)                  // parse contents
+	html(page *Page, el *element)      // generate html element
+	parentBlock() block                // parent block
+	blockType() string                 // block type
+	close(pos position)                // closes the block at the given position
+	closed() bool                      // true when closed
+	hierarchy() string                 // human-readable hierarchy
+	invisible() bool                   // true for invisible blocks (generate no html)
+	visiblePosContent() []posContent   // visible text/blocks
+	warn(pos position, warning string) // produce parser warning
+	catch                              // all blocks must conform to catch
 }
 
 // generic base for all blocks
@@ -93,6 +95,10 @@ func (b *parserBlock) shouldSkipByte(byte) bool {
 
 func (b *parserBlock) invisible() bool {
 	return false
+}
+
+func (b *parserBlock) warn(pos position, warning string) {
+	log.Printf("WARNING: %s{} at %v: %s", b.blockType, pos, warning)
 }
 
 func (b *parserBlock) visiblePosContent() []posContent {

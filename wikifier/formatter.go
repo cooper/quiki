@@ -211,7 +211,7 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Ht
 	}
 
 	// find and copy the position
-	if opts.pos.line == 0 && opts.pos.column == 0 {
+	if opts.pos.none() {
 		// TODO: use the current page position
 	}
 

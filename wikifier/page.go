@@ -6,9 +6,9 @@ import (
 )
 
 type Page struct {
-	FilePath  string
-	parser    *parser
-	mainBlock block
+	FilePath string
+	parser   *parser
+	main     block
 	*variableScope
 }
 
@@ -18,7 +18,7 @@ func NewPage(filePath string) *Page {
 
 func (p *Page) Parse() error {
 	p.parser = newParser()
-	p.mainBlock = p.parser.block
+	p.main = p.parser.block
 	file, err := os.Open(p.FilePath)
 	if err != nil {
 		return err
@@ -34,6 +34,11 @@ func (p *Page) Parse() error {
 	return scanner.Err()
 }
 
+// for attributedObject
+func (p *Page) MainBlock() block {
+	return p.main
+}
+
 func (p *Page) resetParseState() {
 	// TODO: recursively destroy blocks
 	p.parser = nil
@@ -41,5 +46,5 @@ func (p *Page) resetParseState() {
 
 func (p *Page) HTML() Html {
 	// TODO: cache and then recursively destroy elements
-	return generateBlock(p.mainBlock, p)
+	return generateBlock(p.main, p)
 }
