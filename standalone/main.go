@@ -12,9 +12,35 @@ func main() {
 		log.Fatal("wrong # of args")
 	}
 	page := wikifier.NewPage(os.Args[1])
-	err := page.Parse()
-	if err != nil {
-		log.Fatal(err)
+
+	// set some variables
+	page.Set("myKey", "myValue")
+	if val, err := page.GetStr("myKey"); err != nil {
+		log.Fatal("Got error: ", err)
+	} else {
+		log.Println("Got:", val)
 	}
-	log.Println(page.HTML())
+
+	page.Set("page", page)
+
+	if val, err := page.GetObj("page.page"); err != nil {
+		log.Fatal("Got error: ", err)
+	} else {
+		log.Println("Got:", val)
+	}
+
+	if val, err := page.GetStr("page.myKey"); err != nil {
+		log.Fatal("Got error: ", err)
+	} else {
+		log.Println("Got:", val)
+	}
+
+	// // parse
+	// err := page.Parse()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// // spit out html
+	// log.Println(page.HTML())
 }
