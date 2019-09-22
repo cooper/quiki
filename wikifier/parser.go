@@ -338,7 +338,7 @@ func (p *parser) parseByte(b byte) error {
 			}
 
 			// catch the var name
-			catch := newParserVariableName(pfx, p.pos)
+			catch := newVariableName(pfx, p.pos)
 			catch.parent = p.catch
 			p.catch = catch
 
@@ -360,7 +360,7 @@ func (p *parser) parseByte(b byte) error {
 			log.Printf("VALUE VAR NAME: %v", p.varName)
 
 			// now catch the value
-			catch := newParserVariableValue()
+			catch := newVariableValue()
 			catch.parent = p.catch
 			p.catch = catch
 

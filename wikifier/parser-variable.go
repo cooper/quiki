@@ -2,60 +2,60 @@ package wikifier
 
 import "regexp"
 
-type parserVariableName struct {
+type variableName struct {
 	parent catch
 	*genericCatch
 }
 
-func newParserVariableName(pfx string, pos position) *parserVariableName {
+func newVariableName(pfx string, pos position) *variableName {
 	pc := []positionedContent{{pfx, pos}}
-	return &parserVariableName{genericCatch: &genericCatch{positionedPrefixContent: pc}}
+	return &variableName{genericCatch: &genericCatch{positionedPrefixContent: pc}}
 }
 
-func (vn *parserVariableName) catchType() string {
+func (vn *variableName) catchType() string {
 	return catchTypeVariableName
 }
 
-func (vn *parserVariableName) getParentCatch() catch {
+func (vn *variableName) getParentCatch() catch {
 	return vn.parent
 }
 
 // word-like chars and periods are OK in var names
-func (vn *parserVariableName) byteOK(b byte) bool {
+func (vn *variableName) byteOK(b byte) bool {
 	ok, _ := regexp.Match(`[\w\.]`, []byte{b})
 	return ok
 }
 
 // skip whitespace in variable name
-func (vn *parserVariableName) shouldSkipByte(b byte) bool {
+func (vn *variableName) shouldSkipByte(b byte) bool {
 	skip, _ := regexp.Match(`\s`, []byte{b})
 	return skip
 }
 
-type parserVariableValue struct {
+type variableValue struct {
 	parent catch
 	*genericCatch
 }
 
-func newParserVariableValue() *parserVariableValue {
-	return &parserVariableValue{genericCatch: &genericCatch{}}
+func newVariableValue() *variableValue {
+	return &variableValue{genericCatch: &genericCatch{}}
 }
 
-func (vv *parserVariableValue) catchType() string {
+func (vv *variableValue) catchType() string {
 	return catchTypeVariableValue
 }
 
-func (vv *parserVariableValue) getParentCatch() catch {
+func (vv *variableValue) getParentCatch() catch {
 	return vv.parent
 }
 
 // word-like chars and periods are OK in var names
-func (vv *parserVariableValue) byteOK(b byte) bool {
+func (vv *variableValue) byteOK(b byte) bool {
 	ok, _ := regexp.Match(`.`, []byte{b})
 	return ok
 }
 
 // skip whitespace in variable name
-func (vv *parserVariableValue) shouldSkipByte(b byte) bool {
+func (vv *variableValue) shouldSkipByte(b byte) bool {
 	return false
 }
