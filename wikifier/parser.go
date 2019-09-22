@@ -14,7 +14,6 @@ type parser struct {
 	this   byte // current byte
 	next   byte // next byte
 	skip   bool // skip next byte
-	ignore bool // this byte is ignored
 	escape bool // this byte is escaped
 
 	catch parserCatch
@@ -118,7 +117,6 @@ func (p *parser) parseByte(b byte) error {
 
 	// entrance
 	if b == '/' && p.next == '*' {
-		p.ignore = true
 
 		// this is escaped
 		if p.escape {
@@ -155,7 +153,6 @@ func (p *parser) parseByte(b byte) error {
 
 	if b == '{' {
 		// opens a block
-		p.ignore = true
 
 		// this is escaped
 		if p.escape {
@@ -276,9 +273,11 @@ func (p *parser) parseByte(b byte) error {
 				// return if catch fails
 			}
 		}
-	} else if b == '}' {
+		return p.nextByte(b)
+	}
+
+	if b == '}' {
 		// closes a block
-		p.ignore = true
 
 		// this is escaped
 		if p.escape {
@@ -309,16 +308,20 @@ func (p *parser) parseByte(b byte) error {
 		p.catch = p.catch.getParentCatch()
 		p.catch.appendContent(addContents, p.pos)
 
-	} else if b == '\\' {
+		return p.nextByte(b)
+	}
+
+	if b == '\\' {
 		// the escape will be handled later
 		if p.escape {
 			return p.handleByte(b)
 		}
 		return p.nextByte(b)
-	} else if p.block.typ == "main" && variableTokens[b] && p.last != '[' {
+	}
+
+	if p.block.typ == "main" && variableTokens[b] && p.last != '[' {
 		log.Println("variable tok", string(b))
 		// variable stuffs
-		p.ignore = true
 
 		if p.escape {
 			return p.handleByte(b)
@@ -345,45 +348,55 @@ func (p *parser) parseByte(b byte) error {
 			catch.parent = p.catch
 			p.catch = catch
 
-		} else if b == ':' && p.catch.catchType() == catchTypeVariableName {
+			return p.nextByte(b)
+		}
+		if b == ':' && p.catch.catchType() == catchTypeVariableName {
 			// starts a variable value
 
-		} else if b == ';' && (p.catch.catchType() == catchTypeVariableName || p.catch.catchType() == catchTypeVariableValue) {
+			//     $c->clear_catch;
+
+			//     # no length? no variable name
+			//     my $var = $c->{var_name}[-1];
+			//     return $c->error("Variable has no name")
+			//         if !length $var;
+
+			//     # now catch the value
+			//     $c->{var_is_string}++;
+			//     my $hr_var = truncate_hr($var, 30);
+			//     $c->catch(
+			//         name        => 'var_value',
+			//         hr_name     => "variable \@$hr_var value",
+			//         valid_chars => qr/./s,
+			//         location    => $c->{var_value} = []
+			//     ) or next CHAR;
+
+			varName := p.catch.getLastString()
+			p.catch = p.catch.getParentCatch()
+
+			// no var name
+			if len(varName) == 0 {
+				return errors.New("Variable has no name")
+			}
+			log.Printf("VAR NAME: %v", varName)
+			// nw catch the value
+
+			return p.nextByte(b)
+
+		}
+		if b == ';' && (p.catch.catchType() == catchTypeVariableName || p.catch.catchType() == catchTypeVariableValue) {
 			// ends a variable name (boolean) or value
+			return p.nextByte(b)
+
 		} else if b == '-' && (p.next == '@' || p.next == '%') {
 			// negates a boolean variable
 			// do nothing; just make sure we don't get to default
-		}
+			return p.nextByte(b)
 
-		//     # catch the var name
-		//     $c->catch(
-		//         name        => 'var_name',
-		//         hr_name     => 'variable name',
-		//         valid_chars => qr/[\w\.]/,
-		//         skip_chars  => qr/\s/,
-		//         prefix      => [ $prefix, $c->pos ],
-		//         location    => $c->{var_name} = []
-		//     ) or next CHAR;
-		// }
+		}
 
 		// # starts a variable value
 		// elsif ($char eq ':' && $c->catch->{name} eq 'var_name') {
-		//     $c->clear_catch;
 
-		//     # no length? no variable name
-		//     my $var = $c->{var_name}[-1];
-		//     return $c->error("Variable has no name")
-		//         if !length $var;
-
-		//     # now catch the value
-		//     $c->{var_is_string}++;
-		//     my $hr_var = truncate_hr($var, 30);
-		//     $c->catch(
-		//         name        => 'var_value',
-		//         hr_name     => "variable \@$hr_var value",
-		//         valid_chars => qr/./s,
-		//         location    => $c->{var_value} = []
-		//     ) or next CHAR;
 		// }
 
 		// # ends a variable name (for booleans) or value
@@ -438,6 +451,7 @@ func (p *parser) parseByte(b byte) error {
 
 		// # should never reach this, but just in case
 		// else { $use_default++ }
+		return p.nextByte(b)
 	}
 
 	return p.handleByte(b)
@@ -459,7 +473,7 @@ func (p *parser) handleByte(b byte) error {
 	// pretend it's not escaped by reinjecting a backslash. this allows
 	// further parsers to handle escapes (in particular, Formatter.)
 	add := string(b)
-	if p.ignore && p.escape {
+	if p.escape {
 		add = string([]byte{p.last, b})
 	}
 
@@ -502,7 +516,6 @@ func (p *parser) handleByte(b byte) error {
 func (p *parser) nextByte(b byte) error {
 	log.Println("nextByte", string(b))
 
-	p.ignore = false
 	p.last = b
 
 	// if current byte is \, set escape for the next
