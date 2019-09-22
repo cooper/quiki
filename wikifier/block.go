@@ -6,11 +6,14 @@ import (
 )
 
 type block interface {
-	parentBlock() block
-	blockType() string
-	close(pos position)
-	closed() bool
-	catch
+	parse(page *page)             // parse contents
+	html(page *page, el *element) // generate html element
+	parentBlock() block           // parent block
+	blockType() string            // block type
+	close(pos position)           // closes the block at the given position
+	closed() bool                 // true when closed
+	hierarchy() string            // human-readable hierarchy
+	catch                         // all blocks must conform to catch
 }
 
 type parserBlock struct {
@@ -51,7 +54,7 @@ func (b *parserBlock) hierarchy() string {
 		switch val := item.(type) {
 		case string:
 			lines = append(lines, val)
-		case *parserBlock:
+		case block:
 			split := strings.Split(val.hierarchy(), "\n")
 			indented := make([]string, len(split))
 			for i, blockLine := range split {

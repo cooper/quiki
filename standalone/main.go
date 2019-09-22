@@ -16,5 +16,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Fatal(wikifier.Parse(string(content)))
+	err = wikifier.Parse(string(content))
+	if err != nil {
+		log.Fatal(err)
+	}
 }

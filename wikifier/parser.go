@@ -42,9 +42,8 @@ var variableTokens = map[byte]bool{
 }
 
 func Parse(input string) error {
-	mb := &parserBlock{typ: "main", genericCatch: &genericCatch{}}
-	p := &parser{block: mb}
-	p.catch = mb
+	mb := newBlock("main", "", nil, nil, position{})
+	p := &parser{block: mb, catch: mb}
 
 	for i, line := range strings.Split(input, "\n") {
 		p.pos.line = i + 1

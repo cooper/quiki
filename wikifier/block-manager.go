@@ -1,6 +1,7 @@
 package wikifier
 
 var blockInitializers = map[string]func(name string, b *parserBlock) block{
+	"main":  newMainBlock,
 	"clear": newClearBlock,
 }
 
@@ -16,5 +17,5 @@ func newBlock(blockType, blockName string, blockClasses []string, parent block, 
 	if init, ok := blockInitializers[blockType]; ok {
 		return init(blockName, underlying)
 	}
-	return underlying
+	return newUnknownBlock(blockName, underlying)
 }
