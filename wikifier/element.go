@@ -106,7 +106,7 @@ func (el *element) generate() html {
 
 		// inject ID
 		if el.needID {
-			classes = append([]string{el.id}, classes...)
+			classes = append([]string{"q-" + el.id}, classes...)
 		}
 		generated += ` class="` + strings.Join(classes, " ") + `"`
 
@@ -132,26 +132,47 @@ func (el *element) generate() html {
 
 	// non-container
 	if !el.container {
-		generated += " />"
+		generated += " />\n"
 		el.cachedHTML = html(generated)
 		return html(generated)
 	}
 
 	// inner content
-	// TODO: Indent unless noIndent
+	generated += ">\n"
 	for _, textOrEl := range el.content {
+		add := ""
 		switch v := textOrEl.(type) {
 		case html:
-			generated += string(v)
+			add = string(v)
 		case string:
-			generated += htmlfmt.EscapeString(v)
+			add = htmlfmt.EscapeString(v)
 		case *element:
-			generated += string(v.generate())
+			add = string(v.generate())
 		}
+		if !el.noIndent {
+			add = indent(add)
+		}
+		generated += add
 	}
 
 	// close it off
+	if !el.noTags && !el.noClose {
+		generated += "</" + el.tag + ">\n"
+	}
 
 	el.cachedHTML = html(generated)
 	return html(generated)
+}
+
+func indent(str string) string {
+	var res []rune
+	bol := true
+	for _, c := range str {
+		if bol && c != '\n' {
+			res = append(res, []rune("    ")...)
+		}
+		res = append(res, c)
+		bol = c == '\n'
+	}
+	return string(res)
 }

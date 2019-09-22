@@ -53,6 +53,7 @@ func Parse(input string) error {
 	}
 
 	log.Printf(mb.hierarchy())
+	log.Println(generateBlock(mb))
 	return nil
 }
 

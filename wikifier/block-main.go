@@ -21,7 +21,6 @@ func (mb *mainBlock) html(page *page, el *element) {
 	// iterate over visible content only
 	var contentToAdd []posContent
 	for _, pc := range mb.visiblePosContent() {
-
 		switch item := pc.content.(type) {
 		case block:
 
@@ -57,7 +56,7 @@ func (mb *mainBlock) createSection(page *page, el *element, pcs []posContent) {
 	}
 
 	// create a section at first text node position
-	sec := newBlock("section", "", nil, mb, pcs[0].position)
+	sec := newBlock("sec", "", nil, mb, pcs[0].position)
 	sec.pushContents(pcs)
 
 	// parse and generate
