@@ -27,14 +27,14 @@ func (p *pBlock) html(page *page, el *element) {
 		case string:
 
 			// trim again
-			item = strings.Trim(item, "\t ")
+			item = strings.TrimSpace(item)
 			if item == "" {
 				continue
 			}
 
 			// format, then trim again
 			formatted := parseFormattedText(item)
-			item = strings.Trim(string(formatted), "\t ")
+			item = strings.TrimSpace(string(formatted))
 			if item == "" {
 				continue
 			}

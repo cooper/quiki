@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"fmt"
 	htmlfmt "html"
 	"regexp"
 	"strings"
@@ -10,6 +11,7 @@ var variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
 var linkRegex = regexp.MustCompile(`^((\w+)://|\$)`)
 var mailRegex = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
 var colorRegex = regexp.MustCompile(`(?i)^#[\da-f]+$`)
+var wikiRegex = regexp.MustCompile(`^(\w+):`)
 
 var linkNormalizers = map[string]func(string) string{
 	"wikifier": func(s string) string {
@@ -310,7 +312,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 
 	// variable
 	if !opts.noVariables {
-		if match := variableRegex.MatchString(formatType); match {
+		if variableRegex.MatchString(formatType) {
 			// TODO: fetch the variable, warn if it is undef, format text if %var
 			// then return the value
 			return html("(null)")
@@ -354,6 +356,23 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 	//     }
 	// }
 
+	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
+		ok, displaySame, target, display, tooltip, linkType := parseLink(formatType[1 : len(formatType)-2])
+		invalid := ""
+		if !ok {
+			invalid = " invalid"
+		}
+		if !displaySame {
+			display = string(parseFormattedText(display))
+		}
+		return html(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
+			linkType,
+			invalid,
+			target,
+			tooltip,
+			display,
+		))
+	}
 	// # [[link]]
 	// if ($type =~ /^\[(.+)\]$/) {
 	//     my ($ok, $target, $display, $tooltip, $link_type, $display_same) =
@@ -390,7 +409,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 	}
 
 	// color hex code
-	if match := colorRegex.MatchString(formatType); match {
+	if colorRegex.MatchString(formatType) {
 		return html(`<span style="color: "` + formatType + `";">`)
 	}
 
@@ -400,5 +419,112 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 	// }
 
 	return html("")
+
+}
+
+func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {
+	var normalizer func(ok *bool, target, tooltip, display *string)
+
+	// split into display and target
+	split := strings.SplitN(link, "|", 2)
+	display = strings.TrimSpace(split[0])
+	if len(split) == 2 {
+		target = strings.TrimSpace(split[1])
+	}
+
+	// no pipe
+	if target == "" {
+		target = display
+		displaySame = true
+	}
+
+	if linkRegex.MatchString(target) {
+		// http://google.com or $/something (see wikifier issue #68)
+
+		linkType = "other"
+		normalizer = normalizeOtherLink
+
+		// erase the scheme or $
+		if displaySame {
+			display = linkRegex.ReplaceAllString(display, "")
+		}
+	} else if strings.HasPrefix(target, "mailto:") {
+		// mailto:someone@example.com
+
+		linkType = "contact"
+		normalizer = normalizeEmailLink
+		if displaySame {
+			display = strings.TrimPrefix(target, "mailto:")
+		}
+
+	} else if mailRegex.MatchString(target) {
+
+		// someone @example.com
+		linkType = "contact"
+		normalizer = normalizeEmailLink
+
+	} else if s := wikiRegex.FindStringSubmatch(target); len(s) != 0 {
+		// wp: some page
+
+		// FIXME: I think s[0] is wp
+		linkType = "external"
+		normalizer = normalizeExternalLink
+
+		if displaySame {
+			display = wikiRegex.ReplaceAllString(target, "")
+		}
+
+	} else if strings.HasPrefix(target, "~") {
+
+		// ~ some category
+		target = strings.TrimPrefix(target, "~")
+		target = strings.TrimSpace(target)
+		normalizer = normalizeCategoryLink
+
+		if displaySame {
+			display = target
+		}
+	} else {
+		// normal page link
+
+		linkType = "internal"
+		normalizer = normalizePageLink
+	}
+
+	// normalize
+	target = strings.TrimSpace(target)
+	tooltip = strings.TrimSpace(tooltip)
+	display = strings.TrimSpace(display)
+
+	normalizer(&ok, &target, &tooltip, &display)
+	return
+}
+
+func normalizeEmailLink(ok *bool, target, tooltip, display *string) {
+	email := *target
+	if strings.HasPrefix(email, "mailto:") {
+		email = strings.TrimPrefix(email, "mailto:")
+	} else {
+		*target = "mailto:" + email
+	}
+	*tooltip = "Email " + email
+}
+
+func normalizeOtherLink(ok *bool, target, tooltip, display *string) {
+	*target = strings.TrimPrefix(*target, "$")
+	*ok = true
+}
+
+func normalizeCategoryLink(ok *bool, target, tooltip, display *string) {
+	//TODO
+}
+
+func normalizePageLink(ok *bool, target, tooltip, display *string) {
+	//TODO
+
+}
+
+func normalizeExternalLink(ok *bool, target, tooltip, display *string) {
+	//TODO
 
 }
