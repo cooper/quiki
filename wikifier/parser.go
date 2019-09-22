@@ -17,12 +17,12 @@ type parser struct {
 	skip   bool // skip next byte
 	escape bool // this byte is escaped
 
-	catch parserCatch
-	block *parserBlock
+	catch parserCatch  // current parser catch
+	block *parserBlock // current parser block
 
-	commentLevel int
-	braceLevel   int
-	braceFirst   bool
+	commentLevel int  // comment depth
+	braceLevel   int  // brace escape depth
+	braceFirst   bool // true when entering a brace escape
 
 	varName            string
 	varNotInterpolated bool
@@ -321,9 +321,10 @@ func (p *parser) parseByte(b byte) error {
 		return p.nextByte(b)
 	}
 
+	// VARIABLES
+
 	if p.block.typ == "main" && variableTokens[b] && p.last != '[' {
 		log.Println("variable tok", string(b))
-		// variable stuffs
 
 		if p.escape {
 			return p.handleByte(b)
@@ -352,6 +353,8 @@ func (p *parser) parseByte(b byte) error {
 
 			return p.nextByte(b)
 		}
+
+		// terminate variable name, enter value
 		if b == ':' && p.catch.catchType() == catchTypeVariableName {
 			// starts a variable value
 
@@ -424,6 +427,7 @@ func (p *parser) parseByte(b byte) error {
 			case string:
 				log.Println("Got var str:", val)
 				// TODO: Format it
+
 			case *parserBlock:
 				log.Println("Got var block:", val)
 
