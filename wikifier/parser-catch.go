@@ -9,12 +9,12 @@ const (
 )
 
 type catch interface {
-	getParentCatch() catch
-	getPositionedContent() []positionedContent
-	getPositionedPrefixContent() []positionedContent
-	getContent() []interface{}
-	getPrefixContent() []interface{}
-	getLastString() string
+	parentCatch() catch
+	positionedContent() []positionedContent
+	positionedPrefixContent() []positionedContent
+	content() []interface{}
+	prefixContent() []interface{}
+	lastString() string
 	setLastContent(item interface{})
 	appendContent(items []interface{}, pos position)
 	pushContent(item interface{}, pos position)
@@ -26,8 +26,8 @@ type catch interface {
 }
 
 type genericCatch struct {
-	positionedContent       []positionedContent
-	positionedPrefixContent []positionedContent
+	positioned       []positionedContent
+	positionedPrefix []positionedContent
 }
 
 type positionedContent struct {
@@ -36,18 +36,18 @@ type positionedContent struct {
 }
 
 func (c *genericCatch) setLastContent(content interface{}) {
-	c.positionedContent[len(c.positionedContent)-1].content = content
+	c.positioned[len(c.positioned)-1].content = content
 }
 
 func (c *genericCatch) lastContent() interface{} {
-	if c.positionedContent == nil {
+	if c.positioned == nil {
 		return nil
 	}
-	return c.positionedContent[len(c.positionedContent)-1].content
+	return c.positioned[len(c.positioned)-1].content
 }
 
-func (c *genericCatch) getLastString() string {
-	if c.positionedContent == nil {
+func (c *genericCatch) lastString() string {
+	if c.positioned == nil {
 		return ""
 	}
 	if content, ok := c.lastContent().(string); !ok {
@@ -75,7 +75,7 @@ func (c *genericCatch) appendString(s string, pos position) {
 	log.Printf("appendString: %v", s)
 
 	// the location is empty, so this is the first item
-	if len(c.positionedContent) == 0 {
+	if len(c.positioned) == 0 {
 		c.pushContent(s, pos)
 		return
 	}
@@ -83,7 +83,7 @@ func (c *genericCatch) appendString(s string, pos position) {
 	// append an existing string
 	switch v := c.lastContent().(type) {
 	case string:
-		c.positionedContent[len(c.positionedContent)-1].content = v + s
+		c.positioned[len(c.positioned)-1].content = v + s
 	default:
 		c.pushContent(s, pos)
 	}
@@ -91,33 +91,33 @@ func (c *genericCatch) appendString(s string, pos position) {
 
 func (c *genericCatch) pushContent(item interface{}, pos position) {
 	log.Printf("pushContent: %v/%v", item, pos)
-	c.positionedContent = append(c.positionedContent, positionedContent{item, pos})
+	c.positioned = append(c.positioned, positionedContent{item, pos})
 }
 
 func (c *genericCatch) pushContents(pc []positionedContent) {
 	log.Printf("pushContents: %v", pc)
-	c.positionedContent = append(c.positionedContent, pc...)
+	c.positioned = append(c.positioned, pc...)
 }
 
-func (c *genericCatch) getPositionedContent() []positionedContent {
-	return c.positionedContent
+func (c *genericCatch) positionedContent() []positionedContent {
+	return c.positioned
 }
 
-func (c *genericCatch) getPositionedPrefixContent() []positionedContent {
-	return c.positionedPrefixContent
+func (c *genericCatch) positionedPrefixContent() []positionedContent {
+	return c.positionedPrefix
 }
 
-func (c *genericCatch) getContent() []interface{} {
-	content := make([]interface{}, len(c.positionedContent))
-	for i, pc := range c.positionedContent {
+func (c *genericCatch) content() []interface{} {
+	content := make([]interface{}, len(c.positioned))
+	for i, pc := range c.positioned {
 		content[i] = pc.content
 	}
 	return content
 }
 
-func (c *genericCatch) getPrefixContent() []interface{} {
-	content := make([]interface{}, len(c.positionedPrefixContent))
-	for i, pc := range c.positionedPrefixContent {
+func (c *genericCatch) prefixContent() []interface{} {
+	content := make([]interface{}, len(c.positionedPrefix))
+	for i, pc := range c.positionedPrefix {
 		content[i] = pc.content
 	}
 	return content

@@ -47,7 +47,7 @@ func (b *parserBlock) String() string {
 
 func (b *parserBlock) hierarchy() string {
 	lines := []string{b.String()}
-	for _, item := range b.getContent() {
+	for _, item := range b.content() {
 		switch val := item.(type) {
 		case string:
 			lines = append(lines, val)
@@ -63,7 +63,7 @@ func (b *parserBlock) hierarchy() string {
 	return strings.Join(lines, "\n")
 }
 
-func (b *parserBlock) getParentCatch() catch {
+func (b *parserBlock) parentCatch() catch {
 	return b.parent
 }
 

@@ -9,14 +9,14 @@ type variableName struct {
 
 func newVariableName(pfx string, pos position) *variableName {
 	pc := []positionedContent{{pfx, pos}}
-	return &variableName{genericCatch: &genericCatch{positionedPrefixContent: pc}}
+	return &variableName{genericCatch: &genericCatch{positionedPrefix: pc}}
 }
 
 func (vn *variableName) catchType() string {
 	return catchTypeVariableName
 }
 
-func (vn *variableName) getParentCatch() catch {
+func (vn *variableName) parentCatch() catch {
 	return vn.parent
 }
 
@@ -45,7 +45,7 @@ func (vv *variableValue) catchType() string {
 	return catchTypeVariableValue
 }
 
-func (vv *variableValue) getParentCatch() catch {
+func (vv *variableValue) parentCatch() catch {
 	return vv.parent
 }
 

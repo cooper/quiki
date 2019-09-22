@@ -102,7 +102,7 @@ func (p *parser) parseByte(b byte) error {
 
 			// if this was the last brace, clear the brace escape catch
 			if p.braceLevel == 0 {
-				p.catch = p.catch.getParentCatch()
+				p.catch = p.catch.parentCatch()
 			}
 		}
 
@@ -170,7 +170,7 @@ func (p *parser) parseByte(b byte) error {
 			blockType = "variable"
 		} else {
 			var inBlockName, charsScanned int
-			lastContent := p.catch.getLastString()
+			lastContent := p.catch.lastString()
 			log.Printf("LAST CONTENT: %v", lastContent)
 
 			// if there is no lastContent, give up because the block has no type
@@ -298,7 +298,7 @@ func (p *parser) parseByte(b byte) error {
 
 		// clear the catch
 		p.block = p.block.parentBlock()
-		p.catch = p.catch.getParentCatch()
+		p.catch = p.catch.parentCatch()
 		p.catch.appendContent(addContents, p.pos)
 
 		return p.nextByte(b)
@@ -350,8 +350,8 @@ func (p *parser) parseByte(b byte) error {
 			// starts a variable value
 
 			// fetch var name, clear the catch
-			p.varName = p.catch.getLastString()
-			p.catch = p.catch.getParentCatch()
+			p.varName = p.catch.lastString()
+			p.catch = p.catch.parentCatch()
 
 			// no var name
 			if len(p.varName) == 0 {
@@ -371,8 +371,8 @@ func (p *parser) parseByte(b byte) error {
 		if b == ';' && p.catch.catchType() == catchTypeVariableName {
 
 			// fetch var name, clear the catch
-			p.varName = p.catch.getLastString()
-			p.catch = p.catch.getParentCatch()
+			p.varName = p.catch.lastString()
+			p.catch = p.catch.parentCatch()
 
 			// no var name
 			if len(p.varName) == 0 {
@@ -391,8 +391,8 @@ func (p *parser) parseByte(b byte) error {
 		if b == ';' && p.catch.catchType() == catchTypeVariableValue {
 
 			// fetch content and clear catch
-			values := p.catch.getContent()
-			p.catch = p.catch.getParentCatch()
+			values := p.catch.content()
+			p.catch = p.catch.parentCatch()
 
 			//     my ($var, $val) =
 			//         _get_var_parts(delete @$c{ qw(var_name var_value) });
@@ -474,15 +474,15 @@ func (p *parser) handleByte(b byte) error {
 	if p.catch.shouldSkipByte(b) {
 
 		// fetch the stuff caught up to this point
-		pc := p.catch.getPositionedContent()
+		pc := p.catch.positionedContent()
 
 		// also, fetch prefixes if there are any
-		if pfx := p.catch.getPositionedPrefixContent(); pfx != nil {
+		if pfx := p.catch.positionedPrefixContent(); pfx != nil {
 			pc = append(pfx, pc...)
 		}
 
 		// revert to the parent catch, and add our stuff to it
-		p.catch = p.catch.getParentCatch()
+		p.catch = p.catch.parentCatch()
 		p.catch.pushContents(pc)
 
 	} else if !p.catch.byteOK(b) {
@@ -493,7 +493,7 @@ func (p *parser) handleByte(b byte) error {
 			char = "\u2424"
 		}
 		err := "Invalid byte '" + char + "' in " + p.catch.catchType() + "."
-		if str := p.catch.getLastString(); str != "" {
+		if str := p.catch.lastString(); str != "" {
 			err += "Partial: " + str
 		}
 		return errors.New(err)
