@@ -21,17 +21,18 @@ type element struct {
 	parent     *element               // parent element, if any
 	cachedHTML html                   // cached version
 	container  bool                   // true for container elements
+	needID     bool                   // true if we should include id
 	noTags     bool                   // if true, only generate inner HTML
 	noIndent   bool                   // if true, do not indent contents (for <pre>)
 	noClose    bool                   // if true, do not close (containers only)
 }
 
-func newElement(tag, class string) *element {
-	identifiers[class]++
+func newElement(tag, typ string) *element {
+	identifiers[typ]++
 	return &element{
 		tag:       tag,
-		id:        class + "-" + strconv.Itoa(identifiers[class]),
-		typ:       class,
+		id:        typ + "-" + strconv.Itoa(identifiers[typ]),
+		typ:       typ,
 		container: tag == "div",
 	}
 }
@@ -53,11 +54,12 @@ func (el *element) addText(s string) {
 }
 
 func (el *element) addChild(child *element) {
+	child.parent = el // recursive!!
 	el.content = append(el.content, child)
 }
 
-func (el *element) createChild(tag, class string) *element {
-	child := newElement(tag, class)
+func (el *element) createChild(tag, typ string) *element {
+	child := newElement(tag, typ)
 	el.addChild(child)
 	child.parent = el // recursive!!
 	return child
@@ -100,6 +102,11 @@ func (el *element) generate() html {
 		classes[0] = "q-" + el.typ
 		for i, name := range el.classes {
 			classes[i+1] = "qc-" + name
+		}
+
+		// inject ID
+		if el.needID {
+			classes = append([]string{el.id}, classes...)
 		}
 		generated += ` class="` + strings.Join(classes, " ") + `"`
 

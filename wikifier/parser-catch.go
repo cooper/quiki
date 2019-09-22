@@ -10,15 +10,15 @@ const (
 
 type catch interface {
 	parentCatch() catch
-	positionedContent() []positionedContent
-	positionedPrefixContent() []positionedContent
+	posContent() []posContent
+	positionedPrefixContent() []posContent
 	content() []interface{}
 	prefixContent() []interface{}
 	lastString() string
 	setLastContent(item interface{})
 	appendContent(items []interface{}, pos position)
 	pushContent(item interface{}, pos position)
-	pushContents(pc []positionedContent)
+	pushContents(pc []posContent)
 	appendString(s string, pos position)
 	byteOK(b byte) bool
 	shouldSkipByte(b byte) bool
@@ -26,11 +26,11 @@ type catch interface {
 }
 
 type genericCatch struct {
-	positioned       []positionedContent
-	positionedPrefix []positionedContent
+	positioned       []posContent
+	positionedPrefix []posContent
 }
 
-type positionedContent struct {
+type posContent struct {
 	content  interface{}
 	position position
 }
@@ -91,19 +91,19 @@ func (c *genericCatch) appendString(s string, pos position) {
 
 func (c *genericCatch) pushContent(item interface{}, pos position) {
 	log.Printf("pushContent: %v/%v", item, pos)
-	c.positioned = append(c.positioned, positionedContent{item, pos})
+	c.positioned = append(c.positioned, posContent{item, pos})
 }
 
-func (c *genericCatch) pushContents(pc []positionedContent) {
+func (c *genericCatch) pushContents(pc []posContent) {
 	log.Printf("pushContents: %v", pc)
 	c.positioned = append(c.positioned, pc...)
 }
 
-func (c *genericCatch) positionedContent() []positionedContent {
+func (c *genericCatch) posContent() []posContent {
 	return c.positioned
 }
 
-func (c *genericCatch) positionedPrefixContent() []positionedContent {
+func (c *genericCatch) positionedPrefixContent() []posContent {
 	return c.positionedPrefix
 }
 

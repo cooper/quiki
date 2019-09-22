@@ -12,6 +12,7 @@ func newBlock(blockType, blockName string, blockClasses []string, parent block, 
 		typ:          blockType,
 		name:         blockName,
 		classes:      blockClasses,
+		element:      newElement("div", blockType),
 		genericCatch: &genericCatch{},
 	}
 	if init, ok := blockInitializers[blockType]; ok {

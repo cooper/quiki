@@ -8,7 +8,7 @@ type variableName struct {
 }
 
 func newVariableName(pfx string, pos position) *variableName {
-	pc := []positionedContent{{pfx, pos}}
+	pc := []posContent{{pfx, pos}}
 	return &variableName{genericCatch: &genericCatch{positionedPrefix: pc}}
 }
 

@@ -6,14 +6,17 @@ import (
 )
 
 type block interface {
-	parse(page *page)             // parse contents
-	html(page *page, el *element) // generate html element
-	parentBlock() block           // parent block
-	blockType() string            // block type
-	close(pos position)           // closes the block at the given position
-	closed() bool                 // true when closed
-	hierarchy() string            // human-readable hierarchy
-	catch                         // all blocks must conform to catch
+	el() *element                    // returns the html element
+	parse(page *page)                // parse contents
+	html(page *page, el *element)    // generate html element
+	parentBlock() block              // parent block
+	blockType() string               // block type
+	close(pos position)              // closes the block at the given position
+	closed() bool                    // true when closed
+	hierarchy() string               // human-readable hierarchy
+	invisible() bool                 // true for invisible blocks
+	visiblePosContent() []posContent // visible text/blocks (generate no html)
+	catch                            // all blocks must conform to catch
 }
 
 type parserBlock struct {
@@ -22,7 +25,12 @@ type parserBlock struct {
 	openPos   position
 	closePos  position
 	parent    block
+	element   *element
 	*genericCatch
+}
+
+func (b *parserBlock) el() *element {
+	return b.element
 }
 
 func (b *parserBlock) parentBlock() block {
@@ -80,4 +88,19 @@ func (b *parserBlock) byteOK(byte) bool {
 
 func (b *parserBlock) shouldSkipByte(byte) bool {
 	return false
+}
+
+func (b *parserBlock) invisible() bool {
+	return false
+}
+
+func (b *parserBlock) visiblePosContent() []posContent {
+	content := make([]posContent, 0)
+	for _, pc := range b.posContent() {
+		if blk, ok := pc.content.(block); ok && blk.invisible() {
+			continue
+		}
+		content = append(content, pc)
+	}
+	return content
 }

@@ -473,7 +473,7 @@ func (p *parser) handleByte(b byte) error {
 	if p.catch.shouldSkipByte(b) {
 
 		// fetch the stuff caught up to this point
-		pc := p.catch.positionedContent()
+		pc := p.catch.posContent()
 
 		// also, fetch prefixes if there are any
 		if pfx := p.catch.positionedPrefixContent(); pfx != nil {
