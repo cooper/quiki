@@ -7,18 +7,19 @@ import (
 
 type block interface {
 	el() *element                    // returns the html element
-	parse(page *page)                // parse contents
-	html(page *page, el *element)    // generate html element
+	parse(page *Page)                // parse contents
+	html(page *Page, el *element)    // generate html element
 	parentBlock() block              // parent block
 	blockType() string               // block type
 	close(pos position)              // closes the block at the given position
 	closed() bool                    // true when closed
 	hierarchy() string               // human-readable hierarchy
-	invisible() bool                 // true for invisible blocks
-	visiblePosContent() []posContent // visible text/blocks (generate no html)
+	invisible() bool                 // true for invisible blocks (generate no html)
+	visiblePosContent() []posContent // visible text/blocks
 	catch                            // all blocks must conform to catch
 }
 
+// generic base for all blocks
 type parserBlock struct {
 	typ, name string
 	classes   []string

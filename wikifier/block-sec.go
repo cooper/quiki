@@ -12,10 +12,10 @@ func newSecBlock(name string, b *parserBlock) block {
 	return &secBlock{parserBlock: b}
 }
 
-func (sec *secBlock) parse(page *page) {
+func (sec *secBlock) parse(page *Page) {
 }
 
-func (sec *secBlock) html(page *page, el *element) {
+func (sec *secBlock) html(page *Page, el *element) {
 
 	// iterate over visible content only
 	var contentToAdd []posContent
@@ -32,11 +32,20 @@ func (sec *secBlock) html(page *page, el *element) {
 			el.addChild(item.el())
 
 		case string:
-			// TODO: trim the text and increment the line number appropriately
-			item = strings.Trim(item, "\t ")
+			// trim the text and increment the line number appropriately
+			lines := 0
+			item = strings.TrimLeftFunc(item, func(r rune) bool {
+				if r == '\n' {
+					lines++
+					return true
+				}
+				return r == ' ' || r == '\t'
+			})
+			item = strings.TrimSpace(item)
 			if item == "" {
 				continue
 			}
+			pc.position.line += lines
 			contentToAdd = append(contentToAdd, pc)
 
 		default:
@@ -48,7 +57,7 @@ func (sec *secBlock) html(page *page, el *element) {
 	sec.createParagraph(page, el, contentToAdd)
 }
 
-func (sec *secBlock) createParagraph(page *page, el *element, pcs []posContent) {
+func (sec *secBlock) createParagraph(page *Page, el *element, pcs []posContent) {
 
 	// this can be passed nothing
 	if len(pcs) == 0 {

@@ -8,7 +8,7 @@ import (
 
 var identifiers = make(map[string]int)
 
-type html string
+type Html string
 
 type element struct {
 	tag        string                 // html tag
@@ -19,7 +19,7 @@ type element struct {
 	classes    []string               // quiki user-defined classes
 	content    []interface{}          // mixed text and child elements
 	parent     *element               // parent element, if any
-	cachedHTML html                   // cached version
+	cachedHTML Html                   // cached version
 	container  bool                   // true for container elements
 	needID     bool                   // true if we should include id
 	noTags     bool                   // if true, only generate inner HTML
@@ -53,7 +53,7 @@ func (el *element) addText(s string) {
 	el.content = append(el.content, s)
 }
 
-func (el *element) addHtml(h html) {
+func (el *element) addHtml(h Html) {
 	el.content = append(el.content, h)
 }
 
@@ -83,7 +83,7 @@ func (el *element) removeClass(class string) bool {
 	return false
 }
 
-func (el *element) generate() html {
+func (el *element) generate() Html {
 	generated := ""
 
 	// cached version
@@ -137,8 +137,8 @@ func (el *element) generate() html {
 	// non-container
 	if !el.container {
 		generated += " />\n"
-		el.cachedHTML = html(generated)
-		return html(generated)
+		el.cachedHTML = Html(generated)
+		return Html(generated)
 	}
 
 	// inner content
@@ -146,7 +146,7 @@ func (el *element) generate() html {
 	for _, textOrEl := range el.content {
 		add := ""
 		switch v := textOrEl.(type) {
-		case html:
+		case Html:
 			add = string(v)
 		case string:
 			add = htmlfmt.EscapeString(v)
@@ -164,8 +164,8 @@ func (el *element) generate() html {
 		generated += "</" + el.tag + ">\n"
 	}
 
-	el.cachedHTML = html(generated)
-	return html(generated)
+	el.cachedHTML = Html(generated)
+	return Html(generated)
 }
 
 func indent(str string) string {

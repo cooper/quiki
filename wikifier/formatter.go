@@ -199,11 +199,11 @@ type formatterOptions struct {
 	startPos    position // set internally to position of '['
 }
 
-func parseFormattedText(text string) html {
+func parseFormattedText(text string) Html {
 	return parseFormattedTextOpts(text, &formatterOptions{})
 }
 
-func parseFormattedTextOpts(text string, opts *formatterOptions) html {
+func parseFormattedTextOpts(text string, opts *formatterOptions) Html {
 
 	// let's not waste any time here
 	if text == "" {
@@ -242,7 +242,7 @@ func parseFormattedTextOpts(text string, opts *formatterOptions) html {
 				// store the string we have so far
 				if str != "" {
 					if opts.noEntities {
-						items = append(items, html(str))
+						items = append(items, Html(str))
 					} else {
 						items = append(items, str)
 					}
@@ -279,7 +279,7 @@ func parseFormattedTextOpts(text string, opts *formatterOptions) html {
 	// add the final string
 	if str != "" {
 		if opts.noEntities {
-			items = append(items, html(str))
+			items = append(items, Html(str))
 		} else {
 			items = append(items, str)
 		}
@@ -295,19 +295,19 @@ func parseFormattedTextOpts(text string, opts *formatterOptions) html {
 		switch v := piece.(type) {
 		case string:
 			final += htmlfmt.EscapeString(v)
-		case html:
+		case Html:
 			final += string(v)
 		}
 	}
 
-	return html(final)
+	return Html(final)
 }
 
-func parseFormatType(formatType string, opts *formatterOptions) html {
+func parseFormatType(formatType string, opts *formatterOptions) Html {
 
 	// static format
 	if format, exists := staticFormats[formatType]; exists {
-		return html(format)
+		return Html(format)
 	}
 
 	// variable
@@ -315,16 +315,14 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 		if variableRegex.MatchString(formatType) {
 			// TODO: fetch the variable, warn if it is undef, format text if %var
 			// then return the value
-			return html("(null)")
+			return Html("(null)")
 		}
 	}
 
 	// # html entity.
 	if formatType[0] == '&' {
-		return html("&" + formatType[1:] + ";")
+		return Html("&" + formatType[1:] + ";")
 	}
-
-	// TODO: links, references
 
 	// # deprecated: a link in the form of [~link~], [!link!], or [$link$]
 	// # convert to newer link format
@@ -356,6 +354,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 	//     }
 	// }
 
+	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
 		ok, displaySame, target, display, tooltip, linkType := parseLink(formatType[1 : len(formatType)-2])
 		invalid := ""
@@ -365,7 +364,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 		if !displaySame {
 			display = string(parseFormattedText(display))
 		}
-		return html(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
+		return Html(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,
 			invalid,
 			target,
@@ -373,53 +372,30 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 			display,
 		))
 	}
-	// # [[link]]
-	// if ($type =~ /^\[(.+)\]$/) {
-	//     my ($ok, $target, $display, $tooltip, $link_type, $display_same) =
-	//         $wikifier->parse_link($page, $1, %opts);
 
-	//     # text formatting is permitted before the pipe.
-	//     # do nothing when the link did not have a pipe ($display_same)
-	//     $display = $wikifier->parse_formatted_text($page, $display, %opts)
-	//         unless $display_same;
-
-	//     return sprintf '<a class="wiki-link-%s%s" href="%s"%s>%s</a>',
-	//         $link_type,
-	//         $ok ? '' : ' invalid',
-	//         $target,
-	//         length $tooltip ? qq{ title="$tooltip"} : '',
-	//         $display;
-	// }
-
-	// # fake references.
+	// TODO: fake references.
 	// if ($type eq 'ref') {
 	//     $page->{reference_number} ||= 1;
 	//     my $ref = $page->{reference_number}++;
 	//     return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref" class="wiki-ref-anchor">[$ref]</a></sup>};
 	// }
 
-	// # color name.
-	// if (my $color = $colors{ lc $type }) {
-	//     return qq{<span style="color: $color;">};
-	// }
-
 	// color name
 	if color, exists := colors[strings.ToLower(formatType)]; exists {
-		return html(`<span style="color: "` + color + `";">`)
+		return Html(`<span style="color: "` + color + `";">`)
 	}
 
 	// color hex code
 	if colorRegex.MatchString(formatType) {
-		return html(`<span style="color: "` + formatType + `";">`)
+		return Html(`<span style="color: "` + formatType + `";">`)
 	}
 
-	// # real references.
+	// TODO: real references.
 	// if ($type =~ m/^\d+$/) {
 	//     return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type" class="wiki-ref-anchor">[$type]</a></sup>};
 	// }
 
-	return html("")
-
+	return Html("")
 }
 
 func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {
@@ -458,8 +434,8 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		}
 
 	} else if mailRegex.MatchString(target) {
-
 		// someone @example.com
+
 		linkType = "contact"
 		normalizer = normalizeEmailLink
 
@@ -475,8 +451,8 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		}
 
 	} else if strings.HasPrefix(target, "~") {
-
 		// ~ some category
+
 		target = strings.TrimPrefix(target, "~")
 		target = strings.TrimSpace(target)
 		normalizer = normalizeCategoryLink

@@ -49,7 +49,6 @@ func (vv *variableValue) parentCatch() catch {
 	return vv.parent
 }
 
-// word-like chars and periods are OK in var names
 func (vv *variableValue) byteOK(b byte) bool {
 	ok, _ := regexp.Match(`.`, []byte{b})
 	return ok

@@ -12,10 +12,10 @@ func newPBlock(name string, b *parserBlock) block {
 	return &pBlock{parserBlock: b}
 }
 
-func (p *pBlock) parse(page *page) {
+func (p *pBlock) parse(page *Page) {
 }
 
-func (p *pBlock) html(page *page, el *element) {
+func (p *pBlock) html(page *Page, el *element) {
 	el.tag = "p"
 
 	for _, pc := range p.visiblePosContent() {
@@ -39,7 +39,7 @@ func (p *pBlock) html(page *page, el *element) {
 				continue
 			}
 
-			el.addHtml(html(item))
+			el.addHtml(Html(item))
 
 		default:
 			panic("not sure how to handle this content")

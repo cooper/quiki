@@ -41,20 +41,9 @@ var variableTokens = map[byte]bool{
 	'-': true,
 }
 
-func Parse(input string) error {
+func newParser() *parser {
 	mb := newBlock("main", "", nil, nil, position{})
-	p := &parser{block: mb, catch: mb}
-
-	for i, line := range strings.Split(input, "\n") {
-		p.pos.line = i + 1
-		if err := p.parseLine([]byte(line)); err != nil {
-			return err
-		}
-	}
-
-	log.Printf(mb.hierarchy())
-	log.Println(generateBlock(mb))
-	return nil
+	return &parser{block: mb, catch: mb}
 }
 
 func (p *parser) parseLine(line []byte) error {
