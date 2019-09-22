@@ -8,3 +8,4 @@ templates/*
 wikis/*
 !wikis/mywiki
 .DS_Store
+standalone/standalone
