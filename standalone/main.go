@@ -21,6 +21,22 @@ func main() {
 		log.Println("Got:", val)
 	}
 
+	// create map
+	m := wikifier.NewMap(page.MainBlock())
+	m.Set("a", "b")
+
+	// add map as attr of page
+	page.Set("myMap", m)
+
+	// fetch map property from page
+	if val, err := page.GetStr("myMap.a"); err != nil {
+		log.Fatal("Got map error: ", err)
+	} else {
+		log.Println("Got from map:", val)
+	}
+
+	// fetch object var
+
 	page.Set("page", page)
 
 	if val, err := page.GetObj("page.page"); err != nil {
@@ -28,6 +44,8 @@ func main() {
 	} else {
 		log.Println("Got:", val)
 	}
+
+	// fetch recursive var
 
 	if val, err := page.GetStr("page.myKey"); err != nil {
 		log.Fatal("Got error: ", err)
