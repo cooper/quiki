@@ -2,6 +2,7 @@ package wikifier
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -23,6 +24,7 @@ type parser struct {
 	braceLevel   int
 	braceFirst   bool
 
+	varName            string
 	varNotInterpolated bool
 	varNegated         bool
 }
@@ -353,104 +355,100 @@ func (p *parser) parseByte(b byte) error {
 		if b == ':' && p.catch.catchType() == catchTypeVariableName {
 			// starts a variable value
 
-			//     $c->clear_catch;
-
-			//     # no length? no variable name
-			//     my $var = $c->{var_name}[-1];
-			//     return $c->error("Variable has no name")
-			//         if !length $var;
-
-			//     # now catch the value
-			//     $c->{var_is_string}++;
-			//     my $hr_var = truncate_hr($var, 30);
-			//     $c->catch(
-			//         name        => 'var_value',
-			//         hr_name     => "variable \@$hr_var value",
-			//         valid_chars => qr/./s,
-			//         location    => $c->{var_value} = []
-			//     ) or next CHAR;
-
-			varName := p.catch.getLastString()
+			// fetch var name, clear the catch
+			p.varName = p.catch.getLastString()
 			p.catch = p.catch.getParentCatch()
 
 			// no var name
-			if len(varName) == 0 {
+			if len(p.varName) == 0 {
 				return errors.New("Variable has no name")
 			}
-			log.Printf("VAR NAME: %v", varName)
-			// nw catch the value
+			log.Printf("VALUE VAR NAME: %v", p.varName)
+
+			// now catch the value
+			catch := newParserVariableValue()
+			catch.parent = p.catch
+			p.catch = catch
 
 			return p.nextByte(b)
-
-		}
-		if b == ';' && (p.catch.catchType() == catchTypeVariableName || p.catch.catchType() == catchTypeVariableValue) {
-			// ends a variable name (boolean) or value
-			return p.nextByte(b)
-
-		} else if b == '-' && (p.next == '@' || p.next == '%') {
-			// negates a boolean variable
-			// do nothing; just make sure we don't get to default
-			return p.nextByte(b)
-
 		}
 
-		// # starts a variable value
-		// elsif ($char eq ':' && $c->catch->{name} eq 'var_name') {
+		// terminate a boolean
+		if b == ';' && p.catch.catchType() == catchTypeVariableName {
 
-		// }
+			// fetch var name, clear the catch
+			p.varName = p.catch.getLastString()
+			p.catch = p.catch.getParentCatch()
 
-		// # ends a variable name (for booleans) or value
-		// elsif ($char eq ';' && $c->{catch}{name} =~ m/^var_name|var_value$/) {
-		//     $c->clear_catch;
-		//     my ($var, $val) =
-		//         _get_var_parts(delete @$c{ qw(var_name var_value) });
-		//     my ($is_string, $no_intplt, $is_negated) = delete @$c{qw(
-		//         var_is_string var_no_interpolate var_is_negated
-		//     )};
+			// no var name
+			if len(p.varName) == 0 {
+				return errors.New("Variable has no name")
+			}
+			log.Printf("BOOLEAN VAR NAME: %v", p.varName)
 
-		//     # more than one content? not allowed in variables
-		//     return $c->error("Variable can't contain both text and blocks")
-		//         if @$var > 1 || @$val > 1;
-		//     $var = shift @$var;
-		//     $val = shift @$val;
+			// TODO: set the value
+			// TODO: set as false if varNegated
 
-		//     # no length? no variable name
-		//     return $c->error("Variable has no name")
-		//         if !length $var;
+			p.clearVariableState()
+			return p.nextByte(b)
+		}
 
-		//     # string
-		//     if ($is_string && length $val) {
-		//         $val = $wikifier->parse_formatted_text($page, $val)
-		//             if !$no_intplt && !ref $val;
-		//     }
+		// terminate a string or block variable value
+		if b == ';' && p.catch.catchType() == catchTypeVariableValue {
 
-		//     # boolean
-		//     elsif (!$is_string) {
-		//         $val = 1;
-		//     }
+			// fetch content and clear catch
+			values := p.catch.getContent()
+			p.catch = p.catch.getParentCatch()
 
-		//     # no length and not a boolean.
-		//     # there is no value here
-		//     else {
-		//         undef $val;
-		//     }
+			//     my ($var, $val) =
+			//         _get_var_parts(delete @$c{ qw(var_name var_value) });
+			//     my ($is_string, $no_intplt, $is_negated) = delete @$c{qw(
+			//         var_is_string var_no_interpolate var_is_negated
+			//     )};
 
-		//     # set the value
-		//     $val = !$val if $is_negated;
-		//     $val = $page->set($var => $val);
+			//     # more than one content? not allowed in variables
+			//     return $c->error("Variable can't contain both text and blocks")
+			//         if @$var > 1 || @$val > 1;
+			//     $var = shift @$var;
+			//     $val = shift @$val;
+			if len(values) != 1 {
+				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
+			}
 
-		//     # run ->parse and ->html if necessary
-		//     _parse_vars($page, 'parse', $val);
-		//     _parse_vars($page, 'html',  $val);
-		// }
+			// we have to also check this here in case it was something like @;
+			if len(p.varName) == 0 {
+				return errors.New("Variable has no name")
+			}
 
-		// # -@var
-		// elsif ($char eq '-' && $c->{next_char} =~ m/[@%]/) {
-		//     # do nothing; just prevent the - from making it to default
-		// }
+			switch val := values[0].(type) {
+			case string:
+				log.Println("Got var str:", val)
+				// TODO: Format it
+			case *parserBlock:
+				log.Println("Got var block:", val)
 
-		// # should never reach this, but just in case
-		// else { $use_default++ }
+			default:
+				return fmt.Errorf("Not sure what to do with: %v", val)
+			}
+
+			// TODO: set the value
+			//     # set the value
+
+			// TODO:
+			//     # run ->parse and ->html if necessary
+			//     _parse_vars($page, 'parse', $val);
+			//     _parse_vars($page, 'html',  $val);
+
+			p.clearVariableState()
+			return p.nextByte(b)
+		}
+
+		// negates a boolean variable
+		if b == '-' && (p.next == '@' || p.next == '%') {
+			// do nothing yet; just make sure we don't get to default
+			return p.nextByte(b)
+		}
+
 		return p.nextByte(b)
 	}
 
@@ -526,4 +524,10 @@ func (p *parser) nextByte(b byte) error {
 	}
 
 	return nil
+}
+
+func (p *parser) clearVariableState() {
+	p.varName = ""
+	p.varNotInterpolated = false
+	p.varNegated = false
 }
