@@ -25,13 +25,21 @@ func (p *pBlock) html(page *page, el *element) {
 			el.addChild(item.el())
 
 		case string:
+
+			// trim again
 			item = strings.Trim(item, "\t ")
 			if item == "" {
 				continue
 			}
-			// TODO: format, then trim formatted text
-			// then .addHtml()
-			el.addText(item)
+
+			// format, then trim again
+			formatted := parseFormattedText(item)
+			item = strings.Trim(string(formatted), "\t ")
+			if item == "" {
+				continue
+			}
+
+			el.addHtml(html(item))
 
 		default:
 			panic("not sure how to handle this content")

@@ -53,6 +53,10 @@ func (el *element) addText(s string) {
 	el.content = append(el.content, s)
 }
 
+func (el *element) addHtml(h html) {
+	el.content = append(el.content, h)
+}
+
 func (el *element) addChild(child *element) {
 	child.parent = el // recursive!!
 	el.content = append(el.content, child)
