@@ -8,18 +8,18 @@ const (
 	catchTypeBlock         = "Block"
 )
 
-type parserCatch interface {
-	getParentCatch() parserCatch
+type catch interface {
+	getParentCatch() catch
 	getPositionedContent() []positionedContent
 	getPositionedPrefixContent() []positionedContent
 	getContent() []interface{}
 	getPrefixContent() []interface{}
 	getLastString() string
 	setLastContent(item interface{})
-	appendContent(items []interface{}, pos parserPosition)
-	pushContent(item interface{}, pos parserPosition)
+	appendContent(items []interface{}, pos position)
+	pushContent(item interface{}, pos position)
 	pushContents(pc []positionedContent)
-	appendString(s string, pos parserPosition)
+	appendString(s string, pos position)
 	byteOK(b byte) bool
 	shouldSkipByte(b byte) bool
 	catchType() string
@@ -32,7 +32,7 @@ type genericCatch struct {
 
 type positionedContent struct {
 	content  interface{}
-	position parserPosition
+	position position
 }
 
 func (c *genericCatch) setLastContent(content interface{}) {
@@ -58,7 +58,7 @@ func (c *genericCatch) getLastString() string {
 }
 
 // append any combination of blocks and strings
-func (c *genericCatch) appendContent(content []interface{}, pos parserPosition) {
+func (c *genericCatch) appendContent(content []interface{}, pos position) {
 	log.Printf("appendContent: %v", content)
 	for _, item := range content {
 		switch v := item.(type) {
@@ -71,7 +71,7 @@ func (c *genericCatch) appendContent(content []interface{}, pos parserPosition) 
 }
 
 // append an existing string if the last item is one
-func (c *genericCatch) appendString(s string, pos parserPosition) {
+func (c *genericCatch) appendString(s string, pos position) {
 	log.Printf("appendString: %v", s)
 
 	// the location is empty, so this is the first item
@@ -89,7 +89,7 @@ func (c *genericCatch) appendString(s string, pos parserPosition) {
 	}
 }
 
-func (c *genericCatch) pushContent(item interface{}, pos parserPosition) {
+func (c *genericCatch) pushContent(item interface{}, pos position) {
 	log.Printf("pushContent: %v/%v", item, pos)
 	c.positionedContent = append(c.positionedContent, positionedContent{item, pos})
 }

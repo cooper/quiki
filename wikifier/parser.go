@@ -9,7 +9,7 @@ import (
 )
 
 type parser struct {
-	pos parserPosition
+	pos position
 
 	last   byte // last byte
 	this   byte // current byte
@@ -17,8 +17,8 @@ type parser struct {
 	skip   bool // skip next byte
 	escape bool // this byte is escaped
 
-	catch parserCatch  // current parser catch
-	block *parserBlock // current parser block
+	catch catch // current parser catch
+	block block // current parser block
 
 	commentLevel int  // comment depth
 	braceLevel   int  // brace escape depth
@@ -29,7 +29,7 @@ type parser struct {
 	varNegated         bool
 }
 
-type parserPosition struct {
+type position struct {
 	line, column int
 }
 
@@ -53,7 +53,7 @@ func Parse(input string) error {
 		}
 	}
 
-	log.Printf("OK so at the end, main block content is %+v", mb.getContent())
+	log.Printf(mb.hierarchy())
 	return nil
 }
 
@@ -250,15 +250,7 @@ func (p *parser) parseByte(b byte) error {
 
 			// create the block
 			log.Printf("Creating block: %s[%s]{}", blockType, blockName)
-			block := &parserBlock{
-				parser:       p,
-				openPos:      p.pos,
-				parent:       p.block,
-				typ:          blockType,
-				name:         blockName,
-				classes:      blockClasses,
-				genericCatch: &genericCatch{},
-			}
+			block := newBlock(blockType, blockName, blockClasses, p.block, p.pos)
 
 			// TODO: produce a warning if the block has a name but the type does not support it
 
@@ -287,7 +279,7 @@ func (p *parser) parseByte(b byte) error {
 		}
 
 		// we cannot close the main block
-		if p.block.typ == "main" {
+		if p.block.blockType() == "main" {
 			return errors.New("Attempted to close main block")
 		}
 
@@ -302,11 +294,10 @@ func (p *parser) parseByte(b byte) error {
 		}
 
 		// close the block
-		p.block.closed = true
-		p.block.closePos = p.pos
+		p.block.close(p.pos)
 
 		// clear the catch
-		p.block = p.block.parent
+		p.block = p.block.parentBlock()
 		p.catch = p.catch.getParentCatch()
 		p.catch.appendContent(addContents, p.pos)
 
@@ -323,7 +314,7 @@ func (p *parser) parseByte(b byte) error {
 
 	// VARIABLES
 
-	if p.block.typ == "main" && variableTokens[b] && p.last != '[' {
+	if p.block.blockType() == "main" && variableTokens[b] && p.last != '[' {
 		log.Println("variable tok", string(b))
 
 		if p.escape {

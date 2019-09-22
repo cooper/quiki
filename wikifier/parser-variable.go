@@ -3,11 +3,11 @@ package wikifier
 import "regexp"
 
 type parserVariableName struct {
-	parent parserCatch
+	parent catch
 	*genericCatch
 }
 
-func newParserVariableName(pfx string, pos parserPosition) *parserVariableName {
+func newParserVariableName(pfx string, pos position) *parserVariableName {
 	pc := []positionedContent{{pfx, pos}}
 	return &parserVariableName{genericCatch: &genericCatch{positionedPrefixContent: pc}}
 }
@@ -16,7 +16,7 @@ func (vn *parserVariableName) catchType() string {
 	return catchTypeVariableName
 }
 
-func (vn *parserVariableName) getParentCatch() parserCatch {
+func (vn *parserVariableName) getParentCatch() catch {
 	return vn.parent
 }
 
@@ -33,7 +33,7 @@ func (vn *parserVariableName) shouldSkipByte(b byte) bool {
 }
 
 type parserVariableValue struct {
-	parent parserCatch
+	parent catch
 	*genericCatch
 }
 
@@ -45,7 +45,7 @@ func (vv *parserVariableValue) catchType() string {
 	return catchTypeVariableValue
 }
 
-func (vv *parserVariableValue) getParentCatch() parserCatch {
+func (vv *parserVariableValue) getParentCatch() catch {
 	return vv.parent
 }
 
