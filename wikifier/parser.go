@@ -419,7 +419,7 @@ func (p *parser) parseByte(b byte) error {
 				log.Println("Got var str:", val)
 				// TODO: Format it
 
-			case *parserBlock:
+			case block:
 				log.Println("Got var block:", val)
 
 			default:

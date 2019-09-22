@@ -6,6 +6,24 @@ import (
 	"strings"
 )
 
+var variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
+var linkRegex = regexp.MustCompile(`^((\w+)://|\$)`)
+var mailRegex = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
+var colorRegex = regexp.MustCompile(`(?i)^#[\da-f]+$`)
+
+var linkNormalizers = map[string]func(string) string{
+	"wikifier": func(s string) string {
+		return pageNameLink(s)
+	},
+	"mediawiki": func(s string) string {
+		s = strings.Replace(s, " ", "_", -1)
+		return htmlfmt.EscapeString(s)
+	},
+	"none": func(s string) string {
+		return htmlfmt.EscapeString(s)
+	},
+}
+
 var colors = map[string]string{
 	"aliceblue":            "#f0f8ff",
 	"antiquewhite":         "#faebd7",
@@ -292,7 +310,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 
 	// variable
 	if !opts.noVariables {
-		if match, _ := regexp.MatchString(`^([@%])([\w\.]+)$`, formatType); match {
+		if match := variableRegex.MatchString(formatType); match {
 			// TODO: fetch the variable, warn if it is undef, format text if %var
 			// then return the value
 			return html("(null)")
@@ -372,7 +390,7 @@ func parseFormatType(formatType string, opts *formatterOptions) html {
 	}
 
 	// color hex code
-	if match, _ := regexp.MatchString(`(?i)^#[\da-f]+$`, formatType); match {
+	if match := colorRegex.MatchString(formatType); match {
 		return html(`<span style="color: "` + formatType + `";">`)
 	}
 
