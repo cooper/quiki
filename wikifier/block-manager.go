@@ -16,6 +16,5 @@ func newBlock(blockType, blockName string, blockClasses []string, parent block, 
 	if init, ok := blockInitializers[blockType]; ok {
 		return init(blockName, underlying)
 	}
-	panic("BAD: " + blockType)
-	return nil
+	return underlying
 }

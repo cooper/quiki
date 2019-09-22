@@ -2,6 +2,7 @@
 *~
 *.old
 quiki
+quiki.exe
 quiki.conf
 templates/*
 !templates/default
