@@ -373,8 +373,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 			log.Printf("BOOLEAN VAR NAME: %v", p.varName)
 
-			// TODO: set the value
-			// TODO: set as false if varNegated
+			// set the value
+			page.SetBool(p.varName, p.varNegated)
 
 			p.clearVariableState()
 			return p.nextByte(b)
@@ -387,17 +387,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			values := p.catch.content()
 			p.catch = p.catch.parentCatch()
 
-			//     my ($var, $val) =
-			//         _get_var_parts(delete @$c{ qw(var_name var_value) });
-			//     my ($is_string, $no_intplt, $is_negated) = delete @$c{qw(
-			//         var_is_string var_no_interpolate var_is_negated
-			//     )};
-
-			//     # more than one content? not allowed in variables
-			//     return $c->error("Variable can't contain both text and blocks")
-			//         if @$var > 1 || @$val > 1;
-			//     $var = shift @$var;
-			//     $val = shift @$val;
 			if len(values) != 1 {
 				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
 			}
@@ -410,7 +399,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			switch val := values[0].(type) {
 			case string:
 				log.Println("Got var str:", val)
-				// TODO: Format it
+
+				// format it unless told not to
+				if !p.varNotInterpolated {
+					values[0] = page.parseFormattedText(val)
+				}
 
 			case block:
 				log.Println("Got var block:", val)
@@ -419,8 +412,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				return fmt.Errorf("Not sure what to do with: %v", val)
 			}
 
-			// TODO: set the value
-			//     # set the value
+			// set the value
+			page.Set(p.varName, values[0])
 
 			// TODO:
 			//     # run ->parse and ->html if necessary

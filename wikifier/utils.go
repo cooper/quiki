@@ -1,5 +1,7 @@
 package wikifier
 
+import "strings"
+
 func pageNameLink(s string) string {
 	return ""
 }
@@ -7,4 +9,83 @@ func pageNameLink(s string) string {
 func humanReadableValue(i interface{}) string {
 	//TODO
 	return i.(string)
+}
+
+// fix a value before storing it in a list or map
+// this returns either a string, block, or []interface{} of both
+// strings next to each other are merged; empty strings are removed
+func fixValuesForStorage(values []interface{}) interface{} {
+
+	// no items
+	if len(values) == 0 {
+		return nil
+	}
+
+	// one value in; one value out!
+	if len(values) == 1 {
+		return fixSingleValue(values[0])
+	}
+
+	// multiple values
+	var valuesToStore []interface{}
+	var lastValue interface{}
+	for _, value := range values {
+
+		// fix this value; then skip it if it's nothin
+		value = fixSingleValue(value)
+		if value == nil {
+			continue
+		}
+
+		// if this is a string and the previous one was too, combine them
+		thisStr, isStr := value.(string)
+		lastStr, lastWasStr := lastValue.(string)
+		if isStr && lastWasStr {
+			valuesToStore[len(valuesToStore)-1] = lastStr + thisStr
+		} else {
+			valuesToStore = append(valuesToStore, value)
+		}
+
+		lastValue = value
+	}
+
+	// ended up with nothing
+	if len(valuesToStore) == 0 {
+		return nil
+	}
+
+	// ended up with just one
+	if len(valuesToStore) == 1 {
+		return valuesToStore[1]
+	}
+
+	// mix of strings and blocks
+	return valuesToStore
+}
+
+func fixSingleValue(value interface{}) interface{} {
+	switch v := value.(type) {
+	case string:
+		v = strings.TrimSpace(v)
+		if v == "" {
+			return nil
+		}
+		return v
+	case block:
+		// just in case
+		if v == nil {
+			return nil
+		}
+		return value
+	default:
+		panic("somehow a non-string and non-block value got into a map or list")
+	}
+}
+
+func reverseString(s string) string {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
 }

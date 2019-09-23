@@ -9,10 +9,12 @@ type attributedObject interface {
 	MainBlock() block
 
 	Get(key string) (interface{}, error)
+	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
 	GetObj(key string) (attributedObject, error)
 
 	Set(key string, value interface{}) (interface{}, error)
+	SetBool(key string, value bool) error
 	SetStr(key, value string) error
 	SetObj(key string, value attributedObject) error
 
@@ -62,6 +64,11 @@ func (scope *variableScope) Set(key string, value interface{}) (interface{}, err
 
 	where.setOwn(setting, value)
 	return value, nil
+}
+
+func (scope *variableScope) SetBool(key string, value bool) error {
+	scope.vars[key] = value
+	return nil
 }
 
 func (scope *variableScope) SetStr(key, value string) error {
@@ -114,6 +121,28 @@ func (scope *variableScope) GetStr(key string) (string, error) {
 
 	// not what we asked for
 	return "", errors.New("not a string")
+}
+
+// fetch the string value of a variable
+// fails only if a non-bool value is present
+func (scope *variableScope) GetBool(key string) (bool, error) {
+	val, err := scope.Get(key)
+	if err != nil {
+		return false, err
+	}
+
+	// there is nothing here
+	if val == nil {
+		return false, nil
+	}
+
+	// something is here, so it best be a bool
+	if b, ok := val.(bool); ok {
+		return b, nil
+	}
+
+	// not what we asked for
+	return false, errors.New("not a boolean")
 }
 
 // fetch the object value of a variable

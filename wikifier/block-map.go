@@ -8,14 +8,25 @@ import (
 )
 
 var keyNormalizer = regexp.MustCompile(`\W`)
+var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
 
 type Map struct {
+	mapList []mapListEntry
 	*parserBlock
 	*variableScope
 }
 
+type mapListEntry struct {
+	keyTitle string      // displayed key text
+	key      string      // actual underlying key
+	value    interface{} // string, block, or mixed []interface{}
+	isBlock  bool        // true if it contains precisely 1 block and no text
+	pos      position    // position where the item started
+}
+
 type mapParser struct {
-	key interface{}
+	key    interface{}
+	values []interface{}
 
 	escape        bool
 	inValue       bool
@@ -34,11 +45,11 @@ func NewMap(mb block) *Map {
 		element:      newElement("div", "map"),
 		genericCatch: &genericCatch{},
 	}
-	return &Map{underlying, newVariableScope()}
+	return &Map{nil, underlying, newVariableScope()}
 }
 
 func newMapBlock(name string, b *parserBlock) block {
-	return &Map{b, newVariableScope()}
+	return &Map{nil, b, newVariableScope()}
 }
 
 func (m *Map) parse(page *Page) {
@@ -56,9 +67,15 @@ func (m *Map) parse(page *Page) {
 
 		// block
 		case block:
-
 			if p.inValue {
-				// append_value $value, $item, $pos, $startpos;
+
+				// first item
+				if len(p.values) == 0 {
+					p.startPos = p.pos
+				}
+
+				// add item
+				p.values = append(p.values, item)
 
 			} else {
 				// overwrote a key
@@ -78,10 +95,23 @@ func (m *Map) parse(page *Page) {
 			}
 		}
 	}
+
+	// positional warnings
+	m.warnMaybe(p)
+	keyHR, valueHR := humanReadableValue(p.key), humanReadableValue(p.values)
+
+	// end of map warnings
+	if valueHR != "" || p.inValue {
+		// looks like we were in the middle of a value
+		m.warn(p.pos, "Value "+valueHR+" for key "+keyHR+" not terminated")
+	} else if keyHR != "" {
+		// we were in the middle of a key
+		m.warn(p.pos, "Stray key "+keyHR+" ignored")
+	}
+
 }
 
 func (m *Map) handleChar(i int, p *mapParser, c rune) {
-	strKey, isStrKey := p.key.(string)
 
 	if c == ':' && !p.inValue && !p.escape {
 		// first colon indicates we're entering a value
@@ -96,31 +126,43 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 	} else if c == ';' && !p.escape {
 		// semicolon indicates termination of a pair
 
+		strKey, isStrKey := p.key.(string)
 		keyTitle := ""
 
-		// determine ky
+		// determine key
 		if (isStrKey && strKey == "") || p.key == nil {
 			// this is something like
-			//		: value;
+			//		: value; (can be text or block though)
 
-			p.key = "anon_" + strconv.Itoa(i)
+			strKey = "anon_" + strconv.Itoa(i)
+			p.key = strKey
+			// no keyTitle
+
 		} else if !p.inValue {
-			// if there i a key but we aren't in the value,
+			// if there is a key but we aren't in the value,
 			// it is something like
-			//		value;
+			//		value; (can be text or block though)
 
+			// better to prefix text with : for less ambiguity
 			if isStrKey && strKey[0] != '-' {
 				m.warn(p.pos, "Standalone text should be prefixed with ':")
 			}
+
+			strKey = "anon_" + strconv.Itoa(i)
+			p.key = strKey
+			p.values = append(p.values, p.key)
+			// no keyTitle
+
 		} else {
 			// otherwise it's a normal key-value pair
+			// (can be text or block though)
 
 			// we have to convert this to a string key somehow, so use the address
 			if !isStrKey {
 				strKey = fmt.Sprintf("%p", p.key)
 			}
 
-			// in any case, normalize the key for internal use
+			// normalize the key for internal use
 			strKey = strings.TrimSpace(strKey)
 			keyTitle = strKey
 			strKey = keyNormalizer.ReplaceAllString(strKey, "_")
@@ -129,60 +171,106 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 		}
 
 		// fix the value
+		// this returns either a string, block, or []interface{} of both
+		// strings next to each other are merged; empty strings are removed
+		valueToStore := fixValuesForStorage(p.values)
+
+		// true if ONE block and no text
+		_, isBlock := valueToStore.(block)
+
+		// if this key exists, rename it to the next available <key>_key_<n>
+		for exist, err := m.Get(strKey); exist != nil && err != nil; {
+			matches := keySplitter.FindStringSubmatch(strKey)
+			keyName, keyNumber := matches[1], matches[2]
+
+			// first one, so make it _2
+			if matches == nil {
+				strKey += "_2"
+				p.key = strKey
+				continue
+			}
+
+			// it has _n, so increment that
+			newKeyNumber, _ := strconv.Atoi(keyNumber)
+			newKeyNumber++
+			strKey = keyName + "_" + strconv.Itoa(newKeyNumber)
+			p.key = strKey
+
+		}
+
+		// store the value in the underlying variableScope
+		// FIXME: Set() needs to accept interface{}{[]interface{}} (list of values)
+		m.Set(strKey, valueToStore)
+
+		// store the value in the map list
+		m.mapList = append(m.mapList, mapListEntry{
+			keyTitle: keyTitle,     // displayed key
+			value:    valueToStore, // string, block, or mixed []interface{}
+			key:      strKey,       // actual underlying key
+			isBlock:  isBlock,      // true if it contains precisely 1 block and no text
+			pos:      p.startPos,   // position where the item started
+		})
+
+		// check for warnings once more
+		m.warnMaybe(p)
+
+		// reset status
+		p.inValue = false
+		p.key = nil
+		p.values = nil
+
+	} else {
+		// any other character; add to key or value
+		p.escape = false
+
+		// this is part of the value
+		if p.inValue {
+
+			// first item
+			if len(p.values) == 0 {
+				p.startPos = p.pos
+				p.values = append(p.values, string(c))
+				return
+			}
+
+			// check previous item
+			last := p.values[len(p.values)-1]
+			if lastStr, ok := last.(string); ok {
+				// previous item was a string, so append it
+
+				p.values[len(p.values)-1] = lastStr + string(c)
+			} else {
+				// previous item was not a string,
+				// so start a new string item
+
+				p.values = append(p.values, string(c))
+			}
+
+			return
+		}
+
+		// this is part of the key
+
+		// starting a new key
+		if p.key == nil {
+			p.startPos = p.pos
+			p.key = string(c)
+			return
+		}
+
+		// check current key
+		if lastStr, ok := p.key.(string); ok {
+			// already working on a string key, so append it
+
+			p.key = lastStr + string(c)
+		} else if strings.TrimSpace(string(c)) != "" {
+			// previous item was not a string
+			// trying to add text to a non-text key...
+			// (above ignores whitespace chars)
+
+			p.appendedKey = p.key
+		}
 	}
-
-	//             # fix the value
-	//             fix_value $value;
-	//             my $is_block = blessed $value; # true if ONE block and no text
-
-	//             # if this key exists, rename it to the next available <key>_key_<n>.
-	//             KEY: while (exists $values{$key}) {
-	//                 my ($key_name, $key_number) = reverse map scalar reverse,
-	//                     split('_', reverse($key), 2);
-	//                 if (!defined $key_number || $key_number =~ m/\D/) {
-	//                     $key = "${key}_2";
-	//                     next KEY;
-	//                 }
-	//                 $key_number++;
-	//                 $key = "${key_name}_${key_number}";
-	//             }
-
-	//             # store the value.
-	//             $values{$key} = $value;
-	//             push @{ $block->{map_array} }, {
-	//                 key_title   => $key_title,     # displayed key
-	//                 value       => $value,         # value, text or block
-	//                 key         => $key,           # actual hash key
-	//                 is_block    => $is_block,      # true if value was a block
-	//                 pos         => { %$startpos }  # position
-	//             };
-
-	//             # warn bad keys and values
-	//             $warn_bad_maybe->();
-
-	//             # reset status.
-	//             $in_value = 0;
-	//             $key = $value = '';
-	//         }
-
-	//         # any other character
-	//         else {
-	//             $escaped = 0;
-
-	//             # this is part of the value
-	//             if ($in_value) {
-	//                 append_value $value, $char, $pos, $startpos;
-	//             }
-
-	//             # this must be part of the key
-	//             else {
-	//                 if (blessed $key) {
-	//                     $ap_key = $key unless $char =~ m/\s/;
-	//                 }
-	//                 else { $key .= $char }
-	//             }
-	//         }
-
 }
 
 // produce warnings as needed at current parser state

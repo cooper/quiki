@@ -1,0 +1,4 @@
+@myMap: map {
+    A: B;
+    C: D
+};

@@ -21,13 +21,6 @@ func main() {
 		log.Println("Got:", val)
 	}
 
-	// create map
-	m := wikifier.NewMap(page.MainBlock())
-	m.Set("a", "b")
-
-	// add map as attr of page
-	page.Set("myMap", m)
-
 	// fetch map property from page
 	if val, err := page.GetStr("myMap.a"); err != nil {
 		log.Fatal("Got map error: ", err)
