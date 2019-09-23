@@ -2,18 +2,11 @@ package wikifier
 
 type infobox struct {
 	*Map
-	*parserBlock
 }
 
 func newInfobox(name string, b *parserBlock) block {
-	// FIXME: this code to create the underlying map is pretty messy
-	return &infobox{newMapBlock("", &parserBlock{
-		openPos:      b.openPos,
-		parentB:      b.parentB,
-		parentC:      b.parentC,
-		typ:          "map",
-		genericCatch: &genericCatch{},
-	}).(*Map), b}
+	b.typ = "infobox"
+	return &infobox{newMapBlock("", b).(*Map)}
 }
 
 func (ib *infobox) parse(page *Page) {
