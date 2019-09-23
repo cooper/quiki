@@ -10,70 +10,183 @@ var identifiers = make(map[string]int)
 
 type Html string
 
-type element struct {
-	tag        string                 // html tag
-	attr       map[string]interface{} // html attributes
-	style      map[string]string      // inline styles
-	id         string                 // unique element identifier
-	typ        string                 // primary quiki class
-	classes    []string               // quiki user-defined classes
-	content    []interface{}          // mixed text and child elements
-	parent     *element               // parent element, if any
-	cachedHTML Html                   // cached version
-	container  bool                   // true for container elements
-	needID     bool                   // true if we should include id
-	noTags     bool                   // if true, only generate inner HTML
-	noIndent   bool                   // if true, do not indent contents (for <pre>)
-	noClose    bool                   // if true, do not close (containers only)
+type element interface {
+
+	// tag
+	tag() string
+	setTag(tag string)
+
+	// attributes
+	hasAttr(name string) bool
+	attr(name string) string
+	boolAttr(name string) bool
+	setAttr(name, value string)
+	setBoolAttr(name string, value bool)
+
+	// metadata
+	hasMeta(name string) bool
+	meta(name string) string
+
+	// adding content
+	addText(s string)
+	addHtml(h Html)
+	addChild(child element)
+	createChild(tag, typ string) element
+
+	// classes
+	addClass(class string)
+	removeClass(class string) bool
+
+	// parent
+	parent() element
+	setParent(parent element)
+	setNeedID(need bool)
+
+	// html generation
+	generate() Html
 }
 
-func newElement(tag, typ string) *element {
+type genericElement struct {
+	_tag          string                 // html tag
+	attrs         map[string]interface{} // html attributes
+	style         map[string]string      // inline styles
+	metas         map[string]string      // metadata
+	id            string                 // unique element identifier
+	typ           string                 // primary quiki class
+	classes       []string               // quiki user-defined classes
+	content       []interface{}          // mixed text and child elements
+	parentElement element                // parent element, if any
+	cachedHTML    Html                   // cached version
+	container     bool                   // true for container elements
+	needID        bool                   // true if we should include id
+	noTags        bool                   // if true, only generate inner HTML
+	noIndent      bool                   // if true, do not indent contents (for <pre>)
+	noClose       bool                   // if true, do not close (containers only)
+}
+
+func newElement(tag, typ string) element {
 	identifiers[typ]++
-	return &element{
-		tag:       tag,
+	return &genericElement{
+		_tag:      tag,
 		id:        typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:       typ,
 		container: tag == "div",
 	}
 }
 
-func (el *element) setAttr(name, value string) {
-	el.attr[name] = value
+// fetch tag
+func (el *genericElement) tag() string {
+	return el._tag
 }
 
-func (el *element) setBoolAttr(name string, value bool) {
-	if value == false {
-		delete(el.attr, name)
+// set the tag
+func (el *genericElement) setTag(tag string) {
+	el._tag = tag
+}
+
+// true when a meta key is present on an element
+func (el *genericElement) hasMeta(name string) bool {
+	_, exist := el.metas[name]
+	return exist
+}
+
+// fetch string value for an attribute
+func (el *genericElement) meta(name string) string {
+	return el.metas[name]
+}
+
+// true when an attr is present on an element
+func (el *genericElement) hasAttr(name string) bool {
+	_, exist := el.attrs[name]
+	return exist
+}
+
+// fetch string value for an attribute
+func (el *genericElement) attr(name string) string {
+	attr, exist := el.attrs[name]
+	if !exist {
+		return ""
+	}
+	if attrStr, ok := attr.(string); ok {
+		return attrStr
+	}
+	return ""
+}
+
+// fetch boolean value for an attribute
+func (el *genericElement) boolAttr(name string) bool {
+	attr, exist := el.attrs[name]
+	if !exist {
+		return false
+	}
+	if attrBool, ok := attr.(bool); ok {
+		return attrBool
+	}
+	return false
+}
+
+// set a string attribute
+func (el *genericElement) setAttr(name, value string) {
+	if value == "" {
+		delete(el.attrs, name)
 		return
 	}
-	el.attr[name] = true
+	el.attrs[name] = value
 }
 
-func (el *element) addText(s string) {
+// set a boolean attribute
+func (el *genericElement) setBoolAttr(name string, value bool) {
+	if value == false {
+		delete(el.attrs, name)
+		return
+	}
+	el.attrs[name] = true
+}
+
+// add a text node
+func (el *genericElement) addText(s string) {
 	el.content = append(el.content, s)
 }
 
-func (el *element) addHtml(h Html) {
+// add inner html
+func (el *genericElement) addHtml(h Html) {
 	el.content = append(el.content, h)
 }
 
-func (el *element) addChild(child *element) {
-	child.parent = el // recursive!!
+// add child element
+func (el *genericElement) addChild(child element) {
 	el.content = append(el.content, child)
 }
 
-func (el *element) createChild(tag, typ string) *element {
+// create a child element and add it
+func (el *genericElement) createChild(tag, typ string) element {
 	child := newElement(tag, typ)
 	el.addChild(child)
-	child.parent = el // recursive!!
 	return child
 }
 
-func (el *element) addClass(class string) {
+// fetch element's parent
+func (el *genericElement) parent() element {
+	return el.parentElement
+}
+
+// set this element's parent (internal only)
+func (el *genericElement) setParent(parent element) {
+	el.parentElement = parent // recursive!!
+}
+
+// set whether to include element's unique ID
+func (el *genericElement) setNeedID(need bool) {
+	el.needID = need
+}
+
+// add a class
+func (el *genericElement) addClass(class string) {
 	el.classes = append(el.classes, class)
 }
 
-func (el *element) removeClass(class string) bool {
+// remove a class, returning true if it was present
+func (el *genericElement) removeClass(class string) bool {
 	for i, v := range el.classes {
 		if v == class {
 			el.classes = append(el.classes[:i], el.classes[i+1:]...)
@@ -83,7 +196,7 @@ func (el *element) removeClass(class string) bool {
 	return false
 }
 
-func (el *element) generate() Html {
+func (el *genericElement) generate() Html {
 	generated := ""
 
 	// cached version
@@ -99,7 +212,7 @@ func (el *element) generate() Html {
 
 	// tags
 	if !el.noTags {
-		generated = "<" + el.tag
+		generated = "<" + el._tag
 
 		// classes
 		classes := make([]string, len(el.classes)+1)
@@ -124,7 +237,7 @@ func (el *element) generate() Html {
 		}
 
 		// other attributes
-		for key, val := range el.attr {
+		for key, val := range el.attrs {
 			switch v := val.(type) {
 			case string:
 				generated += " " + key + `="` + htmlfmt.EscapeString(v) + `"`
@@ -150,7 +263,7 @@ func (el *element) generate() Html {
 			add = string(v)
 		case string:
 			add = htmlfmt.EscapeString(v)
-		case *element:
+		case *genericElement:
 			add = string(v.generate())
 		}
 		if !el.noIndent {
@@ -161,7 +274,7 @@ func (el *element) generate() Html {
 
 	// close it off
 	if !el.noTags && !el.noClose {
-		generated += "</" + el.tag + ">\n"
+		generated += "</" + el._tag + ">\n"
 	}
 
 	el.cachedHTML = Html(generated)

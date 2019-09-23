@@ -15,8 +15,8 @@ func newPBlock(name string, b *parserBlock) block {
 func (p *pBlock) parse(page *Page) {
 }
 
-func (p *pBlock) html(page *Page, el *element) {
-	el.tag = "p"
+func (p *pBlock) html(page *Page, el element) {
+	el.setTag("p")
 
 	for _, pc := range p.visiblePosContent() {
 		switch item := pc.content.(type) {

@@ -12,6 +12,6 @@ func (b *unknownBlock) parse(page *Page) {
 
 }
 
-func (b *unknownBlock) html(page *Page, el *element) {
+func (b *unknownBlock) html(page *Page, el element) {
 
 }

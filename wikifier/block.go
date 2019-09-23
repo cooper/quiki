@@ -8,11 +8,12 @@ import (
 
 type block interface {
 	String() string                    // description
-	el() *element                      // returns the html element
+	el() element                      // returns the html element
 	parse(page *Page)                  // parse contents
-	html(page *Page, el *element)      // generate html element
+	html(page *Page, el element)      // generate html element
 	parentBlock() block                // parent block
 	blockType() string                 // block type
+	blockName() string                 // block name, if any
 	close(pos position)                // closes the block at the given position
 	closed() bool                      // true when closed
 	hierarchy() string                 // human-readable hierarchy
@@ -31,7 +32,7 @@ type parserBlock struct {
 	closePos  position
 	parentB   block
 	parentC   catch
-	element   *element
+	element   element
 	*genericCatch
 }
 
@@ -42,7 +43,7 @@ func (b *parserBlock) parse(page *Page) {
 	}
 }
 
-func (b *parserBlock) el() *element {
+func (b *parserBlock) el() element {
 	return b.element
 }
 
@@ -52,6 +53,10 @@ func (b *parserBlock) parentBlock() block {
 
 func (b *parserBlock) blockType() string {
 	return b.typ
+}
+
+func (b *parserBlock) blockName() string {
+	return b.name
 }
 
 func (b *parserBlock) close(pos position) {

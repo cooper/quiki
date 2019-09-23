@@ -1,11 +1,12 @@
 package wikifier
 
 var blockInitializers = map[string]func(name string, b *parserBlock) block{
-	"main":  newMainBlock,
-	"clear": newClearBlock,
-	"sec":   newSecBlock,
-	"p":     newPBlock,
-	"map":   newMapBlock,
+	"main":    newMainBlock,
+	"clear":   newClearBlock,
+	"sec":     newSecBlock,
+	"p":       newPBlock,
+	"map":     newMapBlock,
+	"infobox": newInfobox,
 }
 
 func newBlock(blockType, blockName string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {

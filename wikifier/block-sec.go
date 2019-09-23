@@ -15,7 +15,7 @@ func newSecBlock(name string, b *parserBlock) block {
 func (sec *secBlock) parse(page *Page) {
 }
 
-func (sec *secBlock) html(page *Page, el *element) {
+func (sec *secBlock) html(page *Page, el element) {
 
 	// iterate over visible content only
 	var contentToAdd []posContent
@@ -57,7 +57,7 @@ func (sec *secBlock) html(page *Page, el *element) {
 	sec.createParagraph(page, el, contentToAdd)
 }
 
-func (sec *secBlock) createParagraph(page *Page, el *element, pcs []posContent) {
+func (sec *secBlock) createParagraph(page *Page, el element, pcs []posContent) {
 
 	// this can be passed nothing
 	if len(pcs) == 0 {

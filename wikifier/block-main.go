@@ -12,11 +12,11 @@ func (mb *mainBlock) parse(page *Page) {
 
 }
 
-func (mb *mainBlock) html(page *Page, el *element) {
+func (mb *mainBlock) html(page *Page, el element) {
 
 	// always include the ID so that element styles can refer to it
 	// (needed when more than 1 logical page is displayed in a browser window)
-	el.needID = true
+	el.setNeedID(true)
 
 	// iterate over visible content only
 	var contentToAdd []posContent
@@ -48,7 +48,7 @@ func (mb *mainBlock) html(page *Page, el *element) {
 	mb.createSection(page, el, contentToAdd)
 }
 
-func (mb *mainBlock) createSection(page *Page, el *element, pcs []posContent) {
+func (mb *mainBlock) createSection(page *Page, el element, pcs []posContent) {
 
 	// this can be passed nothing
 	if len(pcs) == 0 {

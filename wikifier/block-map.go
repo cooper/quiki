@@ -307,7 +307,7 @@ func (m *Map) warnMaybe(p *mapParser) {
 	}
 }
 
-func (m *Map) html(page *Page, el *element) {
+func (m *Map) html(page *Page, el element) {
 
 }
 
