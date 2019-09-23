@@ -56,7 +56,7 @@ func (mb *mainBlock) createSection(page *Page, el *element, pcs []posContent) {
 	}
 
 	// create a section at first text node position
-	sec := newBlock("sec", "", nil, mb, pcs[0].position)
+	sec := newBlock("sec", "", nil, mb, mb, pcs[0].position)
 	sec.pushContents(pcs)
 
 	// parse and generate

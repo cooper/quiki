@@ -46,7 +46,7 @@ func (pos position) none() bool {
 }
 
 func newParser() *parser {
-	mb := newBlock("main", "", nil, nil, position{})
+	mb := newBlock("main", "", nil, nil, nil, position{})
 	return &parser{block: mb, catch: mb}
 }
 
@@ -243,7 +243,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// create the block
 			log.Printf("Creating block: %s[%s]{}", blockType, blockName)
-			block := newBlock(blockType, blockName, blockClasses, p.block, p.pos)
+			block := newBlock(blockType, blockName, blockClasses, p.block, p.catch, p.pos)
 
 			// TODO: produce a warning if the block has a name but the type does not support it
 
@@ -357,6 +357,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			catch.parent = p.catch
 			p.catch = catch
 
+			log.Printf("SETTING CATCH FOR VAR: %+v", p.catch)
+
 			return p.nextByte(b)
 		}
 
@@ -383,29 +385,36 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		// terminate a string or block variable value
 		if b == ';' && p.catch.catchType() == catchTypeVariableValue {
 
-			// fetch content and clear catch
-			values := p.catch.content()
-			p.catch = p.catch.parentCatch()
-
-			if len(values) != 1 {
-				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
-			}
-
 			// we have to also check this here in case it was something like @;
 			if len(p.varName) == 0 {
 				return errors.New("Variable has no name")
 			}
 
-			switch val := values[0].(type) {
+			// fetch content and clear catch
+			value := fixValuesForStorage(p.catch.content())
+			p.catch = p.catch.parentCatch()
+
+			log.Println("Variable values = ", value)
+
+			switch val := value.(type) {
+			case []interface{}:
+				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
+
 			case string:
 				log.Println("Got var str:", val)
 
 				// format it unless told not to
 				if !p.varNotInterpolated {
-					values[0] = page.parseFormattedText(val)
+					value = page.parseFormattedText(val)
 				}
 
 			case block:
+
+				// parse the block
+				// note: in Perl, this was done recursively here for maps/lists/etc.
+				// or any blessed object with ->to_data; but here blocks must parse()
+				// their own children manually
+				val.parse(page)
 				log.Println("Got var block:", val)
 
 			default:
@@ -413,12 +422,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// set the value
-			page.Set(p.varName, values[0])
-
-			// TODO:
-			//     # run ->parse and ->html if necessary
-			//     _parse_vars($page, 'parse', $val);
-			//     _parse_vars($page, 'html',  $val);
+			log.Println("Setting", p.varName, value)
+			page.Set(p.varName, value)
 
 			p.clearVariableState()
 			return p.nextByte(b)
@@ -429,6 +434,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			// do nothing yet; just make sure we don't get to default
 			return p.nextByte(b)
 		}
+
+		log.Printf("MADE IT DOWN WITH %v; CATCH: %v", string(b), p.catch)
 
 		return p.nextByte(b)
 	}

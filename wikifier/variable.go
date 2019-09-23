@@ -2,6 +2,7 @@ package wikifier
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -90,11 +91,17 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 	parts := strings.Split(key, ".")
 	setting, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
-	for _, name := range parts {
+	for i, name := range parts {
 		newWhere, err := where.GetObj(name)
 		if err != nil {
 			return nil, err
 		}
+
+		// no error, but there's nothing there
+		if newWhere == nil {
+			return nil, fmt.Errorf("Get(%s): '%s' does not exist", key, parts[i])
+		}
+
 		where = newWhere
 	}
 

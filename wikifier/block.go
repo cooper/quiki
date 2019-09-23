@@ -7,6 +7,7 @@ import (
 )
 
 type block interface {
+	String() string                    // description
 	el() *element                      // returns the html element
 	parse(page *Page)                  // parse contents
 	html(page *Page, el *element)      // generate html element
@@ -17,6 +18,7 @@ type block interface {
 	hierarchy() string                 // human-readable hierarchy
 	invisible() bool                   // true for invisible blocks (generate no html)
 	visiblePosContent() []posContent   // visible text/blocks
+	blockContent() []block             // block children
 	warn(pos position, warning string) // produce parser warning
 	catch                              // all blocks must conform to catch
 }
@@ -27,9 +29,17 @@ type parserBlock struct {
 	classes   []string
 	openPos   position
 	closePos  position
-	parent    block
+	parentB   block
+	parentC   catch
 	element   *element
 	*genericCatch
+}
+
+func (b *parserBlock) parse(page *Page) {
+	// TODO: maybe split text nodes by line?
+	for _, child := range b.blockContent() {
+		child.parse(page)
+	}
 }
 
 func (b *parserBlock) el() *element {
@@ -37,7 +47,7 @@ func (b *parserBlock) el() *element {
 }
 
 func (b *parserBlock) parentBlock() block {
-	return b.parent
+	return b.parentB
 }
 
 func (b *parserBlock) blockType() string {
@@ -78,7 +88,7 @@ func (b *parserBlock) hierarchy() string {
 }
 
 func (b *parserBlock) parentCatch() catch {
-	return b.parent
+	return b.parentC
 }
 
 func (b *parserBlock) catchType() string {
@@ -98,7 +108,17 @@ func (b *parserBlock) invisible() bool {
 }
 
 func (b *parserBlock) warn(pos position, warning string) {
-	log.Printf("WARNING: %s{} at %v: %s", b.blockType, pos, warning)
+	log.Printf("WARNING: %s{} at %v: %s", b.blockType(), pos, warning)
+}
+
+func (b *parserBlock) blockContent() []block {
+	var blocks []block
+	for _, c := range b.content() {
+		if blk, ok := c.(block); ok {
+			blocks = append(blocks, blk)
+		}
+	}
+	return blocks
 }
 
 func (b *parserBlock) visiblePosContent() []posContent {

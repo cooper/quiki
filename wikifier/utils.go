@@ -1,14 +1,51 @@
 package wikifier
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func pageNameLink(s string) string {
 	return ""
 }
 
+// convert wikifier values to human-readable form
 func humanReadableValue(i interface{}) string {
-	//TODO
-	return i.(string)
+	switch v := i.(type) {
+
+	// FIXME: recursions possible?
+
+	// list
+	case []interface{}:
+		hrValues := make([]string, len(v))
+		for i, val := range v {
+			hrValues[i] = humanReadableValue(val)
+		}
+		return strings.Join(hrValues, " ")
+
+	// nothing
+	case nil:
+		return ""
+
+	// string
+	case string:
+		return `'` + strings.TrimSpace(v) + `'`
+
+	// boolean
+	case bool:
+		if v {
+			return "true"
+		}
+		return "false"
+
+	// block
+	case block:
+		return v.String()
+
+		// something else
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }
 
 // fix a value before storing it in a list or map
@@ -56,7 +93,7 @@ func fixValuesForStorage(values []interface{}) interface{} {
 
 	// ended up with just one
 	if len(valuesToStore) == 1 {
-		return valuesToStore[1]
+		return valuesToStore[0]
 	}
 
 	// mix of strings and blocks
@@ -83,9 +120,9 @@ func fixSingleValue(value interface{}) interface{} {
 }
 
 func reverseString(s string) string {
-    runes := []rune(s)
-    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-        runes[i], runes[j] = runes[j], runes[i]
-    }
-    return string(runes)
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }

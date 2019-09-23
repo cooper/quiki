@@ -13,45 +13,34 @@ func main() {
 	}
 	page := wikifier.NewPage(os.Args[1])
 
-	// set some variables
-	page.Set("myKey", "myValue")
-	if val, err := page.GetStr("myKey"); err != nil {
-		log.Fatal("Got error: ", err)
-	} else {
-		log.Println("Got:", val)
+	// parse
+	err := page.Parse()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// fetch map property from page
-	if val, err := page.GetStr("myMap.a"); err != nil {
-		log.Fatal("Got map error: ", err)
+	// spit out html
+	log.Println(page.HTML())
+
+	// fetch map
+	if m, err := page.GetObj("myMap"); err != nil {
+		log.Fatal("myMap error: ", err)
 	} else {
-		log.Println("Got from map:", val)
+		log.Println("myMap:", m)
 	}
 
-	// fetch object var
-
-	page.Set("page", page)
-
-	if val, err := page.GetObj("page.page"); err != nil {
-		log.Fatal("Got error: ", err)
+	// fetch map
+	if val, err := page.GetStr("myMap.A"); err != nil {
+		log.Fatal("myMap.A error: ", err)
 	} else {
-		log.Println("Got:", val)
+		log.Println("myMap.A:", val)
 	}
 
-	// fetch recursive var
-
-	if val, err := page.GetStr("page.myKey"); err != nil {
-		log.Fatal("Got error: ", err)
+	// fetch nested map
+	if val, err := page.GetStr("myMap.E.F"); err != nil {
+		log.Fatal("myMap.E.F error: ", err)
 	} else {
-		log.Println("Got:", val)
+		log.Println("myMap.E.F:", val)
 	}
 
-	// // parse
-	// err := page.Parse()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// // spit out html
-	// log.Println(page.HTML())
 }

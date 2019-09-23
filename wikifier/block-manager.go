@@ -8,10 +8,11 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"map":   newMapBlock,
 }
 
-func newBlock(blockType, blockName string, blockClasses []string, parent block, pos position) block {
+func newBlock(blockType, blockName string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {
 	underlying := &parserBlock{
 		openPos:      pos,
-		parent:       parent,
+		parentB:      parentBlock,
+		parentC:      parentCatch,
 		typ:          blockType,
 		name:         blockName,
 		classes:      blockClasses,

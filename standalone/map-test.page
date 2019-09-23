@@ -1,4 +1,8 @@
 @myMap: map {
     A: B;
-    C: D
+    C: D;
+    E: map {
+        F: G;
+        H: I;
+    };
 };

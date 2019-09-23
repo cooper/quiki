@@ -2,6 +2,7 @@ package wikifier
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -40,7 +41,8 @@ type mapParser struct {
 func NewMap(mb block) *Map {
 	underlying := &parserBlock{
 		openPos:      position{0, 0}, // FIXME
-		parent:       mb,
+		parentB:      mb,
+		parentC:      mb,
 		typ:          "map",
 		element:      newElement("div", "map"),
 		genericCatch: &genericCatch{},
@@ -53,6 +55,8 @@ func newMapBlock(name string, b *parserBlock) block {
 }
 
 func (m *Map) parse(page *Page) {
+	log.Println("Map parse")
+	m.parserBlock.parse(page)
 	p := new(mapParser)
 
 	for _, pc := range m.visiblePosContent() {
@@ -67,6 +71,7 @@ func (m *Map) parse(page *Page) {
 
 		// block
 		case block:
+
 			if p.inValue {
 
 				// first item
@@ -84,6 +89,9 @@ func (m *Map) parse(page *Page) {
 				p.key = item
 			}
 			m.warnMaybe(p)
+
+			// parse the block
+			item.parse(page)
 
 		case string:
 			item = strings.TrimSpace(item)

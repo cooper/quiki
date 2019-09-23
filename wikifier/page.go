@@ -7,6 +7,7 @@ import (
 
 type Page struct {
 	FilePath string
+	VarsOnly bool
 	parser   *parser
 	main     block
 	*variableScope
@@ -30,8 +31,18 @@ func (p *Page) Parse() error {
 			return err
 		}
 	}
+	if err = scanner.Err(); err != nil {
+		return err
+	}
 
-	return scanner.Err()
+	// TODO: check if p.parser.catch != main block
+
+	//  parse the blocks, unless we only want vars
+	if !p.VarsOnly {
+		p.main.parse(p)
+	}
+
+	return nil
 }
 
 // for attributedObject
