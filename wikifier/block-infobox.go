@@ -31,13 +31,13 @@ func (ib *infobox) html(page *Page, el element) {
 	}
 
 	// add the rows
-	infoboxTableAddRows(el, page, ib.mapList)
+	infoboxTableAddRows(ib, el, page, ib.mapList)
 }
 
 // # append each pair.
 // # note that $table might actually be a Wikifier::Elements container
 // sub table_add_rows {
-func infoboxTableAddRows(table element, page *Page, pairs []mapListEntry) {
+func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []mapListEntry) {
 	//     my @pairs = $block->map_array;
 	//     my $has_title = 0;
 	hasTitle := false
@@ -45,19 +45,15 @@ func infoboxTableAddRows(table element, page *Page, pairs []mapListEntry) {
 	//     for (0..$#pairs)
 	for i, entry := range pairs {
 
-		//         my ($key_title, $value, $key, $pos, $is_block, $is_title) =
-		//             @{ $pairs[$_] }{ qw(key_title value key pos is_block is_title) };
-		//         my $next = $pairs[$_ + 1];
-
-		//         # if the value is from infosec{}, add each row
-		//         if (blessed $value && $value->{is_infosec}) {
-		//             #warning("Key associated with infosec{} ignored")
-		//             #    if length $key_title;
-		//             $table->add($value);
-		//             next;
-		//		   }d
+		// if the value is from infosec{}, add each row
 		if els, ok := entry.value.(element); ok && els.hasMeta("infosec") {
 
+			// infosec do not need a key
+			if entry.keyTitle != "" {
+				infoboxOrSec.warn(infoboxOrSec.openPosition(), "Key associated with infosec{} ignored")
+			}
+
+			table.addChild(els)
 		}
 
 		// determine next entry

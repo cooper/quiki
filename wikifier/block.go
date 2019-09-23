@@ -8,9 +8,9 @@ import (
 
 type block interface {
 	String() string                    // description
-	el() element                      // returns the html element
+	el() element                       // returns the html element
 	parse(page *Page)                  // parse contents
-	html(page *Page, el element)      // generate html element
+	html(page *Page, el element)       // generate html element
 	parentBlock() block                // parent block
 	blockType() string                 // block type
 	blockName() string                 // block name, if any
@@ -20,6 +20,7 @@ type block interface {
 	invisible() bool                   // true for invisible blocks (generate no html)
 	visiblePosContent() []posContent   // visible text/blocks
 	blockContent() []block             // block children
+	openPosition() position            // position opened at
 	warn(pos position, warning string) // produce parser warning
 	catch                              // all blocks must conform to catch
 }
@@ -45,6 +46,10 @@ func (b *parserBlock) parse(page *Page) {
 
 func (b *parserBlock) el() element {
 	return b.element
+}
+
+func (b *parserBlock) openPosition() position {
+	return b.openPos
 }
 
 func (b *parserBlock) parentBlock() block {

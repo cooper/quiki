@@ -23,6 +23,11 @@ type element interface {
 	setAttr(name, value string)
 	setBoolAttr(name string, value bool)
 
+	// styles
+	hasStyle(name string) bool
+	style(name string) string
+	setStyle(name, value string)
+
 	// metadata
 	hasMeta(name string) bool
 	meta(name string) string
@@ -49,7 +54,7 @@ type element interface {
 type genericElement struct {
 	_tag          string                 // html tag
 	attrs         map[string]interface{} // html attributes
-	style         map[string]string      // inline styles
+	styles        map[string]string      // inline styles
 	metas         map[string]string      // metadata
 	id            string                 // unique element identifier
 	typ           string                 // primary quiki class
@@ -143,6 +148,22 @@ func (el *genericElement) setBoolAttr(name string, value bool) {
 	el.attrs[name] = true
 }
 
+// true when a style key is present on an element
+func (el *genericElement) hasStyle(name string) bool {
+	_, exist := el.styles[name]
+	return exist
+}
+
+// fetch string value for a style
+func (el *genericElement) style(name string) string {
+	return el.styles[name]
+}
+
+// set string value for a style
+func (el *genericElement) setStyle(name, value string) {
+	el.styles[name] = value
+}
+
 // add a text node
 func (el *genericElement) addText(s string) {
 	el.content = append(el.content, s)
@@ -229,7 +250,7 @@ func (el *genericElement) generate() Html {
 
 		// styles
 		styles := ""
-		for key, val := range el.style {
+		for key, val := range el.styles {
 			styles += key + ":" + val + "; "
 		}
 		if styles != "" {
