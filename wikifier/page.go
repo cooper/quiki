@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+// Page represents a single page or article, generally associated with a .page file.
+// It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
 	FilePath string
 	VarsOnly bool
@@ -13,10 +15,12 @@ type Page struct {
 	*variableScope
 }
 
+// NewPage creates a page given its filepath.
 func NewPage(filePath string) *Page {
 	return &Page{FilePath: filePath, variableScope: newVariableScope()}
 }
 
+// Parse opens the page file and attempts to parse it, returning any errors encountered.
 func (p *Page) Parse() error {
 	p.parser = newParser()
 	p.main = p.parser.block
@@ -45,17 +49,15 @@ func (p *Page) Parse() error {
 	return nil
 }
 
-// for attributedObject
-func (p *Page) MainBlock() block {
-	return p.main
-}
-
-func (p *Page) resetParseState() {
-	// TODO: recursively destroy blocks
-	p.parser = nil
-}
-
+// HTML generates and returns the HTML code for the page.
+// The page must be parsed with Parse before attempting this method.
 func (p *Page) HTML() HTML {
 	// TODO: cache and then recursively destroy elements
 	return generateBlock(p.main, p)
+}
+
+// resets the parser
+func (p *Page) resetParseState() {
+	// TODO: recursively destroy blocks
+	p.parser = nil
 }
