@@ -12,6 +12,7 @@ const (
 	catchTypeVariableName  catchType = "Variable name"
 	catchTypeVariableValue           = "Variable value"
 	catchTypeBlock                   = "Block"
+	catchTypeBraceEscape             = "Brace escape"
 )
 
 type catch interface {

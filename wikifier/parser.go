@@ -104,6 +104,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// if this was the last brace, clear the brace escape catch
 			if p.braceLevel == 0 {
+				p.block.appendContents(p.catch.posContent())
 				p.catch = p.catch.parentCatch()
 			}
 		}
@@ -266,8 +267,10 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			p.braceFirst = true
 			p.braceLevel++
 
-			// TODO: set the current catch to the brace escape
-			// return if catch fails
+			// start the brace escape catch
+			catch := newBraceEscape(p.pos)
+			catch.parent = p.catch
+			p.catch = catch
 		}
 
 		return p.nextByte(b)
