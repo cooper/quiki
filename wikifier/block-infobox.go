@@ -10,6 +10,7 @@ func newInfobox(name string, b *parserBlock) block {
 }
 
 func (ib *infobox) parse(page *Page) {
+	ib.Map.parse(page)
 }
 
 func (ib *infobox) html(page *Page, el element) {

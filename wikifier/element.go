@@ -31,6 +31,7 @@ type element interface {
 	// metadata
 	hasMeta(name string) bool
 	meta(name string) string
+	setMeta(name, value string)
 
 	// adding content
 	addText(s string)
@@ -76,6 +77,9 @@ func newElement(tag, typ string) element {
 		id:        typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:       typ,
 		container: tag == "div",
+		attrs:     make(map[string]interface{}),
+		styles:    make(map[string]string),
+		metas:     make(map[string]string),
 	}
 }
 
@@ -95,9 +99,14 @@ func (el *genericElement) hasMeta(name string) bool {
 	return exist
 }
 
-// fetch string value for an attribute
+// fetch string value for a meta
 func (el *genericElement) meta(name string) string {
 	return el.metas[name]
+}
+
+// set string value for a meta
+func (el *genericElement) setMeta(name, value string) {
+	el.metas[name] = value
 }
 
 // true when an attr is present on an element
@@ -299,7 +308,7 @@ func (el *genericElement) generate() Html {
 	}
 
 	el.cachedHTML = Html(generated)
-	return Html(generated)
+	return el.cachedHTML
 }
 
 func indent(str string) string {
