@@ -5,14 +5,14 @@ import "log"
 // A collection of elements.
 type elements struct {
 	elements      []element
-	metas         map[string]string
+	metas         map[string]bool
 	cachedHTML    HTML
 	parentElement element
 }
 
 // Creates a collection of elements.
 func newElements(els []element) *elements {
-	return &elements{elements: els, metas: make(map[string]string)}
+	return &elements{elements: els, metas: make(map[string]bool)}
 }
 
 // If els is empty, returns an empty string.
@@ -36,19 +36,17 @@ func (els *elements) elementType() string {
 	return "elements"
 }
 
-// Reports whether a metadata key is present in this collection.
-func (els *elements) hasMeta(name string) bool {
-	_, exist := els.metas[name]
-	return exist
-}
-
 // Fetches a value from the collection's metadata.
-func (els *elements) meta(name string) string {
+func (els *elements) meta(name string) bool {
 	return els.metas[name]
 }
 
 // Sets a value in the collection's metadata.
-func (els *elements) setMeta(name, value string) {
+func (els *elements) setMeta(name string, value bool) {
+	if value == false {
+		delete(els.metas, name)
+		return
+	}
 	els.metas[name] = value
 }
 
@@ -136,13 +134,6 @@ func (els *elements) parent() element {
 // Sets the parent of this element collection.
 func (els *elements) setParent(parent element) {
 	els.parentElement = parent // recursive!!
-}
-
-// Sets whether to include underlying elements' unique IDs in generated HTML.
-func (els *elements) setNeedID(need bool) {
-	for _, el := range els.elements {
-		el.setNeedID(need)
-	}
 }
 
 // Adds some classes to all underlying elements.

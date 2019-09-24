@@ -32,9 +32,8 @@ type element interface {
 	setStyle(name, value string)
 
 	// metadata
-	hasMeta(name string) bool
-	meta(name string) string
-	setMeta(name, value string)
+	meta(name string) bool
+	setMeta(name string, value bool)
 
 	// adding content
 	add(i interface{})
@@ -51,7 +50,6 @@ type element interface {
 	// parent
 	parent() element
 	setParent(parent element)
-	setNeedID(need bool)
 
 	// html generation
 	generate() HTML
@@ -61,7 +59,7 @@ type genericElement struct {
 	_tag          string                 // html tag
 	attrs         map[string]interface{} // html attributes
 	styles        map[string]string      // inline styles
-	metas         map[string]string      // metadata
+	metas         map[string]bool        // metadata
 	id            string                 // unique element identifier
 	typ           string                 // primary quiki class
 	classes       []string               // quiki user-defined classes
@@ -69,10 +67,6 @@ type genericElement struct {
 	parentElement element                // parent element, if any
 	cachedHTML    HTML                   // cached version
 	container     bool                   // true for container elements
-	needID        bool                   // true if we should include id
-	noTags        bool                   // if true, only generate inner HTML
-	noIndent      bool                   // if true, do not indent contents (for <pre>)
-	noClose       bool                   // if true, do not close (containers only)
 }
 
 func newElement(tag, typ string) element {
@@ -84,7 +78,7 @@ func newElement(tag, typ string) element {
 		container: true,
 		attrs:     make(map[string]interface{}),
 		styles:    make(map[string]string),
-		metas:     make(map[string]string),
+		metas:     make(map[string]bool),
 	}
 }
 
@@ -103,19 +97,17 @@ func (el *genericElement) elementType() string {
 	return el.typ
 }
 
-// true when a meta key is present on an element
-func (el *genericElement) hasMeta(name string) bool {
-	_, exist := el.metas[name]
-	return exist
-}
-
 // fetch string value for a meta
-func (el *genericElement) meta(name string) string {
+func (el *genericElement) meta(name string) bool {
 	return el.metas[name]
 }
 
 // set string value for a meta
-func (el *genericElement) setMeta(name, value string) {
+func (el *genericElement) setMeta(name string, value bool) {
+	if value == false {
+		delete(el.metas, name)
+		return
+	}
 	el.metas[name] = value
 }
 
@@ -235,11 +227,6 @@ func (el *genericElement) setParent(parent element) {
 	el.parentElement = parent // recursive!!
 }
 
-// set whether to include element's unique ID
-func (el *genericElement) setNeedID(need bool) {
-	el.needID = need
-}
-
 // add classes
 func (el *genericElement) addClasses(classes []string) {
 	el.classes = append(el.classes, classes...)
@@ -276,7 +263,7 @@ func (el *genericElement) generate() HTML {
 	}
 
 	// tags
-	if !el.noTags {
+	if !el.meta("noTags") {
 		generated = "<" + el._tag
 
 		// classes
@@ -297,7 +284,7 @@ func (el *genericElement) generate() HTML {
 		}
 
 		// inject ID
-		if el.needID {
+		if el.meta("needID") {
 			classes = append([]string{"q-" + el.id}, classes...)
 		}
 		if len(classes) != 0 {
@@ -343,14 +330,14 @@ func (el *genericElement) generate() HTML {
 		case element:
 			add = string(v.generate())
 		}
-		if !el.noIndent {
+		if !el.meta("noIndent") {
 			add = indent(add)
 		}
 		generated += add
 	}
 
 	// close it off
-	if !el.noTags && !el.noClose {
+	if !el.meta("noTags") && !el.meta("noClose") {
 		if generated[len(generated)-1] != '\n' {
 			generated += "\n"
 		}

@@ -21,6 +21,7 @@ type block interface {
 	invisible() bool                   // true for invisible blocks (generate no html)
 	visiblePosContent() []posContent   // visible text/blocks
 	blockContent() []block             // block children
+	textContent() []string             // text children
 	openPosition() position            // position opened at
 	warn(pos position, warning string) // produce parser warning
 	catch                              // all blocks must conform to catch
@@ -134,6 +135,16 @@ func (b *parserBlock) blockContent() []block {
 		}
 	}
 	return blocks
+}
+
+func (b *parserBlock) textContent() []string {
+	var text []string
+	for _, c := range b.content() {
+		if txt, ok := c.(string); ok {
+			text = append(text, txt)
+		}
+	}
+	return text
 }
 
 func (b *parserBlock) visiblePosContent() []posContent {

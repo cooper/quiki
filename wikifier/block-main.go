@@ -18,7 +18,7 @@ func (mb *mainBlock) html(page *Page, el element) {
 
 	// always include the ID so that element styles can refer to it
 	// (needed when more than 1 logical page is displayed in a browser window)
-	el.setNeedID(true)
+	el.setMeta("needID", true)
 
 	// iterate over visible content only
 	var contentToAdd []posContent

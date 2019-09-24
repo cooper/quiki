@@ -17,6 +17,7 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"infosec":   newInfosec,
 	"invisible": newInvisibleBlock,
 	"list":      newListBlock,
+	"code":      newCodeBlock,
 }
 
 func newBlock(blockType, blockName string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {

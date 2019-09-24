@@ -20,19 +20,23 @@ type Map struct {
 }
 
 type mapListEntry struct {
-	keyTitle string            // displayed key text
-	key      string            // actual underlying key
-	value    interface{}       // string, block, or mixed []interface{}
-	typ      valueType         // value type
-	pos      position          // position where the item started
-	metas    map[string]string // metadata
+	keyTitle string          // displayed key text
+	key      string          // actual underlying key
+	value    interface{}     // string, block, or mixed []interface{}
+	typ      valueType       // value type
+	pos      position        // position where the item started
+	metas    map[string]bool // metadata
 }
 
-func (entry *mapListEntry) setMeta(key, val string) {
+func (entry *mapListEntry) setMeta(key string, val bool) {
+	if val == false {
+		delete(entry.metas, key)
+		return
+	}
 	entry.metas[key] = val
 }
 
-func (entry *mapListEntry) meta(key string) string {
+func (entry *mapListEntry) meta(key string) bool {
 	return entry.metas[key]
 }
 

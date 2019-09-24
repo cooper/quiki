@@ -61,7 +61,7 @@ func (is *infosec) parse(page *Page) {
 // html converts the contents of the infosec to HTML elements.
 func (is *infosec) html(page *Page, els element) {
 	is.Map.html(page, nil)
-	els.setMeta("isInfosec", "1")
+	els.setMeta("isInfosec", true)
 
 	// not in an infobox{}
 	// FIXME: do not produce this warning if infosec{} is in a variable
@@ -74,7 +74,7 @@ func (is *infosec) html(page *Page, els element) {
 	if is.blockName() != "" {
 		is.mapList = append([]*mapListEntry{&mapListEntry{
 			key:   "_infosec_title_",
-			metas: map[string]string{"isTitle": "1"},
+			metas: map[string]bool{"isTitle": true},
 			value: page.parseFormattedTextOpts(is.blockName(), &formatterOptions{pos: is.openPosition()}),
 		}}, is.mapList...)
 	}
@@ -93,7 +93,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 	for i, entry := range pairs {
 
 		// if the value is from infosec{}, add each row
-		if els, ok := entry.value.(element); ok && els.meta("isInfosec") != "" {
+		if els, ok := entry.value.(element); ok && els.meta("isInfosec") {
 
 			// infosec do not need a key
 			if entry.keyTitle != "" {
@@ -114,7 +114,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 		var classes []string
 
 		// this is the title
-		isTitle := entry.meta("isTitle") != ""
+		isTitle := entry.meta("isTitle")
 		if isTitle {
 			classes = append(classes, "infosec-title")
 			hasTitle = true
@@ -126,7 +126,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 		}
 
 		// this is the last item in this infosec
-		b4infosec := hasNext && next.meta("isInfobox") != ""
+		b4infosec := hasNext && next.meta("isInfobox")
 		if !isTitle && (b4infosec || i == len(pairs)-1) {
 			classes = append(classes, "infosec-last")
 		}
