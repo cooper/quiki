@@ -4,20 +4,25 @@ import "log"
 
 // infobox{}
 
+// infobox{} displays a summary of information for an article.
+// Usually there is just one per article, and it occurs before the first section.
 type infobox struct {
 	*Map
 }
 
+// newInfobox creates an infobox given an underlying parser block.
 func newInfobox(name string, b *parserBlock) block {
 	b.typ = "infobox"
 	return &infobox{newMapBlock("", b).(*Map)}
 }
 
+// parse parses the infobox contents.
 func (ib *infobox) parse(page *Page) {
 	ib.Map.parse(page)
 	log.Println("infobox parse")
 }
 
+// html converts the contents of the infobox to HTML elements.
 func (ib *infobox) html(page *Page, el element) {
 	ib.Map.html(page, nil)
 	el.setTag("table")
@@ -35,24 +40,29 @@ func (ib *infobox) html(page *Page, el element) {
 
 // infosec{}
 
+// infosec{} allows you to organize an infobox{} into sections.
 type infosec struct {
 	*Map
 }
 
+// newInfosec creates an infosec{} given an underlying parser block.
 func newInfosec(name string, b *parserBlock) block {
 	b.typ = "infosec"
 	return &infosec{newMapBlock("", b).(*Map)}
 }
 
+// infosec{} yields multiple elements (table rows)
 func (is *infosec) multi() bool {
 	return true
 }
 
+// parse parses the infosec contents.
 func (is *infosec) parse(page *Page) {
 	is.Map.parse(page)
 	log.Println("infosec parse")
 }
 
+// html converts the contents of the infosec to HTML elements.
 func (is *infosec) html(page *Page, els element) {
 	is.Map.html(page, nil)
 	els.setMeta("isInfosec", "1")
@@ -78,7 +88,7 @@ func (is *infosec) html(page *Page, els element) {
 
 // INTERNALS
 
-// Appends each pair.
+// infoTableAddRows appends each pair.
 // Note that table might actually be an element collection.
 func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
 	log.Printf("adding rows: %+v", pairs)
@@ -132,7 +142,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 	}
 }
 
-// Adds a row.
+// infoTableAddRow adds a row.
 // Note that table might actually be an element collection.
 func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
 	log.Printf("adding row: %+v", entry)
