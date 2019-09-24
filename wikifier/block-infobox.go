@@ -1,7 +1,5 @@
 package wikifier
 
-import "log"
-
 // infobox{}
 
 // infobox{} displays a summary of information for an article.
@@ -19,7 +17,6 @@ func newInfobox(name string, b *parserBlock) block {
 // parse parses the infobox contents.
 func (ib *infobox) parse(page *Page) {
 	ib.Map.parse(page)
-	log.Println("infobox parse")
 }
 
 // html converts the contents of the infobox to HTML elements.
@@ -59,7 +56,6 @@ func (is *infosec) multi() bool {
 // parse parses the infosec contents.
 func (is *infosec) parse(page *Page) {
 	is.Map.parse(page)
-	log.Println("infosec parse")
 }
 
 // html converts the contents of the infosec to HTML elements.
@@ -91,8 +87,6 @@ func (is *infosec) html(page *Page, els element) {
 // infoTableAddRows appends each pair.
 // Note that table might actually be an element collection.
 func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
-	log.Printf("adding rows: %+v", pairs)
-
 	hasTitle := false
 
 	// add a row for each entry
@@ -145,7 +139,6 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 // infoTableAddRow adds a row.
 // Note that table might actually be an element collection.
 func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
-	log.Printf("adding row: %+v", entry)
 
 	// create the row
 	tr := table.createChild("tr", "infobox-pair")
