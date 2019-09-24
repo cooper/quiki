@@ -8,10 +8,10 @@ import (
 // Page represents a single page or article, generally associated with a .page file.
 // It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
-	FilePath string
-	VarsOnly bool
-	parser   *parser
-	main     block
+	FilePath string  // Path to the .page file
+	VarsOnly bool    // True if Parse() should only extract variables
+	parser   *parser // wikifier parser instance
+	main     block   // main block
 	*variableScope
 }
 

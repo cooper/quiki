@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// TODO: Make list comply to attributedObject but only accept integer keys
+// TODO: Make list comply to AttributedObject but only accept integer keys
 
 // List represents a list of items.
 // It is a quiki data type as well as the base of many block types.

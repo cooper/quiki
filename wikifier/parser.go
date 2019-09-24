@@ -376,7 +376,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			log.Printf("BOOLEAN VAR NAME: %v", p.varName)
 
 			// set the value
-			page.SetBool(p.varName, p.varNegated)
+			page.Set(p.varName, p.varNegated)
 
 			p.clearVariableState()
 			return p.nextByte(b)

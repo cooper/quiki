@@ -6,16 +6,21 @@ import (
 	"strings"
 )
 
-type attributedObject interface {
+// An AttributedObject is any object on which you can set and retrieve attributes.
+//
+// For example, a Page is an attributed object since it contains variables.
+// Likewise, a Map is an attributed object because it has named properties.
+//
+type AttributedObject interface {
+
+	// getters
 	Get(key string) (interface{}, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
-	GetObj(key string) (attributedObject, error)
+	GetObj(key string) (AttributedObject, error)
 
-	Set(key string, value interface{}) (interface{}, error)
-	SetBool(key string, value bool) error
-	SetStr(key, value string) error
-	SetObj(key string, value attributedObject) error
+	// setters
+	Set(key string, value interface{}) error
 
 	// internal use
 	mainBlock() block
@@ -27,6 +32,7 @@ type variableScope struct {
 	vars map[string]interface{}
 }
 
+// newVariableScope creates a variable scope
 func newVariableScope() *variableScope {
 	return &variableScope{make(map[string]interface{})}
 }
@@ -35,22 +41,27 @@ func (scope *variableScope) mainBlock() block {
 	return nil
 }
 
-func (scope *variableScope) Set(key string, value interface{}) (interface{}, error) {
-	var where attributedObject = scope
-	// my @parts   = split /\./, $var;
-	// my $setting = pop @parts;
+// Set sets a value at the given key.
+//
+// The key may be segmented to indicate properties of each object
+// (e.g. person.name).
+//
+// If attempting to write to a property of an object that does not
+// support properties, such as a string, Set returns an error.
+//
+func (scope *variableScope) Set(key string, value interface{}) error {
+	var where AttributedObject = scope
 
+	// split into parts
 	parts := strings.Split(key, ".")
 	setting, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
-	// while (length($var = shift @parts)) {
 	for _, name := range parts {
 
-		//     my ($new_where, $err) = _get_attr($where, $var);
-		//     return (undef, $err) if $err
+		// fetch the next object
 		newWhere, err := where.GetObj(name)
 		if err != nil {
-			return "", err
+			return err
 		}
 
 		// this location doesn't exist; make a new map
@@ -62,30 +73,23 @@ func (scope *variableScope) Set(key string, value interface{}) (interface{}, err
 		where = newWhere
 	}
 
+	// finally, set it on the last object
 	where.setOwn(setting, value)
-	return value, nil
-}
-
-func (scope *variableScope) SetBool(key string, value bool) error {
-	scope.vars[key] = value
 	return nil
 }
 
-func (scope *variableScope) SetStr(key, value string) error {
-	scope.vars[key] = value
-	return nil
-}
-
-func (scope *variableScope) SetObj(key string, value attributedObject) error {
-	scope.vars[key] = value
-	return nil
-}
-
-// fetch a variable regardless of type
-// only fails if attempting to fetch attributes on non attributed value
-// does not fail due to the absence of a value
+// Get fetches a a value regardless of type.
+//
+// The key may be segmented to indicate properties of each object
+// (e.g. person.name).
+//
+// If attempting to read a property of an object that does not
+// support properties, such as a string, Get returns an error.
+//
+// If the key is valid but nothing exists at it, Get returns (nil, nil).
+//
 func (scope *variableScope) Get(key string) (interface{}, error) {
-	var where attributedObject = scope
+	var where AttributedObject = scope
 
 	parts := strings.Split(key, ".")
 	setting, parts := parts[len(parts)-1], parts[:len(parts)-1]
@@ -107,8 +111,7 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 	return where.getOwn(setting), nil
 }
 
-// fetch the string value of a variable
-// fails only if a non-string value is present
+// GetStr is like Get except it always returns a string.
 func (scope *variableScope) GetStr(key string) (string, error) {
 	val, err := scope.Get(key)
 	if err != nil {
@@ -129,8 +132,7 @@ func (scope *variableScope) GetStr(key string) (string, error) {
 	return "", errors.New("not a string")
 }
 
-// fetch the string value of a variable
-// fails only if a non-bool value is present
+// GetBool is like Get except it always returns a boolean.
 func (scope *variableScope) GetBool(key string) (bool, error) {
 	val, err := scope.Get(key)
 	if err != nil {
@@ -151,9 +153,8 @@ func (scope *variableScope) GetBool(key string) (bool, error) {
 	return false, errors.New("not a boolean")
 }
 
-// fetch the object value of a variable
-// fails only if a non-object value is present
-func (scope *variableScope) GetObj(key string) (attributedObject, error) {
+// GetObj is like Get except it always returns an AttributedObject.
+func (scope *variableScope) GetObj(key string) (AttributedObject, error) {
 	obj, err := scope.Get(key)
 	if err != nil {
 		return nil, err
@@ -164,8 +165,8 @@ func (scope *variableScope) GetObj(key string) (attributedObject, error) {
 		return nil, nil
 	}
 
-	// something is here, so it best be an attributedObject
-	if aObj, ok := obj.(attributedObject); ok {
+	// something is here, so it best be an AttributedObject
+	if aObj, ok := obj.(AttributedObject); ok {
 		return aObj, nil
 	}
 
@@ -175,10 +176,12 @@ func (scope *variableScope) GetObj(key string) (attributedObject, error) {
 
 // INTERNAL
 
+// set own property
 func (scope *variableScope) setOwn(key string, value interface{}) {
 	scope.vars[key] = value
 }
 
+// fetch own property
 func (scope *variableScope) getOwn(key string) interface{} {
 	if val, exist := scope.vars[key]; exist {
 		return val
