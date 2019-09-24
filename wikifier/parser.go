@@ -604,6 +604,11 @@ func (p *parser) getConditional(page *Page, condition string) bool {
 		p.warn("Conditional has no condition")
 	}
 
+	// negated
+	if condition[0] == '!' {
+		return !p.getConditional(page, condition[1:])
+	}
+
 	// looks like a variable
 	if condition[0] == '@' {
 
