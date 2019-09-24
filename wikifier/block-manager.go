@@ -16,7 +16,7 @@ func newBlock(blockType, blockName string, blockClasses []string, parentBlock bl
 		parentC:      parentCatch,
 		typ:          blockType,
 		name:         blockName,
-		classes:      blockClasses,
+		classes:      blockClasses, // TODO: add them to the element with prefix qc-
 		element:      newElement("div", blockType),
 		genericCatch: &genericCatch{},
 	}

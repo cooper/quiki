@@ -29,6 +29,11 @@ func (els *elements) setTag(tag string) {
 	}
 }
 
+// Returns "elements" as the type of element.
+func (els *elements) elementType() string {
+	return "elements"
+}
+
 // Reports whether a metadata key is present in this collection.
 func (els *elements) hasMeta(name string) bool {
 	_, exist := els.metas[name]

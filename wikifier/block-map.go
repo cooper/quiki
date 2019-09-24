@@ -167,9 +167,10 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 				m.warn(p.pos, "Standalone text should be prefixed with ':")
 			}
 
+			p.values = append(p.values, p.key)
 			strKey = "anon_" + strconv.Itoa(i)
 			p.key = strKey
-			p.values = append(p.values, p.key)
+
 			// no keyTitle
 
 		} else {
@@ -320,7 +321,9 @@ func (m *Map) warnMaybe(p *mapParser) {
 }
 
 func (m *Map) html(page *Page, el element) {
-
+	for i, entry := range m.mapList {
+		m.mapList[i].value = prepareForHTML(entry.value, page, entry.pos)
+	}
 }
 
 func (m *Map) MainBlock() block {

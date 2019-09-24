@@ -12,9 +12,10 @@ type Html string
 
 type element interface {
 
-	// tag
+	// tag/type
 	tag() string
 	setTag(tag string)
+	elementType() string
 
 	// attributes
 	hasAttr(name string) bool
@@ -93,6 +94,11 @@ func (el *genericElement) tag() string {
 // set the tag
 func (el *genericElement) setTag(tag string) {
 	el._tag = tag
+}
+
+// fetch type
+func (el *genericElement) elementType() string {
+	return el.typ
 }
 
 // true when a meta key is present on an element
@@ -188,8 +194,10 @@ func (el *genericElement) add(i interface{}) {
 		for _, val := range v {
 			el.add(val)
 		}
+	case block:
+		panic("add() block " + v.blockType() + "{} to element " + el.elementType())
 	default:
-		panic("add() unknown type to element")
+		panic("add() unknown type to element " + el.elementType())
 	}
 }
 
@@ -273,7 +281,7 @@ func (el *genericElement) generate() Html {
 		classes := make([]string, len(el.classes)+1)
 		classes[0] = "q-" + el.typ
 		for i, name := range el.classes {
-			classes[i+1] = "qc-" + name
+			classes[i+1] = "q-" + name
 		}
 
 		// inject ID
@@ -329,6 +337,9 @@ func (el *genericElement) generate() Html {
 
 	// close it off
 	if !el.noTags && !el.noClose {
+		if generated[len(generated)-1] != '\n' {
+			generated += "\n"
+		}
 		generated += "</" + el._tag + ">\n"
 	}
 

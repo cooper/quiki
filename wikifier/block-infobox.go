@@ -1,5 +1,7 @@
 package wikifier
 
+import "log"
+
 type infobox struct {
 	*Map
 }
@@ -11,6 +13,7 @@ func newInfobox(name string, b *parserBlock) block {
 
 func (ib *infobox) parse(page *Page) {
 	ib.Map.parse(page)
+	log.Println("infobox parse")
 }
 
 func (ib *infobox) html(page *Page, el element) {
@@ -31,6 +34,8 @@ func (ib *infobox) html(page *Page, el element) {
 // Appends each pair.
 // Note that table might actually be an element collection.
 func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
+	log.Printf("adding rows: %+v", pairs)
+
 	hasTitle := false
 
 	// add a row for each entry
@@ -82,6 +87,7 @@ func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []
 // Adds a row.
 // Note that table might actually be an element collection.
 func infoboxTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
+	log.Printf("adding row: %+v", entry)
 
 	// create the row
 	tr := table.createChild("tr", "infobox-pair")

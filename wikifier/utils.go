@@ -17,6 +17,9 @@ const (
 	valueTypeMixed                 // []interface{} with a mixture of these
 )
 
+// Returns a quiki valueType, given a value. Accepted types are string,
+// block, Html, element, or an []interface{} with mixed types.
+// If i is none of these, returns -1.
 func getValueType(i interface{}) valueType {
 	switch i.(type) {
 	case string:
@@ -32,6 +35,29 @@ func getValueType(i interface{}) valueType {
 	default:
 		return -1
 	}
+}
+
+// Prepares a quiki value for representation as HTML.
+//
+// Strings are formatted with quiki's text formatter.
+// Blocks are converted to elements.
+// Preformatted HTML is left as-is.
+//
+func prepareForHTML(value interface{}, page *Page, pos position) interface{} {
+	switch v := value.(type) {
+	case string:
+		value = page.parseFormattedTextOpts(v, &formatterOptions{pos: pos})
+	case block:
+		v.html(page, v.el())
+		value = v.el()
+	case []interface{}:
+		newValues := make([]interface{}, len(v))
+		for idx, val := range v {
+			newValues[idx] = prepareForHTML(val, page, pos)
+		}
+		value = newValues
+	}
+	return value
 }
 
 func pageNameLink(s string) string {
@@ -71,7 +97,11 @@ func humanReadableValue(i interface{}) string {
 	case block:
 		return v.String()
 
-		// something else
+	// element
+	case element:
+		return "<" + v.tag() + ">..."
+
+	// something else
 	default:
 		return fmt.Sprintf("%v", v)
 	}

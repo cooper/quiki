@@ -9,7 +9,9 @@ func newMainBlock(name string, b *parserBlock) block {
 }
 
 func (mb *mainBlock) parse(page *Page) {
-
+	for _, block := range mb.blockContent() {
+		block.parse(page)
+	}
 }
 
 func (mb *mainBlock) html(page *Page, el element) {
