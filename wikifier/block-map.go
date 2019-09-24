@@ -217,7 +217,6 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 		}
 
 		// store the value in the underlying variableScope
-		// FIXME: Set() needs to accept interface{}{[]interface{}} (list of values)
 		m.Set(strKey, valueToStore)
 
 		// store the value in the map list

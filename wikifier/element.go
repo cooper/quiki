@@ -288,7 +288,12 @@ func (el *genericElement) generate() HTML {
 			classes[0] = "q-" + el.typ
 		}
 		for i, name := range el.classes {
-			classes[i+1] = "q-" + name
+			if name[0] == '!' {
+				name = name[1:]
+				classes[i+1] = name
+			} else {
+				classes[i+1] = "q-" + name
+			}
 		}
 
 		// inject ID
