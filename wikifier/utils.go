@@ -18,7 +18,7 @@ const (
 )
 
 // Returns a quiki valueType, given a value. Accepted types are string,
-// block, Html, element, or an []interface{} with mixed types.
+// block, HTML, element, or an []interface{} with mixed types.
 // If i is none of these, returns -1.
 func getValueType(i interface{}) valueType {
 	switch i.(type) {
@@ -26,7 +26,7 @@ func getValueType(i interface{}) valueType {
 		return valueTypeString
 	case block:
 		return valueTypeBlock
-	case Html:
+	case HTML:
 		return valueTypeHTML
 	case element:
 		return valueTypeElement

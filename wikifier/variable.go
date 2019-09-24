@@ -7,8 +7,6 @@ import (
 )
 
 type attributedObject interface {
-	MainBlock() block
-
 	Get(key string) (interface{}, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
@@ -20,6 +18,7 @@ type attributedObject interface {
 	SetObj(key string, value attributedObject) error
 
 	// internal use
+	mainBlock() block
 	setOwn(key string, value interface{})
 	getOwn(key string) interface{}
 }
@@ -32,7 +31,7 @@ func newVariableScope() *variableScope {
 	return &variableScope{make(map[string]interface{})}
 }
 
-func (scope *variableScope) MainBlock() block {
+func (scope *variableScope) mainBlock() block {
 	return nil
 }
 
@@ -56,7 +55,7 @@ func (scope *variableScope) Set(key string, value interface{}) (interface{}, err
 
 		// this location doesn't exist; make a new map
 		if newWhere == nil {
-			newWhere = NewMap(where.MainBlock())
+			newWhere = NewMap(where.mainBlock())
 			// TODO: maybe somehow include some positioning info here?
 		}
 

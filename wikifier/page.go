@@ -55,7 +55,7 @@ func (p *Page) resetParseState() {
 	p.parser = nil
 }
 
-func (p *Page) HTML() Html {
+func (p *Page) HTML() HTML {
 	// TODO: cache and then recursively destroy elements
 	return generateBlock(p.main, p)
 }

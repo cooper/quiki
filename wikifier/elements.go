@@ -6,7 +6,7 @@ import "log"
 type elements struct {
 	elements      []element
 	metas         map[string]string
-	cachedHTML    Html
+	cachedHTML    HTML
 	parentElement element
 }
 
@@ -112,7 +112,7 @@ func (els *elements) addText(s string) {
 }
 
 // Panics. Cannot add raw HTML to a collection of elements.
-func (els *elements) addHtml(h Html) {
+func (els *elements) addHTML(h HTML) {
 	panic("unimplemented")
 }
 
@@ -171,7 +171,7 @@ func (els *elements) removeClass(class string) bool {
 }
 
 // Generates and returns HTML for the elements.
-func (els *elements) generate() Html {
+func (els *elements) generate() HTML {
 	generated := ""
 
 	// cached version
@@ -184,7 +184,7 @@ func (els *elements) generate() Html {
 		generated += string(el.generate())
 	}
 
-	els.cachedHTML = Html(generated)
+	els.cachedHTML = HTML(generated)
 	log.Println("GENERATED ELEMENTS:", els.cachedHTML)
 	return els.cachedHTML
 }

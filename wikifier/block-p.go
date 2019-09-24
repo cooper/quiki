@@ -39,7 +39,7 @@ func (p *pBlock) html(page *Page, el element) {
 				continue
 			}
 
-			el.addHtml(Html(item))
+			el.addHTML(HTML(item))
 
 		default:
 			panic("not sure how to handle this content")

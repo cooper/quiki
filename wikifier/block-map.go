@@ -11,6 +11,8 @@ import (
 var keyNormalizer = regexp.MustCompile(`\W`)
 var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
 
+// Map represents a Key-value dictionary.
+// It is a quiki data type as well as the base of many block types.
 type Map struct {
 	mapList []*mapListEntry
 	*parserBlock
@@ -48,7 +50,7 @@ type mapParser struct {
 	appendedKey   interface{}
 }
 
-// Creates a new map, given the main block of the page it is to be associated with.
+// NewMap creates a new map, given the main block of the page it is to be associated with.
 func NewMap(mb block) *Map {
 	underlying := &parserBlock{
 		openPos:      position{0, 0}, // FIXME
@@ -326,7 +328,7 @@ func (m *Map) html(page *Page, el element) {
 	}
 }
 
-func (m *Map) MainBlock() block {
+func (m *Map) mainBlock() block {
 	var b block = m
 	for b.parentBlock() != nil {
 		b = b.parentBlock()

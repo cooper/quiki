@@ -26,7 +26,7 @@ func (ib *infobox) html(page *Page, el element) {
 	if ib.name != "" {
 		th := el.createChild("tr", "infobox-title").createChild("th", "")
 		th.setAttr("colspan", "2")
-		th.addHtml(page.parseFormattedTextOpts(ib.name, &formatterOptions{pos: ib.openPos}))
+		th.addHTML(page.parseFormattedTextOpts(ib.name, &formatterOptions{pos: ib.openPos}))
 	}
 
 	// add the rows

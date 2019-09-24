@@ -1,13 +1,14 @@
 package wikifier
 
 var blockInitializers = map[string]func(name string, b *parserBlock) block{
-	"main":    newMainBlock,
-	"clear":   newClearBlock,
-	"sec":     newSecBlock,
-	"p":       newPBlock,
-	"map":     newMapBlock,
-	"infobox": newInfobox,
-	"infosec": newInfosec,
+	"main":      newMainBlock,
+	"clear":     newClearBlock,
+	"sec":       newSecBlock,
+	"p":         newPBlock,
+	"map":       newMapBlock,
+	"infobox":   newInfobox,
+	"infosec":   newInfosec,
+	"invisible": newInvisibleBlock,
 }
 
 func newBlock(blockType, blockName string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {
@@ -34,7 +35,7 @@ func newBlock(blockType, blockName string, blockClasses []string, parentBlock bl
 	return newUnknownBlock(blockName, underlying)
 }
 
-func generateBlock(b block, page *Page) Html {
+func generateBlock(b block, page *Page) HTML {
 	b.html(page, b.el()) // FIXME: actual page
 	return b.el().generate()
 }

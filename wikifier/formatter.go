@@ -199,11 +199,11 @@ type formatterOptions struct {
 	startPos    position // set internally to position of '['
 }
 
-func (page *Page) parseFormattedText(text string) Html {
+func (page *Page) parseFormattedText(text string) HTML {
 	return page.parseFormattedTextOpts(text, &formatterOptions{})
 }
 
-func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Html {
+func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -242,7 +242,7 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Ht
 				// store the string we have so far
 				if str != "" {
 					if opts.noEntities {
-						items = append(items, Html(str))
+						items = append(items, HTML(str))
 					} else {
 						items = append(items, str)
 					}
@@ -279,7 +279,7 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Ht
 	// add the final string
 	if str != "" {
 		if opts.noEntities {
-			items = append(items, Html(str))
+			items = append(items, HTML(str))
 		} else {
 			items = append(items, str)
 		}
@@ -295,19 +295,19 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) Ht
 		switch v := piece.(type) {
 		case string:
 			final += htmlfmt.EscapeString(v)
-		case Html:
+		case HTML:
 			final += string(v)
 		}
 	}
 
-	return Html(final)
+	return HTML(final)
 }
 
-func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Html {
+func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTML {
 
 	// static format
 	if format, exists := staticFormats[formatType]; exists {
-		return Html(format)
+		return HTML(format)
 	}
 
 	// variable
@@ -315,13 +315,13 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Htm
 		if variableRegex.MatchString(formatType) {
 			// TODO: fetch the variable, warn if it is undef, format text if %var
 			// then return the value
-			return Html("(null)")
+			return HTML("(null)")
 		}
 	}
 
 	// # html entity.
 	if formatType[0] == '&' {
-		return Html("&" + formatType[1:] + ";")
+		return HTML("&" + formatType[1:] + ";")
 	}
 
 	// # deprecated: a link in the form of [~link~], [!link!], or [$link$]
@@ -364,7 +364,7 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Htm
 		if !displaySame {
 			display = string(page.parseFormattedText(display))
 		}
-		return Html(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
+		return HTML(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,
 			invalid,
 			target,
@@ -382,12 +382,12 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Htm
 
 	// color name
 	if color, exists := colors[strings.ToLower(formatType)]; exists {
-		return Html(`<span style="color: "` + color + `";">`)
+		return HTML(`<span style="color: "` + color + `";">`)
 	}
 
 	// color hex code
 	if colorRegex.MatchString(formatType) {
-		return Html(`<span style="color: "` + formatType + `";">`)
+		return HTML(`<span style="color: "` + formatType + `";">`)
 	}
 
 	// TODO: real references.
@@ -395,7 +395,7 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) Htm
 	//     return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type" class="wiki-ref-anchor">[$type]</a></sup>};
 	// }
 
-	return Html("")
+	return HTML("")
 }
 
 func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {

@@ -8,7 +8,9 @@ import (
 
 var identifiers = make(map[string]int)
 
-type Html string
+// HTML encapsulates a string to indicate that it is preformatted HTML.
+// It lets quiki's parsers know not to attempt to format it any further.
+type HTML string
 
 type element interface {
 
@@ -37,7 +39,7 @@ type element interface {
 	// adding content
 	add(i interface{})
 	addText(s string)
-	addHtml(h Html)
+	addHTML(h HTML)
 	addChild(child element)
 	createChild(tag, typ string) element
 
@@ -52,7 +54,7 @@ type element interface {
 	setNeedID(need bool)
 
 	// html generation
-	generate() Html
+	generate() HTML
 }
 
 type genericElement struct {
@@ -65,7 +67,7 @@ type genericElement struct {
 	classes       []string               // quiki user-defined classes
 	content       []interface{}          // mixed text and child elements
 	parentElement element                // parent element, if any
-	cachedHTML    Html                   // cached version
+	cachedHTML    HTML                   // cached version
 	container     bool                   // true for container elements
 	needID        bool                   // true if we should include id
 	noTags        bool                   // if true, only generate inner HTML
@@ -186,8 +188,8 @@ func (el *genericElement) add(i interface{}) {
 	switch v := i.(type) {
 	case string:
 		el.addText(v)
-	case Html:
-		el.addHtml(v)
+	case HTML:
+		el.addHTML(v)
 	case element:
 		el.addChild(v)
 	case []interface{}:
@@ -207,7 +209,7 @@ func (el *genericElement) addText(s string) {
 }
 
 // add inner html
-func (el *genericElement) addHtml(h Html) {
+func (el *genericElement) addHTML(h HTML) {
 	el.content = append(el.content, h)
 }
 
@@ -259,7 +261,7 @@ func (el *genericElement) removeClass(class string) bool {
 	return false
 }
 
-func (el *genericElement) generate() Html {
+func (el *genericElement) generate() HTML {
 	generated := ""
 
 	// cached version
@@ -320,8 +322,8 @@ func (el *genericElement) generate() Html {
 	// non-container
 	if !el.container {
 		generated += " />\n"
-		el.cachedHTML = Html(generated)
-		return Html(generated)
+		el.cachedHTML = HTML(generated)
+		return HTML(generated)
 	}
 
 	// inner content
@@ -329,7 +331,7 @@ func (el *genericElement) generate() Html {
 	for _, textOrEl := range el.content {
 		add := ""
 		switch v := textOrEl.(type) {
-		case Html:
+		case HTML:
 			add = string(v)
 		case string:
 			add = htmlfmt.EscapeString(v)
@@ -350,7 +352,7 @@ func (el *genericElement) generate() Html {
 		generated += "</" + el._tag + ">\n"
 	}
 
-	el.cachedHTML = Html(generated)
+	el.cachedHTML = HTML(generated)
 	return el.cachedHTML
 }
 
