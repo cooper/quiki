@@ -2,6 +2,8 @@ package wikifier
 
 import "log"
 
+// infobox{}
+
 type infobox struct {
 	*Map
 }
@@ -28,12 +30,57 @@ func (ib *infobox) html(page *Page, el element) {
 	}
 
 	// add the rows
-	infoboxTableAddRows(ib, el, page, ib.mapList)
+	infoTableAddRows(ib, el, page, ib.mapList)
 }
+
+// infosec{}
+
+type infosec struct {
+	*Map
+}
+
+func newInfosec(name string, b *parserBlock) block {
+	b.typ = "infosec"
+	return &infosec{newMapBlock("", b).(*Map)}
+}
+
+func (is *infosec) multi() bool {
+	return true
+}
+
+func (is *infosec) parse(page *Page) {
+	is.Map.parse(page)
+	log.Println("infosec parse")
+}
+
+func (is *infosec) html(page *Page, els element) {
+	is.Map.html(page, nil)
+	els.setMeta("isInfosec", "1")
+
+	// not in an infobox{}
+	// FIXME: do not produce this warning if infosec{} is in a variable
+	if is.parentBlock().blockType() != "infobox" {
+		is.warn(is.openPosition(), "infosec{} outside of infobox{} does nothing")
+		return
+	}
+
+	// inject the title
+	if is.blockName() != "" {
+		is.mapList = append([]*mapListEntry{&mapListEntry{
+			key:   "_infosec_title_",
+			metas: map[string]string{"isTitle": "1"},
+			value: page.parseFormattedTextOpts(is.blockName(), &formatterOptions{pos: is.openPosition()}),
+		}}, is.mapList...)
+	}
+
+	infoTableAddRows(is, els, page, is.mapList)
+}
+
+// INTERNALS
 
 // Appends each pair.
 // Note that table might actually be an element collection.
-func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
+func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
 	log.Printf("adding rows: %+v", pairs)
 
 	hasTitle := false
@@ -42,7 +89,7 @@ func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []
 	for i, entry := range pairs {
 
 		// if the value is from infosec{}, add each row
-		if els, ok := entry.value.(element); ok && entry.meta("infosec") != "" {
+		if els, ok := entry.value.(element); ok && els.meta("infosec") != "" {
 
 			// infosec do not need a key
 			if entry.keyTitle != "" {
@@ -80,13 +127,13 @@ func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []
 		}
 
 		// not an infosec{}; this is a top-level pair
-		infoboxTableAddRow(infoboxOrSec, table, entry, classes)
+		infoTableAddRow(infoboxOrSec, table, entry, classes)
 	}
 }
 
 // Adds a row.
 // Note that table might actually be an element collection.
-func infoboxTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
+func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
 	log.Printf("adding row: %+v", entry)
 
 	// create the row

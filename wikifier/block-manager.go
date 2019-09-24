@@ -21,7 +21,14 @@ func newBlock(blockType, blockName string, blockClasses []string, parentBlock bl
 		genericCatch: &genericCatch{},
 	}
 	if init, ok := blockInitializers[blockType]; ok {
-		return init(blockName, underlying)
+		b := init(blockName, underlying)
+
+		// multi
+		if b.multi() {
+			underlying.element = newElements(nil)
+		}
+
+		return b
 	}
 	return newUnknownBlock(blockName, underlying)
 }

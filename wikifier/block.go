@@ -8,6 +8,7 @@ import (
 
 type block interface {
 	String() string                    // description
+	multi() bool                       // true when block produces multiple elements
 	el() element                       // returns the html element
 	parse(page *Page)                  // parse contents
 	html(page *Page, el element)       // generate html element
@@ -42,6 +43,10 @@ func (b *parserBlock) parse(page *Page) {
 	for _, child := range b.blockContent() {
 		child.parse(page)
 	}
+}
+
+func (b *parserBlock) multi() bool {
+	return false
 }
 
 func (b *parserBlock) el() element {
