@@ -33,20 +33,16 @@ func (sec *secBlock) html(page *Page, el element) {
 			el.addChild(item.el())
 
 		case string:
-			// trim the text and increment the line number appropriately
-			lines := 0
-			item = strings.TrimLeftFunc(item, func(r rune) bool {
-				if r == '\n' {
-					lines++
-					return true
-				}
-				return r == ' ' || r == '\t'
-			})
+
+			// if this is an empty line, create a new paragraph
 			item = strings.TrimSpace(item)
 			if item == "" {
+				sec.createParagraph(page, el, contentToAdd)
+				contentToAdd = nil
 				continue
 			}
-			pc.position.line += lines
+
+			// otherwise, add it to the buffer
 			contentToAdd = append(contentToAdd, pc)
 
 		default:
