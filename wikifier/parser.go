@@ -274,6 +274,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	if b == '}' {
 		// closes a block
+		accepting := p.catch.parentCatch()
 
 		// this is escaped
 		if p.escape {
@@ -285,8 +286,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			return errors.New("Attempted to close main block")
 		}
 
-		var addContent interface{}
-
 		// if{}, elsif{}, else{}, {@vars}
 		switch p.block.blockType() {
 
@@ -296,8 +295,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			p.conditionalExists = true
 			p.conditional = p.getConditional(page, p.block.blockName())
 			if p.conditional {
-				//     @add_contents = $c->content if $c->{conditional};
-
+				accepting.appendContents(p.block.posContent())
 			}
 
 		// elsif [condition] { ... }
@@ -312,7 +310,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			if !p.conditional {
 				p.conditional = p.getConditional(page, p.block.blockName())
 				if p.conditional {
-					//     @add_contents = $c->content if $c->{conditional};
+					accepting.appendContents(p.block.posContent())
 				}
 			}
 
@@ -331,7 +329,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// the condition was false. add the contents of the else.
 			if !p.conditional {
-				//     @add_contents = $c->content unless delete $c->{conditional};
+				accepting.appendContents(p.block.posContent())
 			}
 
 			// reset the conditional
@@ -368,16 +366,13 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			// FIXME: this is disabled for now because it causes problems when
 			// there are blocks inside of else{}
 			// p.conditionalExists = false
-			addContent = p.block
+			accepting.appendContent(p.block, p.pos)
 		}
 
 		// close the block
 		p.block.close(p.pos)
-
-		// clear the catch
 		p.block = p.block.parentBlock()
 		p.catch = p.catch.parentCatch()
-		p.catch.appendContent(addContent, p.pos)
 
 		return p.nextByte(b)
 	}
@@ -461,7 +456,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			log.Printf("BOOLEAN VAR NAME: %v", p.varName)
 
 			// set the value
-			page.Set(p.varName, p.varNegated)
+			page.Set(p.varName, !p.varNegated)
 
 			p.clearVariableState()
 			return p.nextByte(b)
@@ -501,6 +496,9 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				// their own children manually
 				val.parse(page)
 				log.Println("Got var block:", val)
+
+			case nil:
+				return fmt.Errorf("There's nothing here!")
 
 			default:
 				return fmt.Errorf("Not sure what to do with: %v", val)
@@ -600,12 +598,48 @@ func (p *parser) nextByte(b byte) error {
 }
 
 func (p *parser) getConditional(page *Page, condition string) bool {
+
+	// no condition
+	if condition == "" {
+		p.warn("Conditional has no condition")
+	}
+
+	// looks like a variable
+	if condition[0] == '@' {
+
+		// check boolean first
+		b, err1 := page.GetBool(condition[1:])
+
+		// possibly just says this is not a boolean
+		if err1 != nil {
+
+			// try a generic lookup
+			v, err2 := page.Get(condition[1:])
+
+			// still error? this is something serious
+			if err2 != nil {
+				p.warn(err2.Error())
+				return false
+			}
+
+			// something's there
+			return v != nil
+		}
+
+		return b
+	}
+
+	// something else
+	p.warn("Invalid condition; expected variable or attribute")
 	return false
-	// TODO
 }
 
 func (p *parser) clearVariableState() {
 	p.varName = ""
 	p.varNotInterpolated = false
 	p.varNegated = false
+}
+
+func (p *parser) warn(warning string) {
+	log.Printf("WARNING: at %v: %s", p.pos, warning)
 }
