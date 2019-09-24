@@ -89,7 +89,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 	for i, entry := range pairs {
 
 		// if the value is from infosec{}, add each row
-		if els, ok := entry.value.(element); ok && els.meta("infosec") != "" {
+		if els, ok := entry.value.(element); ok && els.meta("isInfosec") != "" {
 
 			// infosec do not need a key
 			if entry.keyTitle != "" {
@@ -97,6 +97,7 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 			}
 
 			table.addChild(els)
+			continue
 		}
 
 		// determine next entry

@@ -1,5 +1,7 @@
 package wikifier
 
+import "log"
+
 // A collection of elements.
 type elements struct {
 	elements      []element
@@ -183,5 +185,6 @@ func (els *elements) generate() Html {
 	}
 
 	els.cachedHTML = Html(generated)
+	log.Println("GENERATED ELEMENTS:", els.cachedHTML)
 	return els.cachedHTML
 }

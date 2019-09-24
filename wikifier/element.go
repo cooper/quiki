@@ -278,8 +278,13 @@ func (el *genericElement) generate() Html {
 		generated = "<" + el._tag
 
 		// classes
-		classes := make([]string, len(el.classes)+1)
-		classes[0] = "q-" + el.typ
+		var classes []string
+		if el.typ == "" {
+			classes = make([]string, len(el.classes))
+		} else {
+			classes = make([]string, len(el.classes)+1)
+			classes[0] = "q-" + el.typ
+		}
 		for i, name := range el.classes {
 			classes[i+1] = "q-" + name
 		}
@@ -288,7 +293,9 @@ func (el *genericElement) generate() Html {
 		if el.needID {
 			classes = append([]string{"q-" + el.id}, classes...)
 		}
-		generated += ` class="` + strings.Join(classes, " ") + `"`
+		if len(classes) != 0 {
+			generated += ` class="` + strings.Join(classes, " ") + `"`
+		}
 
 		// styles
 		styles := ""
@@ -326,7 +333,7 @@ func (el *genericElement) generate() Html {
 			add = string(v)
 		case string:
 			add = htmlfmt.EscapeString(v)
-		case *genericElement:
+		case element:
 			add = string(v.generate())
 		}
 		if !el.noIndent {
