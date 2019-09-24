@@ -5,12 +5,13 @@ import (
 	"strings"
 )
 
+// TODO: Make list comply to attributedObject but only accept integer keys
+
 // List represents a list of items.
 // It is a quiki data type as well as the base of many block types.
 type List struct {
 	list []*listEntry
 	*parserBlock
-	*variableScope
 }
 
 type listEntry struct {
@@ -45,11 +46,11 @@ func NewList(mb block) *List {
 		element:      newElement("div", "list"),
 		genericCatch: &genericCatch{},
 	}
-	return &List{nil, underlying, newVariableScope()}
+	return &List{nil, underlying}
 }
 
 func newListBlock(name string, b *parserBlock) block {
-	return &List{nil, b, newVariableScope()}
+	return &List{nil, b}
 }
 
 func (l *List) parse(page *Page) {
