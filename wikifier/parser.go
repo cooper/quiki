@@ -27,6 +27,9 @@ type parser struct {
 	varName            string
 	varNotInterpolated bool
 	varNegated         bool
+
+	conditional       bool // current conditional
+	conditionalExists bool
 }
 
 type position struct {
@@ -284,11 +287,87 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		var addContent interface{}
 
-		// TODO: if/elsif/else statements, {@vars}
-		if false {
+		// if{}, elsif{}, else{}, {@vars}
+		switch p.block.blockType() {
 
-		} else {
-			// normal block. add the block itself
+		// if [condition] { ... }
+		case "if":
+
+			p.conditionalExists = true
+			p.conditional = p.getConditional(page, p.block.blockName())
+			if p.conditional {
+				//     @add_contents = $c->content if $c->{conditional};
+
+			}
+
+		// elsif [condition] { ... }
+		case "elsif":
+
+			// no conditional exists before this
+			if !p.conditionalExists {
+				return errors.New("Unexpected elsif{}")
+			}
+
+			// only evaluate the conditional if the last one was false
+			if !p.conditional {
+				p.conditional = p.getConditional(page, p.block.blockName())
+				if p.conditional {
+					//     @add_contents = $c->content if $c->{conditional};
+				}
+			}
+
+		// else { ... }
+		case "else":
+
+			// no conditional exists before this
+			if !p.conditionalExists {
+				return errors.New("Unexpected elsif{}")
+			}
+
+			// title provided
+			if p.block.blockName() != "" {
+				p.block.warn(p.pos, "Conditional on else{} ignored")
+			}
+
+			// the condition was false. add the contents of the else.
+			if !p.conditional {
+				//     @add_contents = $c->content unless delete $c->{conditional};
+			}
+
+			// reset the conditional
+			p.conditionalExists = false
+
+		case "variable":
+
+			//     # the variable name may be the block's content.
+			//     # clear the content and set the block name to the variable name
+			//     my $var = length $c->block->name ? $c->block->name : do {
+			//         my $last = $c->last_content;
+			//         $c->clear_content;
+			//         $c->block->{name} = $last;
+			//         $last;
+			//     };
+
+			//     # find the block; make sure it's a block
+			//     my $block = $page->get($var);
+			//     if (!$block) {
+			//         return $c->error("Variable block \@$var does not exist");
+			//     }
+			//     elsif (!blessed $block || !$block->isa('Wikifier::Block')) {
+			//         return $c->error("Variable \@$var does not contain a block");
+			//     }
+
+			//     # overwrite the block's parent to the parent of the variable{} block
+			//     $block->{parent} = $c->block->parent;
+
+			//     # add the block we got from the variable
+			//     @add_contents = $block;
+
+		// normal block. add the block itself
+		default:
+			// FIXME: this is disabled for now because it causes problems when
+			// there are blocks inside of else{}
+			// p.conditionalExists = false
 			addContent = p.block
 		}
 
@@ -518,6 +597,11 @@ func (p *parser) nextByte(b byte) error {
 	}
 
 	return nil
+}
+
+func (p *parser) getConditional(page *Page, condition string) bool {
+	return false
+	// TODO
 }
 
 func (p *parser) clearVariableState() {
