@@ -1,5 +1,12 @@
 package wikifier
 
+var blockAliases = map[string]string{
+	"section":   "sec",
+	"paragraph": "p",
+	"hash":      "map",
+	"format":    "fmt",
+}
+
 var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"main":      newMainBlock,
 	"clear":     newClearBlock,
@@ -12,6 +19,9 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 }
 
 func newBlock(blockType, blockName string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {
+	if alias, exist := blockAliases[blockType]; exist {
+		blockType = alias
+	}
 	underlying := &parserBlock{
 		openPos:      pos,
 		parentB:      parentBlock,
