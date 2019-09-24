@@ -13,6 +13,7 @@ type block interface {
 	parse(page *Page)                  // parse contents
 	html(page *Page, el element)       // generate html element
 	parentBlock() block                // parent block
+	setParentBlock(p block)            // set parent block
 	blockType() string                 // block type
 	blockName() string                 // block name, if any
 	close(pos position)                // closes the block at the given position
@@ -62,6 +63,10 @@ func (b *parserBlock) openPosition() position {
 
 func (b *parserBlock) parentBlock() block {
 	return b.parentB
+}
+
+func (b *parserBlock) setParentBlock(p block) {
+	b.parentB = p
 }
 
 func (b *parserBlock) blockType() string {

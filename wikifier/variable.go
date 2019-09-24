@@ -17,6 +17,7 @@ type AttributedObject interface {
 	Get(key string) (interface{}, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
+	GetBlock(key string) (block, error)
 	GetObj(key string) (AttributedObject, error)
 
 	// setters
@@ -172,6 +173,27 @@ func (scope *variableScope) GetObj(key string) (AttributedObject, error) {
 
 	// not what we asked for
 	return nil, errors.New("not an object")
+}
+
+// GetBlock is like Get except it always returns a block.
+func (scope *variableScope) GetBlock(key string) (block, error) {
+	obj, err := scope.Get(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// there is nothing here
+	if obj == nil {
+		return nil, nil
+	}
+
+	// something is here, so it best be an AttributedObject
+	if blk, ok := obj.(block); ok {
+		return blk, nil
+	}
+
+	// not what we asked for
+	return nil, errors.New("not a block")
 }
 
 // INTERNAL

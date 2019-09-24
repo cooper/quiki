@@ -237,38 +237,39 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			if split := strings.Split(string(blockType), "."); len(split) > 1 {
 				blockType, blockClasses = split[0], split[1:]
 			}
-
-			// if there is no type at this point, assume it is a map
-			if len(blockType) == 0 {
-				blockType = "map"
-			}
-
-			// if the block type starts with $, it is a model
-			if blockType[0] == '$' {
-				blockType = blockType[1:]
-				blockName = blockType
-				blockType = "model"
-			}
-
-			// create the block
-			log.Printf("Creating block: %s[%s]{}", blockType, blockName)
-			block := newBlock(blockType, blockName, blockClasses, p.block, p.catch, p.pos)
-
-			// TODO: produce a warning if the block has a name but the type does not support it
-
-			// set the current block
-			p.block = block
-			p.catch = block
-
-			// if the next char is a brace, this is a brace escaped block
-			if p.next == '{' {
-				p.braceFirst = true
-				p.braceLevel++
-
-				// TODO: set the current catch to the brace escape
-				// return if catch fails
-			}
 		}
+
+		// if there is no type at this point, assume it is a map
+		if len(blockType) == 0 {
+			blockType = "map"
+		}
+
+		// if the block type starts with $, it is a model
+		if blockType[0] == '$' {
+			blockType = blockType[1:]
+			blockName = blockType
+			blockType = "model"
+		}
+
+		// create the block
+		log.Printf("Creating block: %s[%s]{}", blockType, blockName)
+		block := newBlock(blockType, blockName, blockClasses, p.block, p.catch, p.pos)
+
+		// TODO: produce a warning if the block has a name but the type does not support it
+
+		// set the current block
+		p.block = block
+		p.catch = block
+
+		// if the next char is a brace, this is a brace escaped block
+		if p.next == '{' {
+			p.braceFirst = true
+			p.braceLevel++
+
+			// TODO: set the current catch to the brace escape
+			// return if catch fails
+		}
+
 		return p.nextByte(b)
 	}
 
@@ -335,31 +336,34 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			// reset the conditional
 			p.conditionalExists = false
 
+		// {@var}
 		case "variable":
 
-			//     # the variable name may be the block's content.
-			//     # clear the content and set the block name to the variable name
-			//     my $var = length $c->block->name ? $c->block->name : do {
-			//         my $last = $c->last_content;
-			//         $c->clear_content;
-			//         $c->block->{name} = $last;
-			//         $last;
-			//     };
+			// fetch variable name
+			varName := p.block.blockName()
+			if varName == "" {
+				// consider: clear the block content? does it matter?
+				varName = p.block.lastString()
+			}
 
-			//     # find the block; make sure it's a block
-			//     my $block = $page->get($var);
-			//     if (!$block) {
-			//         return $c->error("Variable block \@$var does not exist");
-			//     }
-			//     elsif (!blessed $block || !$block->isa('Wikifier::Block')) {
-			//         return $c->error("Variable \@$var does not contain a block");
-			//     }
+			// find the value and make sure it's a block
+			obj, err := page.GetBlock(varName)
+			if err != nil {
+				return errors.New("Variable block @" + varName + " does not contain a block")
+			}
+			if obj == nil {
+				return errors.New("Variable block @" + varName + " does not exist")
+			}
+			blk, ok := obj.(block)
+			if !ok {
+				return errors.New("Variable block @" + varName + " does not contain a block")
+			}
 
-			//     # overwrite the block's parent to the parent of the variable{} block
-			//     $block->{parent} = $c->block->parent;
+			// overwrite the block's parent to the parent of the {@var}
+			blk.setParentBlock(p.block.parentBlock())
 
-			//     # add the block we got from the variable
-			//     @add_contents = $block;
+			// add this block
+			accepting.appendContent(blk, p.pos)
 
 		// normal block. add the block itself
 		default:

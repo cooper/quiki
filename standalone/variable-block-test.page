@@ -1,0 +1,8 @@
+@myP: p {
+    Here's a paragraph.
+        Some text
+        is indented,
+    but some is not.
+};
+
+{@myP}

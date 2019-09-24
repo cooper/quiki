@@ -22,7 +22,16 @@ if [@firstTrueThenFalse] {
     Oh no!
 }
 
-@emptyStr:;
-if [@emptyStr] {
-    Empty strings are true, I guess.
+@myMap: {
+    aTrueVal: true;
+};
+
+I wonder if it works with maps?
+
+if [@myMap.aTrueVal] {
+    ...yes!
+}
+
+if [@myMap.aFalseVal] {
+    huh!
 }
