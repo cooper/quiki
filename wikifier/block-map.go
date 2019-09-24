@@ -24,7 +24,6 @@ type mapListEntry struct {
 	key      string            // actual underlying key
 	value    interface{}       // string, block, or mixed []interface{}
 	typ      valueType         // value type
-	isBlock  bool              // true if it contains precisely 1 block and no text
 	pos      position          // position where the item started
 	metas    map[string]string // metadata
 }
@@ -38,7 +37,7 @@ func (entry *mapListEntry) meta(key string) string {
 }
 
 type mapParser struct {
-	key    interface{} ``
+	key    interface{}
 	values []interface{}
 
 	escape        bool
@@ -197,9 +196,6 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 		// strings next to each other are merged; empty strings are removed
 		valueToStore := fixValuesForStorage(p.values)
 
-		// true if ONE block and no text
-		_, isBlock := valueToStore.(block)
-
 		// if this key exists, rename it to the next available <key>_key_<n>
 		for exist, err := m.Get(strKey); exist != nil && err != nil; {
 			matches := keySplitter.FindStringSubmatch(strKey)
@@ -230,7 +226,6 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 			value:    valueToStore,               // string, block, or mixed []interface{}
 			typ:      getValueType(valueToStore), // type of value
 			key:      strKey,                     // actual underlying key
-			isBlock:  isBlock,                    // true if it contains precisely 1 block and no text
 			pos:      p.startPos,                 // position where the item started
 		})
 
@@ -325,6 +320,7 @@ func (m *Map) warnMaybe(p *mapParser) {
 func (m *Map) html(page *Page, el element) {
 	for i, entry := range m.mapList {
 		m.mapList[i].value = prepareForHTML(entry.value, page, entry.pos)
+		m.setOwn(entry.key, m.mapList[i].value)
 	}
 }
 
