@@ -55,7 +55,6 @@ func newListBlock(name string, b *parserBlock) block {
 
 func (l *List) parse(page *Page) {
 	log.Println("List parse")
-	l.parserBlock.parse(page)
 	p := new(listParser)
 
 	for _, pc := range l.visiblePosContent() {
