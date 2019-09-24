@@ -83,6 +83,7 @@ func (l *List) parse(page *Page) {
 
 		// string
 		case string:
+
 			item = strings.TrimSpace(item)
 			if item == "" {
 				continue
@@ -148,8 +149,15 @@ func (l *List) handleChar(i int, p *listParser, c rune) {
 }
 
 func (l *List) html(page *Page, el element) {
+	el.setTag("ul")
 	for i, entry := range l.list {
-		l.list[i].value = prepareForHTML(entry.value, page, entry.pos)
+
+		// prepare the value for inclusion in HTML element
+		value := prepareForHTML(entry.value, page, entry.pos)
+		l.list[i].value = value
+
+		// create a list item
+		el.createChild("li", "list-item").add(value)
 	}
 }
 

@@ -13,6 +13,7 @@ func newSecBlock(name string, b *parserBlock) block {
 }
 
 func (sec *secBlock) parse(page *Page) {
+	sec.parserBlock.parse(page)
 }
 
 func (sec *secBlock) html(page *Page, el element) {

@@ -81,7 +81,7 @@ func newElement(tag, typ string) element {
 		_tag:      tag,
 		id:        typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:       typ,
-		container: tag == "div",
+		container: true,
 		attrs:     make(map[string]interface{}),
 		styles:    make(map[string]string),
 		metas:     make(map[string]string),
