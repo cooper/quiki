@@ -1,5 +1,7 @@
 package wikifier
 
+import "strings"
+
 type mainBlock struct {
 	*parserBlock
 }
@@ -35,8 +37,7 @@ func (mb *mainBlock) html(page *Page, el element) {
 			el.addChild(item.el())
 
 		case string:
-			// TODO: trim the text and increment the line number appropriately
-			if item == "" {
+			if strings.TrimSpace(item) == "" && len(contentToAdd) == 0 {
 				continue
 			}
 			contentToAdd = append(contentToAdd, pc)
