@@ -50,11 +50,11 @@ func (c *genericCatch) lastString() string {
 	if c.positioned == nil {
 		return ""
 	}
-	if content, ok := c.lastContent().(string); !ok {
+	content, ok := c.lastContent().(string)
+	if !ok {
 		return ""
-	} else {
-		return content
 	}
+	return content
 }
 
 // append any combination of blocks and strings
