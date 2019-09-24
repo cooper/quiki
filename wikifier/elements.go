@@ -1,6 +1,6 @@
 package wikifier
 
-import "log"
+import "fmt"
 
 // A collection of elements.
 type elements struct {
@@ -163,19 +163,26 @@ func (els *elements) removeClass(class string) bool {
 
 // Generates and returns HTML for the elements.
 func (els *elements) generate() HTML {
-	generated := ""
 
 	// cached version
 	if els.cachedHTML != "" {
 		return els.cachedHTML
 	}
 
+	els.cachedHTML = generateIndentedLines(els.generateIndented(0))
+	return els.cachedHTML
+}
+
+// Generates and returns HTML for the elements with an indent applied.
+func (els *elements) generateIndented(indent int) []indentedLine {
+	var lines []indentedLine
+
 	// add each
-	for _, el := range els.elements {
-		generated += string(el.generate())
+	for i, el := range els.elements {
+		fmt.Printf("el %v: %v\n", i, el.tag())
+		theirLines := el.generateIndented(indent + 1)
+		lines = append(lines, theirLines...)
 	}
 
-	els.cachedHTML = HTML(generated)
-	log.Println("GENERATED ELEMENTS:", els.cachedHTML)
-	return els.cachedHTML
+	return lines
 }

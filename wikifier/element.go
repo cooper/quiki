@@ -53,6 +53,7 @@ type element interface {
 
 	// html generation
 	generate() HTML
+	generateIndented(indent int) []indentedLine
 }
 
 type genericElement struct {
@@ -249,12 +250,23 @@ func (el *genericElement) removeClass(class string) bool {
 }
 
 func (el *genericElement) generate() HTML {
-	generated := ""
 
 	// cached version
 	if el.cachedHTML != "" {
 		return el.cachedHTML
 	}
+
+	el.cachedHTML = generateIndentedLines(el.generateIndented(0))
+	return el.cachedHTML
+}
+
+type indentedLine struct {
+	line   string
+	indent int
+}
+
+func (el *genericElement) generateIndented(indent int) []indentedLine {
+	var lines []indentedLine
 
 	// if we haven't yet determined if this is a container,
 	// check if it has any child elements
@@ -264,7 +276,7 @@ func (el *genericElement) generate() HTML {
 
 	// tags
 	if !el.meta("noTags") {
-		generated = "<" + el._tag
+		openingTag := "<" + el._tag
 
 		// classes
 		var classes []string
@@ -288,7 +300,7 @@ func (el *genericElement) generate() HTML {
 			classes = append([]string{"q-" + el.id}, classes...)
 		}
 		if len(classes) != 0 {
-			generated += ` class="` + strings.Join(classes, " ") + `"`
+			openingTag += ` class="` + strings.Join(classes, " ") + `"`
 		}
 
 		// styles
@@ -297,66 +309,78 @@ func (el *genericElement) generate() HTML {
 			styles += key + ":" + val + "; "
 		}
 		if styles != "" {
-			generated += ` style="` + styles + `"`
+			openingTag += ` style="` + styles + `"`
 		}
 
 		// other attributes
 		for key, val := range el.attrs {
 			switch v := val.(type) {
 			case string:
-				generated += " " + key + `="` + htmlfmt.EscapeString(v) + `"`
+				openingTag += " " + key + `="` + htmlfmt.EscapeString(v) + `"`
 			case bool:
-				generated += " " + key
+				openingTag += " " + key
 			}
 		}
-	}
 
-	// non-container
-	if !el.container {
-		generated += " />\n"
-		el.cachedHTML = HTML(generated)
-		return HTML(generated)
+		// non-container
+		if !el.container {
+			lines = append(lines, indentedLine{openingTag + " />", indent})
+			return lines
+		}
+
+		// container
+		lines = append(lines, indentedLine{openingTag + ">", indent})
 	}
 
 	// inner content
-	generated += ">\n"
 	for _, textOrEl := range el.content {
-		add := ""
+		var addLines []indentedLine
 		switch v := textOrEl.(type) {
-		case HTML:
-			add = string(v)
-		case string:
-			add = htmlfmt.EscapeString(v)
+
 		case element:
-			add = string(v.generate())
+			if v.meta("invisible") {
+				break
+			}
+			if v.meta("noIndent") {
+				addLines = v.generateIndented(0)
+			} else {
+				addLines = v.generateIndented(indent + 1)
+			}
+
+		case string:
+			myIndent := indent + 1
+			if el.meta("noIndent") {
+				myIndent = 0
+			}
+			addLines = []indentedLine{indentedLine{htmlfmt.EscapeString(v), myIndent}}
+
+		case HTML:
+			myIndent := indent + 1
+			if el.meta("noIndent") {
+				myIndent = 0
+			}
+			addLines = []indentedLine{indentedLine{string(v), myIndent}}
+
 		}
-		if !el.meta("noIndent") {
-			add = indent(add)
-		}
-		generated += add
+
+		lines = append(lines, addLines...)
 	}
 
 	// close it off
 	if !el.meta("noTags") && !el.meta("noClose") {
-		if generated[len(generated)-1] != '\n' {
-			generated += "\n"
-		}
-		generated += "</" + el._tag + ">\n"
+		lines = append(lines, indentedLine{"</" + el._tag + ">", indent})
 	}
 
-	el.cachedHTML = HTML(generated)
-	return el.cachedHTML
+	return lines
 }
 
-func indent(str string) string {
-	var res []rune
-	bol := true
-	for _, c := range str {
-		if bol && c != '\n' {
-			res = append(res, []rune("    ")...)
+func generateIndentedLines(lines []indentedLine) HTML {
+	generated := ""
+	for _, line := range lines {
+		generated += strings.Repeat("    ", line.indent) + line.line
+		if line.line == "" || line.line[len(line.line)-1] != '\n' {
+			generated += "\n"
 		}
-		res = append(res, c)
-		bol = c == '\n'
 	}
-	return string(res)
+	return HTML(generated)
 }

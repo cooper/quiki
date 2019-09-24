@@ -41,6 +41,8 @@ type parserBlock struct {
 
 func (b *parserBlock) parse(page *Page) {
 	// TODO: maybe split text nodes by line?
+	// Note: this is not necessarily called for every block type inheriting Map.
+	// Some blocks may parse() their children directly or not at all.
 	for _, child := range b.blockContent() {
 		child.parse(page)
 	}

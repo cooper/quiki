@@ -72,7 +72,6 @@ func newMapBlock(name string, b *parserBlock) block {
 
 func (m *Map) parse(page *Page) {
 	log.Println("Map parse")
-	m.parserBlock.parse(page)
 	p := new(mapParser)
 
 	for _, pc := range m.visiblePosContent() {

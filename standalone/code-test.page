@@ -1,6 +1,11 @@
-code {
-<div>
-    This is some code.
-    <img src="logo.png" alt=""logo" />
-</div>
+
+sec {
+    Some crazy indented code will follow.
+    code {
+        <div>
+            This is some code.
+            <img src="logo.png" alt="logo" />
+        </div>
+    }
 }
+
