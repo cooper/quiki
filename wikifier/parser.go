@@ -572,7 +572,7 @@ func (p *parser) handleByte(b byte) error {
 		if char == "\n" {
 			char = "\u2424"
 		}
-		err := "Invalid byte '" + char + "' in " + p.catch.catchType() + "."
+		err := "Invalid byte '" + char + "' in " + string(p.catch.catchType()) + "."
 		if str := p.catch.lastString(); str != "" {
 			err += "Partial: " + str
 		}

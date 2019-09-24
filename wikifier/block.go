@@ -114,7 +114,7 @@ func (b *parserBlock) parentCatch() catch {
 	return b.parentC
 }
 
-func (b *parserBlock) catchType() string {
+func (b *parserBlock) catchType() catchType {
 	return catchTypeBlock
 }
 

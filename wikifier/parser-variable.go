@@ -12,7 +12,7 @@ func newVariableName(pfx string, pos position) *variableName {
 	return &variableName{genericCatch: &genericCatch{positionedPrefix: pc}}
 }
 
-func (vn *variableName) catchType() string {
+func (vn *variableName) catchType() catchType {
 	return catchTypeVariableName
 }
 
@@ -41,7 +41,7 @@ func newVariableValue() *variableValue {
 	return &variableValue{genericCatch: &genericCatch{}}
 }
 
-func (vv *variableValue) catchType() string {
+func (vv *variableValue) catchType() catchType {
 	return catchTypeVariableValue
 }
 

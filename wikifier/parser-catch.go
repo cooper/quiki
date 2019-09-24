@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
+type catchType string
+
 const (
-	catchTypeVariableName  = "Variable name"
-	catchTypeVariableValue = "Variable value"
-	catchTypeBlock         = "Block"
+	catchTypeVariableName  catchType = "Variable name"
+	catchTypeVariableValue           = "Variable value"
+	catchTypeBlock                   = "Block"
 )
 
 type catch interface {
@@ -24,7 +26,7 @@ type catch interface {
 	appendContents(pc []posContent)
 	byteOK(b byte) bool
 	shouldSkipByte(b byte) bool
-	catchType() string
+	catchType() catchType
 }
 
 type genericCatch struct {
