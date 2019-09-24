@@ -5,6 +5,35 @@ import (
 	"strings"
 )
 
+// Represents a quiki value type.
+type valueType int
+
+// These are the value types in a quiki page model.
+const (
+	valueTypeString  valueType = 0 // String
+	valueTypeBlock                 // Block
+	valueTypeHTML                  // Raw HTML
+	valueTypeElement               // HTML element
+	valueTypeMixed                 // []interface{} with a mixture of these
+)
+
+func getValueType(i interface{}) valueType {
+	switch i.(type) {
+	case string:
+		return valueTypeString
+	case block:
+		return valueTypeBlock
+	case Html:
+		return valueTypeHTML
+	case element:
+		return valueTypeElement
+	case []interface{}:
+		return valueTypeMixed
+	default:
+		return -1
+	}
+}
+
 func pageNameLink(s string) string {
 	return ""
 }

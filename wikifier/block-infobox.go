@@ -28,19 +28,16 @@ func (ib *infobox) html(page *Page, el element) {
 	infoboxTableAddRows(ib, el, page, ib.mapList)
 }
 
-// # append each pair.
-// # note that $table might actually be a Wikifier::Elements container
-// sub table_add_rows {
-func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []mapListEntry) {
-	//     my @pairs = $block->map_array;
-	//     my $has_title = 0;
+// Appends each pair.
+// Note that table might actually be an element collection.
+func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
 	hasTitle := false
 
-	//     for (0..$#pairs)
+	// add a row for each entry
 	for i, entry := range pairs {
 
 		// if the value is from infosec{}, add each row
-		if els, ok := entry.value.(element); ok && els.hasMeta("infosec") {
+		if els, ok := entry.value.(element); ok && entry.meta("infosec") != "" {
 
 			// infosec do not need a key
 			if entry.keyTitle != "" {
@@ -51,73 +48,63 @@ func infoboxTableAddRows(infoboxOrSec block, table element, page *Page, pairs []
 		}
 
 		// determine next entry
-		var next mapListEntry
+		var next *mapListEntry
 		hasNext := i != len(pairs)-1
 		if hasNext {
 			next = pairs[i+1]
 		}
 
-		//         # options based on position in the infosec
-		//         my @classes;
-		//         push @classes, 'infosec-title' and $has_title++ if $is_title;
-		//         push @classes, 'infosec-first' if $_ == $has_title;
-		//         my $b4_infosec = $next && blessed $next->{value} &&
-		//             $next->{value}{is_infosec};
-		//         push @classes, 'infosec-last'
-		//             if !$is_title && ($b4_infosec || $_ == $#pairs);
+		var classes []string
 
-		//         my %row_opts = (
-		//             is_block => $is_block,
-		//             is_title => $is_title,
-		//             td_opts  => { classes => \@classes }
-		//         );
+		// this is the title
+		isTitle := entry.meta("isTitle") != ""
+		if isTitle {
+			classes = append(classes, "infosec-title")
+			hasTitle = true
+		}
 
-		//         # not an infosec{}; this is a top-level pair
-		//         table_add_row($table, $page, $key_title, $value, $pos, \%row_opts);
-		//     }
-		// }
+		// this is the first item in this infosec
+		if (hasTitle && i == 1) || (!hasTitle && i == 0) {
+			classes = append(classes, "infosec-first")
+		}
+
+		// this is the last item in this infosec
+		b4infosec := hasNext && next.meta("isInfobox") != ""
+		if !isTitle && (b4infosec || i == len(pairs)-1) {
+			classes = append(classes, "infosec-last")
+		}
+
+		// not an infosec{}; this is a top-level pair
+		infoboxTableAddRow(infoboxOrSec, table, entry, classes)
 	}
 }
 
-// # add a row.
-// # note that $table might actually be a Wikifier::Elements container
-// sub table_add_row {
-//     my ($table, $page, $key_title, $value, $pos, $opts_) = @_;
-//     my %opts    = hash_maybe $opts_;
-//     my %td_opts = hash_maybe $opts{td_opts};
+// Adds a row.
+// Note that table might actually be an element collection.
+func infoboxTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
 
-//     # create the row.
-//     my $tr = $table->create_child(
-//         type  => 'tr',
-//         class => 'infobox-pair'
-//     );
+	// create the row
+	tr := table.createChild("tr", "infobox-pair")
 
-//     # append table row with key.
-//     if (length $key_title) {
-//         $key_title = $page->parse_formatted_text($key_title, pos => $pos);
-//         $tr->create_child(
-//             type       => 'th',
-//             class      => 'infobox-key',
-//             content    => $key_title,
-//             %td_opts
-//         );
-//         $tr->create_child(
-//             type       => 'td',
-//             class      => 'infobox-value',
-//             content    => $value,
-//             %td_opts
-//         );
-//     }
+	// append table row with a key
+	if entry.keyTitle != "" {
 
-//     # append table row without key.
-//     else {
-//         my $td = $tr->create_child(
-//             type       => 'td',
-//             class      => 'infobox-anon',
-//             attributes => { colspan => 2 },
-//             content    => $value,
-//             %td_opts
-//         );
-//         $td->add_class('infobox-text') if !$opts{is_block};
-//     }
-// }
+		// key
+		th := tr.createChild("th", "infobox-key")
+		th.addText(entry.keyTitle)
+		th.addClasses(classes)
+
+		// value
+		td := tr.createChild("td", "infobox-value")
+		td.add(entry.value)
+		td.addClasses(classes)
+
+		return
+	}
+
+	// otherwise, append a table row without a key
+	td := tr.createChild("td", "infobox-anon")
+	td.setAttr("colspan", "2")
+	td.add(entry.value)
+	td.addClasses(classes)
+}

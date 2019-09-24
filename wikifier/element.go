@@ -34,12 +34,14 @@ type element interface {
 	setMeta(name, value string)
 
 	// adding content
+	add(i interface{})
 	addText(s string)
 	addHtml(h Html)
 	addChild(child element)
 	createChild(tag, typ string) element
 
 	// classes
+	addClasses(classes []string)
 	addClass(class string)
 	removeClass(class string) bool
 
@@ -173,6 +175,24 @@ func (el *genericElement) setStyle(name, value string) {
 	el.styles[name] = value
 }
 
+// add something
+func (el *genericElement) add(i interface{}) {
+	switch v := i.(type) {
+	case string:
+		el.addText(v)
+	case Html:
+		el.addHtml(v)
+	case element:
+		el.addChild(v)
+	case []interface{}:
+		for _, val := range v {
+			el.add(val)
+		}
+	default:
+		panic("add() unknown type to element")
+	}
+}
+
 // add a text node
 func (el *genericElement) addText(s string) {
 	el.content = append(el.content, s)
@@ -208,6 +228,11 @@ func (el *genericElement) setParent(parent element) {
 // set whether to include element's unique ID
 func (el *genericElement) setNeedID(need bool) {
 	el.needID = need
+}
+
+// add classes
+func (el *genericElement) addClasses(classes []string) {
+	el.classes = append(el.classes, classes...)
 }
 
 // add a class

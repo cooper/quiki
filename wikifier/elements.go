@@ -91,6 +91,14 @@ func (els *elements) setStyle(name, value string) {
 	}
 }
 
+// Adds another element. If i is not an element, panics.
+func (els *elements) add(i interface{}) {
+	if child, ok := i.(element); ok {
+		els.addChild(child)
+	}
+	panic("can't add() non-element to element collection")
+}
+
 // Panics. Cannot add text node to a collection of elements.
 func (els *elements) addText(s string) {
 	panic("unimplemented")
@@ -127,6 +135,13 @@ func (els *elements) setParent(parent element) {
 func (els *elements) setNeedID(need bool) {
 	for _, el := range els.elements {
 		el.setNeedID(need)
+	}
+}
+
+// Adds some classes to all underlying elements.
+func (els *elements) addClasses(classes []string) {
+	for _, el := range els.elements {
+		el.addClasses(classes)
 	}
 }
 

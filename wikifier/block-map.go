@@ -12,21 +12,31 @@ var keyNormalizer = regexp.MustCompile(`\W`)
 var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
 
 type Map struct {
-	mapList []mapListEntry
+	mapList []*mapListEntry
 	*parserBlock
 	*variableScope
 }
 
 type mapListEntry struct {
-	keyTitle string      // displayed key text
-	key      string      // actual underlying key
-	value    interface{} // string, block, or mixed []interface{}
-	isBlock  bool        // true if it contains precisely 1 block and no text
-	pos      position    // position where the item started
+	keyTitle string            // displayed key text
+	key      string            // actual underlying key
+	value    interface{}       // string, block, or mixed []interface{}
+	typ      valueType         // value type
+	isBlock  bool              // true if it contains precisely 1 block and no text
+	pos      position          // position where the item started
+	metas    map[string]string // metadata
+}
+
+func (entry *mapListEntry) setMeta(key, val string) {
+	entry.metas[key] = val
+}
+
+func (entry *mapListEntry) meta(key string) string {
+	return entry.metas[key]
 }
 
 type mapParser struct {
-	key    interface{}
+	key    interface{} ``
 	values []interface{}
 
 	escape        bool
@@ -38,6 +48,7 @@ type mapParser struct {
 	appendedKey   interface{}
 }
 
+// Creates a new map, given the main block of the page it is to be associated with.
 func NewMap(mb block) *Map {
 	underlying := &parserBlock{
 		openPos:      position{0, 0}, // FIXME
@@ -211,12 +222,13 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 		m.Set(strKey, valueToStore)
 
 		// store the value in the map list
-		m.mapList = append(m.mapList, mapListEntry{
-			keyTitle: keyTitle,     // displayed key
-			value:    valueToStore, // string, block, or mixed []interface{}
-			key:      strKey,       // actual underlying key
-			isBlock:  isBlock,      // true if it contains precisely 1 block and no text
-			pos:      p.startPos,   // position where the item started
+		m.mapList = append(m.mapList, &mapListEntry{
+			keyTitle: keyTitle,                   // displayed key
+			value:    valueToStore,               // string, block, or mixed []interface{}
+			typ:      getValueType(valueToStore), // type of value
+			key:      strKey,                     // actual underlying key
+			isBlock:  isBlock,                    // true if it contains precisely 1 block and no text
+			pos:      p.startPos,                 // position where the item started
 		})
 
 		// check for warnings once more
