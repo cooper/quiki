@@ -1,0 +1,6 @@
+code {
+<div>
+    This is some code.
+    <img src="logo.png" alt=""logo" />
+</div>
+}

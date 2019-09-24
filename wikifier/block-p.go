@@ -1,7 +1,5 @@
 package wikifier
 
-import "strings"
-
 type pBlock struct {
 	*parserBlock
 }
@@ -25,21 +23,11 @@ func (p *pBlock) html(page *Page, el element) {
 			el.addChild(item.el())
 
 		case string:
-
-			// trim again
-			item = strings.TrimSpace(item)
-			if item == "" {
-				continue
-			}
-
-			// format, then trim again
 			formatted := page.parseFormattedText(item)
-			item = strings.TrimSpace(string(formatted))
 			if item == "" {
 				continue
 			}
-
-			el.addHTML(HTML(item))
+			el.addHTML(formatted)
 
 		default:
 			panic("not sure how to handle this content")

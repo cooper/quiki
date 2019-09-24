@@ -51,6 +51,13 @@ func newParser() *parser {
 }
 
 func (p *parser) parseLine(line []byte, page *Page) error {
+
+	// inject newline back
+	if len(line) == 0 || line[len(line)-1] != '\n' {
+		line = append(line, '\n')
+	}
+
+	// handle each byte
 	for i, b := range line {
 
 		// skip this byte
@@ -74,7 +81,6 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -276,14 +282,14 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			return errors.New("Attempted to close main block")
 		}
 
-		var addContents []interface{}
+		var addContent interface{}
 
 		// TODO: if/elsif/else statements, {@vars}
 		if false {
 
 		} else {
 			// normal block. add the block itself
-			addContents = []interface{}{p.block}
+			addContent = p.block
 		}
 
 		// close the block
@@ -292,7 +298,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		// clear the catch
 		p.block = p.block.parentBlock()
 		p.catch = p.catch.parentCatch()
-		p.catch.appendContent(addContents, p.pos)
+		p.catch.appendContent(addContent, p.pos)
 
 		return p.nextByte(b)
 	}
@@ -476,7 +482,7 @@ func (p *parser) handleByte(b byte) error {
 
 		// revert to the parent catch, and add our stuff to it
 		p.catch = p.catch.parentCatch()
-		p.catch.pushContents(pc)
+		p.catch.appendContents(pc)
 
 	} else if !p.catch.byteOK(b) {
 		// ask the catch if this byte is acceptable
@@ -493,7 +499,7 @@ func (p *parser) handleByte(b byte) error {
 	}
 
 	// append
-	p.catch.appendString(add, p.pos)
+	p.catch.appendContent(add, p.pos)
 
 	return p.nextByte(b)
 }
