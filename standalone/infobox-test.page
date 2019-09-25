@@ -1,4 +1,4 @@
-@ib: infobox [United States of America] {
+infobox [United States of America] {
     infosec {  
         Capital:        [! Washington, DC !];  
         Largest city:   [! New York City !];    
@@ -17,6 +17,4 @@
         Constitution:           June 21, 1788;
         Last polity admitted:   March 24, 1976;
     };
-};
-
-{@ib}
+}

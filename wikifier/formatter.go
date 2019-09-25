@@ -313,9 +313,39 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 	// variable
 	if !opts.noVariables {
 		if variableRegex.MatchString(formatType) {
-			// TODO: fetch the variable, warn if it is undef, format text if %var
-			// then return the value
-			return HTML("(null)")
+
+			// fetch the value
+			val, err := page.Get(formatType[1:])
+			if err != nil {
+				// TODO: Produce warning wrapping error unless noWarnings
+				return HTML("(error)")
+			}
+			if val == nil {
+				// TODO: Produce warning that var is undefined unless noWarnings
+				return HTML("(null)")
+			}
+
+			// format text if this is %var
+			strVal, ok := val.(string)
+			if formatType[0] == '%' {
+				if !ok {
+					// TODO: Produce warning that attempted to interpolate non-string
+					return HTML("(error)")
+				}
+				return page.parseFormattedTextOpts(strVal, &formatterOptions{noVariables: true})
+			}
+
+			// it was a string but just @var
+			if ok {
+				return HTML(htmlfmt.EscapeString(strVal))
+			}
+
+			// otherwise this is probably HTML
+			if htmlVal, ok := val.(HTML); ok {
+				return htmlVal
+			}
+
+			return HTML(htmlfmt.EscapeString(humanReadableValue(val)))
 		}
 	}
 

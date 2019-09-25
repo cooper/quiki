@@ -1,0 +1,7 @@
+@person: infobox [Britney Spears] {
+    First name:     Britney;
+    Last name:      Spears;
+    Age:            35;
+};
+
+The person I'm about to tell you about is named [@person.First_name].

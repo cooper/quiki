@@ -503,6 +503,10 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			case block:
 
 				// parse the block
+				// note: this means the block will be parsed twice
+				// once now so that vars/warnings can be produced
+				// once later when it is injected..
+				// just cuz there is no way to tell that it has been done already
 				val.parse(page)
 				log.Println("Got var block:", val)
 
