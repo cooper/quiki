@@ -14,15 +14,15 @@ type parser struct {
 	last   byte // last byte
 	this   byte // current byte
 	next   byte // next byte
-	skip   bool // skip next byte
+	next2  byte // next-next byte
 	escape bool // this byte is escaped
+	skip   int  // number of next bytes to skip
 
 	catch catch // current parser catch
 	block block // current parser block
 
-	commentLevel int  // comment depth
-	braceLevel   int  // brace escape depth
-	braceFirst   bool // true when entering a brace escape
+	commentLevel int // comment depth
+	braceLevel   int // brace escape depth
 
 	varName            string
 	varNotInterpolated bool
@@ -57,7 +57,7 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 	p.pos.line++
 
 	// this is a hack to fix extra whitespace in blocks just before they close
-	if strings.TrimSpace(string(line)) == "}" {
+	if p.braceLevel == 0 && strings.TrimSpace(string(line)) == "}" {
 		line = []byte{'}', '\n'}
 	}
 
@@ -70,8 +70,8 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 	for i, b := range line {
 
 		// skip this byte
-		if p.skip {
-			p.skip = false
+		if p.skip != 0 {
+			p.skip--
 			continue
 		}
 
@@ -79,10 +79,16 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 		p.pos.column = i + 1
 		p.this = b
 
+		// next two bytes
 		if len(line) > i+1 {
 			p.next = line[i+1]
 		} else {
 			p.next = 0
+		}
+		if len(line) > i+2 {
+			p.next2 = line[i+2]
+		} else {
+			p.next2 = 0
 		}
 
 		// handle this byte and give up if error occurred
@@ -96,12 +102,15 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 func (p *parser) parseByte(b byte, page *Page) error {
 	log.Printf("parseByte(%s, last: %s, next: %s)", string(b), string(p.last), string(p.next))
 
+	// fix extra newline added to code{} blocks
+	if p.braceLevel == 0 && b == '{' && p.next == '\n' {
+		p.skip++
+	}
+
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
-		isFirst := p.braceFirst
-		p.braceFirst = false
 
-		if b == '{' && !isFirst {
+		if b == '{' {
 			// increase brace depth
 			p.braceLevel++
 		} else if b == '}' {
@@ -116,7 +125,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		// proceed to the next byte if this was the first or last brace
-		if isFirst || p.braceLevel == 0 {
+		if p.braceLevel == 0 {
 			return p.nextByte(b)
 		}
 
@@ -151,7 +160,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		// decrease comment level and skip this and next byte
 		p.commentLevel--
 		log.Println("decreased comment level to", p.commentLevel)
-		p.skip = true
+		p.skip++
 		return p.nextByte(b)
 	}
 
@@ -175,7 +184,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// if the next char is @, this is {@some_var}
 		if p.next == '@' {
-			p.skip = true
+			p.skip++
 			blockType = "variable"
 		} else {
 			var inBlockName, charsScanned int
@@ -279,8 +288,15 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// if the next char is a brace, this is a brace escaped block
 		if p.next == '{' {
-			p.braceFirst = true
 			p.braceLevel++
+
+			// skip the next brace
+			p.skip++
+
+			// also skip the newline after it
+			if p.next2 == '\n' {
+				p.skip++
+			}
 
 			// start the brace escape catch
 			catch := newBraceEscape(p.pos)
@@ -607,11 +623,6 @@ func (p *parser) handleByte(b byte) error {
 // (NEXT BYTE)
 func (p *parser) nextByte(b byte) error {
 	log.Println("nextByte", string(b))
-
-	// fix extra newline added to code{} blocks
-	if b == '{' && p.next == '\n' {
-		p.skip = true
-	}
 
 	// if current byte is \, set escape for the next
 	if b == '\\' && !p.escape && p.braceLevel == 0 {
