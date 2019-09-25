@@ -345,6 +345,7 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 				return htmlVal
 			}
 
+			// I don't really know what to do
 			return HTML(htmlfmt.EscapeString(humanReadableValue(val)))
 		}
 	}

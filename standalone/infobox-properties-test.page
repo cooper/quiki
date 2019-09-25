@@ -4,4 +4,6 @@
     Age:            35;
 };
 
+{@person}
+
 The person I'm about to tell you about is named [@person.First_name].

@@ -245,9 +245,14 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 		}
 
-		// if there is no type at this point, assume it is a map
+		// if there is a name but no type, it's a section with a heading
+		// if neither, it's a map
 		if len(blockType) == 0 {
-			blockType = "map"
+			if len(blockName) != 0 {
+				blockType = "sec"
+			} else {
+				blockType = "map"
+			}
 		}
 
 		// if the block type starts with $, it is a model
