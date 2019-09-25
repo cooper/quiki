@@ -259,10 +259,10 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		// otherwise:
 		// if there is a name but no type, it's a section with a heading
 		// if neither, it's a map
-		if p.block.blockType() == "infobox" {
-			blockType = "infosec"
-		} else if len(blockType) == 0 {
-			if len(blockName) != 0 {
+		if len(blockType) == 0 {
+			if p.block.blockType() == "infobox" {
+				blockType = "infosec"
+			} else if len(blockName) != 0 {
 				blockType = "sec"
 			} else {
 				blockType = "map"
