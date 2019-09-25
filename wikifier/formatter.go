@@ -11,7 +11,7 @@ var variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
 var linkRegex = regexp.MustCompile(`^((\w+)://|\$)`)
 var mailRegex = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
 var colorRegex = regexp.MustCompile(`(?i)^#[\da-f]+$`)
-var wikiRegex = regexp.MustCompile(`^(\w+):`)
+var wikiRegex = regexp.MustCompile(`^(\w+):(.*)$`)
 var oldLinkRegex = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
 
 var linkNormalizers = map[string]func(string) string{
@@ -436,7 +436,6 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 }
 
 func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {
-	var normalizer func(ok *bool, target, tooltip, display *string)
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
@@ -455,44 +454,49 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		// http://google.com or $/something (see wikifier issue #68)
 
 		linkType = "other"
-		normalizer = normalizeOtherLink
 
 		// erase the scheme or $
 		if displaySame {
 			display = linkRegex.ReplaceAllString(display, "")
 		}
+
 	} else if strings.HasPrefix(target, "mailto:") {
 		// mailto:someone@example.com
 
 		linkType = "contact"
-		normalizer = normalizeEmailLink
+		email := strings.TrimPrefix(target, "mailto:")
+		tooltip = "Email " + email
+
+		// erase mailto:
 		if displaySame {
-			display = strings.TrimPrefix(target, "mailto:")
+			display = email
 		}
 
 	} else if mailRegex.MatchString(target) {
-		// someone @example.com
+		// someone@example.com
 
 		linkType = "contact"
-		normalizer = normalizeEmailLink
+		tooltip = "Email " + target
+		target = "mailto:" + target
 
 	} else if s := wikiRegex.FindStringSubmatch(target); len(s) != 0 {
 		// wp: some page
 
 		// FIXME: I think s[0] is wp
 		linkType = "external"
-		normalizer = normalizeExternalLink
+
+		// TODO: finish this
 
 		if displaySame {
-			display = wikiRegex.ReplaceAllString(target, "")
+			display = s[1]
 		}
 
 	} else if strings.HasPrefix(target, "~") {
 		// ~ some category
 
-		target = strings.TrimPrefix(target, "~")
-		target = strings.TrimSpace(target)
-		normalizer = normalizeCategoryLink
+		target = strings.TrimSpace(strings.TrimPrefix(target, "~"))
+
+		// TODO: finish this
 
 		if displaySame {
 			display = target
@@ -501,7 +505,8 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		// normal page link
 
 		linkType = "internal"
-		normalizer = normalizePageLink
+
+		// TODO: finish this
 	}
 
 	// normalize
@@ -509,35 +514,5 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 	tooltip = strings.TrimSpace(tooltip)
 	display = strings.TrimSpace(display)
 
-	normalizer(&ok, &target, &tooltip, &display)
 	return
-}
-
-func normalizeEmailLink(ok *bool, target, tooltip, display *string) {
-	email := *target
-	if strings.HasPrefix(email, "mailto:") {
-		email = strings.TrimPrefix(email, "mailto:")
-	} else {
-		*target = "mailto:" + email
-	}
-	*tooltip = "Email " + email
-}
-
-func normalizeOtherLink(ok *bool, target, tooltip, display *string) {
-	*target = strings.TrimPrefix(*target, "$")
-	*ok = true
-}
-
-func normalizeCategoryLink(ok *bool, target, tooltip, display *string) {
-	//TODO
-}
-
-func normalizePageLink(ok *bool, target, tooltip, display *string) {
-	//TODO
-
-}
-
-func normalizeExternalLink(ok *bool, target, tooltip, display *string) {
-	//TODO
-
 }

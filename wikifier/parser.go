@@ -90,6 +90,11 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 func (p *parser) parseByte(b byte, page *Page) error {
 	log.Printf("parseByte(%s, last: %s, next: %s)", string(b), string(p.last), string(p.next))
 
+	// fix extra newline added to code{} blocks
+	if b == '{' && p.next == '\n' {
+		p.skip = true
+	}
+
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
 		isFirst := p.braceFirst
@@ -162,11 +167,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		// this is escaped
 		if p.escape {
 			return p.handleByte(b)
-		}
-
-		// skip newline after this
-		if p.next == '\n' {
-			p.skip = true
 		}
 
 		var blockClasses []string
