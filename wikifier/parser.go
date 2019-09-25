@@ -164,6 +164,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			return p.handleByte(b)
 		}
 
+		// skip newline after this
+		if p.next == '\n' {
+			p.skip = true
+		}
+
 		var blockClasses []string
 		var blockType, blockName string
 
@@ -498,14 +503,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			case block:
 
 				// parse the block
-				// note: in Perl, this was done recursively here for maps/lists/etc.
-				// or any blessed object with ->to_data; but here blocks must parse()
-				// their own children manually
 				val.parse(page)
 				log.Println("Got var block:", val)
 
 			case nil:
-				return fmt.Errorf("There's nothing here!")
+				return fmt.Errorf("there's nothing here")
 
 			default:
 				return fmt.Errorf("Not sure what to do with: %v", val)

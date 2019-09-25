@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"log"
 	"strings"
 )
 
@@ -10,7 +9,8 @@ import (
 // List represents a list of items.
 // It is a quiki data type as well as the base of many block types.
 type List struct {
-	list []*listEntry
+	didParse bool
+	list     []*listEntry
 	*parserBlock
 }
 
@@ -46,17 +46,22 @@ func NewList(mb block) *List {
 		element:      newElement("div", "list"),
 		genericCatch: &genericCatch{},
 	}
-	return &List{nil, underlying}
+	return &List{false, nil, underlying}
 }
 
 func newListBlock(name string, b *parserBlock) block {
-	return &List{nil, b}
+	return &List{false, nil, b}
 }
 
 func (l *List) parse(page *Page) {
-	log.Println("List parse")
-	p := new(listParser)
 
+	// already parsed
+	if l.didParse {
+		return
+	}
+	l.didParse = true
+
+	p := new(listParser)
 	for _, pc := range l.visiblePosContent() {
 		p.pos = pc.position
 

@@ -1,6 +1,8 @@
 package wikifier
 
-import "strings"
+import (
+	"strings"
+)
 
 type mainBlock struct {
 	*parserBlock

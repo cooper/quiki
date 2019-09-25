@@ -2,7 +2,6 @@ package wikifier
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,7 +13,8 @@ var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
 // Map represents a Key-value dictionary.
 // It is a quiki data type as well as the base of many block types.
 type Map struct {
-	mapList []*mapListEntry
+	didParse bool
+	mapList  []*mapListEntry
 	*parserBlock
 	*variableScope
 }
@@ -63,17 +63,22 @@ func NewMap(mb block) *Map {
 		element:      newElement("div", "map"),
 		genericCatch: &genericCatch{},
 	}
-	return &Map{nil, underlying, newVariableScope()}
+	return &Map{false, nil, underlying, newVariableScope()}
 }
 
 func newMapBlock(name string, b *parserBlock) block {
-	return &Map{nil, b, newVariableScope()}
+	return &Map{false, nil, b, newVariableScope()}
 }
 
 func (m *Map) parse(page *Page) {
-	log.Println("Map parse")
-	p := new(mapParser)
 
+	// already parsed
+	if m.didParse {
+		return
+	}
+	m.didParse = true
+
+	p := new(mapParser)
 	for _, pc := range m.visiblePosContent() {
 		p.pos = pc.position
 
