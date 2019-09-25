@@ -1,16 +1,17 @@
 infobox [United States of America] {
-    infosec {  
-        Capital:        [! Washington, DC !];  
-        Largest city:   [! New York City !];    
-    };
-    infosec [Goverment] {
+
+    Capital:        [! Washington, DC !];  
+    Largest city:   [! New York City !];   
+
+    [Goverment] {
         :[! Federal presidential constitutional republic | Republic !];   
         President:              [! Donald Trump !];
         Vice President:         [! Mike Pence !];
         Speaker of the House:   [! Paul Ryan !];
         Chief Justice:          [! John Roberts !];
     };
-    infosec [Independence[nl]from [! Great Britain !]] {
+    
+    [Independence[nl]from [! Great Britain !]] {
         Declaration:            July 4, 1776;
         Confederation:          March 1, 1781;
         Treaty of Paris:        September 3, 1783;

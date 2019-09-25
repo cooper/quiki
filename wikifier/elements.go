@@ -180,7 +180,7 @@ func (els *elements) generateIndented(indent int) []indentedLine {
 	// add each
 	for i, el := range els.elements {
 		fmt.Printf("el %v: %v\n", i, el.tag())
-		theirLines := el.generateIndented(indent + 1)
+		theirLines := el.generateIndented(indent)
 		lines = append(lines, theirLines...)
 	}
 

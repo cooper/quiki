@@ -54,6 +54,12 @@ func newParser() *parser {
 }
 
 func (p *parser) parseLine(line []byte, page *Page) error {
+	p.pos.line++
+
+	// this is a hack to fix extra whitespace in blocks just before they close
+	if strings.TrimSpace(string(line)) == "}" {
+		line = []byte{'}', '\n'}
+	}
 
 	// inject newline back
 	if len(line) == 0 || line[len(line)-1] != '\n' {
@@ -89,11 +95,6 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 
 func (p *parser) parseByte(b byte, page *Page) error {
 	log.Printf("parseByte(%s, last: %s, next: %s)", string(b), string(p.last), string(p.next))
-
-	// fix extra newline added to code{} blocks
-	if b == '{' && p.next == '\n' {
-		p.skip = true
-	}
 
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
@@ -245,9 +246,13 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 		}
 
+		// if the current block is an infobox{}, sub-blocks are infosec{}
+		// otherwise:
 		// if there is a name but no type, it's a section with a heading
 		// if neither, it's a map
-		if len(blockType) == 0 {
+		if p.block.blockType() == "infobox" {
+			blockType = "infosec"
+		} else if len(blockType) == 0 {
 			if len(blockName) != 0 {
 				blockType = "sec"
 			} else {
@@ -603,7 +608,10 @@ func (p *parser) handleByte(b byte) error {
 func (p *parser) nextByte(b byte) error {
 	log.Println("nextByte", string(b))
 
-	p.last = b
+	// fix extra newline added to code{} blocks
+	if b == '{' && p.next == '\n' {
+		p.skip = true
+	}
 
 	// if current byte is \, set escape for the next
 	if b == '\\' && !p.escape && p.braceLevel == 0 {
@@ -612,6 +620,7 @@ func (p *parser) nextByte(b byte) error {
 		p.escape = false
 	}
 
+	p.last = b
 	return nil
 }
 
