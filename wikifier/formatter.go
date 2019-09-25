@@ -358,35 +358,37 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 
 	// # deprecated: a link in the form of [~link~], [!link!], or [$link$]
 	// # convert to newer link format
-	if match := oldLinkRegex.FindStringSubmatch(formatType); match != nil {
-		linkChar, inner := match[1], match[2]
-		text, target := inner, inner
+	if formatType[0] != '[' {
+		if match := oldLinkRegex.FindStringSubmatch(formatType); match != nil {
+			linkChar, inner := match[1], match[2]
+			text, target := inner, inner
 
-		// format is <text>|<target>
-		if pipe := strings.LastIndexByte(inner, '|'); pipe != -1 {
-			text = inner[:pipe]
-			target = inner[pipe+1:]
+			// format is <text>|<target>
+			if pipe := strings.LastIndexByte(inner, '|'); pipe != -1 {
+				text = inner[:pipe]
+				target = inner[pipe+1:]
+			}
+
+			switch linkChar[0] {
+
+			// external wiki link
+			// technically this used to observe @external.name and @external.root,
+			// but in practice it was also set to wikipedia
+			case '!':
+				formatType = text + "|wp:" + target
+
+			// category link
+			case '~':
+				formatType = text + "|~" + target
+
+			// other non-wiki link
+			case '$':
+				formatType = text + "|" + target
+
+			}
+
+			formatType = "[" + formatType + "]"
 		}
-
-		switch linkChar[0] {
-
-		// external wiki link
-		// technically this used to observe @external.name and @external.root,
-		// but in practice it was also set to wikipedia
-		case '!':
-			formatType = text + "|wp:" + target
-
-		// category link
-		case '~':
-			formatType = text + "|~" + target
-
-		// other non-wiki link
-		case '$':
-			formatType = text + "|" + target
-
-		}
-
-		formatType = "[" + formatType + "]"
 	}
 
 	// [[link]]
