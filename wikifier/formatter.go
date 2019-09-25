@@ -12,6 +12,7 @@ var linkRegex = regexp.MustCompile(`^((\w+)://|\$)`)
 var mailRegex = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
 var colorRegex = regexp.MustCompile(`(?i)^#[\da-f]+$`)
 var wikiRegex = regexp.MustCompile(`^(\w+):`)
+var oldLinkRegex = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
 
 var linkNormalizers = map[string]func(string) string{
 	"wikifier": func(s string) string {
@@ -357,33 +358,36 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 
 	// # deprecated: a link in the form of [~link~], [!link!], or [$link$]
 	// # convert to newer link format
-	// if ($type =~ /^([\!\$\~]+?)(.+)([\!\$\~]+?)$/) {
-	//     my ($link_char, $inner) = ($1, $2);
-	//     my ($target, $text) = ($inner, $inner);
+	if match := oldLinkRegex.FindStringSubmatch(formatType); match != nil {
+		linkChar, inner := match[1], match[2]
+		text, target := inner, inner
 
-	//     # format is <text>|<target>
-	//     if ($inner =~ m/^(.+)\|(.+?)$/) {
-	//         $text   = $1;
-	//         $target = $2;
-	//     }
+		// format is <text>|<target>
+		if pipe := strings.LastIndexByte(inner, '|'); pipe != -1 {
+			text = inner[:pipe]
+			target = inner[pipe+1:]
+		}
 
-	//     # category wiki link [~ category ~]
-	//     if ($link_char eq '~') {
-	//         $type = "[ $text | ~ $target ]";
-	//     }
+		switch linkChar[0] {
 
-	//     # external wiki link [! article !]
-	//     # technically this used to observe @external.name and @external.root,
-	//     # but in practice this was always set to wikipedia, so use 'wp'
-	//     elsif ($link_char eq '!') {
-	//         $type = "[ $text | wp: $target ]";
-	//     }
+		// external wiki link
+		// technically this used to observe @external.name and @external.root,
+		// but in practice it was also set to wikipedia
+		case '!':
+			formatType = text + "|wp:" + target
 
-	//     # other non-wiki link [$ url $]
-	//     elsif ($link_char eq '$') {
-	//         $type = "[ $text | $target ]";
-	//     }
-	// }
+		// category link
+		case '~':
+			formatType = text + "|~" + target
+
+		// other non-wiki link
+		case '$':
+			formatType = text + "|" + target
+
+		}
+
+		formatType = "[" + formatType + "]"
+	}
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
