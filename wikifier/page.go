@@ -12,12 +12,15 @@ import (
 // Page represents a single page or article, generally associated with a .page file.
 // It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
-	Source   string // source content
-	FilePath string // Path to the .page file
-	VarsOnly bool   // True if Parse() should only extract variables
-	styles   []styleEntry
-	parser   *parser // wikifier parser instance
-	main     block   // main block
+	Source     string   // source content
+	FilePath   string   // Path to the .page file
+	VarsOnly   bool     // True if Parse() should only extract variables
+	Opt        PageOpts // page options
+	styles     []styleEntry
+	parser     *parser // wikifier parser instance
+	main       block   // main block
+	images     map[string][][]int
+	imagesFull map[string][][]int
 	*variableScope
 }
 
@@ -77,6 +80,7 @@ func (p *Page) HTML() HTML {
 	return generateBlock(p.main, p)
 }
 
+// CSS generates and returns the CSS code for the page's inline styles.
 func (p *Page) CSS() string {
 	// my $page = shift;
 	// return unless $page->{styles};
