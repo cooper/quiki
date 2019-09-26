@@ -157,12 +157,12 @@ func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, cla
 		// key
 		th := tr.createChild("th", "infobox-key")
 		th.addText(entry.keyTitle)
-		th.addClasses(classes)
+		th.addClass(classes...)
 
 		// value
 		td := tr.createChild("td", "infobox-value")
 		td.add(entry.value)
-		td.addClasses(classes)
+		td.addClass(classes...)
 
 		return
 	}
@@ -171,5 +171,5 @@ func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, cla
 	td := tr.createChild("td", "infobox-anon")
 	td.setAttr("colspan", "2")
 	td.add(entry.value)
-	td.addClasses(classes)
+	td.addClass(classes...)
 }

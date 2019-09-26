@@ -43,8 +43,7 @@ type element interface {
 	createChild(tag, typ string) element
 
 	// classes
-	addClasses(classes []string)
-	addClass(class string)
+	addClass(class ...string)
 	removeClass(class string) bool
 
 	// parent
@@ -228,14 +227,9 @@ func (el *genericElement) setParent(parent element) {
 	el.parentElement = parent // recursive!!
 }
 
-// add classes
-func (el *genericElement) addClasses(classes []string) {
-	el.classes = append(el.classes, classes...)
-}
-
 // add a class
-func (el *genericElement) addClass(class string) {
-	el.classes = append(el.classes, class)
+func (el *genericElement) addClass(class ...string) {
+	el.classes = append(el.classes, class...)
 }
 
 // remove a class, returning true if it was present

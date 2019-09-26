@@ -2,12 +2,16 @@ package wikifier
 
 import (
 	"bufio"
+	"errors"
+	"io"
 	"os"
+	"strings"
 )
 
 // Page represents a single page or article, generally associated with a .page file.
 // It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
+	Source   string  // source content
 	FilePath string  // Path to the .page file
 	VarsOnly bool    // True if Parse() should only extract variables
 	parser   *parser // wikifier parser instance
@@ -20,22 +24,37 @@ func NewPage(filePath string) *Page {
 	return &Page{FilePath: filePath, variableScope: newVariableScope()}
 }
 
+// NewPageSource creates a page given some source code.
+func NewPageSource(source string) *Page {
+	return &Page{Source: source, variableScope: newVariableScope()}
+}
+
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
 func (p *Page) Parse() error {
 	p.parser = newParser()
 	p.main = p.parser.block
-	file, err := os.Open(p.FilePath)
-	if err != nil {
-		return err
+
+	var reader io.Reader
+	if p.Source != "" {
+		reader = strings.NewReader(p.Source)
+	} else if p.FilePath != "" {
+		file, err := os.Open(p.FilePath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader = file
+	} else {
+		return errors.New("neither Source nor FilePath provided")
 	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
+
+	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		if err := p.parser.parseLine(scanner.Bytes(), p); err != nil {
 			return err
 		}
 	}
-	if err = scanner.Err(); err != nil {
+	if err := scanner.Err(); err != nil {
 		return err
 	}
 

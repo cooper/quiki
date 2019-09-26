@@ -136,17 +136,10 @@ func (els *elements) setParent(parent element) {
 	els.parentElement = parent // recursive!!
 }
 
-// Adds some classes to all underlying elements.
-func (els *elements) addClasses(classes []string) {
+// Adds one or more classes to all underlying elements.
+func (els *elements) addClass(class ...string) {
 	for _, el := range els.elements {
-		el.addClasses(classes)
-	}
-}
-
-// Adds a class to all underlying elements.
-func (els *elements) addClass(class string) {
-	for _, el := range els.elements {
-		el.addClass(class)
+		el.addClass(class...)
 	}
 }
 
