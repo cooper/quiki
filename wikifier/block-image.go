@@ -54,6 +54,11 @@ func (image *imageBlock) parse(page *Page) {
 		image.align = image.getString("float")
 	}
 
+	// determine alt text
+	if image.alt == "" {
+		image.alt = image.file
+	}
+
 	// no dimensions. if it's an inbox we can guess it
 	if image.width == 0 && image.height == 0 && image.parentBlock().blockType() == "infobox" {
 		image.width = 270
@@ -163,7 +168,122 @@ func (image *imagebox) html(page *Page, el element) {
 
 // image{} or imagebox{} html
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
+	image.Map.html(page, el)
 
+	// image parse failed, so no need to waste any time here
+	if image.parseFailed {
+		return
+	}
+
+	// add the appropriate float class
+	if isBox {
+		if image.float == "" {
+			image.float = "right"
+		}
+		el.addClass("imagebox-" + image.float)
+	} else if image.float != "" {
+		el.addClass("image-" + image.float)
+	}
+
+	// retina
+	// FIXME: if true -> if the image is not full-size
+	srcset := ""
+	if true && len(page.Opt.Image.Retina) != 0 {
+
+		// find image name and extension
+		imageName, ext := image.path, ""
+		if lastDot := strings.LastIndexByte(image.path, '.'); lastDot != -1 {
+			ext = image.path[:lastDot]
+			imageName = image.path[lastDot+1:]
+		}
+
+		// rewrite a.jpg to a@2x.jpg
+		scales := make([]string, len(page.Opt.Image.Retina))
+		for i, scale := range page.Opt.Image.Retina {
+			scales[i] = imageName + "@" + strconv.Itoa(scale) + "x." + ext
+		}
+
+		srcset = strings.Join(scales, ", ")
+	}
+
+	// determine link
+	linkTarget := ""
+	if image.link == "none" {
+		// we're asked not to link to the image
+		image.link = ""
+
+	} else if image.link != "" {
+		// link to something else
+		// TODO: parse the link
+		linkTarget = "_blank"
+	} else {
+		// link to the image
+
+		image.link = image.path
+	}
+
+	// ############
+	// ### HTML ###
+	// ############
+
+	// create an anchor for the link if there is one
+
+	// this is just an image, no imagebox
+	if !isBox {
+
+		// put in link if there is one
+		divOrA := el
+		if image.link != "" {
+			a := el.createChild("a", "image-a")
+			a.setAttr("href", image.link)
+			a.setAttr("target", linkTarget)
+			divOrA = a
+		}
+
+		// create img with parent as either a or div
+		img := divOrA.createChild("img", "image-img")
+		img.setMeta("nonContainer", true)
+		img.setAttr("src", image.path)
+		img.setAttr("alt", image.alt)
+		img.setAttr("srcset", srcset)
+
+		return
+	}
+
+	// create inner box with width restriction
+	inner := el.createChild("div", "imagebox-inner")
+	inner.setStyle("width", strconv.Itoa(image.width)+"px")
+
+	// put in link if there is one
+	divOrA := inner
+	if image.link != "" {
+		a := inner.createChild("a", "image-a")
+		a.setAttr("href", image.link)
+		a.setAttr("target", linkTarget)
+		divOrA = a
+	}
+
+	// create img with parent as either a or div
+	img := divOrA.createChild("img", "imagebox-img")
+	img.setMeta("nonContainer", true)
+	img.setAttr("src", image.path)
+	img.setAttr("alt", image.alt)
+	img.setAttr("srcset", srcset)
+
+	// insert javascript if using browser sizing
+	if page.Opt.Image.SizeMethod == "javascript" {
+		img.setAttr("onload", "quiki.imageResize(this);")
+	}
+
+	// description. we have to extract this here instead of in parse()
+	// because at the time of parse() its text is not yet formatted
+	if desc, _ := image.Get("description"); desc != nil {
+		inner.createChild(
+			"div", "imagebox-description",
+		).createChild(
+			"div", "imagebox-description-inner",
+		).add(desc)
+	}
 }
 
 // FIXME: use position of the key
@@ -181,6 +301,9 @@ func (image *imageBlock) getPx(key string) int {
 	s, err := image.GetStr(key)
 	if err != nil {
 		image.warn(image.openPos, key+": "+err.Error())
+		return 0
+	}
+	if s == "" {
 		return 0
 	}
 	i, err := strconv.Atoi(strings.TrimSuffix(s, "px"))

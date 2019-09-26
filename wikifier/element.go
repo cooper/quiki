@@ -73,20 +73,18 @@ type genericElement struct {
 	content       []interface{}          // mixed text and child elements
 	parentElement element                // parent element, if any
 	cachedHTML    HTML                   // cached version
-	container     bool                   // true for container elements
 	shouldHide    bool                   // whether to hide the element
 }
 
 func newElement(tag, typ string) element {
 	identifiers[typ]++
 	return &genericElement{
-		_tag:      tag,
-		_id:       typ + "-" + strconv.Itoa(identifiers[typ]),
-		typ:       typ,
-		container: true,
-		attrs:     make(map[string]interface{}),
-		styles:    make(map[string]string),
-		metas:     make(map[string]bool),
+		_tag:   tag,
+		_id:    typ + "-" + strconv.Itoa(identifiers[typ]),
+		typ:    typ,
+		attrs:  make(map[string]interface{}),
+		styles: make(map[string]string),
+		metas:  make(map[string]bool),
 	}
 }
 
@@ -287,12 +285,6 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 		return nil
 	}
 
-	// if we haven't yet determined if this is a container,
-	// check if it has any child elements
-	if !el.container {
-		el.container = len(el.content) != 0
-	}
-
 	// tags
 	if !el.meta("noTags") {
 		openingTag := "<" + el._tag
@@ -325,10 +317,10 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 		// styles
 		styles := ""
 		for key, val := range el.styles {
-			styles += key + ":" + val + "; "
+			styles += key + ": " + val + "; "
 		}
 		if styles != "" {
-			openingTag += ` style="` + styles + `"`
+			openingTag += ` style="` + strings.TrimSpace(styles) + `"`
 		}
 
 		// other attributes
@@ -342,7 +334,7 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 		}
 
 		// non-container
-		if !el.container {
+		if el.meta("nonContainer") {
 			lines = append(lines, indentedLine{openingTag + " />", indent})
 			return lines
 		}

@@ -37,6 +37,7 @@ type pageOptRoot struct {
 
 // image options
 type pageOptImage struct {
+	Retina     []int
 	SizeMethod string
 	Rounding   string
 	Sizer      func(file string, width, height int, page *Page) (path string)
@@ -58,6 +59,7 @@ var defaultPageOpt = PageOpts{
 		Page:     "/page",
 	},
 	Image: pageOptImage{
+		Retina:     []int{2, 3},
 		SizeMethod: "javascript",
 		Rounding:   "normal",
 		Sizer:      nil,

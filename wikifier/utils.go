@@ -56,6 +56,9 @@ func prepareForHTML(value interface{}, page *Page, pos position) interface{} {
 			newValues[idx] = prepareForHTML(val, page, pos)
 		}
 		value = newValues
+	case HTML:
+	default:
+		panic("not sure what to do with this")
 	}
 	return value
 }
