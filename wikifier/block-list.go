@@ -62,7 +62,7 @@ func (l *List) parse(page *Page) {
 	l.didParse = true
 
 	p := new(listParser)
-	for _, pc := range l.visiblePosContent() {
+	for _, pc := range l.posContent() {
 		p.pos = pc.position
 
 		// infer start position to this one

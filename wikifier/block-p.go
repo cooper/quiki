@@ -13,7 +13,7 @@ func newPBlock(name string, b *parserBlock) block {
 func (p *pBlock) html(page *Page, el element) {
 	el.setTag("p")
 
-	for _, pc := range p.visiblePosContent() {
+	for _, pc := range p.posContent() {
 		switch item := pc.content.(type) {
 		case block:
 			item.html(page, item.el())

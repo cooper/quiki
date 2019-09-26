@@ -19,8 +19,6 @@ type block interface {
 	close(pos position)                // closes the block at the given position
 	closed() bool                      // true when closed
 	hierarchy() string                 // human-readable hierarchy
-	invisible() bool                   // true for invisible blocks (generate no html)
-	visiblePosContent() []posContent   // visible text/blocks
 	blockContent() []block             // block children
 	textContent() []string             // text children
 	openPosition() position            // position opened at
@@ -126,10 +124,6 @@ func (b *parserBlock) shouldSkipByte(byte) bool {
 	return false
 }
 
-func (b *parserBlock) invisible() bool {
-	return false
-}
-
 func (b *parserBlock) warn(pos position, warning string) {
 	log.Printf("WARNING: %s{} at %v: %s", b.blockType(), pos, warning)
 }
@@ -152,15 +146,4 @@ func (b *parserBlock) textContent() []string {
 		}
 	}
 	return text
-}
-
-func (b *parserBlock) visiblePosContent() []posContent {
-	content := make([]posContent, 0)
-	for _, pc := range b.posContent() {
-		if blk, ok := pc.content.(block); ok && blk.invisible() {
-			continue
-		}
-		content = append(content, pc)
-	}
-	return content
 }

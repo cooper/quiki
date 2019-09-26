@@ -20,7 +20,7 @@ func (sec *secBlock) html(page *Page, el element) {
 
 	// iterate over visible content only
 	var contentToAdd []posContent
-	for _, pc := range sec.visiblePosContent() {
+	for _, pc := range sec.posContent() {
 		switch item := pc.content.(type) {
 		case block:
 

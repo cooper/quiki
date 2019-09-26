@@ -80,7 +80,7 @@ func (m *Map) parse(page *Page) {
 	m.didParse = true
 
 	p := new(mapParser)
-	for _, pc := range m.visiblePosContent() {
+	for _, pc := range m.posContent() {
 		p.pos = pc.position
 
 		// infer start position to this one
