@@ -307,7 +307,7 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) HT
 func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTML {
 
 	// static format
-	if format, exists := staticFormats[formatType]; exists {
+	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
 		return HTML(format)
 	}
 
