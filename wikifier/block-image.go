@@ -61,6 +61,7 @@ func (image *imageBlock) parse(page *Page) {
 
 	// no file - this is mandatory
 	if image.file == "" {
+		image.warn(image.openPos, "No file specified for image")
 		image.parseFailed = true
 		return
 	}
@@ -129,20 +130,23 @@ func (image *imageBlock) parse(page *Page) {
 			true, // override generation
 		)
 
-		orFullSize := func(wh int) int {
-			if fullSize {
-				return 0
-			}
-			return wh
-		}
-
 		// call the image sizer
-		image.path = page.Opt.Image.Sizer(
-			image.file,
-			orFullSize(w),
-			orFullSize(h),
-			page,
-		)
+		// use 0x0 if the image calc said to use the full size image
+		if fullSize {
+			image.path = page.Opt.Image.Sizer(
+				image.file,
+				0,
+				0,
+				page,
+			)
+		} else {
+			image.path = page.Opt.Image.Sizer(
+				image.file,
+				w,
+				h,
+				page,
+			)
+		}
 
 		// remember if we're using the fullsize version
 		// so that we don't attempt to retina-scale it
