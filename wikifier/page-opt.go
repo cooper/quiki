@@ -60,14 +60,6 @@ var defaultPageOpt = PageOpts{
 	Image: pageOptImage{
 		SizeMethod: "javascript",
 		Rounding:   "normal",
-		Sizer:      defaultPageImageSizer,
+		Sizer:      nil,
 	},
-}
-
-func defaultPageImageCalc(file string, width, height int, page *Page, override bool) (w, h, bigW, bigH int, fullSize bool) {
-	return
-}
-
-func defaultPageImageSizer(file string, width, height int, page *Page) string {
-	return ""
 }

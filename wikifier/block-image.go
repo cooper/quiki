@@ -119,6 +119,13 @@ func (image *imageBlock) parse(page *Page) {
 		// - faster page load (since image files are smaller)
 		// - require read access to local image directory
 
+		// this must be provided by wiki
+		if page.Opt.Image.Sizer == nil {
+			image.warn(image.openPos, "image.sizer required with image.size_method 'server'")
+			image.parseFailed = true
+			return
+		}
+
 		// path is as returned by the function that sizes the image
 		image.path = page.Opt.Image.Sizer(
 			image.file,
