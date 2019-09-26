@@ -1,0 +1,5 @@
+fmt {
+    <div>
+        [b]Bold text[/b]
+    </div>
+}
