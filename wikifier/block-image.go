@@ -13,7 +13,7 @@ type imageBlock struct {
 	align, float, author, license   string
 	widthString, heightString       string
 	width, height                   int
-	parseFailed, useJS, useFullSize bool
+	parseFailed, useJS              bool
 	*Map
 }
 
@@ -119,42 +119,16 @@ func (image *imageBlock) parse(page *Page) {
 		// - faster page load (since image files are smaller)
 		// - require read access to local image directory
 
-		// find the resized dimensions
-		var bigW, bigH int
-		var fullSize bool
-		w, h, bigW, bigH, fullSize = page.Opt.Image.Calc(
+		// path is as returned by the function that sizes the image
+		image.path = page.Opt.Image.Sizer(
 			image.file,
-			image.width,
-			image.height,
+			w,
+			h,
 			page,
-			true, // override generation
 		)
-
-		// call the image sizer
-		// use 0x0 if the image calc said to use the full size image
-		if fullSize {
-			image.path = page.Opt.Image.Sizer(
-				image.file,
-				0,
-				0,
-				page,
-			)
-		} else {
-			image.path = page.Opt.Image.Sizer(
-				image.file,
-				w,
-				h,
-				page,
-			)
-		}
-
-		// remember if we're using the fullsize version
-		// so that we don't attempt to retina-scale it
-		image.useFullSize = true
 
 		// remember that we use this image in these dimensions on this page
 		page.images[image.file] = append(page.images[image.file], []int{w, h})
-		page.imagesFull[image.file] = append(page.imagesFull[image.file], []int{bigW, bigH})
 	}
 
 	// convert dimensions to string
