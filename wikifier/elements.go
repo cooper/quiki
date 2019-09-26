@@ -8,6 +8,7 @@ type elements struct {
 	metas         map[string]bool
 	cachedHTML    HTML
 	parentElement element
+	shouldHide    bool
 }
 
 // Creates a collection of elements.
@@ -17,6 +18,14 @@ func newElements(els []element) *elements {
 
 func (els *elements) id() string {
 	return "elements"
+}
+
+func (els *elements) hide() {
+	els.shouldHide = true
+}
+
+func (els *elements) hidden() bool {
+	return els.shouldHide
 }
 
 // If els is empty, returns an empty string.
@@ -173,6 +182,10 @@ func (els *elements) generate() HTML {
 // Generates and returns HTML for the elements with an indent applied.
 func (els *elements) generateIndented(indent int) []indentedLine {
 	var lines []indentedLine
+
+	if els.hidden() {
+		return nil
+	}
 
 	// add each
 	for i, el := range els.elements {

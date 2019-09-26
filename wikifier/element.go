@@ -53,6 +53,10 @@ type element interface {
 	parent() element
 	setParent(parent element)
 
+	// invisibility
+	hide()
+	hidden() bool
+
 	// html generation
 	generate() HTML
 	generateIndented(indent int) []indentedLine
@@ -70,6 +74,7 @@ type genericElement struct {
 	parentElement element                // parent element, if any
 	cachedHTML    HTML                   // cached version
 	container     bool                   // true for container elements
+	shouldHide    bool                   // whether to hide the element
 }
 
 func newElement(tag, typ string) element {
@@ -251,6 +256,14 @@ func (el *genericElement) removeClass(class string) bool {
 	return false
 }
 
+func (el *genericElement) hide() {
+	el.shouldHide = true
+}
+
+func (el *genericElement) hidden() bool {
+	return el.shouldHide
+}
+
 func (el *genericElement) generate() HTML {
 
 	// cached version
@@ -269,6 +282,10 @@ type indentedLine struct {
 
 func (el *genericElement) generateIndented(indent int) []indentedLine {
 	var lines []indentedLine
+
+	if el.hidden() {
+		return nil
+	}
 
 	// if we haven't yet determined if this is a container,
 	// check if it has any child elements

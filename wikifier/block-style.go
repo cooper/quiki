@@ -24,10 +24,6 @@ func newStyleBlock(name string, b *parserBlock) block {
 	return &styleBlock{styleEntry{}, newMapBlock("", b).(*Map)}
 }
 
-// func (sb *styleBlock) invisible() bool {
-// 	return true
-// }
-
 func (sb *styleBlock) parse(page *Page) {
 
 	// my ($block, $page) = (shift, @_);
@@ -112,6 +108,7 @@ func (sb *styleBlock) parse(page *Page) {
 }
 
 func (sb *styleBlock) html(page *Page, el element) {
+	el.hide()
 	// my ($block, $page) = (shift, @_);
 	// my %style     = %{ $block->{style} };
 	style := sb.style
