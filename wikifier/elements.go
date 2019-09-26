@@ -15,6 +15,10 @@ func newElements(els []element) *elements {
 	return &elements{elements: els, metas: make(map[string]bool)}
 }
 
+func (els *elements) id() string {
+	return "elements"
+}
+
 // If els is empty, returns an empty string.
 // Otherwise, returns the first element's tag.
 func (els *elements) tag() string {

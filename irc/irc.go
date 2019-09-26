@@ -25,10 +25,16 @@ func main() {
 
 			var reply string
 
+			// html
 			if err := page.Parse(); err != nil {
 				reply = err.Error()
 			} else {
 				reply = string(page.HTML())
+			}
+
+			// css
+			if css := page.CSS(); css != "" {
+				reply += "\n\nCSS:\n" + css
 			}
 
 			for _, line := range strings.Split(reply, "\n") {

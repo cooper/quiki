@@ -10,9 +10,6 @@ func newPBlock(name string, b *parserBlock) block {
 	return &pBlock{parserBlock: b}
 }
 
-func (p *pBlock) parse(page *Page) {
-}
-
 func (p *pBlock) html(page *Page, el element) {
 	el.setTag("p")
 

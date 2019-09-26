@@ -14,6 +14,9 @@ type HTML string
 
 type element interface {
 
+	// ID
+	id() string
+
 	// tag/type
 	tag() string
 	setTag(tag string)
@@ -57,10 +60,10 @@ type element interface {
 
 type genericElement struct {
 	_tag          string                 // html tag
+	_id           string                 // unique element identifier
 	attrs         map[string]interface{} // html attributes
 	styles        map[string]string      // inline styles
 	metas         map[string]bool        // metadata
-	id            string                 // unique element identifier
 	typ           string                 // primary quiki class
 	classes       []string               // quiki user-defined classes
 	content       []interface{}          // mixed text and child elements
@@ -73,13 +76,18 @@ func newElement(tag, typ string) element {
 	identifiers[typ]++
 	return &genericElement{
 		_tag:      tag,
-		id:        typ + "-" + strconv.Itoa(identifiers[typ]),
+		_id:       typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:       typ,
 		container: true,
 		attrs:     make(map[string]interface{}),
 		styles:    make(map[string]string),
 		metas:     make(map[string]bool),
 	}
+}
+
+// fetch ID
+func (el *genericElement) id() string {
+	return el._id
 }
 
 // fetch tag
@@ -291,7 +299,7 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 
 		// inject ID
 		if el.meta("needID") {
-			classes = append([]string{"q-" + el.id}, classes...)
+			classes = append([]string{"q-" + el._id}, classes...)
 		}
 		if len(classes) != 0 {
 			openingTag += ` class="` + strings.Join(classes, " ") + `"`

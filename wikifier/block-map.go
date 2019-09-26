@@ -13,8 +13,9 @@ var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
 // Map represents a Key-value dictionary.
 // It is a quiki data type as well as the base of many block types.
 type Map struct {
-	didParse bool
-	mapList  []*mapListEntry
+	noFormatValues bool
+	didParse       bool
+	mapList        []*mapListEntry
 	*parserBlock
 	*variableScope
 }
@@ -63,11 +64,11 @@ func NewMap(mb block) *Map {
 		element:      newElement("div", "map"),
 		genericCatch: &genericCatch{},
 	}
-	return &Map{false, nil, underlying, newVariableScope()}
+	return &Map{false, false, nil, underlying, newVariableScope()}
 }
 
 func newMapBlock(name string, b *parserBlock) block {
-	return &Map{false, nil, b, newVariableScope()}
+	return &Map{false, false, nil, b, newVariableScope()}
 }
 
 func (m *Map) parse(page *Page) {
@@ -325,6 +326,9 @@ func (m *Map) warnMaybe(p *mapParser) {
 }
 
 func (m *Map) html(page *Page, el element) {
+	if m.noFormatValues {
+		return
+	}
 	for i, entry := range m.mapList {
 		m.mapList[i].value = prepareForHTML(entry.value, page, entry.pos)
 		m.setOwn(entry.key, m.mapList[i].value)
