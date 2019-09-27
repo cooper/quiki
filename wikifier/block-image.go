@@ -34,7 +34,6 @@ func newImagebox(name string, b *parserBlock) block {
 // image{} or imagebox{} parse
 func (image *imageBlock) parse(page *Page) {
 	image.Map.parse(page)
-	var w, h int
 
 	// fetch string values from map
 	image.file = image.getString("file")
@@ -85,14 +84,6 @@ func (image *imageBlock) parse(page *Page) {
 		// if the file is an absolute URL, we cannot size the image
 		// do nothing
 
-	} else if image.width != 0 && image.height != 0 {
-		// both dimensions were given, so we need to do no sizing.
-		// FIXME: this forces the full size image instead of generating in the
-		// given dimensions
-
-		w = image.width
-		h = image.height
-
 	} else if sizeMethod == "javascript" {
 		// use javascript image sizing
 		//
@@ -103,15 +94,8 @@ func (image *imageBlock) parse(page *Page) {
 		// inject javascript resizer if no width is given
 		if image.width == 0 {
 			image.useJS = true
+			image.width = 200 // dummy will be overridden by javascript
 		}
-
-		// width and height dummies will be overriden by JavaScript
-		if image.width == 0 {
-			w = 200
-		} else {
-			w = image.width
-		}
-		h = image.height
 
 		// path is file relative to image root (full size image)
 		image.path = page.Opt.Root.Image + "/" + image.file
@@ -134,25 +118,25 @@ func (image *imageBlock) parse(page *Page) {
 		// path is as returned by the function that sizes the image
 		image.path = page.Opt.Image.Sizer(
 			image.file,
-			w,
-			h,
+			image.width,
+			image.height,
 			page,
 		)
 
 		// remember that we use this image in these dimensions on this page
-		page.images[image.file] = append(page.images[image.file], []int{w, h})
+		page.images[image.file] = append(page.images[image.file], []int{image.width, image.height})
 	}
 
 	// convert dimensions to string
-	if w == 0 {
+	if image.width == 0 {
 		image.widthString = "auto"
 	} else {
-		image.widthString = strconv.Itoa(w) + "px"
+		image.widthString = strconv.Itoa(image.width) + "px"
 	}
-	if h == 0 {
+	if image.height == 0 {
 		image.heightString = "auto"
 	} else {
-		image.heightString = strconv.Itoa(h) + "px"
+		image.heightString = strconv.Itoa(image.height) + "px"
 	}
 }
 
