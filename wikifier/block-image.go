@@ -123,8 +123,9 @@ func (image *imageBlock) parse(page *Page) {
 			page,
 		)
 
-		// remember that we use this image in these dimensions on this page
+		// remember that the page uses this image in these dimensions
 		page.images[image.file] = append(page.images[image.file], []int{image.width, image.height})
+
 	} else {
 		image.warn(image.openPos, "image.size_method neither 'javascript' nor 'server'")
 		image.parseFailed = true
@@ -203,8 +204,16 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 
 	} else if image.link != "" {
 		// link to something else
-		// TODO: parse the link
-		linkTarget = "_blank"
+
+		// parse the link
+		// ok, displaySame bool, target, display, tooltip, linkType string
+		if ok, _, target, _, _, _ := parseLink(image.link); ok {
+			image.link = target
+			linkTarget = "_blank"
+		} else {
+			image.link = ""
+		}
+
 	} else {
 		// link to the image
 

@@ -171,23 +171,32 @@ var colors = map[string]string{
 }
 
 var staticFormats = map[string]string{
-	"i":   `<span style="font-style: italic;">`,            // italic
-	"b":   `<span style="font-weight: bold;">`,             // bold
-	"s":   `<span style="text-decoration: line-through;">`, // strike
-	"c":   `<code>`,                                        // inline code
-	"/c":  `</code>`,
-	"/s":  `</span>`,
-	"/b":  `</span>`,
-	"/i":  `</span>`,
-	"q":   `<span style="font-style: italic;">"`, // inline quote
-	"/q":  `"</span>`,
-	"^":   `<sup>`, // superscript
-	"/^":  `</sup>`,
-	"v":   `<sub>`, // subscript
-	"/v":  `</sub>`,
-	"/":   `</span>`,
-	"nl":  `<br />`,  // line break
-	"br":  `<br />`,  // (deprecated)
+	"i":  `<span style="font-style: italic;">`, // italic
+	"/i": `</span>`,
+
+	"b":  `<span style="font-weight: bold;">`, // bold
+	"/b": `</span>`,
+
+	"s":  `<span style="text-decoration: line-through;">`, // strike
+	"/s": `</span>`,
+
+	"c":  `<code>`, // inline code
+	"/c": `</code>`,
+
+	"q":  `<span style="font-style: italic;">"`, // inline quote
+	"/q": `"</span>`,
+
+	"^":  `<sup>`, // superscript
+	"/^": `</sup>`,
+
+	"v":  `<sub>`, // subscript
+	"/v": `</sub>`,
+
+	"/": `</span>`, // ends a color
+
+	"nl": `<br />`, // line break
+	"br": `<br />`, // (deprecated)
+
 	"--":  `&ndash;`, // en dash
 	"---": `&mdash;`, // em dash
 }
