@@ -65,7 +65,7 @@ func (image *imageBlock) parse(page *Page) {
 
 	// no file - this is mandatory
 	if image.file == "" {
-		image.warn(image.openPos, "No file specified for image")
+		image.warn(image.getKeyPos("file"), "No file specified for image")
 		image.parseFailed = true
 		return
 	}
@@ -125,6 +125,10 @@ func (image *imageBlock) parse(page *Page) {
 
 		// remember that we use this image in these dimensions on this page
 		page.images[image.file] = append(page.images[image.file], []int{image.width, image.height})
+	} else {
+		image.warn(image.openPos, "image.size_method neither 'javascript' nor 'server'")
+		image.parseFailed = true
+		return
 	}
 
 	// convert dimensions to string
@@ -177,14 +181,15 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 		// find image name and extension
 		imageName, ext := image.path, ""
 		if lastDot := strings.LastIndexByte(image.path, '.'); lastDot != -1 {
-			ext = image.path[:lastDot]
-			imageName = image.path[lastDot+1:]
+			imageName = image.path[:lastDot]
+			ext = image.path[lastDot:]
 		}
 
 		// rewrite a.jpg to a@2x.jpg
 		scales := make([]string, len(page.Opt.Image.Retina))
 		for i, scale := range page.Opt.Image.Retina {
-			scales[i] = imageName + "@" + strconv.Itoa(scale) + "x." + ext
+			scaleStr := strconv.Itoa(scale) + "x"
+			scales[i] = imageName + "@" + scaleStr + ext + " " + scaleStr
 		}
 
 		srcset = strings.Join(scales, ", ")
@@ -255,7 +260,7 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	img.setAttr("srcset", srcset)
 
 	// insert javascript if using browser sizing
-	if page.Opt.Image.SizeMethod == "javascript" {
+	if image.useJS {
 		img.setAttr("onload", "quiki.imageResize(this);")
 	}
 
@@ -274,6 +279,7 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	}
 }
 
+// fetch a string key, producing a warning at the appropriate spot if needed
 func (image *imageBlock) getString(key string) string {
 	s, err := image.GetStr(key)
 	if err != nil {
@@ -283,6 +289,7 @@ func (image *imageBlock) getString(key string) string {
 	return s
 }
 
+// fetch a pixel size key, producing a warning at the appropriate spot if needed
 func (image *imageBlock) getPx(key string) int {
 	s, err := image.GetStr(key)
 	if err != nil {

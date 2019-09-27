@@ -344,6 +344,8 @@ func (m *Map) warnMaybe(p *mapParser) {
 	}
 }
 
+// default behavior for maps is to run html() on all children
+// and replace the block value in the map with the generated element
 func (m *Map) html(page *Page, el element) {
 	if m.noFormatValues {
 		return
@@ -354,6 +356,8 @@ func (m *Map) html(page *Page, el element) {
 	}
 }
 
+// since maps can be stored in variables and are generated on the fly,
+// we sometimes need the main block to associate them with
 func (m *Map) mainBlock() block {
 	var b block = m
 	for b.parentBlock() != nil {
