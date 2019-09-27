@@ -20,7 +20,8 @@ type PageOpts struct {
 
 // actual file paths
 type pageOptDir struct {
-	Wikifier string // path to wikifier
+	Wikifier string // path to wikifier directory
+	Wiki     string // path to wiki root directory
 	Image    string // path to image directory
 	Page     string // path to page directory
 	Model    string // path to model directory
