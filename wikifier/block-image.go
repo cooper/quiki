@@ -277,7 +277,11 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 
 	// description. we have to extract this here instead of in parse()
 	// because at the time of parse() its text is not yet formatted
-	if desc, _ := image.Get("description"); desc != nil {
+	desc, _ := image.Get("description")
+	if desc == nil {
+		desc, _ = image.Get("desc")
+	}
+	if desc != nil {
 		inner.createChild(
 			"div", "imagebox-description",
 		).createChild(
