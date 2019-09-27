@@ -1,7 +1,5 @@
 package wikifier
 
-import "fmt"
-
 // infobox{}
 
 // infobox{} displays a summary of information for an article.
@@ -57,7 +55,7 @@ func (is *infosec) multi() bool {
 
 // parse parses the infosec contents.
 func (is *infosec) parse(page *Page) {
-	fmt.Printf("is.Map: %v\n", is.Map.mapList)
+	// fmt.Printf("is.Map: %v\n", is.Map.mapList)
 	is.Map.parse(page)
 }
 
@@ -84,7 +82,7 @@ func (is *infosec) html(page *Page, els element) {
 
 	infoTableAddRows(is, els, page, is.mapList)
 
-	fmt.Printf("After infosec{} html(%V)endhtml", els.generate())
+	// fmt.Printf("After infosec{} html(%V)endhtml", els.generate())
 }
 
 // INTERNALS
@@ -94,11 +92,11 @@ func (is *infosec) html(page *Page, els element) {
 func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
 	hasTitle := false
 
-	fmt.Printf("addRows for %v; %v items\n", infoboxOrSec.String(), len(pairs))
+	// fmt.Printf("addRows for %v; %v items\n", infoboxOrSec.String(), len(pairs))
 
 	// add a row for each entry
 	for i, entry := range pairs {
-		fmt.Printf("...add item: value(%+v)\n", entry)
+		// fmt.Printf("...add item: value(%+v)\n", entry)
 
 		// if the value is from infosec{}, add each row
 		if els, ok := entry.value.(element); ok && els.meta("isInfosec") {

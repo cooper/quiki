@@ -3,7 +3,6 @@ package wikifier
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -109,7 +108,7 @@ func (p *Page) CSS() string {
 }
 
 func (p *Page) cssApplyString(sets [][]string) string {
-	fmt.Printf("sets: %v\n", sets)
+	// fmt.Printf("sets: %v\n", sets)
 	// my ($page, @sets) = @_;
 	// # @sets = an array of [
 	// #   ['section'],

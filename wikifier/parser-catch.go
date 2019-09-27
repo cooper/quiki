@@ -1,8 +1,6 @@
 package wikifier
 
 import (
-	"fmt"
-	"log"
 	"strings"
 )
 
@@ -85,15 +83,15 @@ func (c *genericCatch) appendContent(content interface{}, pos position) {
 }
 
 func (c *genericCatch) appendContents(pc []posContent) {
-	log.Printf("pushContents: %v", pc)
+	// log.Printf("pushContents: %v", pc)
 	c.positioned = append(c.positioned, pc...)
 }
 
 // append an existing string if the last item is one
 func (c *genericCatch) appendString(s string, pos position) {
-	log.Printf("appendString: %v", s)
+	// log.Printf("appendString: %v", s)
 	c.line += s
-	fmt.Println("line", c.line)
+	// fmt.Println("line", c.line)
 
 	if s[len(s)-1] == '\n' {
 		if !c.firstNewline && len(c.line) > 2 {
@@ -105,9 +103,9 @@ func (c *genericCatch) appendString(s string, pos position) {
 				c.removeIndent = c.line[:difference]
 				// s = afterTrim
 			}
-			log.Printf("INDENT(%s) = (%s)", c.line, c.removeIndent)
+			// log.Printf("INDENT(%s) = (%s)", c.line, c.removeIndent)
 		}
-		fmt.Println("COMPLETE LINE:", strings.TrimPrefix(c.line, c.removeIndent))
+		// fmt.Println("COMPLETE LINE:", strings.TrimPrefix(c.line, c.removeIndent))
 		c.finishLine()
 	}
 
@@ -160,7 +158,7 @@ func (c *genericCatch) finishLine() {
 }
 
 func (c *genericCatch) pushContent(item interface{}, pos position) {
-	log.Printf("pushContent: %v/%v", item, pos)
+	// log.Printf("pushContent: %v/%v", item, pos)
 	c.positioned = append(c.positioned, posContent{item, pos})
 }
 
