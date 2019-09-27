@@ -2,6 +2,8 @@ package wikifier
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 )
 
@@ -187,4 +189,116 @@ func reverseString(s string) string {
 		runes[i], runes[j] = runes[j], runes[i]
 	}
 	return string(runes)
+}
+
+func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]string, error) {
+	uniqueFiles := make(map[string]string)
+
+	// nothin in, nothin out
+	if dir == "" {
+		return nil, nil
+	}
+
+	// no need for trailing /
+	if dir[len(dir)-1] == '/' {
+		dir = dir[:len(dir)-1]
+	}
+
+	dirAbs, _ := filepath.Abs(dir)
+
+	var doDir func(pfx string)
+	doDir = func(pfx string) {
+		dir := dir + "/" + pfx
+		fmt.Println("doDir", pfx, dir)
+
+		// can't open directory
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			// TODO: report the error somehow
+			fmt.Println(err)
+			return
+		}
+
+		// check each file
+		for _, file := range files {
+			path := dir + file.Name()
+
+			// skip hidden files
+			if file.Name()[0] == '.' {
+				fmt.Println("hidden", file.Name())
+				continue
+			}
+
+			// this is a directory
+			if file.IsDir() {
+				if !thisDirOnly {
+					doDir(pfx + file.Name() + "/")
+				}
+				continue
+			}
+
+			// find extension
+			ext := ""
+			if lastDot := strings.LastIndexByte(file.Name(), '.'); lastDot != -1 && lastDot < len(file.Name())-1 {
+				ext = file.Name()[lastDot+1:]
+			}
+
+			// skip files without desired extension
+			skip := true
+			for _, acceptable := range extensions {
+				fmt.Println("check", file.Name(), ext, "==", acceptable)
+
+				if ext == acceptable {
+					skip = false
+					break
+				}
+			}
+			if skip {
+				continue
+			}
+
+			// resolve symlinks
+			symlinkOrOrig, err := filepath.EvalSymlinks(path)
+			fmt.Println("sym", path, symlinkOrOrig, err)
+			if err != nil {
+				continue
+			}
+
+			// resolve absolute path
+			abs, err := filepath.Abs(symlinkOrOrig)
+			fmt.Println("abs", path, abs, err)
+			if err != nil {
+				// TODO: report the error
+				continue
+			}
+
+			// use the basename of the resolved path only if the target
+			// file is in the same directory; otherwise use the original path
+			filename := path
+			a, b := filepath.Rel(dirAbs, abs)
+			fmt.Println("rel", path, abs, a, b)
+
+			if rel, err := filepath.Rel(dirAbs, abs); err == nil {
+				if strings.IndexByte(rel, '/') == -1 {
+					filename = abs
+				}
+			}
+			filename = filepath.Base(filename)
+
+			// remember this file
+			uniqueFiles[strings.ToLower(pfx+filename)] = pfx + filename
+		}
+	}
+
+	doDir("")
+
+	// convert back to list
+	i := 0
+	unique := make([]string, len(uniqueFiles))
+	for _, name := range uniqueFiles {
+		unique[i] = name
+		i++
+	}
+
+	return unique, nil
 }
