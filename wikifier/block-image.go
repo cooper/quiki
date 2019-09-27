@@ -290,21 +290,19 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	}
 }
 
-// FIXME: use position of the key
 func (image *imageBlock) getString(key string) string {
 	s, err := image.GetStr(key)
 	if err != nil {
-		image.warn(image.openPos, key+": "+err.Error())
+		image.warn(image.getKeyPos(key), key+": "+err.Error())
 		return ""
 	}
 	return s
 }
 
-// FIXME: use position of the key
 func (image *imageBlock) getPx(key string) int {
 	s, err := image.GetStr(key)
 	if err != nil {
-		image.warn(image.openPos, key+": "+err.Error())
+		image.warn(image.getKeyPos(key), key+": "+err.Error())
 		return 0
 	}
 	if s == "" {
@@ -312,7 +310,7 @@ func (image *imageBlock) getPx(key string) int {
 	}
 	i, err := strconv.Atoi(strings.TrimSuffix(s, "px"))
 	if err != nil {
-		image.warn(image.openPos, key+": "+err.Error())
+		image.warn(image.getKeyPos(key), key+": "+err.Error())
 		return 0
 	}
 	return i

@@ -299,6 +299,25 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 	}
 }
 
+// getEntry fetches the MapListEntry for a key.
+func (m *Map) getEntry(key string) *mapListEntry {
+	for _, entry := range m.mapList {
+		if entry.key == key {
+			return entry
+		}
+	}
+	return nil
+}
+
+// getKeyPos returns the position where a key started.
+// If the key doesn't exist, it returns the position where the map started.
+func (m *Map) getKeyPos(key string) position {
+	if entry := m.getEntry(key); entry != nil {
+		return entry.pos
+	}
+	return m.openPos
+}
+
 // produce warnings as needed at current parser state
 func (m *Map) warnMaybe(p *mapParser) {
 	hrKey := humanReadableValue(p.key)
