@@ -190,7 +190,7 @@ func InjectPageOpts(page *Page, opt *PageOpts) error {
 		opt.Category.PerPage = intVal
 	}
 
-	// 'search.enable' - whether to enable search optimization
+	// search.enable - whether to enable search optimization
 	enable, err = page.GetBool("search.enable")
 	if err != nil {
 		return errors.Wrap(err, "search.enable")

@@ -37,6 +37,7 @@ func (p *Page) Parse() error {
 	p.parser = newParser()
 	p.main = p.parser.block
 
+	// create reader from file path or source code provided
 	var reader io.Reader
 	if p.Source != "" {
 		reader = strings.NewReader(p.Source)
@@ -51,6 +52,7 @@ func (p *Page) Parse() error {
 		return errors.New("neither Source nor FilePath provided")
 	}
 
+	// parse line-by-line
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		if err := p.parser.parseLine(scanner.Bytes(), p); err != nil {
@@ -63,9 +65,15 @@ func (p *Page) Parse() error {
 
 	// TODO: check if p.parser.catch != main block
 
-	//  parse the blocks, unless we only want vars
+	// parse the blocks, unless we only want vars
 	if !p.VarsOnly {
 		p.main.parse(p)
+	}
+
+	// inject variables set in the page to page opts
+	if err := InjectPageOpts(p, &p.Opt); err != nil {
+		// TODO: position
+		return err
 	}
 
 	return nil

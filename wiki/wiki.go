@@ -40,3 +40,11 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 	// no errors occurred
 	return w, nil
 }
+
+// NewPage creates a Page given its filepath and configures it for
+// use with this Wiki.
+func (w *Wiki) NewPage(filePath string) *wikifier.Page {
+	p := wikifier.NewPage(filePath)
+	p.Opt = w.Opt
+	return p
+}
