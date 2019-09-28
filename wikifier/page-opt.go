@@ -20,22 +20,22 @@ import (
 type PageOpts struct {
 	Name     string // wiki name
 	MainPage string // name of main page
-	Page     pageOptPage
-	Dir      pageOptDir
-	Root     pageOptRoot
-	Image    pageOptImage
-	Category pageOptCategory
-	Search   pageOptSearch
+	Page     PageOptPage
+	Dir      PageOptDir
+	Root     PageOptRoot
+	Image    PageOptImage
+	Category PageOptCategory
+	Search   PageOptSearch
 }
 
-// page options
-type pageOptPage struct {
+// PageOptPage describes option relating to a page.
+type PageOptPage struct {
 	EnableTitle bool // enable page title headings
 	EnableCache bool // enable page caching
 }
 
-// actual file paths
-type pageOptDir struct {
+// PageOptDir describes actual filepaths to wiki resources.
+type PageOptDir struct {
 	Wikifier string // path to wikifier directory
 	Wiki     string // path to wiki root directory
 	Image    string // path to image directory
@@ -44,61 +44,62 @@ type pageOptDir struct {
 	Cache    string // path to cache directory
 }
 
-// web resource paths
-type pageOptRoot struct {
+// PageOptRoot describes HTTP paths to wiki resources.
+type PageOptRoot struct {
 	Wiki     string // wiki root path
 	Image    string // image root path
 	Category string // category root path
 	Page     string // page root path
 }
 
-// image options
-type pageOptImage struct {
+// PageOptImage describes wiki imaging options.
+type PageOptImage struct {
 	Retina     []int
 	SizeMethod string
 	Rounding   string
 	Sizer      func(file string, width, height int, page *Page) (path string)
 }
 
-// category options
-type pageOptCategory struct {
+// PageOptCategory describes wiki category options.
+type PageOptCategory struct {
 	PerPage int
 }
 
-// search options
-type pageOptSearch struct {
+// PageOptSearch describes wiki search options.
+type PageOptSearch struct {
 	Enable bool
 }
 
 // defaults for Page
 var defaultPageOpt = PageOpts{
-	Page: pageOptPage{
+	Page: PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
 	},
-	Dir: pageOptDir{
+	Dir: PageOptDir{
 		Wikifier: ".",
+		Wiki:     "",
 		Image:    "images",
 		Page:     "pages",
 		Model:    "models",
 		Cache:    "cache",
 	},
-	Root: pageOptRoot{
+	Root: PageOptRoot{
 		Wiki:     "", // aka /
 		Image:    "/images",
 		Category: "/topic",
 		Page:     "/page",
 	},
-	Image: pageOptImage{
+	Image: PageOptImage{
 		Retina:     []int{2, 3},
 		SizeMethod: "javascript",
 		Rounding:   "normal",
 		Sizer:      nil,
 	},
-	Category: pageOptCategory{
+	Category: PageOptCategory{
 		PerPage: 5,
 	},
-	Search: pageOptSearch{
+	Search: PageOptSearch{
 		Enable: true,
 	},
 }

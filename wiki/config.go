@@ -6,19 +6,36 @@ import (
 )
 
 var defaultWikiOpt = wikifier.PageOpts{
-	// TODO:
-	// 'page.enable.cache'             => 1,
-	// 'image.enable.restriction'      => 1,
-	// 'image.enable.cache'            => 1,
-	// 'image.enable.retina'           => 3,
-	// 'image.enable.tracking'         => 1,
-	// 'image.enable.pregeneration'    => 1,
-	// 'image.rounding'                => 'up',
-	// 'image.size_method'             => 'server',
-	// 'image.sizer'                   => \&_wiki_default_sizer,   # from Images
-	// 'image.calc'                    => \&_wiki_default_calc,    # from Images
-	// 'cat.per_page'                  => 5,
-	// 'search.enable'                 => 1
+	Page: wikifier.PageOptPage{
+		EnableTitle: true,
+		EnableCache: false,
+	},
+	Dir: wikifier.PageOptDir{
+		Wikifier: ".",
+		Wiki:     "",
+		Image:    "images",
+		Page:     "pages",
+		Model:    "models",
+		Cache:    "cache",
+	},
+	Root: wikifier.PageOptRoot{
+		Wiki:     "", // aka /
+		Image:    "/images",
+		Category: "/topic",
+		Page:     "/page",
+	},
+	Image: wikifier.PageOptImage{
+		Retina:     []int{2, 3},
+		SizeMethod: "server",
+		Rounding:   "normal",
+		Sizer:      nil, // FIXME
+	},
+	Category: wikifier.PageOptCategory{
+		PerPage: 5,
+	},
+	Search: wikifier.PageOptSearch{
+		Enable: true,
+	},
 }
 
 func (w *Wiki) readConfig(file string) error {
