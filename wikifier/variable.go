@@ -2,7 +2,6 @@ package wikifier
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -68,6 +67,7 @@ func (scope *variableScope) Set(key string, value interface{}) error {
 		// this location doesn't exist; make a new map
 		if newWhere == nil {
 			newWhere = NewMap(where.mainBlock())
+			where.setOwn(name, newWhere)
 			// TODO: maybe somehow include some positioning info here?
 		}
 
@@ -95,7 +95,7 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 	parts := strings.Split(key, ".")
 	setting, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
-	for i, name := range parts {
+	for _, name := range parts {
 		newWhere, err := where.GetObj(name)
 		if err != nil {
 			return nil, err
@@ -103,7 +103,7 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 
 		// no error, but there's nothing there
 		if newWhere == nil {
-			return nil, fmt.Errorf("Get(%s): '%s' does not exist", key, parts[i])
+			return nil, nil //fmt.Errorf("Get(%s): '%s' does not exist", key, parts[i])
 		}
 
 		where = newWhere
@@ -113,6 +113,9 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 }
 
 // GetStr is like Get except it always returns a string.
+//
+// If the value is HTML, it is converted to a string.
+//
 func (scope *variableScope) GetStr(key string) (string, error) {
 	val, err := scope.Get(key)
 	if err != nil {
@@ -127,10 +130,12 @@ func (scope *variableScope) GetStr(key string) (string, error) {
 	// something is here, so it best be a string
 	if str, ok := val.(string); ok {
 		return str, nil
+	} else if html, ok := val.(HTML); ok {
+		return string(html), nil
 	}
 
 	// not what we asked for
-	return "", errors.New("not a string")
+	return "", errors.New("not a string (" + humanReadableValue(val) + ")")
 }
 
 // GetBool is like Get except it always returns a boolean.

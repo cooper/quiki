@@ -537,7 +537,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				// log.Println("Got var block:", val)
 
 			case nil:
-				return fmt.Errorf("there's nothing here")
+				// empty string
+				value = ""
 
 			default:
 				return fmt.Errorf("Not sure what to do with: %v", val)

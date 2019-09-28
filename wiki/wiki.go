@@ -38,5 +38,5 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 	}
 
 	// no errors occurred
-	return nil, w
+	return w, nil
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 	hbot "github.com/whyrusleeping/hellabot"
 )
@@ -48,6 +49,36 @@ func main() {
 
 	mybot.AddTrigger(hbot.Trigger{
 		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quikv")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quikv"), " ,:")
+
+			var reply string
+			page := wikifier.NewPage("../wikis/mywiki/wiki.conf")
+
+			// parse
+			if err := page.Parse(); err != nil {
+				reply = err.Error()
+			} else {
+				val, err := page.Get(line)
+				if err != nil {
+					reply = err.Error()
+				} else {
+					reply = fmt.Sprintf("%+v", val)
+				}
+			}
+
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+
+			return false
+		},
+	})
+
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quiku")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
@@ -55,6 +86,28 @@ func main() {
 
 			f, err := wikifier.UniqueFilesInDir("../standalone/", []string{"page"}, false)
 			reply := fmt.Sprintf("err(%v) %v", err, f)
+
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+
+			return false
+		},
+	})
+
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quikc")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
+
+			var reply string
+			if err != nil {
+				reply = err.Error()
+			} else {
+				reply = fmt.Sprintf("%+v", w.Opt)
+			}
 
 			for _, line := range strings.Split(reply, "\n") {
 				irc.Send("PRIVMSG " + mes.To + " :" + line)
