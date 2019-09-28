@@ -80,54 +80,23 @@ func (p *Page) HTML() HTML {
 
 // CSS generates and returns the CSS code for the page's inline styles.
 func (p *Page) CSS() string {
-	// my $page = shift;
-	// return unless $page->{styles};
-	// my $string = '';
 	generated := ""
 
-	// foreach my $rule_set (@{ $page->{styles} }) {
 	for _, style := range p.styles {
-
-		//     my $apply_to = $page->_css_apply_string(@{ $rule_set->{apply_to} });
 		applyTo := p.cssApplyString(style.applyTo)
-
-		//     $string     .= "$apply_to {\n";
 		generated += applyTo + " {\n"
-
-		//     foreach my $rule (keys %{ $rule_set->{rules} }) {
 		for rule, value := range style.rules {
 			generated += "    " + rule + ": " + value + ";\n"
-			//         my $value = $rule_set->{rules}{$rule};
-			//         $string  .= "    $rule: $value;\n";
 		}
-		//     $string .= "}\n";
 		generated += "}\n"
 	}
-	// return $string;
+
 	return generated
 }
 
 func (p *Page) cssApplyString(sets [][]string) string {
-	// fmt.Printf("sets: %v\n", sets)
-	// my ($page, @sets) = @_;
-	// # @sets = an array of [
-	// #   ['section'],
-	// #   ['.someClass'],
-	// #   ['section', '.someClass'],
-	// #   ['section', '.someClass.someOther']
-	// # ] etc.
-
 	parts := make([]string, len(sets))
 
-	// return join ",\n", map {
-	//     my $string = $page->_css_set_string(@$_);
-	//     my $start  = substr $string, 0, 10;
-	//     if (!$start || $start ne '.wiki-main') {
-	//         my $id  = $page->{wikifier}{main_block}{element}{id};
-	//         $string = ".wiki-$id $string";
-	//     }
-	//     $string
-	// } @sets;
 	for i, set := range sets {
 		str := p.cssSetString(set)
 		var start string
@@ -145,7 +114,6 @@ func (p *Page) cssApplyString(sets [][]string) string {
 }
 
 func (p *Page) cssSetString(set []string) string {
-	//    return join ' ', map { $page->_css_item_string(split //, $_) } @items;
 	for i, item := range set {
 		set[i] = p.cssItemString([]rune(item))
 	}
@@ -153,49 +121,31 @@ func (p *Page) cssSetString(set []string) string {
 }
 
 func (p *Page) cssItemString(chars []rune) string {
-	// my ($string, $in_class, $in_id, $in_el_type) = '';
 	var str string
 	var inClass, inID, inElType bool
-
-	// foreach my $char (@chars) {
 	for _, char := range chars {
 
 		switch char {
 
-		//     # we're starting a class.
-		//     if ($char eq '.') {
-		//         $in_class++;
-		//         $string .= '.wiki-class-';
-		//         next;
-		//     }
+		// starting a class
 		case '.':
 			inClass = true
 			str += ".qc-"
 
-		//     # we're starting an ID.
-		//     if ($char eq '#') {
-		//         $in_id++;
-		//         $string .= '.wiki-id-';
-		//         next;
-		//     }
+		// starting an ID
 		case '#':
 			inID = true
 			str += ".qi-"
 
+		// in neither a class nor an element type
+		// assume that this is the start of element type
 		default:
-			//     # we're in neither a class nor an element type.
-			//     # assume that this is the start of element type.
-			//     if (!$in_class && !$in_id && !$in_el_type && $char ne '*') {
-			//         $in_el_type = 1;
-			//         $string .= '.wiki-';
-			//     }
 			if !inClass && !inID && !inElType && char != '*' {
 				inElType = true
 				str += ".q-"
 			}
-
-			//     $string .= $char;
 			str += string(char)
+
 		}
 	}
 
