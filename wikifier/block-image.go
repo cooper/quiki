@@ -127,6 +127,7 @@ func (image *imageBlock) parse(page *Page) {
 		page.images[image.file] = append(page.images[image.file], []int{image.width, image.height})
 
 	} else {
+		// note: this should never happen because the config parser validates it
 		image.warn(image.openPos, "image.size_method neither 'javascript' nor 'server'")
 		image.parseFailed = true
 		return

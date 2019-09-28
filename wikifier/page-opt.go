@@ -2,7 +2,6 @@ package wikifier
 
 // # default options.
 // our %wiki_defaults = (
-//     'page.enable.title'     => 1,
 //     'external.wp.name'      => 'Wikipedia',
 //     'external.wp.root'      => 'http://en.wikipedia.org/wiki',
 //     'external.wp.type'      => 'mediawiki',
@@ -12,10 +11,19 @@ package wikifier
 
 // PageOpts describes wiki/website options to a Page.
 type PageOpts struct {
-	Name  string // wiki name
-	Dir   pageOptDir
-	Root  pageOptRoot
-	Image pageOptImage
+	Name     string // wiki name
+	Page     pageOptPage
+	Dir      pageOptDir
+	Root     pageOptRoot
+	Image    pageOptImage
+	Category pageOptCategory
+	Search   pageOptSearch
+}
+
+// page options
+type pageOptPage struct {
+	EnableTitle bool // enable page title headings
+	EnableCache bool // enable page caching
 }
 
 // actual file paths
@@ -44,8 +52,22 @@ type pageOptImage struct {
 	Sizer      func(file string, width, height int, page *Page) (path string)
 }
 
+// category options
+type pageOptCategory struct {
+	PerPage int
+}
+
+// search options
+type pageOptSearch struct {
+	Enable bool
+}
+
 // defaults for Page
 var defaultPageOpt = PageOpts{
+	Page: pageOptPage{
+		EnableTitle: true,
+		EnableCache: false,
+	},
 	Dir: pageOptDir{
 		Wikifier: ".",
 		Image:    "images",
@@ -64,5 +86,11 @@ var defaultPageOpt = PageOpts{
 		SizeMethod: "javascript",
 		Rounding:   "normal",
 		Sizer:      nil,
+	},
+	Category: pageOptCategory{
+		PerPage: 5,
+	},
+	Search: pageOptSearch{
+		Enable: true,
 	},
 }
