@@ -39,8 +39,10 @@ type PageOptDir struct {
 	Wikifier string // path to wikifier directory
 	Wiki     string // path to wiki root directory
 	Image    string // path to image directory
+	Category string // path to category directory
 	Page     string // path to page directory
 	Model    string // path to model directory
+	Markdown string // path to markdown directory
 	Cache    string // path to cache directory
 }
 
