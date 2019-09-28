@@ -32,7 +32,6 @@ func (w *Wiki) readConfig() error {
 	// only compute the variables
 	confPage := wikifier.NewPage(w.ConfigFile)
 	confPage.VarsOnly = true
-	w.conf = confPage
 
 	// set these variables for use in the config
 	confPage.Set("dir.wiki", w.Opt.Dir.Wiki)
@@ -52,7 +51,6 @@ func (w *Wiki) readConfig() error {
 		// only compute the variables
 		pconfPage := wikifier.NewPage(w.PrivateConfigFile)
 		pconfPage.VarsOnly = true
-		w.pconf = pconfPage
 
 		// set these variables for use in the private config
 		pconfPage.Set("dir.wiki", w.Opt.Dir.Wiki)
@@ -63,11 +61,6 @@ func (w *Wiki) readConfig() error {
 			return errors.Wrap(err, "failed to parse private configuration")
 		}
 
-	} else {
-		// if there is no private config, assume the main one also contains
-		// private wiki settings
-
-		w.pconf = confPage
 	}
 
 	return nil

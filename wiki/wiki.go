@@ -9,6 +9,4 @@ type Wiki struct {
 	ConfigFile        string
 	PrivateConfigFile string
 	Opt               wikifier.PageOpts
-	conf              *wikifier.Page
-	pconf             *wikifier.Page
 }
