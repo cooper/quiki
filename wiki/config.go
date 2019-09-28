@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var defaultWikiOpt = wikifier.PageOpts{
+var defaultWikiOpt = wikifier.PageOpt{
 	Page: wikifier.PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
@@ -56,7 +56,7 @@ func (w *Wiki) readConfig(file string) error {
 	}
 
 	// convert the config to wikifier.PageOpt
-	if err := wikifier.InjectPageOpts(confPage, &w.Opt); err != nil {
+	if err := wikifier.InjectPageOpt(confPage, &w.Opt); err != nil {
 		return err
 	}
 

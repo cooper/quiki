@@ -16,8 +16,8 @@ import (
 //     'var'                   => {} # global vars
 // );
 
-// PageOpts describes wiki/website options to a Page.
-type PageOpts struct {
+// PageOpt describes wiki/website options to a Page.
+type PageOpt struct {
 	Name     string // wiki name
 	MainPage string // name of main page
 	Page     PageOptPage
@@ -71,7 +71,7 @@ type PageOptSearch struct {
 }
 
 // defaults for Page
-var defaultPageOpt = PageOpts{
+var defaultPageOpt = PageOpt{
 	Page: PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
@@ -104,9 +104,9 @@ var defaultPageOpt = PageOpts{
 	},
 }
 
-// InjectPageOpts extracts page options found in the specified page and
-// injects them into the provided PageOpts pointer.
-func InjectPageOpts(page *Page, opt *PageOpts) error {
+// InjectPageOpt extracts page options found in the specified page and
+// injects them into the provided PageOpt pointer.
+func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// name - wiki name
 	str, err := page.GetStr("name")

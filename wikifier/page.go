@@ -14,7 +14,7 @@ type Page struct {
 	Source   string   // source content
 	FilePath string   // Path to the .page file
 	VarsOnly bool     // True if Parse() should only extract variables
-	Opt      PageOpts // page options
+	Opt      PageOpt // page options
 	styles   []styleEntry
 	parser   *parser // wikifier parser instance
 	main     block   // main block
@@ -71,7 +71,7 @@ func (p *Page) Parse() error {
 	}
 
 	// inject variables set in the page to page opts
-	if err := InjectPageOpts(p, &p.Opt); err != nil {
+	if err := InjectPageOpt(p, &p.Opt); err != nil {
 		// TODO: position
 		return err
 	}

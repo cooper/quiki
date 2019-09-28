@@ -10,7 +10,7 @@ import (
 type Wiki struct {
 	ConfigFile        string
 	PrivateConfigFile string
-	Opt               wikifier.PageOpts
+	Opt               wikifier.PageOpt
 }
 
 // NewWiki creates a Wiki given the public and private configuration files.
