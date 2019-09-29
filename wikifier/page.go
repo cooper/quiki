@@ -11,6 +11,7 @@ import (
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
+	strip "github.com/grokify/html-strip-tags-go"
 )
 
 // Page represents a single page or article, generally associated with a .page file.
@@ -234,20 +235,7 @@ func (p *Page) CacheModified() time.Time {
 	return fi.ModTime()
 }
 
-// # absolute path to search text file
-// sub search_path {
-//     my $page = shift;
-//     return abs_path($page->{search_path})
-//         if length $page->{search_path};
-//     make_dir($page->opt('dir.cache').'/page', $page->name);
-//     return $page->{abs_search_path}
-//         if length $page->{abs_search_path};
-//     return $page->{cached_props}{search} //= abs_path(
-//         $page->opt('dir.cache').'/page/'.$page->name.'.txt'
-//     );
-// }
-
-// SearchPath returns the path to the page search text file.
+// SearchPath returns the absolute path to the page search text file.
 func (p *Page) SearchPath() string {
 	// FIXME: makedir
 	path, _ := filepath.Abs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
@@ -269,44 +257,43 @@ func (p *Page) SearchPath() string {
 //     };
 // }
 
-// sub _bool ($) { shift() ? \1 : undef }
+// Draft returns true if the page is marked as a draft.
+func (p *Page) Draft() bool {
+	b, _ := p.GetBool("page.draft")
+	return b
+}
 
-// # page draft from @page.draft
-// sub draft {
-//     my $page = shift;
-//     return _bool $page->get('page.draft');
-// }
+// Generated returns true if the page was auto-generated
+// from some other source content.
+func (p *Page) Generated() bool {
+	b, _ := p.GetBool("page.generated")
+	return b
+}
 
-// # page generated from @page.generated
-// sub generated {
-//     my $page = shift;
-//     return _bool $page->get('page.generated');
-// }
+// Author returns the page author's name, if any.
+func (p *Page) Author() string {
+	s, _ := p.GetStr("page.author")
+	return s
+}
 
-// # page author from @page.author
-// sub author {
-//     my $page = shift;
-//     return no_length_undef trim $page->get('page.author');
-// }
+// FmtTitle returns the page title, preserving any possible text formatting.
+func (p *Page) FmtTitle() HTML {
+	s, _ := p.GetStr("page.title")
+	return HTML(s)
+}
 
-// # formatted title from @page.title
-// sub fmt_title {
-//     my $page = shift;
-//     return no_length_undef trim $page->get('page.title');
-// }
+// Title returns the page title with HTML text formatting tags stripped.
+func (p *Page) Title() string {
+	return strip.StripTags(string(p.FmtTitle()))
+}
 
-// # tag-stripped version of page title
-// sub title {
-//     my $page = shift;
-//     my $title = $page->fmt_title;
-//     return length $title ? $stripper->parse($title) : undef;
-// }
-
-// # title if available; otherwise filename
-// sub title_or_name {
-//     my $page = shift;
-//     return $page->title // $page->name;
-// }
+// TitleOrName returns the result of Title if available, otherwise that of Name.
+func (p *Page) TitleOrName() string {
+	if title := p.Title(); title != "" {
+		return title
+	}
+	return p.Name()
+}
 
 // resets the parser
 func (p *Page) resetParseState() {
