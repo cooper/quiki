@@ -1,6 +1,7 @@
 package wiki
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/cooper/quiki/wikifier"
@@ -83,5 +84,9 @@ func (w *Wiki) pathForModel(modelName string) string {
 }
 
 func makeDir(dir, name string) {
-
+	pfx := filepath.Dir(name)
+	if pfx == "." || pfx == "./" {
+		return
+	}
+	os.MkdirAll(dir+"/"+pfx, 0755)
 }
