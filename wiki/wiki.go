@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"errors"
+	"path/filepath"
 
 	"github.com/cooper/quiki/wikifier"
 )
@@ -22,6 +23,10 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 		return nil, errors.New("no config file specified")
 	}
 
+	// guess dir.wiki from config location
+	// (if the conf specifies an absolute path, this will be overwritten)
+	w.Opt.Dir.Wiki = filepath.Dir(conf)
+
 	// parse the config
 	err := w.readConfig(conf)
 	if err != nil {
@@ -39,12 +44,4 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 
 	// no errors occurred
 	return w, nil
-}
-
-// NewPage creates a Page given its filepath and configures it for
-// use with this Wiki.
-func (w *Wiki) NewPage(name string) *wikifier.Page {
-	p := wikifier.NewPage(w.pathForPage(name, false, ""))
-	p.Opt = w.Opt
-	return p
 }

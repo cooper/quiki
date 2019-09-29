@@ -49,36 +49,6 @@ func main() {
 
 	mybot.AddTrigger(hbot.Trigger{
 		func(bot *hbot.Bot, mes *hbot.Message) bool {
-			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".confvar")
-		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
-			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, ".confvar"), " ,:")
-
-			var reply string
-			page := wikifier.NewPage("../wikis/mywiki/wiki.conf")
-
-			// parse
-			if err := page.Parse(); err != nil {
-				reply = err.Error()
-			} else {
-				val, err := page.Get(line)
-				if err != nil {
-					reply = err.Error()
-				} else {
-					reply = fmt.Sprintf("%+v", val)
-				}
-			}
-
-			for _, line := range strings.Split(reply, "\n") {
-				irc.Send("PRIVMSG " + mes.To + " :" + line)
-			}
-
-			return false
-		},
-	})
-
-	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".unique")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
@@ -131,6 +101,28 @@ func main() {
 			} else {
 				val := page.Info()
 				reply = fmt.Sprintf("%+v", val)
+			}
+
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+
+			return false
+		},
+	})
+
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".displaypage")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			var reply string
+			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
+
+			if err != nil {
+				reply = err.Error()
+			} else {
+				reply = fmt.Sprintf("%+v", w.DisplayPage("wikifier.page"))
 			}
 
 			for _, line := range strings.Split(reply, "\n") {

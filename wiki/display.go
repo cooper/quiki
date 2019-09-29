@@ -6,6 +6,11 @@ type DisplayError struct {
 	// included, so this may be shown to users
 	Error string
 
+	// a more detailed human-readable error string that MAY contain
+	// sensitive data. can be used for debugging and logging but should
+	// not be presented to users
+	DetailedError string
+
 	// true if the error occurred during parsing
 	ParseError bool
 

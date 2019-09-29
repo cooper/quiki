@@ -17,10 +17,10 @@ import (
 // Page represents a single page or article, generally associated with a .page file.
 // It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
-	Source   string  // source content
-	FilePath string  // Path to the .page file
-	VarsOnly bool    // True if Parse() should only extract variables
-	Opt      PageOpt // page options
+	Source   string   // source content
+	FilePath string   // Path to the .page file
+	VarsOnly bool     // True if Parse() should only extract variables
+	Opt      *PageOpt // page options
 	styles   []styleEntry
 	parser   *parser // wikifier parser instance
 	main     block   // main block
@@ -42,12 +42,14 @@ type PageInfo struct {
 
 // NewPage creates a page given its filepath.
 func NewPage(filePath string) *Page {
-	return &Page{FilePath: filePath, Opt: defaultPageOpt, variableScope: newVariableScope()}
+	myOpt := defaultPageOpt // copy
+	return &Page{FilePath: filePath, Opt: &myOpt, variableScope: newVariableScope()}
 }
 
 // NewPageSource creates a page given some source code.
 func NewPageSource(source string) *Page {
-	return &Page{Source: source, Opt: defaultPageOpt, variableScope: newVariableScope()}
+	myOpt := defaultPageOpt // copy
+	return &Page{Source: source, Opt: &myOpt, variableScope: newVariableScope()}
 }
 
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
@@ -89,7 +91,7 @@ func (p *Page) Parse() error {
 	}
 
 	// inject variables set in the page to page opts
-	if err := InjectPageOpt(p, &p.Opt); err != nil {
+	if err := InjectPageOpt(p, p.Opt); err != nil {
 		// TODO: position
 		return err
 	}
@@ -125,7 +127,7 @@ func (p *Page) CacheExists() bool {
 // It DOES include the page prefix, however, if applicable.
 //
 func (p *Page) Name() string {
-	dir := p.Opt.Dir.Page
+	dir, _ := filepath.Abs(p.Opt.Dir.Page)
 	path := p.Path()
 	name := strings.TrimPrefix(path, dir)
 	name = strings.TrimPrefix(name, "/")
@@ -164,7 +166,7 @@ func (p *Page) Path() string {
 // This does NOT take symbolic links into account.
 // It is not guaranteed to exist.
 func (p *Page) RelName() string {
-	dir := p.Opt.Dir.Page
+	dir, _ := filepath.Abs(p.Opt.Dir.Page)
 	path := p.RelPath()
 	name := strings.TrimPrefix(path, dir)
 	name = strings.TrimPrefix(name, "/")

@@ -75,6 +75,14 @@ type DisplayPage struct {
 	Title string
 }
 
+// NewPage creates a Page given its filepath and configures it for
+// use with this Wiki.
+func (w *Wiki) NewPage(name string) *wikifier.Page {
+	p := wikifier.NewPage(w.pathForPage(name, false, ""))
+	p.Opt = &w.Opt
+	return p
+}
+
 // DisplayPage returns the display result for a page.
 func (w *Wiki) DisplayPage(name string) interface{} {
 	return w.DisplayPageDraft(name, false)
@@ -93,7 +101,10 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 
 	// file does not exist
 	if !page.Exists() {
-		return DisplayError{Error: "Page does not exist."}
+		return DisplayError{
+			Error:         "Page does not exist.",
+			DetailedError: "Page '" + page.FilePath + "' does not exist.",
+		}
 	}
 
 	// filename and path info

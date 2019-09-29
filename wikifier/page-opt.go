@@ -85,6 +85,7 @@ var defaultPageOpt = PageOpt{
 		Page:     "pages",
 		Model:    "models",
 		Cache:    "cache",
+		Markdown: "md",
 	},
 	Root: PageOptRoot{
 		Wiki:     "", // aka /
@@ -110,37 +111,45 @@ var defaultPageOpt = PageOpt{
 // injects them into the provided PageOpt pointer.
 func InjectPageOpt(page *Page, opt *PageOpt) error {
 
-	// name - wiki name
-	str, err := page.GetStr("name")
-	if err != nil {
-		return errors.Wrap(err, "name")
+	// easy string options
+	pageOptString := map[string]*string{
+		"name":          &opt.Name,          // wiki name
+		"main_page":     &opt.MainPage,      // main page name
+		"dir.wikifier":  &opt.Dir.Wikifier,  // wikifier directory
+		"dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
+		"dir.image":     &opt.Dir.Image,     // image directory
+		"dir.page":      &opt.Dir.Page,      // page directory
+		"dir.model":     &opt.Dir.Model,     // model directory
+		"dir.markdown":  &opt.Dir.Markdown,  // markdown directory
+		"dir.cache":     &opt.Dir.Cache,     // cache directory
+		"root.wiki":     &opt.Root.Wiki,     // http path to wiki
+		"root.image":    &opt.Root.Image,    // http path to images
+		"root.category": &opt.Root.Category, // http path to categories
+		"root.page":     &opt.Root.Page,     // http path to pages
 	}
-	if str != "" {
-		opt.Name = str
+	for name, ptr := range pageOptString {
+		str, err := page.GetStr(name)
+		if err != nil {
+			return errors.Wrap(err, name)
+		}
+		if str != "" {
+			*ptr = str
+		}
 	}
 
-	// main_page - main page name
-	str, err = page.GetStr("main_page")
-	if err != nil {
-		return errors.Wrap(err, "main_page")
+	// easy bool options
+	pageOptBool := map[string]*bool{
+		"page.enable.title": &opt.Page.EnableTitle, // enable page title headings
+		"page.enable.cache": &opt.Page.EnableCache, // enable page caching
+		"search.enable":     &opt.Search.Enable,    // enable search optimization
 	}
-	if str != "" {
-		opt.MainPage = str
+	for name, ptr := range pageOptBool {
+		enable, err := page.GetBool(name)
+		if err != nil {
+			return errors.Wrap(err, name)
+		}
+		*ptr = enable
 	}
-
-	// page.enable.title - enable page title headings
-	enable, err := page.GetBool("page.enable.title")
-	if err != nil {
-		return errors.Wrap(err, "page.enable.title")
-	}
-	opt.Page.EnableTitle = enable
-
-	// page.enable.cache - enable page caching
-	enable, err = page.GetBool("page.enable.cache")
-	if err != nil {
-		return errors.Wrap(err, "page.enable.cache")
-	}
-	opt.Page.EnableCache = enable
 
 	// image.retina - retina image scales
 	if retinaStr, err := page.GetStr("image.retina"); err != nil {
@@ -169,7 +178,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	}
 
 	// image.size_method - how to determine imagebox dimensions
-	str, err = page.GetStr("image.size_method")
+	str, err := page.GetStr("image.size_method")
 	if err != nil {
 		return errors.Wrap(err, "image.size_method")
 	}
@@ -192,13 +201,6 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		}
 		opt.Category.PerPage = intVal
 	}
-
-	// search.enable - whether to enable search optimization
-	enable, err = page.GetBool("search.enable")
-	if err != nil {
-		return errors.Wrap(err, "search.enable")
-	}
-	opt.Search.Enable = enable
 
 	return nil
 }

@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"fmt"
+
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -39,18 +41,20 @@ var defaultWikiOpt = wikifier.PageOpt{
 }
 
 func (w *Wiki) readConfig(file string) error {
-
 	// create a Page for the configuration file
 	// only compute the variables
 	confPage := wikifier.NewPage(file)
 	confPage.VarsOnly = true
 
 	// set these variables for use in the config
-	// FIXME: where do these come from?
+	// FIXME: where does dir.wikifier come from?
+	fmt.Println("setting vars", file)
 	confPage.Set("dir.wiki", w.Opt.Dir.Wiki)
 	confPage.Set("dir.wikifier", w.Opt.Dir.Wikifier)
 
 	// parse the config
+	fmt.Println("parsing", file)
+
 	if err := confPage.Parse(); err != nil {
 		return errors.Wrap(err, "failed to parse configuration "+file)
 	}
