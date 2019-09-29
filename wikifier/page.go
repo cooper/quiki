@@ -221,10 +221,11 @@ func (p *Page) Modified() time.Time {
 	return fi.ModTime()
 }
 
-// CachePath returns the path to the page cache file.
+// CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
 	// FIXME: makedir
-	return p.Opt.Dir.Cache + "/page/" + page.Name() + ".cache"
+	path, _ := filepath.Abs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache")
+	return path
 }
 
 // CacheModified returns the page cache file time.
@@ -245,6 +246,13 @@ func (p *Page) CacheModified() time.Time {
 //         $page->opt('dir.cache').'/page/'.$page->name.'.txt'
 //     );
 // }
+
+// SearchPath returns the path to the page search text file.
+func (p *Page) SearchPath() string {
+	// FIXME: makedir
+	path, _ := filepath.Abs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
+	return path
+}
 
 // # page info to be used in results, stored in cats/cache files
 // sub page_info {
