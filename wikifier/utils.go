@@ -283,9 +283,6 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 			// use the basename of the resolved path only if the target
 			// file is in the same directory; otherwise use the original path
 			filename := path
-			a, b := filepath.Rel(dirAbs, abs)
-			fmt.Println("rel", path, abs, a, b)
-
 			if rel, err := filepath.Rel(dirAbs, abs); err == nil {
 				if strings.IndexByte(rel, '/') == -1 {
 					filename = abs

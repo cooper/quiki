@@ -12,6 +12,18 @@ func (w *Wiki) checkDirectories() {
 	panic("unimplemented")
 }
 
+// relPath returns a path relative to the wiki root
+func (w *Wiki) relPath(absPath string) string {
+	wikiAbs, _ := filepath.Abs(w.Opt.Dir.Wiki)
+	if wikiAbs == "" {
+		return ""
+	}
+	if rel, err := filepath.Rel(wikiAbs, absPath); err == nil {
+		return rel
+	}
+	return ""
+}
+
 func (w *Wiki) allPageFiles() []string {
 	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, []string{"page"}, false)
 	return files
