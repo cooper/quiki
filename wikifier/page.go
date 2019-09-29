@@ -28,6 +28,18 @@ type Page struct {
 	*variableScope
 }
 
+// PageInfo represents metadata associated with a page.
+type PageInfo struct {
+	Created   time.Time `json:"created,omitempty"`   // creation time
+	Modified  time.Time `json:"mod_unix,omitempty"`  // modify time
+	Draft     bool      `json:"draft,omitempty"`     // true if page is marked as draft
+	Generated bool      `json:"generated,omitempty"` // true if page was generated from another source
+	Redirect  string    `json:"redirect,omitempty"`  // path page is to redirect to
+	FmtTitle  HTML      `json:"fmt_title,omitempty"` // title with formatting tags
+	Title     string    `json:"title,omitempty"`     // title without tags
+	Author    string    `json:"author,omitempty"`    // author's name
+}
+
 // NewPage creates a page given its filepath.
 func NewPage(filePath string) *Page {
 	return &Page{FilePath: filePath, Opt: defaultPageOpt, variableScope: newVariableScope()}
@@ -242,21 +254,6 @@ func (p *Page) SearchPath() string {
 	return path
 }
 
-// # page info to be used in results, stored in cats/cache files
-// sub page_info {
-//     my $page = shift;
-//     return filter_nonempty {
-//         mod_unix    => $page->modified,
-//         created     => $page->created,
-//         draft       => $page->draft,
-//         generated   => $page->generated,
-//         redirect    => $page->redirect,
-//         fmt_title   => $page->fmt_title,
-//         title       => $page->title,
-//         author      => $page->author
-//     };
-// }
-
 // Draft returns true if the page is marked as a draft.
 func (p *Page) Draft() bool {
 	b, _ := p.GetBool("page.draft")
@@ -293,6 +290,20 @@ func (p *Page) TitleOrName() string {
 		return title
 	}
 	return p.Name()
+}
+
+// Info returns the PageInfo for the page.
+func (p *Page) Info() PageInfo {
+	return PageInfo{
+		Modified:  p.Modified(),
+		Created:   p.Created(),
+		Draft:     p.Draft(),
+		Generated: p.Generated(),
+		Redirect:  p.Redirect(),
+		FmtTitle:  p.FmtTitle(),
+		Title:     p.Title(),
+		Author:    p.Author(),
+	}
 }
 
 // resets the parser

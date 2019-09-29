@@ -49,10 +49,10 @@ func main() {
 
 	mybot.AddTrigger(hbot.Trigger{
 		func(bot *hbot.Bot, mes *hbot.Message) bool {
-			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quikv")
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".confvar")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
-			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quikv"), " ,:")
+			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, ".confvar"), " ,:")
 
 			var reply string
 			page := wikifier.NewPage("../wikis/mywiki/wiki.conf")
@@ -79,7 +79,7 @@ func main() {
 
 	mybot.AddTrigger(hbot.Trigger{
 		func(bot *hbot.Bot, mes *hbot.Message) bool {
-			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quiku")
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".unique")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
 			// line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiku"), " ,:")
@@ -97,7 +97,7 @@ func main() {
 
 	mybot.AddTrigger(hbot.Trigger{
 		func(bot *hbot.Bot, mes *hbot.Message) bool {
-			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quikc")
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".confvars")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
 			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
@@ -107,6 +107,30 @@ func main() {
 				reply = err.Error()
 			} else {
 				reply = fmt.Sprintf("%+v", w.Opt)
+			}
+
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+
+			return false
+		},
+	})
+
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".pageinfo")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			var reply string
+			page := wikifier.NewPage("../wikis/mywiki/pages/wikifier.page")
+
+			// parse
+			if err := page.Parse(); err != nil {
+				reply = err.Error()
+			} else {
+				val := page.Info()
+				reply = fmt.Sprintf("%+v", val)
 			}
 
 			for _, line := range strings.Split(reply, "\n") {
