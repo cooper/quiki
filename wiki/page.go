@@ -1,6 +1,9 @@
 package wiki
 
-import "errors"
+import (
+	httpdate "github.com/Songmu/go-httpdate"
+	"github.com/cooper/quiki/wikifier"
+)
 
 // DisplayPage represents a page result to display.
 type DisplayPage struct {
@@ -15,7 +18,7 @@ type DisplayPage struct {
 	Path string
 
 	// the page content (HTML)
-	Content string
+	Content wikifier.HTML
 
 	// UNIX timestamp of when the page was last modified.
 	// if Generated is true, this is the current time.
@@ -73,90 +76,87 @@ type DisplayPage struct {
 }
 
 // DisplayPage returns the display result for a page.
-func (w *Wiki) DisplayPage(name string) (DisplayPage, error) {
-	var result DisplayPage
+func (w *Wiki) DisplayPage(name string) interface{} {
+	return w.DisplayPageDraft(name, false)
+}
+
+// DisplayPageDraft returns the display result for a page.
+//
+// Unlike DisplayPage, if draftOK is true, the content is served even if it is
+// marked as draft.
+//
+func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
+	var r DisplayPage
 
 	// create the page
 	page := w.NewPage(name)
 
-	// # get page info
-	// my $path = $page->path;
-	// my $cache_path = $page->cache_path;
-
 	// file does not exist
 	if !page.Exists() {
-		return result, errors.New("page does not exist")
+		return DisplayError{Error: "Page does not exist."}
 	}
 
-	// # filename and path info
-	// $result->{file} = $page->name;      # with extension
-	// $result->{name} = $page->name_ne;   # without extension
-	// $result->{path} = $path;            # absolute path
+	// filename and path info
+	path := page.Path()
+	r.File = page.Name()
+	r.Name = page.NameNE()
+	r.Path = path
 
-	// # page content
-	// $result->{type} = 'page';
-	// $result->{mime} = 'text/html';
+	// FIRST redirect check - symbolic link
+	if page.IsSymlink() {
+		return DisplayRedirect{Redirect: page.Redirect()}
+	}
 
-	// # FIRST redirect check - this is for symbolic link redirects.
-	// return _display_page_redirect($page->redirect, $result)
-	//     if $page->is_symlink;
+	// caching is enabled, so serve the cached copy if available
+	if w.Opt.Page.EnableCache && page.CacheExists() {
+		w.displayCachedPage(page, &r)
+		return r
+	}
 
-	// # caching is enabled, so let's check for a cached copy.
-	// if ($wiki->opt('page.enable.cache') && -f $cache_path) {
-	//     $result = $wiki->_get_page_cache($page, $result, \%opts);
-	//     return $result if $result->{cached};
-	// }
+	// Safe point - we will be generating the page right now.
 
-	// # Safe point - we will be generating the page right now.
+	// parse the page
+	//
+	// if an error occurs, parse it again in variable-only mode.
+	// then hopefully we can at least get the metadata and categories
+	//
+	err := page.Parse()
+	if err != nil {
+		page.VarsOnly = true
+		page.Parse()
+		// TODO: add page to categories
+		// TODO: cache the error
+		return DisplayError{Error: err.Error(), ParseError: true}
+	}
 
-	// # parse the page.
-	// # if an error occurs, parse it again in variable-only mode.
-	// # then hopefully we can at least get the metadata and categories.
-	// my $err = $page->parse;
-	// if ($err) {
-	//     $page->{vars_only}++;
-	//     $page->parse;
-	//     $wiki->cat_check_page($page);
-	//     return $wiki->_display_error_cache($page, $err, parse_error => 1);
-	// }
+	// if this is a draft and we're not serving drafts, pretend
+	// that the page does not exist
+	if !draftOK && page.Draft() {
+		return DisplayError{Error: "Page has not yet been publised.", Draft: true}
+	}
 
-	// # if this is a draft, so pretend it doesn't exist
-	// if ($page->draft && !$opts{draft_ok}) {
-	//     L 'Draft';
-	//     return $wiki->_display_error_cache($page,
-	//         "Page has not yet been published.",
-	//         draft => 1
-	//     );
-	// }
+	// SECOND redirect check -
+	// this is for pages we just parsed with @page.redirect
+	if redir := page.Redirect(); redir != "" {
+		return DisplayRedirect{Redirect: redir}
+	}
 
-	// # THIRD redirect check - this is for pages we just generated with
-	// # @page.redirect in them.
-	// my $redir = _display_page_redirect($page->redirect, $result);
-	// return $wiki->_write_page_cache_maybe($page, $redir) if $redir;
+	// generate HTML and headers
+	r.Generated = true
+	r.Draft = page.Draft()
+	r.ModUnix = page.Modified().Unix()
+	r.Modified = httpdate.Time2Str(page.Modified())
+	r.Content = page.HTML()
+	r.CSS = page.CSS()
+	// TODO: should we include the page object?
+	// TODO: warnings
 
-	// # generate the HTML and headers.
-	// $result->{generated}  = \1;
-	// $result->{page}       = $page;
-	// $result->{draft}      = $page->draft;
-	// $result->{warnings}   = $page->{warnings};
-	// $result->{mod_unix}   = time;
-	// $result->{modified}   = time2str($result->{mod_unix});
-	// $result->{content}    = $page->html;
-	// $result->{css}        = $page->css;
+	// TODO: update categories and set to r.Categories
+	// TODO: write cache file if enabled
+	// TODO: write search file if enabled
 
-	// # update categories. this must come after ->html
-	// $wiki->cat_check_page($page);
-	// $result->{categories} = [ _cats_to_list($page->{categories}) ];
+	return r
+}
 
-	// # write cache file if enabled
-	// $result = $wiki->_write_page_cache_maybe($page, $result);
-	// return $result if $result->{error};
-
-	// # search is enabled, so generate a text file
-	// $result = $wiki->_write_page_text($page, $result)
-	//     if $wiki->opt('search.enable');
-
-	// return $result;
-
-	return result, nil
+func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage) {
 }

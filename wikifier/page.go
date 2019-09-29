@@ -113,6 +113,12 @@ func (p *Page) Exists() bool {
 	return err == nil
 }
 
+// CacheExists is true if the page cache file exists.
+func (p *Page) CacheExists() bool {
+	_, err := os.Stat(p.CachePath())
+	return err == nil
+}
+
 // Name returns the resolved page name, with or without extension.
 //
 // This does NOT take symbolic links into account.

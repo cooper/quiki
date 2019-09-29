@@ -4,7 +4,7 @@ package wiki
 type DisplayError struct {
 	// a human-readable error string. sensitive info is never
 	// included, so this may be shown to users
-	Error error
+	Error string
 
 	// true if the error occurred during parsing
 	ParseError bool
