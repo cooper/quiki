@@ -68,7 +68,7 @@ type DisplayPage struct {
 
 	// page title as extracted from the special @page.title variable, including
 	// any possible HTML-encoded formatting
-	FmtTitle string
+	FmtTitle wikifier.HTML
 
 	// like FmtTitle except that all text formatting has been stripped.
 	// suitable for use in the <title> tag
@@ -152,13 +152,17 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		return DisplayRedirect{Redirect: redir}
 	}
 
-	// generate HTML and headers
+	// generate HTML and metadata
 	r.Generated = true
+	r.Title = page.Title()
+	r.FmtTitle = page.FmtTitle()
+	r.Author = page.Author()
 	r.Draft = page.Draft()
 	r.ModUnix = page.Modified().Unix()
 	r.Modified = httpdate.Time2Str(page.Modified())
-	r.Content = page.HTML()
+	// r.Content = page.HTML()
 	r.CSS = page.CSS()
+
 	// TODO: should we include the page object?
 	// TODO: warnings
 
