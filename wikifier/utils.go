@@ -313,6 +313,14 @@ func PageName(name string) string {
 	return PageNameExt(name, "")
 }
 
+// PageNameNE returns a clean page name with No Extension.
+func PageNameNE(name string) string {
+	name = strings.TrimSuffix(PageName(name), ".page")
+	name = strings.TrimSuffix(name, ".model")
+	name = strings.TrimSuffix(name, ".conf")
+	return name
+}
+
 // PageNameExt returns a clean page name with the provided extension.
 func PageNameExt(name, ext string) string {
 	// 'Some Article' -> 'some_article.page'

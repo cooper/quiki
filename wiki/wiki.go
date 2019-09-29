@@ -43,8 +43,8 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 
 // NewPage creates a Page given its filepath and configures it for
 // use with this Wiki.
-func (w *Wiki) NewPage(filePath string) *wikifier.Page {
-	p := wikifier.NewPage(filePath)
+func (w *Wiki) NewPage(name string) *wikifier.Page {
+	p := wikifier.NewPage(w.pathForPage(name, false, ""))
 	p.Opt = w.Opt
 	return p
 }
