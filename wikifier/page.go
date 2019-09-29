@@ -215,11 +215,11 @@ func (p *Page) Created() time.Time {
 	return t
 }
 
-// # page modification time from stat()
-// sub modified {
-//     my $page = shift;
-//     return (stat $page->path)[9];
-// }
+// Modified returns the page modification time.
+func (p *Page) Modified() time.Time {
+	fi, _ := os.Lstat(p.Path())
+	return fi.ModTime()
+}
 
 // # absolute path to cache file
 // sub cache_path {
