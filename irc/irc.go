@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -122,7 +123,8 @@ func main() {
 			if err != nil {
 				reply = err.Error()
 			} else {
-				reply = fmt.Sprintf("%+v", w.DisplayPage("wikifier.page"))
+				j, _ := json.Marshal(w.DisplayPage("wikifier.page"))
+				reply = fmt.Sprintf("%+v", string(j))
 			}
 
 			for _, line := range strings.Split(reply, "\n") {
