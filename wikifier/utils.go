@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
+
+var nonAlphaRegex = regexp.MustCompile(`[^\w\.\-\/]`)
 
 // Represents a quiki value type.
 type valueType int
@@ -306,4 +309,61 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 	}
 
 	return unique, nil
+}
+
+// PageName returns a clean page name.
+func PageName(name string) string {
+	return PageNameExt(name, "")
+}
+
+// PageNameExt returns a clean page name with the provided extension.
+func PageNameExt(name, ext string) string {
+	// 'Some Article' -> 'some_article.page'
+
+	// convert non-alphanumerics to _
+	name = PageNameLink(name, false)
+
+	// append the extension if it isn't already there
+	lastDot := strings.LastIndexByte(name, '.')
+	if lastDot != -1 && lastDot < len(name)-1 {
+		existing := name[lastDot:]
+		if existing != ".page" && existing != ".model" && existing != ".conf" {
+			if ext == "" {
+				ext = ".page"
+				name += ext
+			}
+		}
+	}
+
+	return name
+}
+
+// PageNameLink returns a clean page name without the extension.
+func PageNameLink(name string, noLower bool) string {
+	// 'Some Article' -> 'some_article'
+	// 'Some Article' -> 'Some_Article' (with noLower)
+
+	// don't waste any time
+	if name == "" {
+		return name
+	}
+
+	// replace non-alphanumerics with _
+	name = nonAlphaRegex.ReplaceAllString(name, "_")
+
+	// lowercase
+	if !noLower {
+		name = strings.ToLower(name)
+	}
+
+	return name
+}
+
+// CategoryName returns a clean category name.
+func CategoryName(name string, noLower bool) string {
+	name = PageNameLink(name, noLower)
+	if !strings.HasSuffix(name, ".cat") {
+		return name + ".cat"
+	}
+	return name
 }
