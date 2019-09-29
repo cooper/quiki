@@ -221,24 +221,17 @@ func (p *Page) Modified() time.Time {
 	return fi.ModTime()
 }
 
-// # absolute path to cache file
-// sub cache_path {
-//     my $page = shift;
-//     return abs_path($page->{cache_path})
-//         if length $page->{cache_path};
-//     make_dir($page->opt('dir.cache').'/page', $page->name);
-//     return $page->{abs_cache_path}
-//         if length $page->{abs_cache_path};
-//     return $page->{cached_props}{cache} //= abs_path(
-//         $page->opt('dir.cache').'/page/'.$page->name.'.cache'
-//     );
-// }
+// CachePath returns the path to the page cache file.
+func (p *Page) CachePath() string {
+	// FIXME: makedir
+	return p.Opt.Dir.Cache + "/page/" + page.Name() + ".cache"
+}
 
-// # cache file modification time from stat()
-// sub cache_modified {
-//     my $page = shift;
-//     return (stat $page->cache_path)[9];
-// }
+// CacheModified returns the page cache file time.
+func (p *Page) CacheModified() time.Time {
+	fi, _ := os.Lstat(p.CachePath())
+	return fi.ModTime()
+}
 
 // # absolute path to search text file
 // sub search_path {
