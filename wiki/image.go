@@ -281,6 +281,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// we're not allowed to do this if this is a legit (non-pregeneration)
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
+
+	// FIXME: this is disabled for now
 	// if !generateOK {
 	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
 	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}

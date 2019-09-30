@@ -14,7 +14,6 @@ infobox {
     Website:        [[ wikifier on GitHub | https://github.com/cooper/wikifier ]];
 }
 
-sec {
     wikifier is a wiki suite. It is unique because it is completely
     file-based. There are no databases. Yet, it offers page caching, image
     sizing, session management/authentication, and lots of other things that
@@ -26,26 +25,25 @@ sec {
         February 2014:  [[ wp: Ebola virus ]] spreads across West Africa.;
         July 2015:      [[ wp: NASA ]] takes a close-up photo of Pluto.;
     }
-}
 
-sec [Components] {
+[Components] {
     wikifier is split up into several packages. They are listed below, with
     each subsequent one built atop the previous.
 
-    sec [Wikifier] {
+    [Wikifier] {
         Responsible for parsing and other low-level functions. While typically
         not used directly, this package provides the most basic implementation
         of the wikifier language.
     }
 
-    sec [Wikifier::Page] {
+    [Wikifier::Page] {
         An object representing a single page. This package provides a
         programming interface for working with a single wikifier page. The
         included [c]wikifier[/c] executable uses this to read a page file and
         output HTML.
     }
 
-    sec [Wikifier::Wiki] {
+    [Wikifier::Wiki] {
         A full wiki suite, capable of managing a diverse collection of content.
         Features page categories, templates, image generation, revision
         tracking, and much more. This package provides a programming interface
@@ -53,7 +51,7 @@ sec [Components] {
         standalone wikiserver is preferred.
     }
 
-    sec [Wikifier::Server] {
+    [Wikifier::Server] {
 
         imagebox {
             file:   wikiserver-logo.png;
@@ -77,10 +75,10 @@ sec [Components] {
     }
 }
 
-sec [Frontends] {
+[Frontends] {
     These frontends connect to a wikiserver and deliver content to end users.
     
-    sec [quiki] {
+    [quiki] {
         [[ quiki | https://github.com/cooper/quiki ]] is a standalone web server
         for wikifier. Because it is designed specifically for wikifier, it is by
         far the easiest option to get a wiki up and running in a few simple
@@ -88,14 +86,14 @@ sec [Frontends] {
         reverse proxy.
     }
     
-    sec [adminifier] {
+    [adminifier] {
         [[ adminifier | https://github.com/cooper/adminifier ]] is a web-based
         administrative panel to manage wikifier wikis. It is written in PHP and
         therefore runs on a variety of web servers.
     }
 }
 
-sec [Interfaces] {
+[Interfaces] {
     These programming interfaces can be used to incorporate wikifier into
     other web servers.
     
