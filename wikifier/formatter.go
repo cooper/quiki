@@ -323,27 +323,23 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 	// variable
 	if !opts.noVariables {
 		if variableRegex.MatchString(formatType) {
-			fmt.Println("formatType: "+formatType, page.Name())
+
 			// fetch the value
 			val, err := page.Get(formatType[1:])
 			if err != nil {
 				// TODO: Produce warning wrapping error unless noWarnings
-				fmt.Println("..err:", err)
 				return HTML("(error)")
 			}
 			if val == nil {
 				// TODO: Produce warning that var is undefined unless noWarnings
-				fmt.Println("..nil")
 				return HTML("(null)")
 			}
 
 			// format text if this is %var
 			strVal, ok := val.(string)
 			if formatType[0] == '%' {
-				fmt.Println("..%")
 				if !ok {
 					// TODO: Produce warning that attempted to interpolate non-string
-					fmt.Println("....not ok")
 					return HTML("(error)")
 				}
 				return page.parseFormattedTextOpts(strVal, &formatterOptions{noVariables: true})
@@ -351,7 +347,6 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 
 			// it was a string but just @var
 			if ok {
-				fmt.Println("..ok!", strVal)
 				return HTML(htmlfmt.EscapeString(strVal))
 			}
 

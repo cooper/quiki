@@ -23,12 +23,13 @@ var (
 // SizedImage represents an image in specific dimensions.
 type SizedImage struct {
 	// for example 100x200-myimage@3x.png
-	Width, Height int    // 100, 200
-	Scale         int    // 3
-	Name          string // myimage
-	Ext           string // png
+	Width, Height int    // 100, 200 (dimensions as requested)
+	Scale         int    // 3 (scale as requested)
+	Name          string // myimage (name without extension)
+	Ext           string // png (extension)
 }
 
+// SizedImageFromName returns a SizedImage given an image name.
 func SizedImageFromName(name string) SizedImage {
 	w, h := 0, 0
 
@@ -71,18 +72,22 @@ func SizedImageFromName(name string) SizedImage {
 	}
 }
 
+// TrueWidth returns the actual image width when the Scale is taken into consideration.
 func (img SizedImage) TrueWidth() int {
 	return img.Width * img.Scale
 }
 
+// TrueHeight returns the actual image height when the Scale is taken into consideration.
 func (img SizedImage) TrueHeight() int {
 	return img.Height * img.Scale
 }
 
+// FullSizeName returns the name of the full-size image.
 func (img SizedImage) FullSizeName() string {
 	return img.Name + "." + img.Ext
 }
 
+// FullNameNE is like FullName but without the extension.
 func (img SizedImage) FullNameNE() string {
 	return fmt.Sprintf(
 		"%dx%d-%s",
@@ -92,10 +97,12 @@ func (img SizedImage) FullNameNE() string {
 	)
 }
 
+// FullName returns the image name with true dimensions.
 func (img SizedImage) FullName() string {
 	return img.FullNameNE() + "." + img.Ext
 }
 
+// ScaleName returns the image name with dimensions and scale.
 func (img SizedImage) ScaleName() string {
 	if img.Scale <= 1 {
 		return img.FullName()
@@ -292,14 +299,10 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// we're not allowed to do this if this is a legit (non-pregeneration)
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
-	// if !generateOK {
-	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	// }
-
-	// # generate the image
-	// my $err = $wiki->_generate_image($image, $cache_path, $result);
-	// return $err if $err;
+	if !generateOK {
+		dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+		return DisplayError{Error: "Image does not exist at " + dimensions + "."}
+	}
 
 	// generate the image
 	dispErr, useFullSize := w.generateImage(img, &r)
@@ -307,15 +310,10 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		return dispErr
 	}
 
-	// # the generator says to use the full-size image.
-	// return $wiki->_get_image_full_size($image, $result, \@stat, \%opts)
-	//     if delete $result->{use_fullsize};
+	// the generator says to use the full-size image
 	if useFullSize {
-
+		return r
 	}
-
-	// delete $result->{content} if $opts{dont_open};
-	// return $result;
 
 	return r
 }
