@@ -14,17 +14,17 @@ infobox {
     Website:        [[ wikifier on GitHub | https://github.com/cooper/wikifier ]];
 }
 
-    wikifier is a wiki suite. It is unique because it is completely
-    file-based. There are no databases. Yet, it offers page caching, image
-    sizing, session management/authentication, and lots of other things that
-    fancy wikis use databases for.
+wikifier is a wiki suite. It is unique because it is completely
+file-based. There are no databases. Yet, it offers page caching, image
+sizing, session management/authentication, and lots of other things that
+fancy wikis use databases for.
 
-    history {
-        February 2013:  The first commit of wikifier is published.;
-        December 2013:  [[ wp: Nelson Mandela ]] passes away.;
-        February 2014:  [[ wp: Ebola virus ]] spreads across West Africa.;
-        July 2015:      [[ wp: NASA ]] takes a close-up photo of Pluto.;
-    }
+history {
+    February 2013:  The first commit of wikifier is published.;
+    December 2013:  [[ wp: Nelson Mandela ]] passes away.;
+    February 2014:  [[ wp: Ebola virus ]] spreads across West Africa.;
+    July 2015:      [[ wp: NASA ]] takes a close-up photo of Pluto.;
+}
 
 [Components] {
     wikifier is split up into several packages. They are listed below, with

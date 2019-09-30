@@ -30,14 +30,21 @@ func (sec *secBlock) parse(page *Page) {
 	sec.isIntro = sec.n == 0 && enable
 	page.sectionN++
 
+	// find the level from the parent section
+	level := 1
+	var blk block = sec
+	for blk != nil {
+		if parentSec, ok := blk.parentBlock().(*secBlock); ok {
+			level = parentSec.headerLevel + 1
+			break
+		}
+		blk = blk.parentBlock()
+	}
+
 	// top-level headers start at h2 when @page.enable.title is true, since the
 	// page title is the sole h1. otherwise, h1 is top-level.
-	level := 0
-	if parentSec, ok := sec.parentBlock().(*secBlock); ok {
-		level = parentSec.headerLevel + 1
-		if parentSec.headerLevel == 0 && enable {
-			level++
-		}
+	if enable && level == 1 {
+		level++
 	}
 
 	// intro is always h1
