@@ -302,7 +302,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// return $err if $err;
 
 	// generate the image
-	dispErr, useFullSize := w.generateImage(img, cachePath, &r)
+	dispErr, useFullSize := w.generateImage(img, &r)
 	if dispErr != nil {
 		return dispErr
 	}
@@ -320,36 +320,14 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	return r
 }
 
-func (w *Wiki) generateImage(img SizedImage, cachePath string, r *DisplayImage) (dispErr interface{}, useFullSize bool) {
-	// my ($wiki, $image, $cache_path, $result) = @_;
-
-	// # if we are restricting to only sizes used in the wiki, check.
-	// my ($width, $height, $r_width, $r_height) =
-	//     @$image{ qw(width height r_width r_height) };
-
-	// # create GD instance with this full size image.
-	// GD::Image->trueColor(1);
-	// my $full_image = GD::Image->new($result->{fullsize_path});
-	// return display_error("Couldn't handle image $$result{fullsize_path}")
-	//     if !$full_image;
-	// my ($fi_width, $fi_height) = $full_image->getBounds();
-
+func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) (dispErr interface{}, useFullSize bool) {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
 	// open the full size image
 	fsPath := w.pathForImage(img.FullSizeName())
-	fsFile, err := os.Open(fsPath)
-	defer fsFile.Close()
-	if err != nil {
-		dispErr = DisplayError{
-			Error:         "Image does not exist.",
-			DetailedError: "Open image '" + fsPath + "' error: " + err.Error(),
-		}
-		return
-	}
+	fsWidth, fsHeight := getImageDimensions(fsPath)
 
 	// decode it
-	fsConfig, _, _ := image.DecodeConfig(fsFile)
 	fsImage, err := imaging.Open(fsPath)
 	if err != nil {
 		dispErr = DisplayError{
@@ -360,7 +338,7 @@ func (w *Wiki) generateImage(img SizedImage, cachePath string, r *DisplayImage) 
 	}
 
 	// the request is to generate an image the same or larger than the original
-	if width >= fsConfig.Width && height >= fsConfig.Height {
+	if width >= fsWidth && height >= fsHeight {
 		useFullSize = true
 
 		// symlink this to the full-size image
@@ -383,11 +361,25 @@ func (w *Wiki) generateImage(img SizedImage, cachePath string, r *DisplayImage) 
 		}
 		return
 	}
-	newImageFi, _ := os.Lstat(newImagePath)
+
+	// determine new dimensions
+	img.Width, img.Height = getImageDimensions(newImagePath)
+	if img.Scale > 1 {
+		img.Width /= img.Scale
+		img.Height /= img.Scale
+	}
+
+	// rename based on actual dimensions
+	newNewImagePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
+	if newImagePath != newNewImagePath {
+		os.Rename(newImagePath, newNewImagePath)
+	}
+
+	newImageFi, _ := os.Lstat(newNewImagePath)
 
 	// inject info from the newly generated image
-	r.Path = cachePath
-	r.File = filepath.Base(cachePath)
+	r.Path = newNewImagePath
+	r.File = filepath.Base(newNewImagePath)
 	r.Generated = true
 	r.Modified = httpdate.Time2Str(newImageFi.ModTime())
 	r.ModUnix = newImageFi.ModTime().Unix()
@@ -406,4 +398,16 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 	if err != nil {
 		os.Symlink(name, scalePath)
 	}
+}
+
+func getImageDimensions(path string) (w, h int) {
+	file, err := os.Open(path)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+	c, _, _ := image.DecodeConfig(file)
+	w = c.Width
+	h = c.Height
+	return
 }
