@@ -3,6 +3,7 @@ package wikifier
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -136,15 +137,15 @@ func (p *Page) CacheExists() bool {
 
 // Name returns the resolved page name, with or without extension.
 //
-// This does NOT take symbolic links into account.
-// It DOES include the page prefix, however, if applicable.
+// This DOES take symbolic links into account
+// and DOES include the page prefix if applicable.
 //
 func (p *Page) Name() string {
-	dir, _ := filepath.Abs(p.Opt.Dir.Page)
+	dir := pageAbs(p.Opt.Dir.Page)
 	path := p.Path()
 	name := strings.TrimPrefix(path, dir)
 	name = strings.TrimPrefix(name, "/")
-	if strings.Index(path, dir) != -1 {
+	if strings.Index(path, dir) != 0 {
 		return filepath.Base(p.RelPath())
 	}
 	return name
@@ -171,19 +172,18 @@ func (p *Page) Prefix() string {
 // Path returns the absolute path to the page as resolved.
 // If the path does not resolve, returns an empty string.
 func (p *Page) Path() string {
-	path, _ := filepath.Abs(p.RelPath())
-	return path
+	return pageAbs(p.RelPath())
 }
 
 // RelName returns the unresolved page filename, with or without extension.
 // This does NOT take symbolic links into account.
 // It is not guaranteed to exist.
 func (p *Page) RelName() string {
-	dir, _ := filepath.Abs(p.Opt.Dir.Page)
+	dir := pageAbs(p.Opt.Dir.Page)
 	path := p.RelPath()
 	name := strings.TrimPrefix(path, dir)
 	name = strings.TrimPrefix(name, "/")
-	if strings.Index(path, dir) != -1 {
+	if strings.Index(path, dir) == 0 {
 		return filepath.Base(p.RelPath())
 	}
 	return name
@@ -210,7 +210,8 @@ func (p *Page) Redirect() string {
 
 	// symbolic link redirect
 	if p.IsSymlink() {
-		return p.Opt.Root.Page + "/" + p.NameNE()
+		fmt.Println("Redirect", p.FilePath, pageAbs(p.Opt.Root.Page+"/"+p.NameNE()))
+		return pageAbs(p.Opt.Root.Page + "/" + p.NameNE())
 	}
 
 	// @page.redirect
@@ -227,7 +228,8 @@ func (p *Page) Redirect() string {
 // the page directory. If it is symlinked to somewhere outside the page directory,
 // it is treated as a normal page rather than a redirect.
 func (p *Page) IsSymlink() bool {
-	if !strings.HasPrefix(p.Prefix(), p.Opt.Dir.Page) {
+	dirPage := pageAbs(p.Opt.Dir.Page)
+	if !strings.HasPrefix(p.Path(), dirPage) {
 		return false
 	}
 	fi, _ := os.Lstat(p.RelPath())
@@ -258,11 +260,7 @@ func (p *Page) Modified() time.Time {
 // CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
 	// FIXME: makedir
-	path := p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache"
-	if abs, _ := filepath.Abs(path); abs != "" {
-		return abs
-	}
-	return path
+	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache")
 }
 
 // CacheModified returns the page cache file time.
@@ -274,8 +272,7 @@ func (p *Page) CacheModified() time.Time {
 // SearchPath returns the absolute path to the page search text file.
 func (p *Page) SearchPath() string {
 	// FIXME: makedir
-	path, _ := filepath.Abs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
-	return path
+	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
 }
 
 // Draft returns true if the page is marked as a draft.
@@ -334,4 +331,14 @@ func (p *Page) Info() PageInfo {
 func (p *Page) resetParseState() {
 	// TODO: recursively destroy blocks
 	p.parser = nil
+}
+
+func pageAbs(path string) string {
+	if abs, _ := filepath.Abs(path); abs != "" {
+		path = abs
+	}
+	if followed, _ := filepath.EvalSymlinks(path); followed != "" {
+		return followed
+	}
+	return path
 }

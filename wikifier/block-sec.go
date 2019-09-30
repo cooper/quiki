@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -19,7 +18,6 @@ func newSecBlock(name string, b *parserBlock) block {
 
 func (sec *secBlock) parse(page *Page) {
 	enable := page.Opt.Page.EnableTitle
-	fmt.Printf("parse(): title(%v) sectionN(%v) enable(%v)\n", sec.blockName(), page.sectionN, enable)
 
 	// @page.enable.title causes the first header to be larger than the
 	// rest. it also uses @page.title as the first header if no other text
@@ -62,7 +60,6 @@ func (sec *secBlock) parse(page *Page) {
 }
 
 func (sec *secBlock) html(page *Page, el element) {
-	fmt.Printf("n(%v) isIntro(%v) title(%v)\n", sec.n, sec.isIntro, sec.blockName())
 	// HEADING
 
 	// determine if this is the intro section

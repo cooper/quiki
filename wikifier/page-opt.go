@@ -150,14 +150,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		"search.enable":     &opt.Search.Enable,    // enable search optimization
 	}
 	for name, ptr := range pageOptBool {
-		// we have to use Get to see if a value is present at all
-		val, err := page.Get(name)
+		enable, err := page.GetBool(name)
 		if err != nil {
 			return errors.Wrap(err, name)
 		}
-		if enable, ok := val.(bool); ok {
-			*ptr = enable
-		}
+		*ptr = enable
 	}
 
 	// image.retina - retina image scales

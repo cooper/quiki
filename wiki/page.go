@@ -164,6 +164,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// THIRD redirect check -
 	// this is for pages we just parsed with @page.redirect
 	if redir := page.Redirect(); redir != "" {
+		w.writeRedirectCache(page)
 		return DisplayRedirect{Redirect: redir}
 	}
 
@@ -191,6 +192,29 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// TODO: write search file if enabled
 
 	return r
+}
+
+func (w *Wiki) writeRedirectCache(page *wikifier.Page) {
+
+	// caching isn't enabled
+	if !page.Opt.Page.EnableCache || page.CachePath() == "" {
+		return
+	}
+
+	// open the cache file for writing
+	cacheFile, err := os.Create(page.CachePath())
+	defer cacheFile.Close()
+	if err != nil {
+		return
+	}
+
+	// create manifest with just page info (includes redirect)
+	j, err := json.Marshal(pageJSONManifest{PageInfo: page.Info()})
+	if err != nil {
+		return
+	}
+
+	cacheFile.Write(j)
 }
 
 func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {

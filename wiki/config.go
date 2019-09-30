@@ -1,8 +1,6 @@
 package wiki
 
 import (
-	"fmt"
-
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -69,8 +67,6 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (fina
 	path := page.Opt.Dir.Image + "/" + name
 	scaleFactor := 0
 	bigW, bigH := getImageDimensions(path)
-
-	fmt.Println("path", path)
 
 	if bigW == 0 || bigH == 0 {
 		return
