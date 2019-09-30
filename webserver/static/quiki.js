@@ -4,12 +4,12 @@ var quiki = {};
 document.addEvent('domready', hashLoad);
 window.addEvent('hashchange', hashLoad);
 
-// redirect #some-section to #wiki-anchor-some-section
+// redirect #some-section to #qa-some-section
 function hashLoad() {
     var hash = window.location.hash;
     if (hash.lastIndexOf('#', 0) === 0)
         hash = hash.substring(1);
-    var anchor = 'wiki-anchor-' + hash;
+    var anchor = 'qa-' + hash;
     var el = $(anchor);
     if (el) {
         pos = el.getPosition();
