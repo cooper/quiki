@@ -11,7 +11,6 @@ var externalImageRegex = regexp.MustCompile(`^(.+)://`)
 type imageBlock struct {
 	file, path, alt, link, lastName string
 	align, float, author, license   string
-	widthString, heightString       string
 	width, height                   int
 	parseFailed, useJS              bool
 	*Map
@@ -108,41 +107,37 @@ func (image *imageBlock) parse(page *Page) {
 		// - faster page load (since image files are smaller)
 		// - require read access to local image directory
 
-		// this must be provided by wiki
-		if page.Opt.Image.Sizer == nil {
-			image.warn(image.openPos, "image.sizer required with image.size_method 'server'")
+		// these must be provided by wiki
+		if page.Opt.Image.Sizer == nil || page.Opt.Image.Calc == nil {
+			image.warn(image.openPos, "image.sizer and image.calc required with image.size_method 'server'")
 			image.parseFailed = true
 			return
 		}
 
-		// path is as returned by the function that sizes the image
-		image.path = page.Opt.Image.Sizer(
+		// determine dimensions
+		calcWidth, calcHeight := page.Opt.Image.Calc(
 			image.file,
 			image.width,
 			image.height,
 			page,
 		)
 
+		// path is as returned by the function that sizes the image
+		image.path = page.Opt.Image.Sizer(
+			image.file,
+			calcWidth,
+			calcHeight,
+			page,
+		)
+
 		// remember that the page uses this image in these dimensions
-		page.images[image.file] = append(page.images[image.file], []int{image.width, image.height})
+		page.images[image.file] = append(page.images[image.file], []int{calcWidth, calcHeight})
 
 	} else {
 		// note: this should never happen because the config parser validates it
 		image.warn(image.openPos, "image.size_method neither 'javascript' nor 'server'")
 		image.parseFailed = true
 		return
-	}
-
-	// convert dimensions to string
-	if image.width == 0 {
-		image.widthString = "auto"
-	} else {
-		image.widthString = strconv.Itoa(image.width) + "px"
-	}
-	if image.height == 0 {
-		image.heightString = "auto"
-	} else {
-		image.heightString = strconv.Itoa(image.height) + "px"
 	}
 }
 

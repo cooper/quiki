@@ -89,6 +89,9 @@ func (img SizedImage) FullSizeName() string {
 
 // FullNameNE is like FullName but without the extension.
 func (img SizedImage) FullNameNE() string {
+	if img.Width == 0 && img.Height == 0 {
+		return img.Name
+	}
 	return fmt.Sprintf(
 		"%dx%d-%s",
 		img.TrueWidth(),
@@ -278,10 +281,10 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// we're not allowed to do this if this is a legit (non-pregeneration)
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
-	if !generateOK {
-		dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-		return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	}
+	// if !generateOK {
+	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
+	// }
 
 	// generate the image
 	if dispErr := w.generateImage(img, &r); dispErr != nil {

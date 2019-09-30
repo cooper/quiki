@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"fmt"
+
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -28,7 +30,8 @@ var defaultWikiOpt = wikifier.PageOpt{
 		Retina:     []int{2, 3},
 		SizeMethod: "server",
 		Rounding:   "normal",
-		Sizer:      nil, // FIXME
+		Calc:       defaultImageCalc,
+		Sizer:      defaultImageSizer,
 	},
 	Category: wikifier.PageOptCategory{
 		PerPage: 5,
@@ -60,4 +63,38 @@ func (w *Wiki) readConfig(file string) error {
 	}
 
 	return nil
+}
+
+func defaultImageCalc(name string, width, height int, page *wikifier.Page) (finalW, finalH int) {
+	path := page.Opt.Dir.Image + "/" + name
+	scaleFactor := 0
+	bigW, bigH := getImageDimensions(path)
+
+	fmt.Println("path", path)
+
+	if bigW == 0 || bigH == 0 {
+		return
+	}
+
+	if width != 0 {
+		scaleFactor = bigW / width
+		finalW = width
+		finalH = bigH / scaleFactor
+		return
+	}
+
+	if height != 0 {
+		scaleFactor = bigH / height
+		finalW = bigW / scaleFactor
+		finalH = height
+	}
+
+	return
+}
+
+func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
+	si := SizedImageFromName(name)
+	si.Width = width
+	si.Height = height
+	return page.Opt.Root.Image + "/" + si.FullName()
 }

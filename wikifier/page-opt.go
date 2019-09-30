@@ -61,6 +61,7 @@ type PageOptImage struct {
 	Retina     []int
 	SizeMethod string
 	Rounding   string
+	Calc       func(file string, width, height int, page *Page) (w, h int)
 	Sizer      func(file string, width, height int, page *Page) (path string)
 }
 

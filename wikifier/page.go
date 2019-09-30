@@ -43,13 +43,23 @@ type PageInfo struct {
 // NewPage creates a page given its filepath.
 func NewPage(filePath string) *Page {
 	myOpt := defaultPageOpt // copy
-	return &Page{FilePath: filePath, Opt: &myOpt, variableScope: newVariableScope()}
+	return &Page{
+		FilePath:      filePath,
+		Opt:           &myOpt,
+		variableScope: newVariableScope(),
+		images:        make(map[string][][]int),
+	}
 }
 
 // NewPageSource creates a page given some source code.
 func NewPageSource(source string) *Page {
 	myOpt := defaultPageOpt // copy
-	return &Page{Source: source, Opt: &myOpt, variableScope: newVariableScope()}
+	return &Page{
+		Source:        source,
+		Opt:           &myOpt,
+		variableScope: newVariableScope(),
+		images:        make(map[string][][]int),
+	}
 }
 
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
