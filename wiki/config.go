@@ -10,7 +10,7 @@ import (
 var defaultWikiOpt = wikifier.PageOpt{
 	Page: wikifier.PageOptPage{
 		EnableTitle: true,
-		EnableCache: false,
+		EnableCache: true,
 	},
 	Dir: wikifier.PageOptDir{
 		Wikifier: ".",

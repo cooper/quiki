@@ -1,6 +1,9 @@
 package wiki
 
 import (
+	"encoding/json"
+	"os"
+
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -167,10 +170,60 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// TODO: warnings
 
 	// TODO: update categories and set to r.Categories
-	// TODO: write cache file if enabled
+
+	// write cache file if enabled
+	if err := w.writePageCache(page, &r); err != nil {
+		return *err
+	}
+
 	// TODO: write search file if enabled
 
 	return r
+}
+
+func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) *DisplayError {
+
+	// caching isn't enabled
+	if !page.Opt.Page.EnableCache || page.CachePath() == "" {
+		return nil
+	}
+
+	// open the cache file for writing
+	cacheFile, err := os.Create(page.CachePath())
+	defer cacheFile.Close()
+	if err != nil {
+		return &DisplayError{
+			Error:         "Could not write page cache file.",
+			DetailedError: "Open '" + page.CachePath() + "' error: " + err.Error(),
+		}
+	}
+
+	// generate page info
+	j, err := json.Marshal(page.Info())
+	if err != nil {
+		return &DisplayError{
+			Error:         "Could not write page cache file.",
+			DetailedError: "JSON encode error: " + err.Error(),
+		}
+	}
+
+	// save prefixing data
+	cacheFile.Write(j)
+	cacheFile.Write([]byte{'\n'})
+
+	// save content
+	content := string(r.Content)
+	cacheFile.WriteString(content)
+	if len(content) != 0 && content[len(content)-1] != '\n' {
+		cacheFile.Write([]byte{'\n'})
+	}
+
+	// update result with real cache modified times
+	r.ModUnix = page.CacheModified().Unix()
+	r.Modified = httpdate.Time2Str(page.CacheModified())
+	r.CacheGenerated = true
+
+	return nil // success
 }
 
 func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage) {

@@ -258,7 +258,10 @@ func (p *Page) Modified() time.Time {
 // CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
 	// FIXME: makedir
-	path, _ := filepath.Abs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache")
+	path := p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache"
+	if abs, _ := filepath.Abs(path); abs != "" {
+		return abs
+	}
 	return path
 }
 
