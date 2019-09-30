@@ -178,28 +178,7 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) interface{} {
 // DisplaySizedImageGenerate returns the display result for an image in specific dimensions
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{} {
-	// my $result = {};
 	var r DisplayImage
-
-	// # if $image_name is an array ref, it's [ name, width, height, scale ]
-	// # if both dimensions are 0, parse the image name normally
-	// if (ref $image_name eq 'ARRAY') {
-	//     my ($name, $w, $h, $s) = @$image_name;
-	//     $w //= 0;
-	//     $h //= 0;
-	//     $image_name  = "${w}x${h}-$name";
-	//     $image_name  = $name    if !$w && !$h;
-	//     $image_name .= "@${s}x" if $s;
-	// }
-
-	// # parse the image name.
-	// my $image = $wiki->parse_image_name($image_name);
-	// $image_name = $image->{name};
-
-	// # check if the file exists.
-	// my $big_path = $wiki->path_for_image($image_name);
-	// return display_error('Image does not exist.')
-	//     if !-f $big_path;
 
 	// check if the file exists
 	path := w.pathForImage(img.FullSizeName())
