@@ -447,6 +447,7 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 }
 
 func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {
+	ok = true
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
