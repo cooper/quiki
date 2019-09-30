@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	strip "github.com/grokify/html-strip-tags-go"
+
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -189,7 +191,10 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		return dispErr
 	}
 
-	// TODO: write search file if enabled
+	// write search file if enabled
+	if dispErr := w.writePageText(page, &r); dispErr != nil {
+		return dispErr
+	}
 
 	return r
 }
@@ -268,6 +273,30 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	r.Modified = httpdate.Time2Str(page.CacheModified())
 	r.CacheGenerated = true
 
+	return nil // success
+}
+
+func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) interface{} {
+
+	// search optimization isn't enabled
+	if !page.Opt.Search.Enable || page.SearchPath() == "" || r.Content == "" {
+		return nil
+	}
+
+	// open the text file for writing
+	textFile, err := os.Create(page.SearchPath())
+	defer textFile.Close()
+	if err != nil {
+		return DisplayError{
+			Error:         "Could not write page text file.",
+			DetailedError: "Open '" + page.SearchPath() + "' for write error: " + err.Error(),
+		}
+	}
+
+	// save the content with HTML tags stripped
+	textFile.WriteString(strip.StripTags(string(r.Content)))
+
+	r.TextGenerated = true
 	return nil // success
 }
 
