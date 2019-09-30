@@ -284,20 +284,14 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	}
 
 	// generate the image
-	dispErr, useFullSize := w.generateImage(img, &r)
-	if dispErr != nil {
+	if dispErr := w.generateImage(img, &r); dispErr != nil {
 		return dispErr
-	}
-
-	// the generator says to use the full-size image
-	if useFullSize {
-		return r
 	}
 
 	return r
 }
 
-func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) (dispErr interface{}, useFullSize bool) {
+func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
 	// open the full size image
@@ -307,21 +301,19 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) (dispErr interface
 	// decode it
 	fsImage, err := imaging.Open(fsPath)
 	if err != nil {
-		dispErr = DisplayError{
+		return DisplayError{
 			Error:         "Image does not exist.",
 			DetailedError: "Decode image '" + fsPath + "' error: " + err.Error(),
 		}
-		return
 	}
 
 	// the request is to generate an image the same or larger than the original
 	if width >= fsWidth && height >= fsHeight {
-		useFullSize = true
 
 		// symlink this to the full-size image
 		w.symlinkScaledImage(img, img.FullSizeName())
 
-		return // success
+		return nil // success
 	}
 
 	// create resized image
@@ -332,11 +324,10 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) (dispErr interface
 	newImagePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
 	err = imaging.Save(newImage, newImagePath)
 	if err != nil {
-		dispErr = DisplayError{
+		return DisplayError{
 			Error:         "Failed to generate image.",
 			DetailedError: "Save image '" + fsPath + "' error: " + err.Error(),
 		}
-		return
 	}
 
 	// determine new dimensions
@@ -363,7 +354,7 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) (dispErr interface
 	r.Length = newImageFi.Size()
 	r.CacheGenerated = true
 
-	return // success
+	return nil // success
 }
 
 func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
