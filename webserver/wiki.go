@@ -4,13 +4,14 @@ package webserver
 
 import (
 	"errors"
-	wikiclient "github.com/cooper/go-wikiclient"
-	"github.com/cooper/quiki/config"
 	"log"
 	"net/http"
 	"path"
 	"strings"
 	"time"
+
+	wikiclient "github.com/cooper/go-wikiclient"
+	"github.com/cooper/quiki/config"
 )
 
 // represents a wiki

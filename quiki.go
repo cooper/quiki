@@ -1,7 +1,7 @@
 package main
 
-import "github.com/cooper/quiki/webserver"
+import "github.com/cooper/quiki/newwebserver"
 
 func main() {
-	webserver.Run()
+	newwebserver.Run()
 }
