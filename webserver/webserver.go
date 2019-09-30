@@ -1,25 +1,23 @@
-// Copyright (c) 2017, Mitchell Cooper
-// quiki - a standalone web server for wikifier
+// Package webserver is the newest webserver.
 package webserver
+
+// Copyright (c) 2019, Mitchell Cooper
+// quiki - a standalone web server for wikifier
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
 
-	"github.com/cooper/quiki/config"
+	"github.com/cooper/quiki/wikifier"
 )
 
-// wikiserver config instance
-var conf *config.Config
+var conf *wikifier.Page
 var mux *http.ServeMux
 
-// wikifier directory path
-var wikifierPath string
-
+// Run runs the webserver.
 func Run() {
 	mux = http.NewServeMux()
 
@@ -29,26 +27,22 @@ func Run() {
 	}
 
 	// parse configuration
-	conf = config.New(os.Args[1])
+	conf = wikifier.NewPage(os.Args[1])
+	conf.VarsOnly = true
 	if err := conf.Parse(); err != nil {
 		log.Fatal(err)
 	}
 
-	// these are required
 	var port string
-	if err := conf.RequireMany(map[string]*string{
+	for key, ptr := range map[string]*string{
 		"server.http.port":    &port,
-		"server.dir.wikifier": &wikifierPath,
-	}); err != nil {
-		log.Fatal(err)
-	}
-
-	// template search directories may have been specified
-	templateDirs = conf.Get("server.dir.template")
-
-	// setup the transport
-	if err := initTransport(); err != nil {
-		log.Fatal(err)
+		"server.dir.template": &templateDirs,
+	} {
+		str, err := conf.GetStr(key)
+		if err != nil {
+			log.Fatal(err)
+		}
+		*ptr = str
 	}
 
 	// set up wikis
@@ -64,11 +58,14 @@ func Run() {
 	log.Println("quiki ready")
 
 	// create server with main handler
-	mux.HandleFunc("/", handleRoot)
+	// mux.HandleFunc("/", handleRoot)
 	server := &http.Server{Handler: mux}
 
 	// listen
-	bind := conf.Get("server.http.bind")
+	bind, err := conf.GetStr("server.http.bind")
+	if err != nil {
+		log.Fatal(err)
+	}
 	if port == "unix" {
 		listener, err := net.Listen("unix", bind)
 		if err != nil {
@@ -82,18 +79,14 @@ func Run() {
 }
 
 func setupStatic() error {
-	if stat, err := os.Stat(wikifierPath); err != nil || !stat.IsDir() {
+	staticPath := "./webserver/static"
+	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
 		}
-		errStr := fmt.Sprintf(
-			"@dir.wikifier (%s) error: %v\n",
-			wikifierPath,
-			err.Error(),
-		)
-		return errors.New(errStr)
+		return err
 	}
-	fileServer := http.FileServer(http.Dir(wikifierPath + "/static"))
+	fileServer := http.FileServer(http.Dir(staticPath))
 	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 	return nil
 }

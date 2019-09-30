@@ -1,67 +1,68 @@
-// Copyright (c) 2017, Mitchell Cooper
 package webserver
+
+// Copyright (c) 2019, Mitchell Cooper
 
 import (
 	"bytes"
-	wikiclient "github.com/cooper/go-wikiclient"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/cooper/quiki/wiki"
 )
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	var delayedWiki wikiInfo
+	var delayedWiki *wikiInfo
 
 	// try each wiki
-	for _, wiki := range wikis {
+	for _, w := range wikis {
 
 		// wrong root
-		wikiRoot := wiki.conf.Get("root.wiki")
+		wikiRoot := w.Opt.Root.Wiki
 		if r.URL.Path != wikiRoot && !strings.HasPrefix(r.URL.Path, wikiRoot+"/") {
 			continue
 		}
 
 		// wrong host
-		if wiki.host != r.Host {
+		if w.host != r.Host {
 
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
-			if wiki.host == "" && delayedWiki.name == "" {
-				delayedWiki = wiki
+			if w.host == "" && delayedWiki.name == "" {
+				delayedWiki = w
 			}
 
 			continue
 		}
 
 		// host matches
-		delayedWiki = wiki
+		delayedWiki = w
 		break
 	}
 
 	// a wiki matches this
-	if delayedWiki.name != "" {
+	if delayedWiki != nil {
 
 		// show the main page for the delayed wiki
-		wikiRoot := delayedWiki.conf.Get("root.wiki")
-		mainPage := delayedWiki.conf.Get("main_page")
+		wikiRoot := delayedWiki.Opt.Root.Wiki
+		mainPage := delayedWiki.Opt.MainPage
 		if mainPage != "" && (r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/") {
 
 			// main page redirect is enabled
-			if delayedWiki.conf.GetBool("main_redirect") {
-				http.Redirect(
-					w, r,
-					delayedWiki.conf.Get("root.page")+
-						"/"+mainPage,
-					http.StatusMovedPermanently,
-				)
-				return
-			}
+			// FIXME:
+			// if delayedWiki.conf.GetBool("main_redirect") {
+			// 	http.Redirect(
+			// 		w, r,
+			// 		delayedWiki.conf.Get("root.page")+
+			// 			"/"+mainPage,
+			// 		http.StatusMovedPermanently,
+			// 	)
+			// 	return
+			// }
 
 			// display main page
-			delayedWiki.client = wikiclient.NewClient(tr, delayedWiki.defaultSess, 60*time.Second)
 			handlePage(delayedWiki, mainPage, w, r)
 			return
 		}
@@ -76,24 +77,23 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 // page request
-func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	res, err := wiki.client.DisplayPage(relPath)
-
-	// wikiclient error or 'not found' response
-	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
-		return
-	}
+func handlePage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	res := wi.DisplayPage(relPath)
 
 	// other response
-	switch res.Get("type") {
+	switch res := res.(type) {
+
+	// error
+	case wiki.DisplayError:
+		handleError(wi, res, w, r)
 
 	// page redirect
-	case "redirect":
-		http.Redirect(w, r, res.Get("redirect"), http.StatusMovedPermanently)
+	case wiki.DisplayRedirect:
+		http.Redirect(w, r, res.Redirect, http.StatusMovedPermanently)
 
 	// page content
-	case "page":
-		renderTemplate(wiki, w, "page", wikiPageFromRes(wiki, res))
+	case wiki.DisplayPage:
+		renderTemplate(wi, w, "page", wikiPageFromRes(wi, res))
 
 	// anything else
 	default:
@@ -102,57 +102,69 @@ func handlePage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 }
 
 // image request
-func handleImage(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	res, err := wiki.client.DisplayImage(relPath, 0, 0)
-	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
-		return
+func handleImage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	res := wi.DisplayImage(relPath)
+
+	// other response
+	switch res := res.(type) {
+
+	// error
+	case wiki.DisplayError:
+		handleError(wi, res, w, r)
+
+	// image content
+	case wiki.DisplayImage:
+		http.ServeFile(w, r, res.Path)
+
+	// anything else
+	default:
+		http.NotFound(w, r)
 	}
-	http.ServeFile(w, r, res.Get("path"))
 }
 
 // topic request
-func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 
-	// extract page number from relPath
-	pageN := 1
-	catName := relPath
-	split := strings.SplitN(relPath, "/", 2)
-	if len(split) == 2 {
-		if i, err := strconv.Atoi(split[1]); err == nil {
-			pageN = i
-		}
-		catName = split[0]
-	}
+	// // extract page number from relPath
+	// pageN := 1
+	// catName := relPath
+	// split := strings.SplitN(relPath, "/", 2)
+	// if len(split) == 2 {
+	// 	if i, err := strconv.Atoi(split[1]); err == nil {
+	// 		pageN = i
+	// 	}
+	// 	catName = split[0]
+	// }
 
-	// error
-	res, err := wiki.client.DisplayCategoryPosts(catName, pageN)
-	if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
-		return
-	}
+	// // error
+	// res, err := wiki.client.DisplayCategoryPosts(catName, pageN)
+	// if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
+	// 	return
+	// }
 
-	// pages is a map of page numbers to arrays of page refs
-	pagesMap, ok := res.Args["pages"].(map[string]interface{})
-	if !ok {
-		handleError(wiki, "invalid response", w, r)
-		return
-	}
+	// // pages is a map of page numbers to arrays of page refs
+	// pagesMap, ok := res.Args["pages"].(map[string]interface{})
+	// if !ok {
+	// 	handleError(wiki, "invalid response", w, r)
+	// 	return
+	// }
 
-	// get the page with the requested number
-	aSlice, ok := pagesMap[strconv.Itoa(pageN)].([]interface{})
-	if !ok {
-		log.Printf("problem: %+v", pagesMap[strconv.Itoa(pageN)])
-		handleError(wiki, "invalid page number", w, r)
-		return
-	}
+	// // get the page with the requested number
+	// aSlice, ok := pagesMap[strconv.Itoa(pageN)].([]interface{})
+	// if !ok {
+	// 	log.Printf("problem: %+v", pagesMap[strconv.Itoa(pageN)])
+	// 	handleError(wiki, "invalid page number", w, r)
+	// 	return
+	// }
 
-	// add each page
-	page := wikiPageFromRes(wiki, res)
-	for _, argMap := range aSlice {
-		msg := wikiclient.Message{Args: argMap.(map[string]interface{})}
-		page.Pages = append(page.Pages, wikiPageFromRes(wiki, msg))
-	}
+	// // add each page
+	// page := wikiPageFromRes(wiki, res)
+	// for _, argMap := range aSlice {
+	// 	msg := wikiclient.Message{Args: argMap.(map[string]interface{})}
+	// 	page.Pages = append(page.Pages, wikiPageFromRes(wiki, msg))
+	// }
 
-	renderTemplate(wiki, w, "posts", page)
+	// renderTemplate(wiki, w, "posts", page)
 }
 
 // this is set true when calling handlePage for the error page. this way, if an
@@ -160,66 +172,62 @@ func handleCategoryPosts(wiki wikiInfo, relPath string, w http.ResponseWriter, r
 // between handleError and handlePage
 var useLowLevelError bool
 
-func handleError(wiki wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) bool {
+func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) {
 	msg := "An unknown error has occurred"
 	switch err := errMaybe.(type) {
 
 	// if there's no error, stop
 	case nil:
-		return false
+		return
 
-	// message of type "not found" is an error; otherwise, stop
-	case wikiclient.Message:
-		if err.Get("type") != "not found" {
-			return false
-		}
-		msg = err.Get("error")
+		// display error
+	case wiki.DisplayError:
+		log.Println(err)
+		msg = err.Error
 
 	// string
 	case string:
 		msg = err
 
-		// error
+	// error
 	case error:
 		msg = err.Error()
 
 	}
 
-	// at this point, there is indeed an error
-
-	// if we have an error page for this wiki, use it
-	errorPage := wiki.conf.Get("error_page")
-	if !useLowLevelError && errorPage != "" {
-		useLowLevelError = true
-		w.WriteHeader(http.StatusNotFound)
-		handlePage(wiki, errorPage, w, r)
-		useLowLevelError = false
-		return true
-	}
+	//TODO:
+	// // if we have an error page for this wiki, use it
+	// errorPage := wiki.conf.Get("error_page")
+	// if !useLowLevelError && errorPage != "" {
+	// 	useLowLevelError = true
+	// 	w.WriteHeader(http.StatusNotFound)
+	// 	handlePage(wiki, errorPage, w, r)
+	// 	useLowLevelError = false
+	// 	return true
+	// }
 
 	// if the template provides an error page, fall back to that
 
-	if errTmpl := wiki.template.template.Lookup("error.tpl"); errTmpl != nil {
+	if errTmpl := wi.template.template.Lookup("error.tpl"); errTmpl != nil {
 		var buf bytes.Buffer
 		w.WriteHeader(http.StatusNotFound)
-		page := wikiPageWith(wiki)
+		page := wikiPageWith(wi)
 		page.Name = "Error"
 		page.Title = "Error"
 		page.Message = msg
 		errTmpl.Execute(&buf, page)
 		w.Header().Set("Content-Length", strconv.FormatInt(int64(buf.Len()), 10))
 		w.Write(buf.Bytes())
-		return true
+		return
 	}
 
 	// finally, fall back to generic error response
 	http.Error(w, msg, http.StatusNotFound)
-	return true
 }
 
-func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
+func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
 	var buf bytes.Buffer
-	err := wiki.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
+	err := wi.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -228,21 +236,21 @@ func renderTemplate(wiki wikiInfo, w http.ResponseWriter, templateName string, d
 	w.Write(buf.Bytes())
 }
 
-func wikiPageFromRes(wiki wikiInfo, res wikiclient.Message) wikiPage {
-	page := wikiPageWith(wiki)
+func wikiPageFromRes(w *wikiInfo, res wiki.DisplayPage) wikiPage {
+	page := wikiPageWith(w)
 	page.Res = res
-	page.File = res.Get("file")
-	page.Name = res.Get("name")
-	page.Title = res.Get("title")
+	page.File = res.File
+	page.Name = res.Name
+	page.Title = res.Title
 	return page
 }
 
-func wikiPageWith(wiki wikiInfo) wikiPage {
+func wikiPageWith(w *wikiInfo) wikiPage {
 	return wikiPage{
-		WikiTitle:  wiki.title,
-		WikiLogo:   wiki.getLogo(),
-		WikiRoot:   wiki.conf.Get("root.wiki"),
-		StaticRoot: wiki.template.staticRoot,
-		navigation: wiki.conf.GetSlice("navigation"),
+		WikiTitle: w.title,
+		// WikiLogo:   w.getLogo(), FIXME:
+		WikiRoot:   w.Opt.Root.Wiki,
+		StaticRoot: w.template.staticRoot,
+		// navigation: w.conf.GetSlice("navigation"), FIXME:
 	}
 }

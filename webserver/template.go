@@ -1,10 +1,10 @@
-// Copyright (c) 2017, Mitchell Cooper
 package webserver
+
+// Copyright (c) 2019, Mitchell Cooper
 
 import (
 	"encoding/json"
 	"errors"
-	wikiclient "github.com/cooper/go-wikiclient"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -12,6 +12,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cooper/quiki/wiki"
 )
 
 var templateDirs string
@@ -164,18 +166,18 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 }
 
 type wikiPage struct {
-	File       string             // page name, with extension
-	Name       string             // page name, without extension
-	WholeTitle string             // optional, shown in <title> as-is
-	Title      string             // page title
-	WikiTitle  string             // wiki titled
-	WikiLogo   string             // path to wiki logo image
-	WikiRoot   string             // wiki HTTP root
-	Res        wikiclient.Message // response
-	StaticRoot string             // path to static resources
-	Pages      []wikiPage         // more pages for category posts
-	Message    string             // message for error page
-	navigation []interface{}      // slice of nav items [display, url]
+	File       string           // page name, with extension
+	Name       string           // page name, without extension
+	WholeTitle string           // optional, shown in <title> as-is
+	Title      string           // page title
+	WikiTitle  string           // wiki titled
+	WikiLogo   string           // path to wiki logo image
+	WikiRoot   string           // wiki HTTP root
+	Res        wiki.DisplayPage // response
+	StaticRoot string           // path to static resources
+	Pages      []wikiPage       // more pages for category posts
+	Message    string           // message for error page
+	navigation []interface{}    // slice of nav items [display, url]
 }
 
 type navItem struct {
@@ -196,21 +198,22 @@ func (p wikiPage) VisibleTitle() string {
 func (p wikiPage) Scripts() []string {
 	return []string{
 		"/static/mootools.min.js",
-		"/static/wiki.js",
+		"/static/quiki.js",
 		"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js",
 	}
 }
 
 func (p wikiPage) PageCSS() template.CSS {
-	css := p.Res.Get("all_css")
-	if css == "" {
-		css = p.Res.Get("css")
-	}
-	return template.CSS(css)
+	// FIXME: all_css?
+	// css := p.Res.Get("all_css")
+	// if css == "" {
+	// 	css = p.Res.Get("css")
+	// }
+	return template.CSS(p.Res.CSS)
 }
 
 func (p wikiPage) HTMLContent() template.HTML {
-	return template.HTML(p.Res.Get("content"))
+	return template.HTML(p.Res.Content)
 }
 
 func (p wikiPage) Navigation() []navItem {
