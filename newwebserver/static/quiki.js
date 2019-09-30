@@ -1,4 +1,4 @@
-var wikifier = {};
+var quiki = {};
 (function (exports) {
 
 document.addEvent('domready', hashLoad);
@@ -23,4 +23,4 @@ exports.imageResize = function (img) {
     img.setStyle('width', '100%');
 };
 
-})(wikifier);
+})(quiki);
