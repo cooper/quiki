@@ -1,7 +1,9 @@
 package wiki
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 
 	httpdate "github.com/Songmu/go-httpdate"
@@ -78,6 +80,14 @@ type DisplayPage struct {
 	Title string `json:"title,omitempty"`
 }
 
+type pageJSONManifest struct {
+	CSS        string   `json:"css,omitempty"`
+	Categories []string `json:"categories,omitempty"`
+	Warnings   []string `json:"warnings,omitempty"`
+	Error      string   `json:"error,omitempty"`
+	wikifier.PageInfo
+}
+
 // NewPage creates a Page given its filepath and configures it for
 // use with this Wiki.
 func (w *Wiki) NewPage(name string) *wikifier.Page {
@@ -123,7 +133,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 
 	// caching is enabled, so serve the cached copy if available
 	if w.Opt.Page.EnableCache && page.CacheExists() {
-		w.displayCachedPage(page, &r)
+		if errOrRedir := w.displayCachedPage(page, &r, draftOK); errOrRedir != nil {
+			return errOrRedir
+		}
 		return r
 	}
 
@@ -149,7 +161,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		return DisplayError{Error: "Page has not yet been publised.", Draft: true}
 	}
 
-	// SECOND redirect check -
+	// THIRD redirect check -
 	// this is for pages we just parsed with @page.redirect
 	if redir := page.Redirect(); redir != "" {
 		return DisplayRedirect{Redirect: redir}
@@ -172,8 +184,8 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// TODO: update categories and set to r.Categories
 
 	// write cache file if enabled
-	if err := w.writePageCache(page, &r); err != nil {
-		return *err
+	if dispErr := w.writePageCache(page, &r); dispErr != nil {
+		return dispErr
 	}
 
 	// TODO: write search file if enabled
@@ -181,7 +193,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	return r
 }
 
-func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) *DisplayError {
+func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 
 	// caching isn't enabled
 	if !page.Opt.Page.EnableCache || page.CachePath() == "" {
@@ -192,16 +204,25 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) *DisplayError
 	cacheFile, err := os.Create(page.CachePath())
 	defer cacheFile.Close()
 	if err != nil {
-		return &DisplayError{
+		return DisplayError{
 			Error:         "Could not write page cache file.",
-			DetailedError: "Open '" + page.CachePath() + "' error: " + err.Error(),
+			DetailedError: "Open '" + page.CachePath() + "' for write error: " + err.Error(),
 		}
 	}
 
 	// generate page info
-	j, err := json.Marshal(page.Info())
+	info := pageJSONManifest{
+		CSS:        page.CSS(),
+		Categories: []string{}, // TODO
+		Warnings:   []string{}, // TODO
+		Error:      "",         // TODO
+		PageInfo:   page.Info(),
+	}
+
+	// encode as json
+	j, err := json.Marshal(info)
 	if err != nil {
-		return &DisplayError{
+		return DisplayError{
 			Error:         "Could not write page cache file.",
 			DetailedError: "JSON encode error: " + err.Error(),
 		}
@@ -226,5 +247,74 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) *DisplayError
 	return nil // success
 }
 
-func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage) {
+func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bool) interface{} {
+	cacheModify := page.CacheModified()
+	timeStr := httpdate.Time2Str(cacheModify)
+
+	// the page's file is more recent than the cache file.
+	// discard the outdated cached copy
+	if page.Modified().After(cacheModify) {
+		os.Remove(page.CachePath())
+		return nil // OK
+	}
+
+	content := "<!-- cached page dated " + timeStr + " -->\n"
+
+	// open cache file for reading
+	cacheContent, err := ioutil.ReadFile(page.CachePath())
+	if err != nil {
+		return DisplayError{
+			Error:         "Could not read page cache file.",
+			DetailedError: "Open '" + page.CachePath() + "' for read error: " + err.Error(),
+		}
+	}
+
+	// find the first line
+	var jsonData []byte
+	firstNL := bytes.IndexByte(cacheContent, '\n')
+	if firstNL != -1 && firstNL < len(cacheContent) {
+		jsonData = cacheContent[:firstNL+1]
+		cacheContent = cacheContent[firstNL:]
+	}
+
+	// the rest is the html content
+	content += string(cacheContent)
+
+	// decode the manifest
+	var info pageJSONManifest
+	if err := json.Unmarshal(jsonData, &info); err != nil {
+		return DisplayError{
+			Error:         "Could not read page cache file.",
+			DetailedError: "JSON encode error: " + err.Error(),
+		}
+	}
+
+	// if this is a draft and we're not serving drafts, pretend
+	// that the page does not exist
+	if !draftOK && info.Draft {
+		return DisplayError{Error: "Page has not yet been publised.", Draft: true}
+	}
+
+	// cached error
+	if info.Error != "" {
+		return DisplayError{Error: info.Error}
+	}
+
+	// cached redirect
+	if info.Redirect != "" {
+		return DisplayRedirect{Redirect: info.Redirect}
+	}
+
+	// update result with stuff from cache
+	r.CreatedUnix = info.Created.Unix()
+	r.Draft = info.Draft
+	r.Author = info.Author
+	r.Title = info.Title
+	r.FmtTitle = info.FmtTitle
+	r.FromCache = true
+	r.Content = wikifier.HTML(content)
+	r.ModUnix = cacheModify.Unix()
+	r.Modified = httpdate.Time2Str(cacheModify)
+
+	return nil // success
 }
