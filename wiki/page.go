@@ -160,7 +160,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	r.Draft = page.Draft()
 	r.ModUnix = page.Modified().Unix()
 	r.Modified = httpdate.Time2Str(page.Modified())
-	// r.Content = page.HTML()
+	r.Content = page.HTML()
 	r.CSS = page.CSS()
 
 	// TODO: should we include the page object?

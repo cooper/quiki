@@ -141,17 +141,17 @@ func setupWiki(w *wikiInfo) error {
 		wikiHandler{
 			rootType: "page",
 			root:     w.Opt.Root.Page,
-			// handler:  handlePage,
+			handler:  handlePage,
 		},
 		wikiHandler{
 			rootType: "image",
 			root:     w.Opt.Root.Image,
-			// handler:  handleImage,
+			handler:  handleImage,
 		},
 		wikiHandler{
 			rootType: "category",
 			root:     w.Opt.Root.Category,
-			// handler:  handleCategoryPosts,
+			handler:  handleCategoryPosts,
 		},
 	}
 

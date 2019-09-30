@@ -325,6 +325,10 @@ func PageNameNE(name string) string {
 func PageNameExt(name, ext string) string {
 	// 'Some Article' -> 'some_article.page'
 
+	if ext == "" {
+		ext = ".page"
+	}
+
 	// convert non-alphanumerics to _
 	name = PageNameLink(name, false)
 
@@ -333,11 +337,10 @@ func PageNameExt(name, ext string) string {
 	if lastDot != -1 && lastDot < len(name)-1 {
 		existing := name[lastDot:]
 		if existing != ".page" && existing != ".model" && existing != ".conf" {
-			if ext == "" {
-				ext = ".page"
-				name += ext
-			}
+			name += ext
 		}
+	} else {
+		name += ext
 	}
 
 	return name
