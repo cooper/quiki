@@ -13,34 +13,34 @@ func newMainBlock(name string, b *parserBlock) block {
 }
 
 func (mb *mainBlock) parse(page *Page) {
-	for _, block := range mb.blockContent() {
-		block.parse(page)
-	}
-}
 
-func (mb *mainBlock) html(page *Page, el element) {
-
-	// always include the ID so that element styles can refer to it
-	// (needed when more than 1 logical page is displayed in a browser window)
-	el.setMeta("needID", true)
-
-	// iterate over visible content only
+	// convert text to sections with paragraphs
+	var newContent []posContent
 	var contentToAdd []posContent
+	var textStartPos position
 	for _, pc := range mb.posContent() {
 		switch item := pc.content.(type) {
 		case block:
 
 			// create a section with the text up to this point
-			mb.createSection(page, el, contentToAdd)
+			sec := mb.createSection(page, contentToAdd)
 			contentToAdd = nil
 
 			// adopt this block as my own
-			item.html(page, item.el())
-			el.addChild(item.el())
+			if sec != nil {
+				newContent = append(newContent, posContent{sec, textStartPos})
+			}
+
+			// now parse and add this block also
+			item.parse(page)
+			newContent = append(newContent, posContent{item, pc.position})
 
 		case string:
 			if strings.TrimSpace(item) == "" && len(contentToAdd) == 0 {
 				continue
+			}
+			if contentToAdd == nil {
+				textStartPos = pc.position
 			}
 			contentToAdd = append(contentToAdd, pc)
 
@@ -50,24 +50,41 @@ func (mb *mainBlock) html(page *Page, el element) {
 	}
 
 	// add whatever's left
-	mb.createSection(page, el, contentToAdd)
+	sec := mb.createSection(page, contentToAdd)
+	if sec != nil {
+		newContent = append(newContent, posContent{sec, textStartPos})
+	}
+
+	// overwrite content
+	mb.positioned = newContent
 }
 
-func (mb *mainBlock) createSection(page *Page, el element, pcs []posContent) {
+func (mb *mainBlock) html(page *Page, el element) {
+
+	// always include the ID so that element styles can refer to it
+	// (needed when more than 1 logical page is displayed in a browser window)
+	el.setMeta("needID", true)
+
+	// everything should be converted to blocks by now
+	for _, item := range mb.blockContent() {
+		item.html(page, item.el())
+		el.addChild(item.el())
+	}
+}
+
+func (mb *mainBlock) createSection(page *Page, pcs []posContent) block {
 
 	// this can be passed nothing
 	if len(pcs) == 0 {
-		return
+		return nil
 	}
 
 	// create a section at first text node position
 	sec := newBlock("sec", "", nil, mb, mb, pcs[0].position)
 	sec.appendContent(pcs, pcs[0].position)
 
-	// parse and generate
+	// parse
 	sec.parse(page)
-	sec.html(page, sec.el())
 
-	// adopt it as my own
-	el.addChild(sec.el())
+	return sec
 }
