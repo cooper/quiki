@@ -135,5 +135,30 @@ func main() {
 		},
 	})
 
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".displayimage")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, ".displayimage"), " ,:")
+
+			var reply string
+			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
+
+			if err != nil {
+				reply = err.Error()
+			} else {
+				res := w.DisplayImage(line)
+				reply = fmt.Sprintf("%+v", res)
+			}
+
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+
+			return false
+		},
+	})
+
 	mybot.Run() // Blocks until exit
 }

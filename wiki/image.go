@@ -3,14 +3,21 @@ package wiki
 import (
 	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/png"
+	_ "image/jpeg" // for jpegs
+	_ "image/png"  // for pngs
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
+	"strings"
 
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/disintegration/imaging"
+)
+
+var (
+	imageNameRegex  = regexp.MustCompile(`^(\d+)x(\d+)-(.+)$`)
+	imageScaleRegex = regexp.MustCompile(`^(.+)\@(\d+)x$`)
 )
 
 // SizedImage represents an image in specific dimensions.
@@ -20,6 +27,48 @@ type SizedImage struct {
 	Scale         int    // 3
 	Name          string // myimage
 	Ext           string // png
+}
+
+func SizedImageFromName(name string) SizedImage {
+	w, h := 0, 0
+
+	// width and height were given, so it's a resized image
+	if matches := imageNameRegex.FindStringSubmatch(name); len(matches) != 0 {
+		w, _ = strconv.Atoi(matches[1])
+		h, _ = strconv.Atoi(matches[2])
+		name = matches[3]
+	}
+
+	// default true width and height to the same
+	trueW, trueH := w, h
+
+	// extract extension
+	nameNE := name
+	ext := ""
+	lastDot := strings.LastIndexByte(name, '.')
+	if lastDot != -1 && lastDot < len(name) {
+		nameNE = name[:lastDot]
+		ext = name[lastDot+1:]
+	}
+
+	// if this is a retina request, calculate scaled dimensions
+	scale := 1
+	if matches := imageScaleRegex.FindStringSubmatch(nameNE); len(matches) != 0 {
+		nameNE = matches[1]
+		scale, _ = strconv.Atoi(matches[2])
+		name = matches[1] + "." + ext
+		trueW *= scale
+		trueH *= scale
+	}
+
+	// put it all together
+	return SizedImage{
+		Width:  w,
+		Height: h,
+		Scale:  scale,
+		Name:   nameNE,
+		Ext:    ext,
+	}
 }
 
 func (img SizedImage) TrueWidth() int {
@@ -111,8 +160,7 @@ type DisplayImage struct {
 
 // DisplayImage returns the display result for an image.
 func (w *Wiki) DisplayImage(name string) interface{} {
-	// TODO: convert to SizedImage
-	return w.DisplaySizedImageGenerate(SizedImage{}, false)
+	return w.DisplaySizedImageGenerate(SizedImageFromName(name), false)
 }
 
 // DisplaySizedImage returns the display result for an image in specific dimensions.
@@ -147,7 +195,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	//     if !-f $big_path;
 
 	// check if the file exists
-	path := w.pathForImage(img.Name)
+	path := w.pathForImage(img.FullSizeName())
 	fi, err := os.Lstat(path)
 	if err != nil {
 		return DisplayError{
@@ -244,23 +292,27 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// we're not allowed to do this if this is a legit (non-pregeneration)
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
-	if !generateOK {
-		dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-		return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	}
+	// if !generateOK {
+	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
+	// }
 
 	// # generate the image
 	// my $err = $wiki->_generate_image($image, $cache_path, $result);
 	// return $err if $err;
 
 	// generate the image
-	// if dispErr,:= w.generateImage(img, cachePath, &r); dispErr != nil {
-	// 	return dispErr
-	// }
+	dispErr, useFullSize := w.generateImage(img, cachePath, &r)
+	if dispErr != nil {
+		return dispErr
+	}
 
 	// # the generator says to use the full-size image.
 	// return $wiki->_get_image_full_size($image, $result, \@stat, \%opts)
 	//     if delete $result->{use_fullsize};
+	if useFullSize {
+
+	}
 
 	// delete $result->{content} if $opts{dont_open};
 	// return $result;
@@ -298,7 +350,7 @@ func (w *Wiki) generateImage(img SizedImage, cachePath string, r *DisplayImage) 
 
 	// decode it
 	fsConfig, _, _ := image.DecodeConfig(fsFile)
-	fsImage, _, err := image.Decode(fsFile)
+	fsImage, err := imaging.Open(fsPath)
 	if err != nil {
 		dispErr = DisplayError{
 			Error:         "Image does not exist.",
