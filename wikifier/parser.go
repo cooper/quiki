@@ -425,8 +425,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	// VARIABLES
 
+	// FIXME: these tokens in stray text in the main block cause issues
 	if p.block.blockType() == "main" && variableTokens[b] && p.last != '[' {
-		// log.Println("variable tok", string(b))
 
 		if p.escape {
 			return p.handleByte(b)

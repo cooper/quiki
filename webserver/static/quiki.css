@@ -1,4 +1,4 @@
-p.q-paragraph {
+p.q-p {
 /*
     line-height: 19px;
     overflow: hidden;
@@ -15,8 +15,8 @@ p.q-paragraph {
 
 /* sections */
 
-h1.q-section-title,
-h1.q-section-page-title {
+h1.q-sec-title,
+h1.q-sec-page-title {
     margin: 0 0 15px 0;
     clear: left;
     border-bottom: 1px solid #ccc;
@@ -24,17 +24,17 @@ h1.q-section-page-title {
     overflow: hidden;
 }
 
-h2.q-section-title {
+h2.q-sec-title {
     border-bottom: 1px solid #ccc;
     line-height: 38px;
     clear: left;
 }
 
-h2.q-section-title,
-h3.q-section-title,
-h4.q-section-title,
-h5.q-section-title,
-h6.q-section-title {
+h2.q-sec-title,
+h3.q-sec-title,
+h4.q-sec-title,
+h5.q-sec-title,
+h6.q-sec-title {
     margin-top: 15px;
     overflow: hidden;
 }
