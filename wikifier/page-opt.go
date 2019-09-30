@@ -20,6 +20,7 @@ import (
 type PageOpt struct {
 	Name     string // wiki name
 	MainPage string // name of main page
+	Template string // name of template
 	Page     PageOptPage
 	Dir      PageOptDir
 	Root     PageOptRoot
@@ -52,6 +53,7 @@ type PageOptRoot struct {
 	Image    string // image root path
 	Category string // category root path
 	Page     string // page root path
+	File     string // file index path
 }
 
 // PageOptImage describes wiki imaging options.
@@ -92,6 +94,7 @@ var defaultPageOpt = PageOpt{
 		Image:    "/images",
 		Category: "/topic",
 		Page:     "/page",
+		File:     "",
 	},
 	Image: PageOptImage{
 		Retina:     []int{2, 3},
@@ -115,6 +118,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	pageOptString := map[string]*string{
 		"name":          &opt.Name,          // wiki name
 		"main_page":     &opt.MainPage,      // main page name
+		"template":      &opt.Template,      // template name
 		"dir.wikifier":  &opt.Dir.Wikifier,  // wikifier directory
 		"dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
 		"dir.image":     &opt.Dir.Image,     // image directory
@@ -126,6 +130,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		"root.image":    &opt.Root.Image,    // http path to images
 		"root.category": &opt.Root.Category, // http path to categories
 		"root.page":     &opt.Root.Page,     // http path to pages
+		"root.file":     &opt.Root.File,     // http path to file index
 	}
 	for name, ptr := range pageOptString {
 		str, err := page.GetStr(name)

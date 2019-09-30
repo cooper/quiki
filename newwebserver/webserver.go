@@ -28,6 +28,7 @@ func Run() {
 
 	// parse configuration
 	conf = wikifier.NewPage(os.Args[1])
+	conf.VarsOnly = true
 	if err := conf.Parse(); err != nil {
 		log.Fatal(err)
 	}
@@ -44,10 +45,10 @@ func Run() {
 		*ptr = str
 	}
 
-	// // set up wikis
-	// if err := initWikis(); err != nil {
-	// 	log.Fatal(err)
-	// }
+	// set up wikis
+	if err := initWikis(); err != nil {
+		log.Fatal(err)
+	}
 
 	// setup static files from wikifier
 	if err := setupStatic(); err != nil {

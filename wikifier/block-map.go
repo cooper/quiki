@@ -367,3 +367,14 @@ func (m *Map) mainBlock() block {
 	}
 	return b
 }
+
+// Keys returns a string of actual underlying map keys.
+func (m *Map) Keys() []string {
+	keys := make([]string, len(m.vars))
+	i := 0
+	for key := range m.vars {
+		keys[i] = key
+		i++
+	}
+	return keys
+}

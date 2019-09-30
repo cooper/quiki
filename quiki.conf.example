@@ -6,8 +6,8 @@
 @gopath:    /home/someone/go;
 @repo:      [@gopath]/src/github.com/cooper/quiki;
 
-/* path for the directory to which you cloned wikifier */
-@server.dir.wikifier: /home/someone/wikifier;
+/* or this is fine if running from the repo */
+@repo: .;
 
 /* other directory paths. the defaults below will work as long as @repo is
    accurately set to the path of the quiki repository. */
@@ -38,7 +38,9 @@
    Host header. if unspecified, the wiki will be accessible from all hosts.
    this is useful if you are running multiple wikis with clashing roots
    (e.g. trying to run two wikis on /).
-/* @server.wiki.mywiki.host: mywiki.com; */
+@server.wiki.mywiki.host: mywiki.com; */
 
 /* now, each wiki requires its own configuration. see wikis/mywiki/wiki.conf
    for an example wiki configuration. */
+
+@server.wiki.mywiki.config: [@repo]/wikis/mywiki/wiki.conf;
