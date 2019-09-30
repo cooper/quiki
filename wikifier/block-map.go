@@ -7,8 +7,10 @@ import (
 	"strings"
 )
 
-var keyNormalizer = regexp.MustCompile(`\W`)
-var keySplitter = regexp.MustCompile(`(.+)_(\d+)`)
+var (
+	keyNormalizer = regexp.MustCompile(`\W`)
+	keySplitter   = regexp.MustCompile(`(.+)_(\d+)`)
+)
 
 // Map represents a Key-value dictionary.
 // It is a quiki data type as well as the base of many block types.

@@ -7,12 +7,14 @@ import (
 	"strings"
 )
 
-var variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
-var linkRegex = regexp.MustCompile(`^((\w+)://|\$)`)
-var mailRegex = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
-var colorRegex = regexp.MustCompile(`(?i)^#[\da-f]+$`)
-var wikiRegex = regexp.MustCompile(`^(\w+):(.*)$`)
-var oldLinkRegex = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
+var (
+	variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
+	linkRegex     = regexp.MustCompile(`^((\w+)://|\$)`)
+	mailRegex     = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
+	colorRegex    = regexp.MustCompile(`(?i)^#[\da-f]+$`)
+	wikiRegex     = regexp.MustCompile(`^(\w+):(.*)$`)
+	oldLinkRegex  = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
+)
 
 var linkNormalizers = map[string]func(string) string{
 	"wikifier": func(s string) string {
