@@ -4,8 +4,6 @@ type pBlock struct {
 	*parserBlock
 }
 
-// TODO: headings, etc.
-
 func newPBlock(name string, b *parserBlock) block {
 	return &pBlock{parserBlock: b}
 }

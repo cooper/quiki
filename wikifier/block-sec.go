@@ -13,8 +13,6 @@ type secBlock struct {
 	*parserBlock
 }
 
-// TODO: headings, etc.
-
 func newSecBlock(name string, b *parserBlock) block {
 	return &secBlock{parserBlock: b}
 }

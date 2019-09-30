@@ -58,7 +58,7 @@ func Run() {
 	log.Println("quiki ready")
 
 	// create server with main handler
-	// mux.HandleFunc("/", handleRoot)
+	mux.HandleFunc("/", handleRoot)
 	server := &http.Server{Handler: mux}
 
 	// listen

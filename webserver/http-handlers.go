@@ -30,7 +30,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
-			if w.host == "" && delayedWiki.name == "" {
+			if w.host == "" && delayedWiki == nil {
 				delayedWiki = w
 			}
 
