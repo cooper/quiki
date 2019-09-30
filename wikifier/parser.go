@@ -558,9 +558,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			return p.nextByte(b)
 		}
 
-		// log.Printf("MADE IT DOWN WITH %v; CATCH: %v", string(b), p.catch)
-
-		return p.nextByte(b)
+		// default
+		return p.handleByte(b)
 	}
 
 	return p.handleByte(b)
