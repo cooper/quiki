@@ -24,7 +24,7 @@
                 <li><a href="{{.Link}}">{{.Display}}</a></li>
             {{end}}
         </ul>
-        <a href="{{.WikiRoot}}/">
+        <a href="{{.Root.Wiki}}/">
             {{if .WikiLogo}}
                 <img src="{{.WikiLogo}}" alt="{{.WikiTitle}}" data-rjs="3" />
             {{else}}

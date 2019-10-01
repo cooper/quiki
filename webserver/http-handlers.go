@@ -4,6 +4,7 @@ package webserver
 
 import (
 	"bytes"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -158,8 +159,7 @@ func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r 
 
 	// create template page
 	page := wikiPageWith(wi)
-	// TODO: CSS
-	// page.Res = res
+	page.PageCSS = template.CSS(res.CSS)
 	page.File = res.File
 	page.Name = res.Name
 	page.Title = res.Title
@@ -248,8 +248,8 @@ func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, do
 
 func wikiPageFromRes(w *wikiInfo, res wiki.DisplayPage) wikiPage {
 	page := wikiPageWith(w)
-	page.Res = res
-	// TODO: Eliminate res
+	page.HTMLContent = template.HTML(res.Content)
+	page.PageCSS = template.CSS(res.CSS)
 	page.File = res.File
 	page.Name = res.Name
 	page.Title = res.Title

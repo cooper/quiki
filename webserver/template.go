@@ -14,8 +14,6 @@ import (
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
-
-	"github.com/cooper/quiki/wiki"
 )
 
 var templateDirs string
@@ -168,21 +166,22 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 }
 
 type wikiPage struct {
-	File       string                       // page name, with extension
-	Name       string                       // page name, without extension
-	WholeTitle string                       // optional, shown in <title> as-is
-	Title      string                       // page title
-	WikiTitle  string                       // wiki titled
-	WikiLogo   string                       // path to wiki logo image
-	WikiRoot   string                       // wiki HTTP root (depreciated, use Root.Wiki)
-	Root       wikifier.PageOptRoot         // all roots
-	Res        wiki.DisplayPage             // response
-	StaticRoot string                       // path to static resources
-	Pages      []wikiPage                   // more pages for category posts
-	Message    string                       // message for error page
-	Navigation []wikifier.PageOptNavigation // slice of nav items
-	PageN      int                          // for category posts, the page number (first page = 1)
-	NumPages   int                          // for category posts, the number of pages
+	File        string                       // page name, with extension
+	Name        string                       // page name, without extension
+	WholeTitle  string                       // optional, shown in <title> as-is
+	Title       string                       // page title
+	WikiTitle   string                       // wiki titled
+	WikiLogo    string                       // path to wiki logo image
+	WikiRoot    string                       // wiki HTTP root (depreciated, use Root.Wiki)
+	Root        wikifier.PageOptRoot         // all roots
+	StaticRoot  string                       // path to static resources
+	Pages       []wikiPage                   // more pages for category posts
+	Message     string                       // message for error page
+	Navigation  []wikifier.PageOptNavigation // slice of nav items
+	PageN       int                          // for category posts, the page number (first page = 1)
+	NumPages    int                          // for category posts, the number of pages
+	PageCSS     template.CSS                 // css
+	HTMLContent template.HTML                // html
 }
 
 func (p wikiPage) VisibleTitle() string {
@@ -201,19 +200,6 @@ func (p wikiPage) Scripts() []string {
 		"/static/quiki.js",
 		"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js",
 	}
-}
-
-func (p wikiPage) PageCSS() template.CSS {
-	// FIXME: all_css?
-	// css := p.Res.Get("all_css")
-	// if css == "" {
-	// 	css = p.Res.Get("css")
-	// }
-	return template.CSS(p.Res.CSS)
-}
-
-func (p wikiPage) HTMLContent() template.HTML {
-	return template.HTML(p.Res.Content)
 }
 
 // for category posts,
