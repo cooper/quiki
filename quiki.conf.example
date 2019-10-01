@@ -11,6 +11,7 @@
 
 /* other directory paths. the defaults below will work as long as @repo is
    accurately set to the path of the quiki repository. */
+@server.dir.static:     [@repo]/webserver/static;
 @server.dir.wiki:       [@repo]/wikis;
 @server.dir.template:   [@repo]/templates;
 

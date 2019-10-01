@@ -33,10 +33,11 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	var port string
+	var port, dirStatic string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &port,
 		"server.dir.template": &templateDirs,
+		"server.dir.static":   &dirStatic,
 	} {
 		str, err := conf.GetStr(key)
 		if err != nil {
@@ -51,7 +52,7 @@ func Run() {
 	}
 
 	// setup static files from wikifier
-	if err := setupStatic(); err != nil {
+	if err := setupStatic(dirStatic); err != nil {
 		log.Fatal(err)
 	}
 
@@ -78,8 +79,7 @@ func Run() {
 	}
 }
 
-func setupStatic() error {
-	staticPath := "./webserver/static"
+func setupStatic(staticPath string) error {
 	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
