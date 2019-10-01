@@ -99,8 +99,15 @@ type CategoryEntry struct {
 // DisplayCategoryPosts represents a category result to display.
 type DisplayCategoryPosts struct {
 
-	// override the Pages field
+	// DisplayPage results
+	// overrides the Category Pages field
 	Pages []DisplayPage `json:"pages,omitempty"`
+
+	// the page number (first page = 0)
+	PageN int
+
+	// the total number of pages
+	NumPages int
 
 	// this is the combined CSS for all pages we're displaying
 	CSS string
@@ -323,8 +330,9 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 	// if there is a limit and we exceeded it
 	limit := w.Opt.Category.PerPage
+	numPages := len(pages)/limit + 1
 	if limit > 0 && !(pageN == 1 && len(pages) <= limit) {
-		pagesOfPages := make([]pagesToSort, 0, len(pages)/limit+1)
+		pagesOfPages := make([]pagesToSort, 0, numPages)
 
 		// break down into PAGES or pages. wow.
 		n := 0
@@ -386,7 +394,13 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// }
 
 	// return $result;
-	return DisplayCategoryPosts{pages, css, cat}
+	return DisplayCategoryPosts{
+		Pages:    pages,
+		PageN:    pageN,
+		NumPages: numPages,
+		CSS:      css,
+		Category: cat,
+	}
 }
 
 // logic for sorting pages by time

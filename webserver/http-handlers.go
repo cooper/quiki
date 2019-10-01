@@ -158,11 +158,13 @@ func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r 
 
 	// create template page
 	page := wikiPageWith(wi)
-	// TODO: CSS, Content
+	// TODO: CSS
 	// page.Res = res
 	page.File = res.File
 	page.Name = res.Name
 	page.Title = res.Title
+	page.PageN = pageN + 1
+	page.NumPages = res.NumPages
 
 	// add each page result as a wikiPage
 	for _, dispPage := range res.Pages {
@@ -259,6 +261,7 @@ func wikiPageWith(w *wikiInfo) wikiPage {
 		WikiTitle: w.title,
 		// WikiLogo:   w.getLogo(), FIXME:
 		WikiRoot:   w.Opt.Root.Wiki,
+		Root:       w.Opt.Root,
 		StaticRoot: w.template.staticRoot,
 		Navigation: w.Opt.Navigation,
 	}

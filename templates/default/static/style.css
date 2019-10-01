@@ -48,12 +48,12 @@ a img {
     top: 3px;
 }
 
-#header a {
+a {
     color: #001644;
     text-decoration: none;
 }
 
-#header a:hover {
+a:hover {
     color: royalblue;
 }
 
@@ -70,4 +70,18 @@ a img {
     border: 1px solid #ccc;
     background-color: #f7f7f7;
     padding: 5px;
+}
+
+a.page-number {
+    margin-top: 20px;
+    display: inline-block;
+    margin-left: 5px;
+    border: 1px solid #ccc;
+    padding: 5px 0;
+    width: 25px;
+    text-align: center;
+}
+
+a.page-number.active {
+    background-color: #dedede;
 }

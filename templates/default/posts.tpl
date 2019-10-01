@@ -8,4 +8,7 @@
         {{$p.HTMLContent}}
     </div>
 {{end}}
+{{range $n := .PageNumbers}}
+    <a class="page-number{{if eq $.PageN $n}} active{{end}}" href="{{$.Root.Category}}/{{$.Name}}/{{$n}}">{{$n}}</a>
+{{end}}
 {{template "footer.tpl" .}}

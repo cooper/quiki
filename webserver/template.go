@@ -174,12 +174,15 @@ type wikiPage struct {
 	Title      string                       // page title
 	WikiTitle  string                       // wiki titled
 	WikiLogo   string                       // path to wiki logo image
-	WikiRoot   string                       // wiki HTTP root
+	WikiRoot   string                       // wiki HTTP root (depreciated, use Root.Wiki)
+	Root       wikifier.PageOptRoot         // all roots
 	Res        wiki.DisplayPage             // response
 	StaticRoot string                       // path to static resources
 	Pages      []wikiPage                   // more pages for category posts
 	Message    string                       // message for error page
 	Navigation []wikifier.PageOptNavigation // slice of nav items
+	PageN      int                          // for category posts, the page number (first page = 1)
+	NumPages   int                          // for category posts, the number of pages
 }
 
 func (p wikiPage) VisibleTitle() string {
@@ -211,4 +214,13 @@ func (p wikiPage) PageCSS() template.CSS {
 
 func (p wikiPage) HTMLContent() template.HTML {
 	return template.HTML(p.Res.Content)
+}
+
+// for category posts,
+func (p wikiPage) PageNumbers() []int {
+	numbers := make([]int, p.NumPages)
+	for i := 1; i <= p.NumPages; i++ {
+		numbers[i-1] = i
+	}
+	return numbers
 }
