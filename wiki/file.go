@@ -29,10 +29,10 @@ func (w *Wiki) allPageFiles() []string {
 	return files
 }
 
-func (w *Wiki) allCategoryFiles(catType string) []string {
+func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	dir := w.Opt.Dir.Category
 	if catType != "" {
-		dir += "/" + catType
+		dir += "/" + string(catType)
 	}
 	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, false)
 	return files
@@ -69,16 +69,16 @@ func (w *Wiki) pathForPage(pageName string, createOK bool, dirPage string) strin
 
 // pathForCategory returns the absolute path for a category. If necessary, it
 // creates directories for the path components that do not exist.
-func (w *Wiki) pathForCategory(catName, catType string, createOK bool) string {
+func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bool) string {
 	catName = wikifier.CategoryName(catName, false)
 	if catType != "" {
 		catType += "/"
 	}
 	dir := w.Opt.Dir.Cache + "/category"
 	if createOK {
-		makeDir(dir, catType+catName)
+		makeDir(dir, string(catType)+catName)
 	}
-	path, _ := filepath.Abs(dir + "/" + catType + catName)
+	path, _ := filepath.Abs(dir + "/" + string(catType) + catName)
 	return path
 }
 

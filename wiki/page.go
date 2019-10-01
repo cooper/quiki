@@ -184,7 +184,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// TODO: should we include the page object?
 	// TODO: warnings
 
-	// TODO: update categories and set to r.Categories
+	// update categories
+	w.updatePageCategories(page)
+	r.Categories = page.Categories()
 
 	// write cache file if enabled
 	if dispErr := w.writePageCache(page, &r); dispErr != nil {

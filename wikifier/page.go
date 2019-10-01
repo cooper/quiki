@@ -313,6 +313,19 @@ func (p *Page) TitleOrName() string {
 	return p.Name()
 }
 
+// Categories returns a list of categories the page belongs to.
+func (p *Page) Categories() []string {
+	obj, err := p.GetObj("category")
+	if err != nil {
+		return nil
+	}
+	catMap, ok := obj.(*Map)
+	if !ok {
+		return nil
+	}
+	return catMap.Keys()
+}
+
 // Info returns the PageInfo for the page.
 func (p *Page) Info() PageInfo {
 	return PageInfo{
