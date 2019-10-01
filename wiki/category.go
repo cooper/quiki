@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -198,7 +197,7 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 // Exists returns whether a category currently exists.
 func (cat *Category) Exists() bool {
 	_, err := os.Lstat(cat.Path)
-	return err != nil
+	return err == nil
 }
 
 // write category to file
@@ -324,28 +323,33 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 	// if there is a limit and we exceeded it
 	limit := w.Opt.Category.PerPage
-	if pageN != 0 && limit > 0 && !(pageN == 1 && len(pages) <= limit) {
-		var pagesOfPages []pagesToSort
+	if limit > 0 && !(pageN == 1 && len(pages) <= limit) {
+		pagesOfPages := make([]pagesToSort, 0, len(pages)/limit+1)
 
 		// break down into PAGES or pages. wow.
-		n := 1
+		n := 0
 		for len(pages) != 0 {
 
 			// first one on the page
-			thisPage := pagesOfPages[n]
-			if thisPage == nil {
-				thisPage = make(pagesToSort, 0, limit)
+			var thisPage pagesToSort
+			if n < len(pagesOfPages) {
+				thisPage = pagesOfPages[n]
+			} else {
+				thisPage = make(pagesToSort, limit)
+				pagesOfPages = pagesOfPages[:n+1]
 				pagesOfPages[n] = thisPage
 			}
 
 			// add up to limit pages
-			for i := 0; i <= limit; i++ {
+			var i int
+			for i = 0; i <= limit-1; i++ {
 				if len(pages) == 0 {
 					break
 				}
 				thisPage[i] = pages[0]
 				pages = pages[1:]
 			}
+			thisPage = thisPage[:i]
 
 			// if that was the page we wanted, stop
 			if n == pageN {
@@ -355,9 +359,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 			n++
 		}
 
-		// get just the page we want
-		pagesOfPages = pagesOfPages[n:]
-		fmt.Printf("%+v", pagesOfPages)
+		// only care about the page requested
 		pages = pagesOfPages[pageN]
 	}
 

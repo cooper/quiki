@@ -1,0 +1,6 @@
+@page.title: A page in a category;
+@page.created: 1;
+
+@category.mytopic;
+
+This is the tenth page.

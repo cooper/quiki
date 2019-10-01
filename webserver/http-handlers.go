@@ -124,46 +124,52 @@ func handleImage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Re
 // topic request
 func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 
-	// // extract page number from relPath
-	// pageN := 1
-	// catName := relPath
-	// split := strings.SplitN(relPath, "/", 2)
-	// if len(split) == 2 {
-	// 	if i, err := strconv.Atoi(split[1]); err == nil {
-	// 		pageN = i
-	// 	}
-	// 	catName = split[0]
-	// }
+	// extract page number from relPath
+	pageN := 0
+	catName := relPath
+	split := strings.SplitN(relPath, "/", 2)
+	if len(split) == 2 {
+		if i, err := strconv.Atoi(split[1]); err == nil {
+			pageN = i - 1
+		}
+		catName = split[0]
+	}
 
-	// // error
-	// res, err := wiki.client.DisplayCategoryPosts(catName, pageN)
-	// if handleError(wiki, err, w, r) || handleError(wiki, res, w, r) {
-	// 	return
-	// }
+	iface := wi.DisplayCategoryPosts(catName, pageN)
+	var res wiki.DisplayCategoryPosts
 
-	// // pages is a map of page numbers to arrays of page refs
-	// pagesMap, ok := res.Args["pages"].(map[string]interface{})
-	// if !ok {
-	// 	handleError(wiki, "invalid response", w, r)
-	// 	return
-	// }
+	// other response
+	switch val := iface.(type) {
 
-	// // get the page with the requested number
-	// aSlice, ok := pagesMap[strconv.Itoa(pageN)].([]interface{})
-	// if !ok {
-	// 	log.Printf("problem: %+v", pagesMap[strconv.Itoa(pageN)])
-	// 	handleError(wiki, "invalid page number", w, r)
-	// 	return
-	// }
+	// error
+	case wiki.DisplayError:
+		handleError(wi, val, w, r)
+		return
 
-	// // add each page
-	// page := wikiPageFromRes(wiki, res)
-	// for _, argMap := range aSlice {
-	// 	msg := wikiclient.Message{Args: argMap.(map[string]interface{})}
-	// 	page.Pages = append(page.Pages, wikiPageFromRes(wiki, msg))
-	// }
+	// posts
+	case wiki.DisplayCategoryPosts:
+		res = val
 
-	// renderTemplate(wiki, w, "posts", page)
+	// anything else
+	default:
+		http.NotFound(w, r)
+		return
+	}
+
+	// create template page
+	page := wikiPageWith(wi)
+	// TODO: CSS, Content
+	// page.Res = res
+	page.File = res.File
+	page.Name = res.Name
+	page.Title = res.Title
+
+	// add each page result as a wikiPage
+	for _, dispPage := range res.Pages {
+		page.Pages = append(page.Pages, wikiPageFromRes(wi, dispPage))
+	}
+
+	renderTemplate(wi, w, "posts", page)
 }
 
 // this is set true when calling handlePage for the error page. this way, if an
@@ -241,6 +247,7 @@ func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, do
 func wikiPageFromRes(w *wikiInfo, res wiki.DisplayPage) wikiPage {
 	page := wikiPageWith(w)
 	page.Res = res
+	// TODO: Eliminate res
 	page.File = res.File
 	page.Name = res.Name
 	page.Title = res.Title
