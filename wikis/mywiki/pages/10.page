@@ -1,6 +1,6 @@
-@page.title: A page in a category;
-@page.created: 1;
+@page.title: Tenth page;
+@page.created: 0;
 
 @category.mytopic;
 
-This is the tenth page.
+This page should be second in line because it has an explicit 0 creation time value.

@@ -33,7 +33,6 @@ a img {
 #header h1 {
     height: 100%;
     line-height: 70px;
-    display: inline-block;
     float: left;
     margin: 0 15px;
     color: #000;
@@ -41,7 +40,6 @@ a img {
 
 #header img {
     margin: 10px;
-    display: inline-block;
     float: left;
     height: 50px;
     position: relative;

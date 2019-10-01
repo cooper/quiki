@@ -507,7 +507,7 @@ func (p pagesToSort) Less(i, j int) bool {
 		return false
 	}
 
-	return p[i].Created.Before(*p[j].Created)
+	return p[i].Created.After(*p[j].Created)
 }
 
 func (p pagesToSort) Swap(i, j int) {
