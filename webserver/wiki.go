@@ -172,7 +172,7 @@ func setupWiki(wi *wikiInfo) error {
 		root += "/"
 
 		// add the real handler
-		wi := wi
+		wi := wi // copy pointer so the handler below always refer to this one
 		mux.HandleFunc(wi.host+root, func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root

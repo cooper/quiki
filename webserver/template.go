@@ -202,8 +202,12 @@ func (p wikiPage) Scripts() []string {
 	}
 }
 
-// for category posts,
+// for category posts, the page numbers available.
+// if there is only one page, this is nothing
 func (p wikiPage) PageNumbers() []int {
+	if p.NumPages == 1 {
+		return nil
+	}
 	numbers := make([]int, p.NumPages)
 	for i := 1; i <= p.NumPages; i++ {
 		numbers[i-1] = i

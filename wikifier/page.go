@@ -329,10 +329,7 @@ func (p *Page) Categories() []string {
 
 // Info returns the PageInfo for the page.
 func (p *Page) Info() PageInfo {
-	mod, create := p.Modified(), p.Created()
-	return PageInfo{
-		Modified:  &mod,
-		Created:   &create,
+	info := PageInfo{
 		Draft:     p.Draft(),
 		Generated: p.Generated(),
 		Redirect:  p.Redirect(),
@@ -340,6 +337,14 @@ func (p *Page) Info() PageInfo {
 		Title:     p.Title(),
 		Author:    p.Author(),
 	}
+	mod, create := p.Modified(), p.Created()
+	if !mod.IsZero() {
+		info.Modified = &mod
+	}
+	if !create.IsZero() {
+		info.Created = &create
+	}
+	return info
 }
 
 // resets the parser

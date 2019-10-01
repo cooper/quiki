@@ -2,12 +2,14 @@ package wiki
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"sort"
 	"time"
 
+	"github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
 )
 
@@ -45,11 +47,13 @@ type Category struct {
 	Title string `json:"title,omitempty"`
 
 	// time when the category was created
-	Created *time.Time `json:"created,omitempty"`
+	Created     *time.Time `json:"created,omitempty"`
+	CreatedHTTP string     `json:"created_http,omitempty"` // HTTP formatted
 
 	// time when the category was last modified.
 	// this is updated when pages are added and deleted
-	Modified *time.Time `json:"modified,omitempty"`
+	Modified     *time.Time `json:"modified,omitempty"`
+	ModifiedHTTP string     `json:"modified_http,omitempty"` // HTTP formatted
 
 	// pages in the category. keys are filenames
 	Pages map[string]CategoryEntry `json:"pages,omitempty"`
@@ -104,13 +108,13 @@ type DisplayCategoryPosts struct {
 	Pages []DisplayPage `json:"pages,omitempty"`
 
 	// the page number (first page = 0)
-	PageN int
+	PageN int `json:"page_n"`
 
 	// the total number of pages
-	NumPages int
+	NumPages int `json:"num_pages"`
 
 	// this is the combined CSS for all pages we're displaying
-	CSS string
+	CSS string `json:"css,omitempty"`
 
 	// all other fields are inherited from the category itself
 	*Category
@@ -135,6 +139,8 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 		now := time.Now()
 		cat.Created = &now
 		cat.Modified = &now
+		cat.CreatedHTTP = httpdate.Time2Str(now)
+		cat.ModifiedHTTP = cat.CreatedHTTP
 		err = nil
 	}
 
@@ -185,6 +191,7 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 	// ok, at this point we're gonna add or update the page if there is one
 	now := time.Now()
 	cat.Modified = &now
+	cat.ModifiedHTTP = httpdate.Time2Str(now)
 	if pageMaybe != nil {
 		if cat.Pages == nil {
 			cat.Pages = make(map[string]CategoryEntry)
@@ -296,13 +303,6 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 		}
 	}
 
-	// $result->{type}     = 'cat_posts';
-	// $result->{cat_type} = $opts{cat_type};
-	// $result->{file}     = $cat_name;
-	// $result->{category} = $cat_name_ne;
-	// $result->{title}    = $wiki->opt("cat.$cat_name_ne.title") // $title;
-	// $result->{all_css}  = '';
-
 	// load each page
 	var pages pagesToSort
 	for pageName := range cat.Pages {
@@ -324,17 +324,13 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// order with newest first
 	sort.Sort(pages)
 
-	// # order with newest first.
-	// my @pages_in_order = sort { $times{$b} <=> $times{$a} } keys %times;
-	// @pages_in_order    = map  { $reses{$_} } @pages_in_order;
-
 	// if there is a limit and we exceeded it
 	limit := w.Opt.Category.PerPage
 	numPages := len(pages)/limit + 1
 	if limit > 0 && !(pageN == 1 && len(pages) <= limit) {
 		pagesOfPages := make([]pagesToSort, 0, numPages)
 
-		// break down into PAGES or pages. wow.
+		// break down into PAGES of pages. wow.
 		n := 0
 		for len(pages) != 0 {
 
@@ -373,34 +369,18 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 	css := ""
 
-	// # order into PAGES of pages. wow.
-	// my $limit = $wiki->opt('cat.per_page') || 'inf';
-	// my $n = 1;
-	// while (@pages_in_order) {
-	// 	$result->{pages}{$n} ||= [];
-	// 	for (1..$limit) {
-
-	// 		# there are no more pages.
-	// 		last unless @pages_in_order;
-
-	// 		# add the next page.
-	// 		my $page = shift @pages_in_order;
-	// 		push @{ $result->{pages}{$n} }, $page;
-
-	// 		# add the CSS.
-	// 		$result->{all_css} .= $page->{css} if length $page->{css};
-	// 	}
-	// 	$n++;
-	// }
-
 	// return $result;
-	return DisplayCategoryPosts{
+	p := DisplayCategoryPosts{
 		Pages:    pages,
 		PageN:    pageN,
 		NumPages: numPages,
 		CSS:      css,
 		Category: cat,
 	}
+
+	j, _ := json.Marshal(p)
+	fmt.Println(string(j))
+	return p
 }
 
 // logic for sorting pages by time
@@ -412,7 +392,10 @@ func (p pagesToSort) Len() int {
 }
 
 func (p pagesToSort) Less(i, j int) bool {
-	return time.Unix(p[i].CreatedUnix, 0).Before(time.Unix(p[j].CreatedUnix, 0))
+	if p[j].Created == nil {
+		return true
+	}
+	return p[i].Created.Before(*p[j].Created)
 }
 
 func (p pagesToSort) Swap(i, j int) {

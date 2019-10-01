@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"time"
 
 	strip "github.com/grokify/html-strip-tags-go"
 
@@ -27,14 +28,12 @@ type DisplayPage struct {
 	// the page content (HTML)
 	Content wikifier.HTML `json:"content,omitempty"`
 
-	// UNIX timestamp of when the page was last modified.
+	// time when the page was last modified.
 	// if Generated is true, this is the current time.
 	// if FromCache is true, this is the modified date of the cache file.
 	// otherwise, this is the modified date of the page file itself.
-	ModUnix int64 `json:"mod_unix,omitempty"`
-
-	// like ModUnix except in HTTP date format, suitable for Last-Modified
-	Modified string `json:"modified,omitempty"`
+	Modified     *time.Time `json:"modified,omitempty"`
+	ModifiedHTTP string     `json:"modified_http,omitempty"` // HTTP formatted for Last-Modified
 
 	// CSS generated for the page from style{} blocks
 	CSS string `json:"css,omitempty"`
@@ -62,9 +61,10 @@ type DisplayPage struct {
 	// warnings produced by the parser
 	Warnings []string `json:"warnings,omitempty"`
 
-	// UNIX timestamp of when the page was created, as extracted from
+	// time when the page was created, as extracted from
 	// the special @page.created variable
-	CreatedUnix int64 `json:"created,omitempty"`
+	Created     *time.Time `json:"created,omitempty"`
+	CreatedHTTP string     `json:"created_http,omitempty"` // HTTP formatted
 
 	// name of the page author, as extracted from the special @page.author
 	// variable
@@ -171,13 +171,19 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	}
 
 	// generate HTML and metadata
+	create := page.Created()
+	if !create.IsZero() {
+		r.Created = &create
+		r.CreatedHTTP = httpdate.Time2Str(create)
+	}
+	mod := page.Modified()
 	r.Generated = true
 	r.Title = page.Title()
 	r.FmtTitle = page.FmtTitle()
 	r.Author = page.Author()
 	r.Draft = page.Draft()
-	r.ModUnix = page.Modified().Unix()
-	r.Modified = httpdate.Time2Str(page.Modified())
+	r.Modified = &mod
+	r.ModifiedHTTP = httpdate.Time2Str(mod)
 	r.Content = page.HTML()
 	r.CSS = page.CSS()
 
@@ -271,8 +277,9 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	}
 
 	// update result with real cache modified times
-	r.ModUnix = page.CacheModified().Unix()
-	r.Modified = httpdate.Time2Str(page.CacheModified())
+	mod := page.CacheModified()
+	r.Modified = &mod
+	r.ModifiedHTTP = httpdate.Time2Str(mod)
 	r.CacheGenerated = true
 
 	return nil // success
@@ -361,15 +368,18 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	}
 
 	// update result with stuff from cache
-	r.CreatedUnix = info.Created.Unix()
+	if info.Created != nil {
+		r.Created = info.Created
+		r.CreatedHTTP = httpdate.Time2Str(*info.Created)
+	}
 	r.Draft = info.Draft
 	r.Author = info.Author
 	r.Title = info.Title
 	r.FmtTitle = info.FmtTitle
 	r.FromCache = true
 	r.Content = wikifier.HTML(content)
-	r.ModUnix = cacheModify.Unix()
-	r.Modified = httpdate.Time2Str(cacheModify)
+	r.Modified = &cacheModify
+	r.ModifiedHTTP = httpdate.Time2Str(cacheModify)
 
 	return nil // success
 }
