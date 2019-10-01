@@ -3,6 +3,7 @@ package wikifier
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -379,4 +380,10 @@ func CategoryName(name string, noLower bool) string {
 // CategoryNameNE returns a clean category with No Extension.
 func CategoryNameNE(name string, noLower bool) string {
 	return strings.TrimSuffix(CategoryName(name, noLower), ".cat")
+}
+
+// MakeDir creates directories recursively.
+func MakeDir(dir, name string) {
+	pfx := filepath.Dir(name)
+	os.MkdirAll(dir+"/"+pfx, 0755)
 }

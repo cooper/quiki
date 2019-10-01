@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	httpdate "github.com/Songmu/go-httpdate"
+	"github.com/cooper/quiki/wikifier"
 	"github.com/disintegration/imaging"
 )
 
@@ -245,6 +246,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 
 	// look for cached version
 	cachePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
+	wikifier.MakeDir(w.Opt.Dir.Cache+"/image/", img.FullName())
 	cacheFi, err := os.Lstat(cachePath)
 
 	// it exists

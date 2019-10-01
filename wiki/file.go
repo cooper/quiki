@@ -1,7 +1,6 @@
 package wiki
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/cooper/quiki/wikifier"
@@ -61,7 +60,7 @@ func (w *Wiki) pathForPage(pageName string, createOK bool, dirPage string) strin
 	}
 	pageName = wikifier.PageName(pageName)
 	if createOK {
-		makeDir(dirPage, pageName)
+		wikifier.MakeDir(dirPage, pageName)
 	}
 	path, _ := filepath.Abs(dirPage + "/" + pageName)
 	return path
@@ -76,7 +75,7 @@ func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bo
 	}
 	dir := w.Opt.Dir.Cache + "/category"
 	if createOK {
-		makeDir(dir, string(catType)+catName)
+		wikifier.MakeDir(dir, string(catType)+catName)
 	}
 	path, _ := filepath.Abs(dir + "/" + string(catType) + catName)
 	return path
@@ -93,12 +92,4 @@ func (w *Wiki) pathForModel(modelName string) string {
 	modelName = wikifier.PageNameExt(modelName, ".model")
 	path, _ := filepath.Abs(w.Opt.Dir.Model + "/" + modelName)
 	return path
-}
-
-func makeDir(dir, name string) {
-	pfx := filepath.Dir(name)
-	if pfx == "." || pfx == "./" {
-		return
-	}
-	os.MkdirAll(dir+"/"+pfx, 0755)
 }

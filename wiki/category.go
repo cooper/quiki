@@ -64,6 +64,12 @@ type Category struct {
 
 	// for CategoryTypePage, this is the info for the tracked page
 	PageInfo *wikifier.PageInfo `json:"page_info,omitempty"`
+
+	// for CategoryTypeImage, this is the info for the tracked image
+	ImageInfo *struct {
+		Width  int `json:"width,omitempty"`
+		Height int `json:"height,omitempty"`
+	} `json:"image_info,omitempty"`
 }
 
 // A CategoryEntry describes a page that belongs to a category.
@@ -203,5 +209,25 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		w.GetCategory(name).AddPage(page)
 	}
 
-	// TODO: page, image, and model categories
+	// image tracking categories
+	for imageName, dimensions := range page.Images {
+		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
+		imageCat.Preserve = true // keep until image no longer exists
+
+		// find the image dimensions if not present
+		if imageCat.ImageInfo == nil {
+			path := w.pathForImage(imageName)
+			w, h := getImageDimensions(path)
+			if w != 0 && h != 0 {
+				imageCat.ImageInfo = &struct {
+					Width  int `json:"width,omitempty"`
+					Height int `json:"height,omitempty"`
+				}{w, h}
+			}
+		}
+
+		imageCat.addPageExtras(page, dimensions, nil)
+	}
+
+	// TODO: page and model categories
 }

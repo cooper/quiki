@@ -25,7 +25,7 @@ type Page struct {
 	styles     []styleEntry
 	parser     *parser // wikifier parser instance
 	main       block   // main block
-	images     map[string][][]int
+	Images     map[string][][]int
 	sectionN   int
 	headingIDs map[string]int
 	*variableScope
@@ -50,7 +50,7 @@ func NewPage(filePath string) *Page {
 		FilePath:      filePath,
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
-		images:        make(map[string][][]int),
+		Images:        make(map[string][][]int),
 		headingIDs:    make(map[string]int),
 	}
 }
@@ -62,7 +62,7 @@ func NewPageSource(source string) *Page {
 		Source:        source,
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
-		images:        make(map[string][][]int),
+		Images:        make(map[string][][]int),
 	}
 }
 
@@ -259,7 +259,7 @@ func (p *Page) Modified() time.Time {
 
 // CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
-	// FIXME: makedir
+	MakeDir(p.Opt.Dir.Cache+"/page", p.Name())
 	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache")
 }
 
@@ -271,7 +271,7 @@ func (p *Page) CacheModified() time.Time {
 
 // SearchPath returns the absolute path to the page search text file.
 func (p *Page) SearchPath() string {
-	// FIXME: makedir
+	MakeDir(p.Opt.Dir.Cache+"/page", p.Name())
 	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
 }
 

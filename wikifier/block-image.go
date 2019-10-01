@@ -131,7 +131,7 @@ func (image *imageBlock) parse(page *Page) {
 		)
 
 		// remember that the page uses this image in these dimensions
-		page.images[image.file] = append(page.images[image.file], []int{calcWidth, calcHeight})
+		page.Images[image.file] = append(page.Images[image.file], []int{calcWidth, calcHeight})
 
 	} else {
 		// note: this should never happen because the config parser validates it
