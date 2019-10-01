@@ -35,7 +35,7 @@ type Category struct {
 	Path string `json:"-"`
 
 	// category filename, including the .cat extension
-	File string `json:"file,omitempty"`
+	File string `json:"-"`
 
 	// category name without extension
 	Name string `json:"name,omitempty"`
@@ -44,11 +44,11 @@ type Category struct {
 	Title string `json:"title,omitempty"`
 
 	// time when the category was created
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 
 	// time when the category was last modified.
 	// this is updated when pages are added and deleted
-	Modified time.Time `json:"modified,omitempty"`
+	Modified *time.Time `json:"modified,omitempty"`
 
 	// pages in the category. keys are filenames
 	Pages map[string]CategoryEntry `json:"pages,omitempty"`
@@ -63,7 +63,7 @@ type Category struct {
 	Type CategoryType `json:"type,omitempty"`
 
 	// for CategoryTypePage, this is the info for the tracked page
-	PageInfo wikifier.PageInfo `json:"page_info,omitempty"`
+	PageInfo *wikifier.PageInfo `json:"page_info,omitempty"`
 }
 
 // A CategoryEntry describes a page that belongs to a category.
@@ -71,7 +71,7 @@ type CategoryEntry struct {
 
 	// time at which the page metadata in this category file was last updated.
 	// this is compared against page file modification time
-	Asof time.Time `json:"asof,omitempty"`
+	Asof *time.Time `json:"asof,omitempty"`
 
 	// embedded page info
 	// note this info is accurate only as of the Asof time
@@ -96,7 +96,7 @@ func (w *Wiki) GetCategory(name string) *Category {
 
 // GetSpecialCategory loads or creates a special category given the type.
 func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
-	name = wikifier.CategoryName(name, false)
+	name = wikifier.CategoryNameNE(name, false)
 	path := w.pathForCategory(name, typ, true)
 
 	// load the category if it exists
@@ -104,9 +104,14 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	jsonData, err := ioutil.ReadFile(path)
 	if err == nil {
 		err = json.Unmarshal(jsonData, &cat)
+	} else {
+		now := time.Now()
+		cat.Created = &now
+		cat.Modified = &now
+		err = nil
 	}
 
-	// if an error occurred in reading or parsing, ditch the file
+	// if an error occurred in parsing, ditch the file
 	// note it may or may not exist anyway
 	if err != nil {
 		log.Printf("GetCategory(%s): %v", name, err)
@@ -116,6 +121,7 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	// update these
 	cat.Path = path
 	cat.Name = name
+	cat.File = name + ".cat"
 	cat.Type = typ
 
 	return &cat
@@ -136,8 +142,10 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 
 		// the page has not changed since the asof time, so do nothing
 		entry, exist := cat.Pages[pageMaybe.Name()]
-		if exist && mod.Before(entry.Asof) || mod.Equal(entry.Asof) {
-			return
+		if exist && entry.Asof != nil {
+			if mod.Before(*entry.Asof) || mod.Equal(*entry.Asof) {
+				return
+			}
 		}
 	}
 
@@ -148,12 +156,14 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 	}
 
 	// ok, at this point we're gonna add or update the page if there is one
+	now := time.Now()
+	cat.Modified = &now
 	if pageMaybe != nil {
 		if cat.Pages == nil {
 			cat.Pages = make(map[string]CategoryEntry)
 		}
 		cat.Pages[pageMaybe.Name()] = CategoryEntry{
-			Asof:       time.Now(),
+			Asof:       &now,
 			PageInfo:   pageMaybe.Info(),
 			Dimensions: dimensions,
 			Lines:      lines,
@@ -182,8 +192,9 @@ func (cat *Category) write() {
 func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 
 	// page metadata category
+	info := page.Info()
 	pageCat := w.GetSpecialCategory(page.Name(), CategoryTypePage)
-	pageCat.PageInfo = page.Info()
+	pageCat.PageInfo = &info
 	pageCat.Preserve = true // keep until page no longer exists
 	pageCat.addPageExtras(nil, nil, nil)
 

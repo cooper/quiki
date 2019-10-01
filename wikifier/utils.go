@@ -375,3 +375,8 @@ func CategoryName(name string, noLower bool) string {
 	}
 	return name
 }
+
+// CategoryNameNE returns a clean category with No Extension.
+func CategoryNameNE(name string, noLower bool) string {
+	return strings.TrimSuffix(CategoryName(name, noLower), ".cat")
+}

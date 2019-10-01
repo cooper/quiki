@@ -33,14 +33,14 @@ type Page struct {
 
 // PageInfo represents metadata associated with a page.
 type PageInfo struct {
-	Created   time.Time `json:"created,omitempty"`   // creation time
-	Modified  time.Time `json:"mod_unix,omitempty"`  // modify time
-	Draft     bool      `json:"draft,omitempty"`     // true if page is marked as draft
-	Generated bool      `json:"generated,omitempty"` // true if page was generated from another source
-	Redirect  string    `json:"redirect,omitempty"`  // path page is to redirect to
-	FmtTitle  HTML      `json:"fmt_title,omitempty"` // title with formatting tags
-	Title     string    `json:"title,omitempty"`     // title without tags
-	Author    string    `json:"author,omitempty"`    // author's name
+	Created   *time.Time `json:"created,omitempty"`   // creation time
+	Modified  *time.Time `json:"modified,omitempty"`  // modify time
+	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
+	Generated bool       `json:"generated,omitempty"` // true if page was generated from another source
+	Redirect  string     `json:"redirect,omitempty"`  // path page is to redirect to
+	FmtTitle  HTML       `json:"fmt_title,omitempty"` // title with formatting tags
+	Title     string     `json:"title,omitempty"`     // title without tags
+	Author    string     `json:"author,omitempty"`    // author's name
 }
 
 // NewPage creates a page given its filepath.
@@ -328,9 +328,10 @@ func (p *Page) Categories() []string {
 
 // Info returns the PageInfo for the page.
 func (p *Page) Info() PageInfo {
+	mod, create := p.Modified(), p.Created()
 	return PageInfo{
-		Modified:  p.Modified(),
-		Created:   p.Created(),
+		Modified:  &mod,
+		Created:   &create,
 		Draft:     p.Draft(),
 		Generated: p.Generated(),
 		Redirect:  p.Redirect(),
