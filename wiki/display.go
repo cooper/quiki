@@ -11,6 +11,9 @@ type DisplayError struct {
 	// not be presented to users
 	DetailedError string
 
+	// HTTP status code. if zero, 404 should be used
+	Status int
+
 	// true if the error occurred during parsing
 	ParseError bool
 

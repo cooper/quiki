@@ -172,6 +172,7 @@ func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r 
 var useLowLevelError bool
 
 func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) {
+	status := http.StatusNotFound
 	msg := "An unknown error has occurred"
 	switch err := errMaybe.(type) {
 
@@ -179,10 +180,13 @@ func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *h
 	case nil:
 		return
 
-		// display error
+	// display error
 	case wiki.DisplayError:
 		log.Println(err)
 		msg = err.Error
+		if err.Status != 0 {
+			status = err.Status
+		}
 
 	// string
 	case string:
@@ -194,22 +198,21 @@ func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *h
 
 	}
 
-	//TODO:
-	// // if we have an error page for this wiki, use it
-	// errorPage := wiki.conf.Get("error_page")
-	// if !useLowLevelError && errorPage != "" {
-	// 	useLowLevelError = true
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	handlePage(wiki, errorPage, w, r)
-	// 	useLowLevelError = false
-	// 	return true
-	// }
+	// if we have an error page for this wiki, use it
+	errorPage := wi.Opt.ErrorPage
+	if !useLowLevelError && errorPage != "" {
+		useLowLevelError = true
+		w.WriteHeader(status)
+		handlePage(wi, errorPage, w, r)
+		useLowLevelError = false
+		return
+	}
 
 	// if the template provides an error page, fall back to that
 
 	if errTmpl := wi.template.template.Lookup("error.tpl"); errTmpl != nil {
 		var buf bytes.Buffer
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(status)
 		page := wikiPageWith(wi)
 		page.Name = "Error"
 		page.Title = "Error"

@@ -20,6 +20,7 @@ import (
 type PageOpt struct {
 	Name         string // wiki name
 	MainPage     string // name of main page
+	ErrorPage    string // name of error page
 	Template     string // name of template
 	MainRedirect bool   // redirect on main page rather than serve root
 	Page         PageOptPage
@@ -127,6 +128,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	pageOptString := map[string]*string{
 		"name":          &opt.Name,          // wiki name
 		"main_page":     &opt.MainPage,      // main page name
+		"error_page":    &opt.ErrorPage,     // error page name
 		"template":      &opt.Template,      // template name
 		"dir.wikifier":  &opt.Dir.Wikifier,  // wikifier directory
 		"dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
