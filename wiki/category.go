@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
@@ -317,11 +318,17 @@ func (cat *Category) update(w *Wiki) {
 		return
 	}
 
-	// TODO: check if the category should purge
-
-	// write update
+	// update information
 	cat.Modified = &now
 	cat.Pages = newPages
+
+	// category should be deleted
+	if cat.shouldPurge(w) {
+		os.Remove(cat.Path)
+		return
+	}
+
+	// write update
 	cat.write()
 }
 
@@ -361,6 +368,7 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 
 	}
 
+	fmt.Println("preserve", cat.Path, preserve)
 	return !preserve
 }
 
@@ -416,6 +424,10 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	cat := w.GetCategory(catName)
 	catName = cat.Name
 
+	// update info
+	// note: this needs to be before existence check because it may purge
+	cat.update(w)
+
 	// category does not exist
 	if !cat.Exists() {
 		return DisplayError{
@@ -423,9 +435,6 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 			DetailedError: "Category '" + cat.Path + "' does not exist.",
 		}
 	}
-
-	// update
-	cat.update(w)
 
 	// category has no pages
 	// (probably shouldn't happen for normal categories, but check anyway)
