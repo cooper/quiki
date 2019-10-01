@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/Songmu/go-httpdate"
@@ -324,9 +325,19 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// order with newest first
 	sort.Sort(pages)
 
-	// if there is a limit and we exceeded it
+	// determine how many pages of pages we're gonna need
 	limit := w.Opt.Category.PerPage
-	numPages := len(pages)/limit + 1
+	numPages := 0
+	if limit > 0 {
+		numPages = len(pages)/limit + 1
+	}
+
+	// the request is for a page beyond what we can offer
+	if pageN > numPages-1 || pageN < 0 {
+		return DisplayError{Error: "Page " + strconv.Itoa(pageN+1) + " does not exist."}
+	}
+
+	// if there is a limit and we exceeded it
 	if limit > 0 && !(pageN == 1 && len(pages) <= limit) {
 		pagesOfPages := make([]pagesToSort, 0, numPages)
 
