@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -380,18 +379,13 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 	css := ""
 
-	// return $result;
-	p := DisplayCategoryPosts{
+	return DisplayCategoryPosts{
 		Pages:    pages,
 		PageN:    pageN,
 		NumPages: numPages,
 		CSS:      css,
 		Category: cat,
 	}
-
-	j, _ := json.Marshal(p)
-	fmt.Println(string(j))
-	return p
 }
 
 // logic for sorting pages by time
@@ -405,6 +399,9 @@ func (p pagesToSort) Len() int {
 func (p pagesToSort) Less(i, j int) bool {
 	if p[j].Created == nil {
 		return true
+	}
+	if p[i].Created == nil {
+		return false
 	}
 	return p[i].Created.Before(*p[j].Created)
 }

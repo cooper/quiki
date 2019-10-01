@@ -3,7 +3,6 @@ package wikifier
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -211,7 +210,6 @@ func (p *Page) Redirect() string {
 
 	// symbolic link redirect
 	if p.IsSymlink() {
-		fmt.Println("Redirect", p.FilePath, pageAbs(p.Opt.Root.Page+"/"+p.NameNE()))
 		return pageAbs(p.Opt.Root.Page + "/" + p.NameNE())
 	}
 
@@ -245,7 +243,7 @@ func (p *Page) Created() time.Time {
 	if created == "" {
 		return t
 	}
-	if unix, err := strconv.ParseInt(created, 10, 0); err != nil {
+	if unix, err := strconv.ParseInt(created, 10, 0); err == nil {
 		return time.Unix(unix, 0)
 	}
 	t, _ = httpdate.Str2Time(created, time.UTC)
