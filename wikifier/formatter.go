@@ -211,15 +211,15 @@ type fmtOpt struct {
 	startPos    position // set internally to position of '['
 }
 
-func (page *Page) parseFormattedText(text string) HTML {
-	return page._parseFormattedTextOpts(text, &fmtOpt{})
+func (page *Page) formatText(text string) HTML {
+	return page._formatTextOpts(text, &fmtOpt{})
 }
 
-func (page *Page) parseFormattedTextOpts(text string, opts fmtOpt) HTML {
-	return page._parseFormattedTextOpts(text, &opts)
+func (page *Page) formatTextOpts(text string, opts fmtOpt) HTML {
+	return page._formatTextOpts(text, &opts)
 }
 
-func (page *Page) _parseFormattedTextOpts(text string, opts *fmtOpt) HTML {
+func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -348,7 +348,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 					// TODO: Produce warning that attempted to interpolate non-string
 					return HTML("(error)")
 				}
-				return page.parseFormattedTextOpts(strVal, fmtOpt{noVariables: true})
+				return page.formatTextOpts(strVal, fmtOpt{noVariables: true})
 			}
 
 			// it was a string but just @var
@@ -414,7 +414,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 			invalid = " invalid"
 		}
 		if !displaySame {
-			display = string(page.parseFormattedText(display))
+			display = string(page.formatText(display))
 		}
 		return HTML(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,

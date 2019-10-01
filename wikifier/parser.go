@@ -523,7 +523,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 				// format it unless told not to
 				if !p.varNotInterpolated {
-					value = page.parseFormattedText(val)
+					value = page.formatText(val)
 				}
 
 			case block:

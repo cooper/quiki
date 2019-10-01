@@ -18,7 +18,7 @@ func (p *pBlock) html(page *Page, el element) {
 			el.addChild(item.el())
 
 		case string:
-			formatted := page.parseFormattedText(item)
+			formatted := page.formatText(item)
 			if item == "" {
 				continue
 			}
