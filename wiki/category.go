@@ -2,9 +2,11 @@ package wiki
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/cooper/quiki/wikifier"
@@ -95,6 +97,19 @@ type CategoryEntry struct {
 	Lines []int `json:"lines,omitempty"`
 }
 
+// DisplayCategoryPosts represents a category result to display.
+type DisplayCategoryPosts struct {
+
+	// override the Pages field
+	Pages []DisplayPage `json:"pages,omitempty"`
+
+	// this is the combined CSS for all pages we're displaying
+	CSS string
+
+	// all other fields are inherited from the category itself
+	*Category
+}
+
 // GetCategory loads or creates a category.
 func (w *Wiki) GetCategory(name string) *Category {
 	return w.GetSpecialCategory(name, "")
@@ -180,6 +195,12 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 	cat.write()
 }
 
+// Exists returns whether a category currently exists.
+func (cat *Category) Exists() bool {
+	_, err := os.Lstat(cat.Path)
+	return err != nil
+}
+
 // write category to file
 func (cat *Category) write() {
 
@@ -238,5 +259,146 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		pageCat.addPageExtras(page, nil, lines)
 	}
 
-	// TODO: page and model categories
+	// TODO: model categories
+}
+
+// DisplayCategoryPosts returns the display result for a category.
+func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
+	cat := w.GetCategory(catName)
+	catName = cat.Name
+
+	// my ($wiki, $cat_name, %opts) = @_; my $result = {};
+	// $cat_name = cat_name($cat_name);
+	// my $cat_name_ne = cat_name_ne($cat_name);
+	// my ($err, $pages, $title) = $wiki->cat_get_pages($cat_name,
+	// 	cat_type => $opts{cat_type}
+	// );
+
+	// category does not exist
+	if !cat.Exists() {
+		return DisplayError{
+			Error:         "Category does not exist.",
+			DetailedError: "Category '" + cat.Path + "' does not exist.",
+		}
+	}
+
+	// category has no pages
+	// (probably shouldn't happen for normal categories, but check anyway)
+	if len(cat.Pages) == 0 {
+		return DisplayError{
+			Error: "Category is empty.",
+		}
+	}
+
+	// $result->{type}     = 'cat_posts';
+	// $result->{cat_type} = $opts{cat_type};
+	// $result->{file}     = $cat_name;
+	// $result->{category} = $cat_name_ne;
+	// $result->{title}    = $wiki->opt("cat.$cat_name_ne.title") // $title;
+	// $result->{all_css}  = '';
+
+	// load each page
+	var pages pagesToSort
+	for pageName := range cat.Pages {
+
+		// fetch page display result
+		res := w.DisplayPage(pageName)
+		pageR, ok := res.(DisplayPage)
+		if !ok {
+			continue
+		}
+
+		// TODO: check for @category.name.main
+		// and if present, set CreatedUnix = infinity
+
+		// store page result
+		pages = append(pages, pageR)
+	}
+
+	// order with newest first
+	sort.Sort(pages)
+
+	// # order with newest first.
+	// my @pages_in_order = sort { $times{$b} <=> $times{$a} } keys %times;
+	// @pages_in_order    = map  { $reses{$_} } @pages_in_order;
+
+	// if there is a limit and we exceeded it
+	limit := w.Opt.Category.PerPage
+	if pageN != 0 && limit > 0 && !(pageN == 1 && len(pages) <= limit) {
+		var pagesOfPages []pagesToSort
+
+		// break down into PAGES or pages. wow.
+		n := 1
+		for len(pages) != 0 {
+
+			// first one on the page
+			thisPage := pagesOfPages[n]
+			if thisPage == nil {
+				thisPage = make(pagesToSort, 0, limit)
+				pagesOfPages[n] = thisPage
+			}
+
+			// add up to limit pages
+			for i := 0; i <= limit; i++ {
+				if len(pages) == 0 {
+					break
+				}
+				thisPage[i] = pages[0]
+				pages = pages[1:]
+			}
+
+			// if that was the page we wanted, stop
+			if n == pageN {
+				break
+			}
+
+			n++
+		}
+
+		// get just the page we want
+		pagesOfPages = pagesOfPages[n:]
+		fmt.Printf("%+v", pagesOfPages)
+		pages = pagesOfPages[pageN]
+	}
+
+	css := ""
+
+	// # order into PAGES of pages. wow.
+	// my $limit = $wiki->opt('cat.per_page') || 'inf';
+	// my $n = 1;
+	// while (@pages_in_order) {
+	// 	$result->{pages}{$n} ||= [];
+	// 	for (1..$limit) {
+
+	// 		# there are no more pages.
+	// 		last unless @pages_in_order;
+
+	// 		# add the next page.
+	// 		my $page = shift @pages_in_order;
+	// 		push @{ $result->{pages}{$n} }, $page;
+
+	// 		# add the CSS.
+	// 		$result->{all_css} .= $page->{css} if length $page->{css};
+	// 	}
+	// 	$n++;
+	// }
+
+	// return $result;
+	return DisplayCategoryPosts{pages, css, cat}
+}
+
+// logic for sorting pages by time
+
+type pagesToSort []DisplayPage
+
+func (p pagesToSort) Len() int {
+	return len(p)
+}
+
+func (p pagesToSort) Less(i, j int) bool {
+	return time.Unix(p[i].CreatedUnix, 0).Before(time.Unix(p[j].CreatedUnix, 0))
+}
+
+func (p pagesToSort) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
 }
