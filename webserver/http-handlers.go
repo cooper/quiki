@@ -51,16 +51,15 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		if mainPage != "" && (r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/") {
 
 			// main page redirect is enabled
-			// FIXME:
-			// if delayedWiki.conf.GetBool("main_redirect") {
-			// 	http.Redirect(
-			// 		w, r,
-			// 		delayedWiki.conf.Get("root.page")+
-			// 			"/"+mainPage,
-			// 		http.StatusMovedPermanently,
-			// 	)
-			// 	return
-			// }
+			if delayedWiki.Opt.MainRedirect {
+				http.Redirect(
+					w, r,
+					delayedWiki.Opt.Root.Page+
+						"/"+mainPage,
+					http.StatusMovedPermanently,
+				)
+				return
+			}
 
 			// display main page
 			handlePage(delayedWiki, mainPage, w, r)

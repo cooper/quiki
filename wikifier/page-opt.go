@@ -18,16 +18,17 @@ import (
 
 // PageOpt describes wiki/website options to a Page.
 type PageOpt struct {
-	Name       string // wiki name
-	MainPage   string // name of main page
-	Template   string // name of template
-	Page       PageOptPage
-	Dir        PageOptDir
-	Root       PageOptRoot
-	Image      PageOptImage
-	Category   PageOptCategory
-	Search     PageOptSearch
-	Navigation []PageOptNavigation
+	Name         string // wiki name
+	MainPage     string // name of main page
+	Template     string // name of template
+	MainRedirect bool   // redirect on main page rather than serve root
+	Page         PageOptPage
+	Dir          PageOptDir
+	Root         PageOptRoot
+	Image        PageOptImage
+	Category     PageOptCategory
+	Search       PageOptSearch
+	Navigation   []PageOptNavigation
 }
 
 // PageOptPage describes option relating to a page.
@@ -152,6 +153,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy bool options
 	pageOptBool := map[string]*bool{
+		"main_redirect":     &opt.MainRedirect,     // redirect root to main page
 		"page.enable.title": &opt.Page.EnableTitle, // enable page title headings
 		"page.enable.cache": &opt.Page.EnableCache, // enable page caching
 		"search.enable":     &opt.Search.Enable,    // enable search optimization
