@@ -17,7 +17,15 @@ func newSecBlock(name string, b *parserBlock) block {
 }
 
 func (sec *secBlock) parse(page *Page) {
+
+	// wiki option
 	enable := page.Opt.Page.EnableTitle
+
+	// overwrite with local var if present
+	val, _ := page.Get("page.enable.title")
+	if boolVal, ok := val.(bool); ok {
+		enable = boolVal
+	}
 
 	// @page.enable.title causes the first header to be larger than the
 	// rest. it also uses @page.title as the first header if no other text
