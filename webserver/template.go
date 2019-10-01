@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cooper/quiki/wikifier"
+
 	"github.com/cooper/quiki/wiki"
 )
 
@@ -166,23 +168,18 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 }
 
 type wikiPage struct {
-	File       string           // page name, with extension
-	Name       string           // page name, without extension
-	WholeTitle string           // optional, shown in <title> as-is
-	Title      string           // page title
-	WikiTitle  string           // wiki titled
-	WikiLogo   string           // path to wiki logo image
-	WikiRoot   string           // wiki HTTP root
-	Res        wiki.DisplayPage // response
-	StaticRoot string           // path to static resources
-	Pages      []wikiPage       // more pages for category posts
-	Message    string           // message for error page
-	navigation []interface{}    // slice of nav items [display, url]
-}
-
-type navItem struct {
-	Display string
-	Link    string
+	File       string                       // page name, with extension
+	Name       string                       // page name, without extension
+	WholeTitle string                       // optional, shown in <title> as-is
+	Title      string                       // page title
+	WikiTitle  string                       // wiki titled
+	WikiLogo   string                       // path to wiki logo image
+	WikiRoot   string                       // wiki HTTP root
+	Res        wiki.DisplayPage             // response
+	StaticRoot string                       // path to static resources
+	Pages      []wikiPage                   // more pages for category posts
+	Message    string                       // message for error page
+	Navigation []wikifier.PageOptNavigation // slice of nav items
 }
 
 func (p wikiPage) VisibleTitle() string {
@@ -214,25 +211,4 @@ func (p wikiPage) PageCSS() template.CSS {
 
 func (p wikiPage) HTMLContent() template.HTML {
 	return template.HTML(p.Res.Content)
-}
-
-func (p wikiPage) Navigation() []navItem {
-
-	// no navigation
-	if len(p.navigation) != 2 {
-		return nil
-	}
-
-	// first item is ordered keys, second is values
-	displays := p.navigation[0].([]interface{})
-	urls := p.navigation[1].([]interface{})
-	items := make([]navItem, len(displays))
-	for i := 0; i < len(items); i++ {
-		items[i] = navItem{
-			displays[i].(string),
-			urls[i].(string),
-		}
-	}
-
-	return items
 }

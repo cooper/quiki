@@ -251,6 +251,6 @@ func wikiPageWith(w *wikiInfo) wikiPage {
 		// WikiLogo:   w.getLogo(), FIXME:
 		WikiRoot:   w.Opt.Root.Wiki,
 		StaticRoot: w.template.staticRoot,
-		// navigation: w.conf.GetSlice("navigation"), FIXME:
+		Navigation: w.Opt.Navigation,
 	}
 }

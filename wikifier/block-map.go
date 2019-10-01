@@ -368,12 +368,30 @@ func (m *Map) mainBlock() block {
 	return b
 }
 
+// Map returns the actual underlying Go map.
+func (m *Map) Map() map[string]interface{} {
+	return m.vars
+}
+
 // Keys returns a string of actual underlying map keys.
 func (m *Map) Keys() []string {
 	keys := make([]string, len(m.vars))
 	i := 0
 	for key := range m.vars {
 		keys[i] = key
+		i++
+	}
+	return keys
+}
+
+// OrderedKeys returns a string of map keys in the order
+// provided in the source. Keys that were set internally
+// (and not from quiki source code) are omitted.
+func (m *Map) OrderedKeys() []string {
+	keys := make([]string, len(m.mapList))
+	i := 0
+	for _, entry := range m.mapList {
+		keys[i] = entry.key
 		i++
 	}
 	return keys

@@ -18,15 +18,16 @@ import (
 
 // PageOpt describes wiki/website options to a Page.
 type PageOpt struct {
-	Name     string // wiki name
-	MainPage string // name of main page
-	Template string // name of template
-	Page     PageOptPage
-	Dir      PageOptDir
-	Root     PageOptRoot
-	Image    PageOptImage
-	Category PageOptCategory
-	Search   PageOptSearch
+	Name       string // wiki name
+	MainPage   string // name of main page
+	Template   string // name of template
+	Page       PageOptPage
+	Dir        PageOptDir
+	Root       PageOptRoot
+	Image      PageOptImage
+	Category   PageOptCategory
+	Search     PageOptSearch
+	Navigation []PageOptNavigation
 }
 
 // PageOptPage describes option relating to a page.
@@ -73,6 +74,12 @@ type PageOptCategory struct {
 // PageOptSearch describes wiki search options.
 type PageOptSearch struct {
 	Enable bool
+}
+
+// PageOptNavigation represents an ordered navigation item.
+type PageOptNavigation struct {
+	Link    string // link
+	Display string // text to display
 }
 
 // defaults for Page
@@ -208,6 +215,34 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 			return errors.Wrap(err, "cat.per_page: must be integer")
 		}
 		opt.Category.PerPage = intVal
+	}
+
+	// navigation - ordered navigation items
+	obj, err := page.GetObj("navigation")
+	if err != nil {
+		return errors.Wrap(err, "navigation")
+	}
+	if obj != nil {
+		navMap, ok := obj.(*Map)
+		if !ok {
+			return errors.New("navigation: must be map{}")
+		}
+
+		// since this runs in vars only mode,
+		// have to force generate html to evalute variables
+		navMap.html(page, navMap.el())
+
+		for _, display := range navMap.OrderedKeys() {
+			link, err := navMap.GetStr(display)
+			display = strings.Replace(display, "_", " ", -1)
+			if err != nil {
+				return errors.Wrap(err, "navigation: map values must be string")
+			}
+			opt.Navigation = append(opt.Navigation, PageOptNavigation{
+				Display: display,
+				Link:    link,
+			})
+		}
 	}
 
 	return nil
