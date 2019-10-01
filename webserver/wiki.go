@@ -93,10 +93,10 @@ func initWikis() error {
 }
 
 // initialize a wiki
-func setupWiki(w *wikiInfo) error {
+func setupWiki(wi *wikiInfo) error {
 
 	// if not configured, use default template
-	templateNameOrPath := w.Opt.Template
+	templateNameOrPath := wi.Opt.Template
 	if templateNameOrPath == "" {
 		templateNameOrPath = "default"
 	}
@@ -116,7 +116,7 @@ func setupWiki(w *wikiInfo) error {
 	if err != nil {
 		return err
 	}
-	w.template = template
+	wi.template = template
 
 	// TODO: generate logo according to template
 	// logoInfo := wiki.template.manifest.Logo
@@ -140,23 +140,23 @@ func setupWiki(w *wikiInfo) error {
 	wikiRoots := []wikiHandler{
 		wikiHandler{
 			rootType: "page",
-			root:     w.Opt.Root.Page,
+			root:     wi.Opt.Root.Page,
 			handler:  handlePage,
 		},
 		wikiHandler{
 			rootType: "image",
-			root:     w.Opt.Root.Image,
+			root:     wi.Opt.Root.Image,
 			handler:  handleImage,
 		},
 		wikiHandler{
 			rootType: "category",
-			root:     w.Opt.Root.Category,
+			root:     wi.Opt.Root.Category,
 			handler:  handleCategoryPosts,
 		},
 	}
 
 	// setup handlers
-	wikiRoot := w.Opt.Root.Wiki
+	wikiRoot := wi.Opt.Root.Wiki
 	for _, item := range wikiRoots {
 		rootType, root, handler := item.rootType, item.root, item.handler
 
@@ -172,8 +172,8 @@ func setupWiki(w *wikiInfo) error {
 		root += "/"
 
 		// add the real handler
-		wi := w
-		mux.HandleFunc(w.host+root, func(w http.ResponseWriter, r *http.Request) {
+		wi := wi
+		mux.HandleFunc(wi.host+root, func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
@@ -185,20 +185,20 @@ func setupWiki(w *wikiInfo) error {
 			handler(wi, relPath, w, r)
 		})
 
-		log.Printf("[%s] registered %s root: %s", w.name, rootType, w.host+root)
+		log.Printf("[%s] registered %s root: %s", wi.name, rootType, wi.host+root)
 	}
 
 	// file server
-	rootFile := w.Opt.Root.File
-	dirWiki := w.Opt.Dir.Wiki
+	rootFile := wi.Opt.Root.File
+	dirWiki := wi.Opt.Dir.Wiki
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		mux.Handle(w.host+rootFile, http.StripPrefix(rootFile, fileServer))
-		log.Printf("[%s] registered file root: %s (%s)", w.name, w.host+rootFile, dirWiki)
+		mux.Handle(wi.host+rootFile, http.StripPrefix(rootFile, fileServer))
+		log.Printf("[%s] registered file root: %s (%s)", wi.name, wi.host+rootFile, dirWiki)
 	}
 
 	// store the wiki info
-	w.title = w.Opt.Name
+	wi.title = wi.Opt.Name
 	return nil
 }

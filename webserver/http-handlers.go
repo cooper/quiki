@@ -246,8 +246,8 @@ func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, do
 	w.Write(buf.Bytes())
 }
 
-func wikiPageFromRes(w *wikiInfo, res wiki.DisplayPage) wikiPage {
-	page := wikiPageWith(w)
+func wikiPageFromRes(wi *wikiInfo, res wiki.DisplayPage) wikiPage {
+	page := wikiPageWith(wi)
 	page.HTMLContent = template.HTML(res.Content)
 	page.PageCSS = template.CSS(res.CSS)
 	page.File = res.File
@@ -256,13 +256,13 @@ func wikiPageFromRes(w *wikiInfo, res wiki.DisplayPage) wikiPage {
 	return page
 }
 
-func wikiPageWith(w *wikiInfo) wikiPage {
+func wikiPageWith(wi *wikiInfo) wikiPage {
 	return wikiPage{
-		WikiTitle: w.title,
+		WikiTitle: wi.title,
 		// WikiLogo:   w.getLogo(), FIXME:
-		WikiRoot:   w.Opt.Root.Wiki,
-		Root:       w.Opt.Root,
-		StaticRoot: w.template.staticRoot,
-		Navigation: w.Opt.Navigation,
+		WikiRoot:   wi.Opt.Root.Wiki,
+		Root:       wi.Opt.Root,
+		StaticRoot: wi.template.staticRoot,
+		Navigation: wi.Opt.Navigation,
 	}
 }
