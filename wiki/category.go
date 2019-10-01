@@ -325,6 +325,45 @@ func (cat *Category) update(w *Wiki) {
 	cat.write()
 }
 
+// checks if a category should be deleted
+func (cat *Category) shouldPurge(w *Wiki) bool {
+
+	// whaa? there are still pages! why you even asking?
+	if len(cat.Pages) != 0 {
+		return false
+	}
+
+	nameNE := wikifier.CategoryNameNE(cat.Name, false)
+	preserve := false
+	switch cat.Type {
+
+	// note that we track references to not-yet-existent content too,
+	// but if we made it to here, there are no pages referencing this
+
+	// for page links, check if the page still exists
+	case CategoryTypePage:
+		_, err := os.Lstat(w.pathForPage(nameNE, false, ""))
+		preserve = err != nil
+
+	// for images, check if the image still exists
+	case CategoryTypeImage:
+		_, err := os.Lstat(w.pathForImage(nameNE))
+		preserve = err != nil
+
+	// for models, check if the model still exists
+	case CategoryTypeModel:
+		_, err := os.Lstat(w.pathForModel(nameNE))
+		preserve = err != nil
+
+	// for normal categories, check if it's being manually preserved
+	default:
+		preserve = cat.Preserve
+
+	}
+
+	return !preserve
+}
+
 // cat_check_page
 func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 
