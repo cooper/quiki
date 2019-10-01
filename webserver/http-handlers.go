@@ -224,7 +224,7 @@ func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *h
 	}
 
 	// finally, fall back to generic error response
-	http.Error(w, msg, http.StatusNotFound)
+	http.Error(w, msg, status)
 }
 
 func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
