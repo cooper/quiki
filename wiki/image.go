@@ -338,6 +338,13 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 	// find image category
 	imageCat := w.GetSpecialCategory(name, CategoryTypeImage)
+
+	// it doesn't exist. let's create it
+	if !imageCat.Exists() {
+		imageCat.addImage(w, name, nil, nil)
+	}
+
+	// it should exist at this point
 	if imageCat.Exists() {
 		info.Width = imageCat.ImageInfo.Width
 		info.Height = imageCat.ImageInfo.Height
@@ -345,8 +352,10 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 		return
 	}
 
-	// image category doesn't exist, so let's read the dimensions manually
+	// image category still doesn't exist???
+	// let's read the dimensions manually
 	info.Width, info.Height = getImageDimensions(path)
+
 	return
 }
 
