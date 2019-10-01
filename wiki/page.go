@@ -138,7 +138,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		if errOrRedir := w.displayCachedPage(page, &r, draftOK); errOrRedir != nil {
 			return errOrRedir
 		}
-		return r
+		if r.FromCache {
+			return r
+		}
 	}
 
 	// Safe point - we will be generating the page right now.
@@ -194,14 +196,18 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	w.updatePageCategories(page)
 	r.Categories = page.Categories()
 
-	// write cache file if enabled
-	if dispErr := w.writePageCache(page, &r); dispErr != nil {
-		return dispErr
-	}
+	// only do these things if content was generated
+	if !page.VarsOnly {
 
-	// write search file if enabled
-	if dispErr := w.writePageText(page, &r); dispErr != nil {
-		return dispErr
+		// write cache file if enabled
+		if dispErr := w.writePageCache(page, &r); dispErr != nil {
+			return dispErr
+		}
+
+		// write search file if enabled
+		if dispErr := w.writePageText(page, &r); dispErr != nil {
+			return dispErr
+		}
 	}
 
 	return r

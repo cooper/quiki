@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -164,11 +165,16 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 //
 // If the page already belongs and any information has changed, the category is updated.
 // If force is true,
-func (cat *Category) AddPage(page *wikifier.Page) {
-	cat.addPageExtras(page, nil, nil)
+func (cat *Category) AddPage(w *Wiki, page *wikifier.Page) {
+	cat.addPageExtras(w, page, nil, nil)
 }
 
-func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int, lines []int) {
+func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions [][]int, lines []int) {
+
+	// update existing info
+	cat.update(w)
+
+	// do nothing if the entry exists and the page has not changed since the asof time
 	if pageMaybe != nil {
 		mod := pageMaybe.Modified()
 		// TODO: if the page was just renamed, delete the old entry
@@ -228,6 +234,97 @@ func (cat *Category) write() {
 	ioutil.WriteFile(cat.Path, jsonData, 0666)
 }
 
+func (cat *Category) update(w *Wiki) {
+
+	// we're probably just now creating the category, so
+	// it's not gonna have any outdated information.
+	if !cat.Exists() {
+		return
+	}
+
+	// check each page
+	now := time.Now()
+	changed := false
+	newPages := make(map[string]CategoryEntry, len(cat.Pages))
+	for pageName, entry := range cat.Pages {
+
+		// page no longer exists
+		path := w.pathForPage(pageName, false, "")
+		pageFi, err := os.Lstat(path)
+		if err != nil {
+			changed = true
+			continue
+		}
+
+		// check if the modification date is more recent than asof date
+		if entry.Asof != nil && pageFi.ModTime().After(*entry.Asof) {
+
+			// the page has been modified since we last parsed it;
+			// let's create a page that only reads variables
+			// FIXME: will images, models, etc. be set?
+			page := w.NewPage(pageName)
+			page.VarsOnly = true
+
+			// parse variables. if errors occur, leave as-is
+			if err := page.Parse(); err != nil {
+				newPages[page.Name()] = entry
+				continue
+			}
+
+			// at this point, we're either removing or updating page info
+			changed = true
+
+			stillMember := false
+			switch cat.Type {
+
+			// for page links, check if the page still references the other
+			case CategoryTypePage:
+				_, stillMember = page.PageLinks[wikifier.CategoryNameNE(cat.Name, false)]
+
+			// for images, check if the page still references the image
+			case CategoryTypeImage:
+				_, stillMember = page.Images[wikifier.CategoryNameNE(cat.Name, false)]
+
+			// for models, check if the page still uses the model
+			case CategoryTypeModel:
+				// TODO
+
+			// for normal categories, check @category
+			default:
+				for _, catName := range page.Categories() {
+					if catName == cat.Name {
+						stillMember = true
+						break
+					}
+				}
+			}
+
+			// page no longer belongs to the category
+			if !stillMember {
+				continue
+			}
+
+			// update page info
+			entry.PageInfo = page.Info()
+			entry.Asof = &now
+		}
+
+		newPages[pageName] = entry
+	}
+
+	// nothing changed
+	if !changed {
+		return
+	}
+
+	// TODO: check if the category should purge
+
+	// write update
+	cat.Modified = &now
+	cat.Pages = newPages
+	cat.write()
+}
+
 // cat_check_page
 func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 
@@ -236,11 +333,11 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	pageCat := w.GetSpecialCategory(page.Name(), CategoryTypePage)
 	pageCat.PageInfo = &info
 	pageCat.Preserve = true // keep until page no longer exists
-	pageCat.addPageExtras(nil, nil, nil)
+	pageCat.addPageExtras(w, nil, nil, nil)
 
 	// actual categories
 	for _, name := range page.Categories() {
-		w.GetCategory(name).AddPage(page)
+		w.GetCategory(name).AddPage(w, page)
 	}
 
 	// image tracking categories
@@ -260,7 +357,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 			}
 		}
 
-		imageCat.addPageExtras(page, dimensions, nil)
+		imageCat.addPageExtras(w, page, dimensions, nil)
 	}
 
 	// page tracking categories
@@ -269,7 +366,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		// however, we track references to not-yet-existent pages as well
 		pageCat := w.GetSpecialCategory(pageName, CategoryTypePage)
 		pageCat.Preserve = true // keep until there are no more references
-		pageCat.addPageExtras(page, nil, lines)
+		pageCat.addPageExtras(w, page, nil, lines)
 	}
 
 	// TODO: model categories
@@ -280,13 +377,6 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	cat := w.GetCategory(catName)
 	catName = cat.Name
 
-	// my ($wiki, $cat_name, %opts) = @_; my $result = {};
-	// $cat_name = cat_name($cat_name);
-	// my $cat_name_ne = cat_name_ne($cat_name);
-	// my ($err, $pages, $title) = $wiki->cat_get_pages($cat_name,
-	// 	cat_type => $opts{cat_type}
-	// );
-
 	// category does not exist
 	if !cat.Exists() {
 		return DisplayError{
@@ -294,6 +384,9 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 			DetailedError: "Category '" + cat.Path + "' does not exist.",
 		}
 	}
+
+	// update
+	cat.update(w)
 
 	// category has no pages
 	// (probably shouldn't happen for normal categories, but check anyway)
@@ -328,7 +421,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	limit := w.Opt.Category.PerPage
 	numPages := 0
 	if limit > 0 {
-		numPages = len(pages)/limit + 1
+		numPages = int(math.Ceil(float64(len(pages)) / float64(limit)))
 	}
 
 	// the request is for a page beyond what we can offer
@@ -338,7 +431,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 	// if there is a limit and we exceeded it
 	if limit > 0 && !(pageN == 1 && len(pages) <= limit) {
-		pagesOfPages := make([]pagesToSort, 0, numPages)
+		pagesOfPages := make([]pagesToSort, numPages)
 
 		// break down into PAGES of pages. wow.
 		n := 0
@@ -346,11 +439,10 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 			// first one on the page
 			var thisPage pagesToSort
-			if n < len(pagesOfPages) {
+			if pagesOfPages[n] != nil {
 				thisPage = pagesOfPages[n]
 			} else {
 				thisPage = make(pagesToSort, limit)
-				pagesOfPages = pagesOfPages[:n+1]
 				pagesOfPages[n] = thisPage
 			}
 
@@ -367,6 +459,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 			// if that was the page we wanted, stop
 			if n == pageN {
+				n++
 				break
 			}
 
@@ -374,9 +467,11 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 		}
 
 		// only care about the page requested
+		pagesOfPages = pagesOfPages[:n]
 		pages = pagesOfPages[pageN]
 	}
 
+	// unfortunately we have to iterate over this 1 more time
 	css := ""
 
 	return DisplayCategoryPosts{
@@ -397,12 +492,21 @@ func (p pagesToSort) Len() int {
 }
 
 func (p pagesToSort) Less(i, j int) bool {
+
+	// neither have time set; fall back to alphabetical
+	if p[i].Created == nil && p[j].Created == nil {
+		names := sort.StringSlice([]string{p[i].Name, p[j].Name})
+		return names.Less(0, 1)
+	}
+
+	// one has no time set
 	if p[j].Created == nil {
 		return true
 	}
 	if p[i].Created == nil {
 		return false
 	}
+
 	return p[i].Created.Before(*p[j].Created)
 }
 
