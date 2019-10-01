@@ -76,7 +76,7 @@ a.page-number {
     margin-left: 5px;
     border: 1px solid #ccc;
     padding: 5px 0;
-    width: 25px;
+    min-width: 25px;
     text-align: center;
 }
 

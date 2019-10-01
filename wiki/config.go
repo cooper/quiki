@@ -23,6 +23,7 @@ var defaultWikiOpt = wikifier.PageOpt{
 		Image:    "/images",
 		Category: "/topic",
 		Page:     "/page",
+		File:     "", // (i.e., disabled)
 	},
 	Image: wikifier.PageOptImage{
 		Retina:     []int{2, 3},

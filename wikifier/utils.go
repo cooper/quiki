@@ -52,7 +52,7 @@ func getValueType(i interface{}) valueType {
 func prepareForHTML(value interface{}, page *Page, pos position) interface{} {
 	switch v := value.(type) {
 	case string:
-		value = page.parseFormattedTextOpts(v, &formatterOptions{pos: pos})
+		value = page.parseFormattedTextOpts(v, fmtOpt{pos: pos})
 	case block:
 		v.html(page, v.el())
 		value = v.el()

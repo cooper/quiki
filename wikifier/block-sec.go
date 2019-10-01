@@ -89,7 +89,7 @@ func (sec *secBlock) html(page *Page, el element) {
 
 		// format title if we still need to
 		if fmtTitle == "" {
-			fmtTitle = page.parseFormattedTextOpts(title, &formatterOptions{pos: sec.openPos})
+			fmtTitle = page.parseFormattedTextOpts(title, fmtOpt{pos: sec.openPos})
 		}
 
 		// TODO: meta section heading ID

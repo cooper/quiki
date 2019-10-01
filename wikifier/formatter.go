@@ -203,7 +203,7 @@ var staticFormats = map[string]string{
 	"---": `&mdash;`, // em dash
 }
 
-type formatterOptions struct {
+type fmtOpt struct {
 	noEntities  bool     // disables html entity conversion
 	noVariables bool     // used internally to prevent recursive interpolation
 	noWarnings  bool     // silence warnings for undefined variables
@@ -212,10 +212,14 @@ type formatterOptions struct {
 }
 
 func (page *Page) parseFormattedText(text string) HTML {
-	return page.parseFormattedTextOpts(text, &formatterOptions{})
+	return page._parseFormattedTextOpts(text, &fmtOpt{})
 }
 
-func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) HTML {
+func (page *Page) parseFormattedTextOpts(text string, opts fmtOpt) HTML {
+	return page._parseFormattedTextOpts(text, &opts)
+}
+
+func (page *Page) _parseFormattedTextOpts(text string, opts *fmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -315,7 +319,7 @@ func (page *Page) parseFormattedTextOpts(text string, opts *formatterOptions) HT
 	return HTML(final)
 }
 
-func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTML {
+func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 	// static format
 	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
@@ -344,7 +348,7 @@ func (page *Page) parseFormatType(formatType string, opts *formatterOptions) HTM
 					// TODO: Produce warning that attempted to interpolate non-string
 					return HTML("(error)")
 				}
-				return page.parseFormattedTextOpts(strVal, &formatterOptions{noVariables: true})
+				return page.parseFormattedTextOpts(strVal, fmtOpt{noVariables: true})
 			}
 
 			// it was a string but just @var

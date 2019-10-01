@@ -19,7 +19,7 @@ func (b *historyBlock) html(page *Page, el element) {
 
 		// key
 		tr.createChild("td", "history-key").add(page.parseFormattedTextOpts(
-			pair.keyTitle, &formatterOptions{
+			pair.keyTitle, fmtOpt{
 				pos: pair.pos,
 			}))
 
