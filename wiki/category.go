@@ -212,7 +212,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	// image tracking categories
 	for imageName, dimensions := range page.Images {
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
-		imageCat.Preserve = true // keep until image no longer exists
+		imageCat.Preserve = true // keep until there are no more references
 
 		// find the image dimensions if not present
 		if imageCat.ImageInfo == nil {
@@ -227,6 +227,15 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		}
 
 		imageCat.addPageExtras(page, dimensions, nil)
+	}
+
+	// page tracking categories
+	for pageName, lines := range page.PageLinks {
+		// note: if the page exists, the category should already exist also.
+		// however, we track references to not-yet-existent pages as well
+		pageCat := w.GetSpecialCategory(pageName, CategoryTypePage)
+		pageCat.Preserve = true // keep until there are no more references
+		pageCat.addPageExtras(page, nil, lines)
 	}
 
 	// TODO: page and model categories

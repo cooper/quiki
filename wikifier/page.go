@@ -23,9 +23,10 @@ type Page struct {
 	VarsOnly   bool     // True if Parse() should only extract variables
 	Opt        *PageOpt // page options
 	styles     []styleEntry
-	parser     *parser // wikifier parser instance
-	main       block   // main block
-	Images     map[string][][]int
+	parser     *parser            // wikifier parser instance
+	main       block              // main block
+	Images     map[string][][]int // references to images
+	PageLinks  map[string][]int   // references to other pages
 	sectionN   int
 	headingIDs map[string]int
 	*variableScope
