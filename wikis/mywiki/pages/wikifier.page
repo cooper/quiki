@@ -53,12 +53,6 @@ history {
 
     [Wikifier::Server] {
 
-        imagebox {
-            file:   wikiserver-logo.png;
-            width:  200px;
-            desc:   Wikifier::Server logo;
-        }
-
         The included [c]wikiserver[/c] executable runs an instance of
         Wikifier::Server. A single wikiserver can manage any number of wikis.
         It monitors source files for changes and generates content immediately

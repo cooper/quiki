@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
@@ -20,6 +21,15 @@ var (
 	imageNameRegex  = regexp.MustCompile(`^(\d+)x(\d+)-(.+)$`)
 	imageScaleRegex = regexp.MustCompile(`^(.+)\@(\d+)x$`)
 )
+
+// ImageInfo represents a full-size image on the wiki.
+type ImageInfo struct {
+	File     string     `json:"file"`               // filename
+	Width    int        `json:"width,omitempty"`    // full-size width
+	Height   int        `json:"height,omitempty"`   // full-size height
+	Created  *time.Time `json:"created,omitempty"`  // creation time
+	Modified *time.Time `json:"modified,omitempty"` // modify time
+}
 
 // SizedImage represents an image in specific dimensions.
 type SizedImage struct {
@@ -213,7 +223,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		}
 	}
 
-	// TODO: update image category as needed
+	// create or update image category
+	w.GetSpecialCategory(r.File, CategoryTypeImage).addImage(w, r.File, nil, nil)
 
 	// if both dimensions are missing, display the full-size version of the image
 	if img.Width == 0 && img.Height == 0 {
@@ -296,6 +307,47 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	}
 
 	return r
+}
+
+// Images returns info about all the images in the wiki.
+func (w *Wiki) Images() map[string]ImageInfo {
+	imageNames := w.allImageFiles()
+	images := make(map[string]ImageInfo, len(imageNames))
+
+	// images individually
+	for _, name := range imageNames {
+		images[name] = w.ImageInfo(name)
+	}
+
+	return images
+}
+
+// ImageInfo returns info for an image given its full-size name.
+func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
+
+	// the image does not exist
+	path := w.pathForImage(name)
+	imgFi, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+
+	mod := imgFi.ModTime()
+	info.File = name
+	info.Modified = &mod // actual image mod time
+
+	// find image category
+	imageCat := w.GetSpecialCategory(name, CategoryTypeImage)
+	if imageCat.Exists() {
+		info.Width = imageCat.ImageInfo.Width
+		info.Height = imageCat.ImageInfo.Height
+		info.Created = imageCat.Created // category creation time, not image
+		return
+	}
+
+	// image category doesn't exist, so let's read the dimensions manually
+	info.Width, info.Height = getImageDimensions(path)
+	return
 }
 
 func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {

@@ -372,6 +372,30 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 	return !preserve
 }
 
+func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Page, dimensionsMaybe [][]int) {
+
+	// what !!
+	if cat.Type != CategoryTypeImage {
+		panic("addImage() on non-image category")
+	}
+
+	cat.Preserve = true // keep until there are no more references
+
+	// find the image dimensions if not present
+	if cat.ImageInfo == nil {
+		path := w.pathForImage(imageName)
+		width, height := getImageDimensions(path)
+		if width != 0 && height != 0 {
+			cat.ImageInfo = &struct {
+				Width  int `json:"width,omitempty"`
+				Height int `json:"height,omitempty"`
+			}{width, height}
+		}
+	}
+
+	cat.addPageExtras(w, pageMaybe, dimensionsMaybe, nil)
+}
+
 // cat_check_page
 func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 
@@ -390,21 +414,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	// image tracking categories
 	for imageName, dimensions := range page.Images {
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
-		imageCat.Preserve = true // keep until there are no more references
-
-		// find the image dimensions if not present
-		if imageCat.ImageInfo == nil {
-			path := w.pathForImage(imageName)
-			w, h := getImageDimensions(path)
-			if w != 0 && h != 0 {
-				imageCat.ImageInfo = &struct {
-					Width  int `json:"width,omitempty"`
-					Height int `json:"height,omitempty"`
-				}{w, h}
-			}
-		}
-
-		imageCat.addPageExtras(w, page, dimensions, nil)
+		imageCat.addImage(w, imageName, page, dimensions)
 	}
 
 	// page tracking categories

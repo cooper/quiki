@@ -218,13 +218,11 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 	var doDir func(pfx string)
 	doDir = func(pfx string) {
 		dir := dir + "/" + pfx
-		fmt.Println("doDir", pfx, dir)
 
 		// can't open directory
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
 			// TODO: report the error somehow
-			fmt.Println(err)
 			return
 		}
 
@@ -234,7 +232,6 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 			// skip hidden files
 			if file.Name()[0] == '.' {
-				fmt.Println("hidden", file.Name())
 				continue
 			}
 
@@ -255,8 +252,6 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 			// skip files without desired extension
 			skip := true
 			for _, acceptable := range extensions {
-				fmt.Println("check", file.Name(), ext, "==", acceptable)
-
 				if ext == acceptable {
 					skip = false
 					break
@@ -268,14 +263,12 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 			// resolve symlinks
 			symlinkOrOrig, err := filepath.EvalSymlinks(path)
-			fmt.Println("sym", path, symlinkOrOrig, err)
 			if err != nil {
 				continue
 			}
 
 			// resolve absolute path
 			abs, err := filepath.Abs(symlinkOrOrig)
-			fmt.Println("abs", path, abs, err)
 			if err != nil {
 				// TODO: report the error
 				continue
