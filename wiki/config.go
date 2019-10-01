@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"math"
+
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -64,29 +66,31 @@ func (w *Wiki) readConfig(file string) error {
 	return nil
 }
 
-func defaultImageCalc(name string, width, height int, page *wikifier.Page) (finalW, finalH int) {
+func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int) {
 	path := page.Opt.Dir.Image + "/" + name
-	scaleFactor := 0
 	bigW, bigH := getImageDimensions(path)
 
+	// original has no dimensions??
 	if bigW == 0 || bigH == 0 {
-		return
+		return 0, 0
 	}
 
-	if width != 0 {
-		scaleFactor = bigW / width
-		finalW = width
-		finalH = bigH / scaleFactor
-		return
+	// requesting 0x0 is same as requesting full-size
+	if width == 0 && height == 0 {
+		return bigW, bigH
 	}
 
-	if height != 0 {
-		scaleFactor = bigH / height
-		finalW = bigW / scaleFactor
-		finalH = height
+	// determine missing dimension
+	if width == 0 {
+		tmpW := float64(height) * float64(bigW) / float64(bigH)
+		width = int(math.Max(1.0, math.Floor(tmpW+0.5)))
+	}
+	if height == 0 {
+		tmpH := float64(width) * float64(bigH) / float64(bigW)
+		height = int(math.Max(1.0, math.Floor(tmpH+0.5)))
 	}
 
-	return
+	return width, height
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
