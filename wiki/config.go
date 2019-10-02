@@ -11,12 +11,11 @@ var defaultWikiOpt = wikifier.PageOpt{
 		EnableCache: true,
 	},
 	Dir: wikifier.PageOptDir{
-		Wikifier: ".",
-		Wiki:     "",
-		Image:    "images",
-		Page:     "pages",
-		Model:    "models",
-		Cache:    "cache",
+		Wiki:  "",
+		Image: "images",
+		Page:  "pages",
+		Model: "models",
+		Cache: "cache",
 	},
 	Root: wikifier.PageOptRoot{
 		Wiki:     "", // aka /
@@ -53,10 +52,8 @@ func (w *Wiki) readConfig(file string) error {
 	confPage := wikifier.NewPage(file)
 	confPage.VarsOnly = true
 
-	// set these variables for use in the config
-	// FIXME: where does dir.wikifier come from?
+	// set this variable for use in the config
 	confPage.Set("dir.wiki", w.Opt.Dir.Wiki)
-	confPage.Set("dir.wikifier", w.Opt.Dir.Wikifier)
 
 	// parse the config
 	if err := confPage.Parse(); err != nil {

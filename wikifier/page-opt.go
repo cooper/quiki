@@ -42,7 +42,6 @@ type PageOptPage struct {
 
 // PageOptDir describes actual filepaths to wiki resources.
 type PageOptDir struct {
-	Wikifier string // path to wikifier directory
 	Wiki     string // path to wiki root directory
 	Image    string // path to image directory
 	Category string // path to category directory
@@ -125,7 +124,6 @@ var defaultPageOpt = PageOpt{
 		EnableCache: false,
 	},
 	Dir: PageOptDir{
-		Wikifier: ".",
 		Wiki:     "",
 		Image:    "images",
 		Page:     "pages",
@@ -168,12 +166,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy string options
 	pageOptString := map[string]*string{
-		"name":          &opt.Name,          // wiki name
-		"main_page":     &opt.MainPage,      // main page name
-		"error_page":    &opt.ErrorPage,     // error page name
-		"template":      &opt.Template,      // template name
-		"dir.wikifier":  &opt.Dir.Wikifier,  // wikifier directory
-		"dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
+		"name":       &opt.Name,      // wiki name
+		"main_page":  &opt.MainPage,  // main page name
+		"error_page": &opt.ErrorPage, // error page name
+		"template":   &opt.Template,  // template name
+		// "dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
 		"dir.image":     &opt.Dir.Image,     // image directory
 		"dir.page":      &opt.Dir.Page,      // page directory
 		"dir.model":     &opt.Dir.Model,     // model directory
