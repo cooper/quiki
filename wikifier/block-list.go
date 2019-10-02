@@ -94,7 +94,7 @@ func (l *List) parse(page *Page) {
 				continue
 			}
 			for i, c := range item {
-				l.handleChar(i, p, c)
+				l.handleChar(page, i, p, c)
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func (l *List) parse(page *Page) {
 	}
 }
 
-func (l *List) handleChar(i int, p *listParser, c rune) {
+func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 
 	if c == '\\' && !p.escape {
 		// escapes the next character
@@ -116,7 +116,7 @@ func (l *List) handleChar(i int, p *listParser, c rune) {
 		// terminates a value
 
 		// store the value
-		valueToStore := fixValuesForStorage(p.values)
+		valueToStore := fixValuesForStorage(p.values, page)
 		l.list = append(l.list, &listEntry{
 			value: valueToStore,               // string, block, or mixed []interface{}
 			typ:   getValueType(valueToStore), // type of value

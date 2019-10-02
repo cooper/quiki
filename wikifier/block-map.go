@@ -122,7 +122,7 @@ func (m *Map) parse(page *Page) {
 				continue
 			}
 			for i, c := range item {
-				m.handleChar(i, p, c)
+				m.handleChar(page, i, p, c)
 			}
 		}
 	}
@@ -142,7 +142,7 @@ func (m *Map) parse(page *Page) {
 
 }
 
-func (m *Map) handleChar(i int, p *mapParser, c rune) {
+func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 
 	if c == ':' && !p.inValue && !p.escape {
 		// first colon indicates we're entering a value
@@ -203,9 +203,9 @@ func (m *Map) handleChar(i int, p *mapParser, c rune) {
 		}
 
 		// fix the value
-		// this returns either a string, block, or []interface{} of both
+		// this returns either a string, block, HTML, or []interface{} combination
 		// strings next to each other are merged; empty strings are removed
-		valueToStore := fixValuesForStorage(p.values)
+		valueToStore := fixValuesForStorage(p.values, page)
 
 		// if this key exists, rename it to the next available <key>_key_<n>
 		for exist, err := m.Get(strKey); exist != nil && err != nil; {

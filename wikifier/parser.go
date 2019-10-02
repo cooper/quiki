@@ -508,8 +508,12 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				return errors.New("Variable has no name")
 			}
 
+			fmt.Println("Fix values:", p.catch.content())
+
 			// fetch content and clear catch
-			value := fixValuesForStorage(p.catch.content())
+			value := fixValuesForStorage(p.catch.content(), page)
+
+			fmt.Println("after:", value)
 			p.catch = p.catch.parentCatch()
 
 			// log.Println("Variable values = ", value)
@@ -525,6 +529,9 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				if !p.varNotInterpolated {
 					value = page.formatText(val)
 				}
+
+			case HTML:
+				value = val
 
 			case block:
 

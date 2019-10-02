@@ -119,7 +119,7 @@ func humanReadableValue(i interface{}) string {
 // fix a value before storing it in a list or map
 // this returns either a string, block, or []interface{} of both
 // strings next to each other are merged; empty strings are removed
-func fixValuesForStorage(values []interface{}) interface{} {
+func fixValuesForStorage(values []interface{}, pageMaybe *Page) interface{} {
 
 	// no items
 	if len(values) == 0 {
@@ -128,7 +128,7 @@ func fixValuesForStorage(values []interface{}) interface{} {
 
 	// one value in; one value out!
 	if len(values) == 1 {
-		return fixSingleValue(values[0])
+		return fixSingleValue(values[0], pageMaybe)
 	}
 
 	// multiple values
@@ -137,16 +137,20 @@ func fixValuesForStorage(values []interface{}) interface{} {
 	for _, value := range values {
 
 		// fix this value; then skip it if it's nothin
-		value = fixSingleValue(value)
+		value = fixSingleValue(value, pageMaybe)
 		if value == nil {
 			continue
 		}
 
-		// if this is a string and the previous one was too, combine them
+		// if this is a string/HTML and the previous one was too, combine them
 		thisStr, isStr := value.(string)
 		lastStr, lastWasStr := lastValue.(string)
+		thisHTML, isHTML := value.(HTML)
+		lastHTML, lastWasHTML := lastValue.(HTML)
 		if isStr && lastWasStr {
 			valuesToStore[len(valuesToStore)-1] = lastStr + thisStr
+		} else if isHTML && lastWasHTML {
+			valuesToStore[len(valuesToStore)-1] = HTML(lastHTML + thisHTML)
 		} else {
 			valuesToStore = append(valuesToStore, value)
 		}
@@ -168,12 +172,15 @@ func fixValuesForStorage(values []interface{}) interface{} {
 	return valuesToStore
 }
 
-func fixSingleValue(value interface{}) interface{} {
+func fixSingleValue(value interface{}, pageMaybe *Page) interface{} {
 	switch v := value.(type) {
 	case string:
 		v = strings.TrimSpace(v)
 		if v == "" {
 			return nil
+		}
+		if pageMaybe != nil {
+			return pageMaybe.formatText(v)
 		}
 		return v
 	case block:

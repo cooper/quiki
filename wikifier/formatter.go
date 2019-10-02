@@ -362,6 +362,8 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 				return htmlVal
 			}
 
+			// TODO: if it's a block, maybe we should complain to use {@var} syntax
+
 			// I don't really know what to do
 			return HTML(html.EscapeString(humanReadableValue(val)))
 		}
