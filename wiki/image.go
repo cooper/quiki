@@ -212,14 +212,15 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 
 	// find missing dimension
 	// note: we haven't checked if both are 0 yet, but this will return 0, 0 in that case
-	oldName := img.FullName()
+	oldName := img.ScaleName()
 	img.Width, img.Height = calculateImageDimensions(bigW, bigH, img.Width, img.Height)
 
 	// check if the name has changed after this adjustment.
 	// if so, redirect
+	scaleName := img.ScaleName()
 	fullName := img.FullName()
-	if fullName != oldName || img.zeroByZero {
-		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + fullName}
+	if scaleName != oldName || img.zeroByZero {
+		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + scaleName}
 	}
 
 	// image name and full path
@@ -298,7 +299,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 			r.Length = cacheFi.Size()
 
 			// symlink if necessary
-			w.symlinkScaledImage(img, fullName)
+			w.symlinkScaledImage(img, scaleName)
 
 			return r
 		}
