@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -360,11 +361,20 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 }
 
 func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
-	width, height := img.TrueWidth(), img.TrueHeight()
 
 	// open the full size image
 	fsPath := w.pathForImage(img.FullSizeName())
-	fsWidth, fsHeight := getImageDimensions(fsPath)
+	bigW, bigH := getImageDimensions(fsPath)
+
+	// find missing dimension
+	width, height := calculateImageDimensions(bigW, bigH, img.TrueWidth(), img.TrueHeight())
+
+	// inject new dimensions
+	img.Width, img.Height = width, height
+	if img.Scale > 1 {
+		img.Width /= img.Scale
+		img.Height /= img.Scale
+	}
 
 	// decode it
 	fsImage, err := imaging.Open(fsPath)
@@ -376,7 +386,7 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
 	}
 
 	// the request is to generate an image the same or larger than the original
-	if width >= fsWidth && height >= fsHeight {
+	if width >= bigW || height >= bigH {
 
 		// symlink this to the full-size image
 		w.symlinkScaledImage(img, img.FullSizeName())
@@ -385,7 +395,6 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
 	}
 
 	// create resized image
-	// note: if either width or height is 0, the aspect is preserved
 	newImage := imaging.Resize(fsImage, width, height, imaging.Lanczos)
 
 	// generate the image in the source format and write
@@ -398,24 +407,11 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
 		}
 	}
 
-	// determine new dimensions
-	img.Width, img.Height = getImageDimensions(newImagePath)
-	if img.Scale > 1 {
-		img.Width /= img.Scale
-		img.Height /= img.Scale
-	}
-
-	// rename based on actual dimensions
-	newNewImagePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
-	if newImagePath != newNewImagePath {
-		os.Rename(newImagePath, newNewImagePath)
-	}
-
-	newImageFi, _ := os.Lstat(newNewImagePath)
+	newImageFi, _ := os.Lstat(newImagePath)
 
 	// inject info from the newly generated image
-	r.Path = newNewImagePath
-	r.File = filepath.Base(newNewImagePath)
+	r.Path = newImagePath
+	r.File = filepath.Base(newImagePath)
 	r.Generated = true
 	r.Modified = httpdate.Time2Str(newImageFi.ModTime())
 	r.ModUnix = newImageFi.ModTime().Unix()
@@ -446,4 +442,17 @@ func getImageDimensions(path string) (w, h int) {
 	w = c.Width
 	h = c.Height
 	return
+}
+
+// determine missing dimensions
+func calculateImageDimensions(bigW, bigH, width, height int) (int, int) {
+	if width == 0 {
+		tmpW := float64(height) * float64(bigW) / float64(bigH)
+		width = int(math.Max(1.0, math.Floor(tmpW+0.5)))
+	}
+	if height == 0 {
+		tmpH := float64(width) * float64(bigH) / float64(bigW)
+		height = int(math.Max(1.0, math.Floor(tmpH+0.5)))
+	}
+	return width, height
 }

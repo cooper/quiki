@@ -1,8 +1,6 @@
 package wiki
 
 import (
-	"math"
-
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -81,16 +79,7 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	}
 
 	// determine missing dimension
-	if width == 0 {
-		tmpW := float64(height) * float64(bigW) / float64(bigH)
-		width = int(math.Max(1.0, math.Floor(tmpW+0.5)))
-	}
-	if height == 0 {
-		tmpH := float64(width) * float64(bigH) / float64(bigW)
-		height = int(math.Max(1.0, math.Floor(tmpH+0.5)))
-	}
-
-	return width, height
+	return calculateImageDimensions(bigW, bigH, width, height)
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
