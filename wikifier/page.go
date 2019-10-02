@@ -28,6 +28,7 @@ type Page struct {
 	PageLinks  map[string][]int   // references to other pages
 	sectionN   int
 	headingIDs map[string]int
+	Wiki       interface{} // only available during Parse() and HTML()
 	*variableScope
 }
 
@@ -70,6 +71,7 @@ func NewPageSource(source string) *Page {
 func (p *Page) Parse() error {
 	p.parser = newParser()
 	p.main = p.parser.block
+	defer p.resetParseState()
 
 	// create reader from file path or source code provided
 	var reader io.Reader

@@ -153,7 +153,7 @@ var defaultPageOpt = PageOpt{
 		Enable: true,
 	},
 	Link: PageOptLink{
-		ParseInternal: defaultInternalLink,
+		ParseInternal: nil,
 		ParseExternal: defaultExternalLink,
 		ParseCategory: nil,
 	},
@@ -290,6 +290,8 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 			})
 		}
 	}
+
+	// TODO: External wikis
 
 	return nil
 }

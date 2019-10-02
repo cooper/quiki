@@ -521,9 +521,9 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		linkType = "internal"
 		target = page.Opt.Root.Page + "/" + PageNameNE(target)
 		handler = page.Opt.Link.ParseInternal
-		if handler == nil {
-			handler = defaultInternalLink
-		}
+		// if handler == nil {
+		// 	handler = defaultInternalLink
+		// }
 	}
 
 	// call link handler
@@ -541,10 +541,6 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	tooltip = strings.TrimSpace(tooltip)
 
 	return
-}
-
-func defaultInternalLink(page *Page, ok *bool, target, tooltip, displayDefault *string) {
-
 }
 
 func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *string) {

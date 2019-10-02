@@ -94,6 +94,7 @@ type pageJSONManifest struct {
 // use with this Wiki.
 func (w *Wiki) NewPage(name string) *wikifier.Page {
 	p := wikifier.NewPage(w.pathForPage(name, false, ""))
+	p.Wiki = w
 	p.Opt = &w.Opt
 	return p
 }

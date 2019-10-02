@@ -38,6 +38,10 @@ var defaultWikiOpt = wikifier.PageOpt{
 	Search: wikifier.PageOptSearch{
 		Enable: true,
 	},
+	Link: wikifier.PageOptLink{
+		ParseInternal: linkPageExists,
+		ParseCategory: linkCategoryExists,
+	},
 	External: map[string]wikifier.PageOptExternal{
 		"wp": wikifier.PageOptExternal{"Wikipedia", "https://en.wikipedia.org/wiki", wikifier.PageOptExternalTypeMediaWiki},
 	},
@@ -90,4 +94,20 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	si.Width = width
 	si.Height = height
 	return page.Opt.Root.Image + "/" + si.FullName()
+}
+
+func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
+	w, good := page.Wiki.(*Wiki)
+	if !good {
+		return
+	}
+	*ok = w.NewPage(*target).Exists()
+}
+
+func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
+	w, good := page.Wiki.(*Wiki)
+	if !good {
+		return
+	}
+	*ok = w.GetCategory(*target).Exists()
 }
