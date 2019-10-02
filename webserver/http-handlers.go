@@ -78,48 +78,12 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 // page request
 func handlePage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	res := wi.DisplayPage(relPath)
-
-	// other response
-	switch res := res.(type) {
-
-	// error
-	case wiki.DisplayError:
-		handleError(wi, res, w, r)
-
-	// page redirect
-	case wiki.DisplayRedirect:
-		http.Redirect(w, r, res.Redirect, http.StatusMovedPermanently)
-
-	// page content
-	case wiki.DisplayPage:
-		renderTemplate(wi, w, "page", wikiPageFromRes(wi, res))
-
-	// anything else
-	default:
-		http.NotFound(w, r)
-	}
+	handleResponse(wi, wi.DisplayPage(relPath), w, r)
 }
 
 // image request
 func handleImage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	res := wi.DisplayImage(relPath)
-
-	// other response
-	switch res := res.(type) {
-
-	// error
-	case wiki.DisplayError:
-		handleError(wi, res, w, r)
-
-	// image content
-	case wiki.DisplayImage:
-		http.ServeFile(w, r, res.Path)
-
-	// anything else
-	default:
-		http.NotFound(w, r)
-	}
+	handleResponse(wi, wi.DisplayImage(relPath), w, r)
 }
 
 // topic request
@@ -136,42 +100,51 @@ func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r 
 		catName = split[0]
 	}
 
-	iface := wi.DisplayCategoryPosts(catName, pageN)
-	var res wiki.DisplayCategoryPosts
+	handleResponse(wi, wi.DisplayCategoryPosts(catName, pageN), w, r)
+}
 
-	// other response
-	switch val := iface.(type) {
+func handleResponse(wi *wikiInfo, res interface{}, w http.ResponseWriter, r *http.Request) {
+	switch res := res.(type) {
 
-	// error
-	case wiki.DisplayError:
-		handleError(wi, val, w, r)
-		return
+	// page content
+	case wiki.DisplayPage:
+		renderTemplate(wi, w, "page", wikiPageFromRes(wi, res))
+
+	// image content
+	case wiki.DisplayImage:
+		http.ServeFile(w, r, res.Path)
 
 	// posts
 	case wiki.DisplayCategoryPosts:
-		res = val
+
+		// create template page
+		page := wikiPageWith(wi)
+		page.PageCSS = template.CSS(res.CSS)
+		page.File = res.File
+		page.Name = res.Name
+		page.Title = res.Title
+		page.PageN = res.PageN + 1
+		page.NumPages = res.NumPages
+
+		// add each page result as a wikiPage
+		for _, dispPage := range res.Pages {
+			page.Pages = append(page.Pages, wikiPageFromRes(wi, dispPage))
+		}
+
+		renderTemplate(wi, w, "posts", page)
+
+	// error
+	case wiki.DisplayError:
+		handleError(wi, res, w, r)
+
+	// redirect
+	case wiki.DisplayRedirect:
+		http.Redirect(w, r, res.Redirect, http.StatusMovedPermanently)
 
 	// anything else
 	default:
 		http.NotFound(w, r)
-		return
 	}
-
-	// create template page
-	page := wikiPageWith(wi)
-	page.PageCSS = template.CSS(res.CSS)
-	page.File = res.File
-	page.Name = res.Name
-	page.Title = res.Title
-	page.PageN = pageN + 1
-	page.NumPages = res.NumPages
-
-	// add each page result as a wikiPage
-	for _, dispPage := range res.Pages {
-		page.Pages = append(page.Pages, wikiPageFromRes(wi, dispPage))
-	}
-
-	renderTemplate(wi, w, "posts", page)
 }
 
 // this is set true when calling handlePage for the error page. this way, if an
