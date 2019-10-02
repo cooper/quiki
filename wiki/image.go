@@ -297,6 +297,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 			r.ModifiedHTTP = httpdate.Time2Str(mod)
 			r.Length = cacheFi.Size()
 
+			w.symlinkScaledImage(img, fullName)
 			return r
 		}
 	}
