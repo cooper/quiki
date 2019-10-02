@@ -529,7 +529,14 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	} else {
 		// normal page link
 		linkType = "internal"
-		target = page.Opt.Root.Page + "/" + PageNameNE(target)
+
+		// determine page prefix
+		pfx := page.Prefix()
+		if pfx != "" {
+			pfx += "/"
+		}
+
+		target = page.Opt.Root.Page + "/" + pfx + PageNameNE(target)
 		handler = page.Opt.Link.ParseInternal
 	}
 

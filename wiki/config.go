@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"strings"
+
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -98,10 +100,8 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 	if !good {
 		return
 	}
-
-	// TODO: tons of crazy stuff for page prefixes
-	// TODO: targets relative to page root
-	pageName := wikifier.PageNameLink(*displayDefault, false)
+	pageName := strings.TrimPrefix(*target, page.Opt.Root.Page+"/") // I don't like this
+	pageName = wikifier.PageNameLink(pageName, false)
 	page.PageLinks[pageName] = append(page.PageLinks[pageName], 1) // FIXME: line number
 	*ok = w.NewPage(pageName).Exists()
 }
