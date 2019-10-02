@@ -383,6 +383,7 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	r.Title = info.Title
 	r.FmtTitle = info.FmtTitle
 	r.FromCache = true
+	r.CSS = info.CSS
 	r.Content = wikifier.HTML(content)
 	r.Modified = &cacheModify
 	r.ModifiedHTTP = httpdate.Time2Str(cacheModify)
