@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -42,7 +41,6 @@ func (sb *styleBlock) parse(page *Page) {
 
 	rules := make(map[string]string, len(sb.mapList))
 	for _, entry := range sb.mapList {
-		fmt.Printf("Guess what: %+v", entry)
 		if str, ok := entry.value.(string); ok {
 			rules[entry.keyTitle] = str
 		} else {
@@ -102,8 +100,6 @@ func (sb *styleBlock) parse(page *Page) {
 		style.applyToParent = true
 	}
 
-	fmt.Printf("STYLE1: %+v\n", style)
-
 	sb.style = style
 }
 
@@ -141,6 +137,4 @@ func (sb *styleBlock) html(page *Page, el element) {
 
 	// push @{ $page->{styles} ||= [] }, \%style;
 	page.styles = append(page.styles, style)
-
-	fmt.Printf("STYLE2: %+v\n", style)
 }
