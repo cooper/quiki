@@ -39,16 +39,19 @@ type SizedImage struct {
 	Scale         int    // 3 (scale as requested)
 	Name          string // myimage (name without extension)
 	Ext           string // png (extension)
+	zeroByZero    bool   // true when created from 0x0-name
 }
 
 // SizedImageFromName returns a SizedImage given an image name.
 func SizedImageFromName(name string) SizedImage {
 	w, h := 0, 0
+	zeroByZero := false
 
 	// width and height were given, so it's a resized image
 	if matches := imageNameRegex.FindStringSubmatch(name); len(matches) != 0 {
 		w, _ = strconv.Atoi(matches[1])
 		h, _ = strconv.Atoi(matches[2])
+		zeroByZero = w == 0 && h == 0
 		name = matches[3]
 	}
 
@@ -76,11 +79,12 @@ func SizedImageFromName(name string) SizedImage {
 
 	// put it all together
 	return SizedImage{
-		Width:  w,
-		Height: h,
-		Scale:  scale,
-		Name:   nameNE,
-		Ext:    ext,
+		Width:      w,
+		Height:     h,
+		Scale:      scale,
+		Name:       nameNE,
+		Ext:        ext,
+		zeroByZero: zeroByZero,
 	}
 }
 
@@ -216,7 +220,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// check if the name has changed after this adjustment.
 	// if so, redirect
 	fullName := img.FullName()
-	if fullName != oldName {
+	if fullName != oldName || img.zeroByZero {
 		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + fullName}
 	}
 
