@@ -119,7 +119,7 @@ func setupWiki(wi *wikiInfo) error {
 		template, err = findTemplate(templateNameOrPath)
 	}
 
-	// couldn't find it, or an error occured in loading it
+	// couldn't find it, or an error occurred in loading it
 	if err != nil {
 		return err
 	}

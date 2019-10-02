@@ -93,7 +93,7 @@ type CategoryEntry struct {
 
 	// for CategoryTypeImage, an array of image dimensions used on this page.
 	// dimensions are guaranteed to be positive integers. the number of elements will
-	// always be even, since each occurence of the image produces two (width and then height)
+	// always be even, since each occurrence of the image produces two (width and then height)
 	Dimensions [][]int `json:"dimensions,omitempty"`
 
 	// for CategoryTypePage, an array of line numbers on which the tracked page is

@@ -205,7 +205,7 @@ func reverseString(s string) string {
 // UniqueFilesInDir recursively scans a directory for files matching the
 // requested extensions, resolves symlinks, and returns a list of
 // unique files. That is, if more than one link resolves to the same thing
-// (as is the case for quiki page redirects), there is only one occurence
+// (as is the case for quiki page redirects), there is only one occurrence
 // in the output.
 func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]string, error) {
 	uniqueFiles := make(map[string]string)
