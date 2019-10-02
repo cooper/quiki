@@ -409,7 +409,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
-		ok, target, linkType, tooltip, display := page.parseLink(formatType[1 : len(formatType)-2])
+		ok, target, linkType, tooltip, display := page.parseLink(formatType[1 : len(formatType)-1])
 		invalid := ""
 		if !ok {
 			invalid = " invalid"
@@ -459,6 +459,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	if link == "" {
 		return
 	}
+	fmt.Println("parseLink", link)
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)

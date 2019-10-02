@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"fmt"
+
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -101,7 +103,13 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 	if !good {
 		return
 	}
-	*ok = w.NewPage(*target).Exists()
+
+	// TODO: tons of crazy stuff for page prefixes
+	// TODO: targets relative to page root
+	pageName := wikifier.PageNameLink(*displayDefault, false)
+	fmt.Println("T:", pageName)
+	page.PageLinks[pageName] = append(page.PageLinks[pageName], 1) // FIXME: line number
+	*ok = w.NewPage(pageName).Exists()
 }
 
 func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
@@ -109,5 +117,6 @@ func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayD
 	if !good {
 		return
 	}
-	*ok = w.GetCategory(*target).Exists()
+	catName := wikifier.CategoryName(*displayDefault, false)
+	*ok = w.GetCategory(catName).Exists()
 }

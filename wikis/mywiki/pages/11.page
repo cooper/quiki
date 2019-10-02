@@ -3,4 +3,7 @@
 
 @category.mytopic;
 
-This page should show up first because it has a creation time value of 1.
+This page should show up first because it has a creation time value of 1.[nl]
+By the way, this was built with [[wikifier]]. It's a member of [[~mytopic]].
+
+However, it was not built with [[fakeifier]], and it's not a member of [[~faketopic]].

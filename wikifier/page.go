@@ -52,19 +52,16 @@ func NewPage(filePath string) *Page {
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
 		Images:        make(map[string][][]int),
+		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
 	}
 }
 
 // NewPageSource creates a page given some source code.
 func NewPageSource(source string) *Page {
-	myOpt := defaultPageOpt // copy
-	return &Page{
-		Source:        source,
-		Opt:           &myOpt,
-		variableScope: newVariableScope(),
-		Images:        make(map[string][][]int),
-	}
+	p := NewPage("")
+	p.Source = source
+	return p
 }
 
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
