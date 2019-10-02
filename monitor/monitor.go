@@ -133,13 +133,25 @@ func main() {
 }
 
 func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
+	dirPage, _ := filepath.Abs(mon.w.Opt.Dir.Page)
+	name := strings.TrimPrefix(abs, dirPage+"/")
+
 	switch event.Op {
 
 	case fsnotify.Create, fsnotify.Write:
-		fmt.Printf("time to update page! %#v\n", event)
+
+		// this is a symlink; ignore it
+		// FIXME: only skip if the target is also in the page root?
+		if fi, err := os.Lstat(abs); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+			return
+		}
+
+		mon.w.DisplayPageDraft(name, true)
 
 	case fsnotify.Rename, fsnotify.Remove:
-		fmt.Printf("time to remove page! %#v\n", event)
+		// TODO: w.PurgePage() or similar
+		os.Remove(mon.w.Opt.Dir.Cache + "/page/" + name + ".cache")
+		os.Remove(mon.w.Opt.Dir.Cache + "/page/" + name + ".txt")
 
 	}
 }
