@@ -342,6 +342,7 @@ func PageNameExt(name, ext string) string {
 
 // PageNameLink returns a clean page name without the extension.
 func PageNameLink(name string, noLower bool) string {
+	name = strings.TrimSpace(name)
 	// 'Some Article' -> 'some_article'
 	// 'Some Article' -> 'Some_Article' (with noLower)
 
@@ -372,7 +373,7 @@ func CategoryName(name string, noLower bool) string {
 
 // CategoryNameNE returns a clean category with No Extension.
 func CategoryNameNE(name string, noLower bool) string {
-	return strings.TrimSuffix(CategoryName(name, noLower), ".cat")
+	return strings.TrimSuffix(PageNameLink(name, noLower), ".cat")
 }
 
 // MakeDir creates directories recursively.

@@ -2,7 +2,7 @@ package wikifier
 
 import (
 	"fmt"
-	htmlfmt "html"
+	"html"
 	"regexp"
 	"strings"
 )
@@ -22,10 +22,10 @@ var linkNormalizers = map[string]func(string) string{
 	},
 	"mediawiki": func(s string) string {
 		s = strings.Replace(s, " ", "_", -1)
-		return htmlfmt.EscapeString(s)
+		return html.EscapeString(s)
 	},
 	"none": func(s string) string {
-		return htmlfmt.EscapeString(s)
+		return html.EscapeString(s)
 	},
 }
 
@@ -310,7 +310,7 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 	for _, piece := range items {
 		switch v := piece.(type) {
 		case string:
-			final += htmlfmt.EscapeString(v)
+			final += html.EscapeString(v)
 		case HTML:
 			final += string(v)
 		}
@@ -353,7 +353,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 			// it was a string but just @var
 			if ok {
-				return HTML(htmlfmt.EscapeString(strVal))
+				return HTML(html.EscapeString(strVal))
 			}
 
 			// otherwise this is probably HTML
@@ -362,7 +362,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 			}
 
 			// I don't really know what to do
-			return HTML(htmlfmt.EscapeString(humanReadableValue(val)))
+			return HTML(html.EscapeString(humanReadableValue(val)))
 		}
 	}
 
@@ -408,13 +408,10 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
-		ok, displaySame, target, display, tooltip, linkType := parseLink(formatType[1 : len(formatType)-2])
+		ok, target, linkType, tooltip, display := page.parseLink(formatType[1 : len(formatType)-2])
 		invalid := ""
 		if !ok {
 			invalid = " invalid"
-		}
-		if !displaySame {
-			display = string(page.formatText(display))
 		}
 		return HTML(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,
@@ -450,31 +447,27 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 	return HTML("")
 }
 
-func parseLink(link string) (ok, displaySame bool, target, display, tooltip, linkType string) {
+func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
-	display = strings.TrimSpace(split[0])
 	if len(split) == 2 {
+		display = page.formatText(strings.TrimSpace(split[0]))
 		target = strings.TrimSpace(split[1])
+	} else {
+		target = strings.TrimSpace(split[0])
 	}
 
-	// no pipe
-	if target == "" {
-		target = display
-		displaySame = true
-	}
+	displayDefault := ""
 
-	if linkRegex.MatchString(target) {
+	if matches := linkRegex.FindStringSubmatch(target); len(matches) != 0 {
 		// http://google.com or $/something (see wikifier issue #68)
 
 		linkType = "other"
 
 		// erase the scheme or $
-		if displaySame {
-			display = linkRegex.ReplaceAllString(display, "")
-		}
+		displayDefault = linkRegex.ReplaceAllString(matches[1], "")
 
 	} else if strings.HasPrefix(target, "mailto:") {
 		// mailto:someone@example.com
@@ -484,9 +477,7 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		tooltip = "Email " + email
 
 		// erase mailto:
-		if displaySame {
-			display = email
-		}
+		displayDefault = email
 
 	} else if mailRegex.MatchString(target) {
 		// someone@example.com
@@ -503,20 +494,19 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 
 		// TODO: finish this
 
-		if displaySame {
-			display = s[1]
-		}
+		tooltip = target
+		displayDefault = s[2]
 
 	} else if strings.HasPrefix(target, "~") {
 		// ~ some category
 
-		target = strings.TrimSpace(strings.TrimPrefix(target, "~"))
+		tooltip = strings.TrimPrefix(target, "~")
+		target = page.Opt.Root.Category + "/" + CategoryNameNE(tooltip, false)
 
 		// TODO: finish this
 
-		if displaySame {
-			display = target
-		}
+		displayDefault = tooltip
+
 	} else {
 		// normal page link
 
@@ -525,10 +515,13 @@ func parseLink(link string) (ok, displaySame bool, target, display, tooltip, lin
 		// TODO: finish this
 	}
 
+	if display == "" {
+		display = HTML(html.EscapeString(displayDefault))
+	}
+
 	// normalize
 	target = strings.TrimSpace(target)
 	tooltip = strings.TrimSpace(tooltip)
-	display = strings.TrimSpace(display)
 
 	return
 }

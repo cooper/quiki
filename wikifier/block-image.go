@@ -203,7 +203,7 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 
 		// parse the link
 		// ok, displaySame bool, target, display, tooltip, linkType string
-		if ok, _, target, _, _, _ := parseLink(image.link); ok {
+		if ok, target, _, _, _ := page.parseLink(image.link); ok {
 			image.link = target
 			linkTarget = "_blank"
 		} else {

@@ -8,7 +8,7 @@ func (w *Wiki) Pregenerate() {
 
 	// cache page content
 	for _, pageName := range w.allPageFiles() {
-		go w.DisplayPageDraft(pageName, true)
+		w.DisplayPageDraft(pageName, true)
 	}
 
 	// generate images in all the sizes used
