@@ -3,6 +3,7 @@ package wikifier
 import (
 	"fmt"
 	"html"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -413,6 +414,9 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 		if !ok {
 			invalid = " invalid"
 		}
+		if tooltip != "" {
+			tooltip = ` title="` + tooltip + `"`
+		}
 		return HTML(fmt.Sprintf(`<a class="q-link-%s%s" href="%s"%s>%s</a>`,
 			linkType,
 			invalid,
@@ -449,6 +453,12 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
+	var handler PageOptLinkFunction
+
+	// nothing in, nothing out
+	if link == "" {
+		return
+	}
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
@@ -460,6 +470,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		target = strings.TrimSpace(split[0])
 		displayDefault = target
 	}
+	tooltip = target
 
 	if matches := linkRegex.FindStringSubmatch(target); len(matches) != 0 {
 		// http://google.com or $/something (see wikifier issue #68)
@@ -488,35 +499,39 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 
 	} else if s := wikiRegex.FindStringSubmatch(target); len(s) != 0 {
 		// wp: some page
-
-		// FIXME: I think s[0] is wp
 		linkType = "external"
-
-		// TODO: finish this
-
-		tooltip = target
-		displayDefault = s[2]
+		tooltip = strings.TrimSpace(s[1]) // for now
+		target = strings.TrimSpace(s[2])  // for now
+		displayDefault = target
+		handler = page.Opt.Link.ParseExternal
+		if handler == nil {
+			handler = defaultExternalLink
+		}
 
 	} else if strings.HasPrefix(target, "~") {
 		// ~ some category
-
 		linkType = "category"
-
 		tooltip = strings.TrimPrefix(target, "~")
 		target = page.Opt.Root.Category + "/" + CategoryNameNE(tooltip, false)
-
-		// TODO: finish this
-
 		displayDefault = tooltip
+		handler = page.Opt.Link.ParseCategory
 
 	} else {
 		// normal page link
-
 		linkType = "internal"
-
-		// TODO: finish this
+		target = page.Opt.Root.Page + "/" + PageNameNE(target)
+		handler = page.Opt.Link.ParseInternal
+		if handler == nil {
+			handler = defaultInternalLink
+		}
 	}
 
+	// call link handler
+	if handler != nil {
+		handler(page, &ok, &target, &tooltip, &displayDefault)
+	}
+
+	// pipe was not present
 	if display == "" {
 		display = HTML(html.EscapeString(displayDefault))
 	}
@@ -526,4 +541,59 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	tooltip = strings.TrimSpace(tooltip)
 
 	return
+}
+
+func defaultInternalLink(page *Page, ok *bool, target, tooltip, displayDefault *string) {
+
+}
+
+func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *string) {
+	// note: the wiki shortcode is in tooltip for now
+	// the target is in displayDefault
+	ext, exists := page.Opt.External[*tooltip]
+	if !exists {
+		// TODO: proper warning
+		log.Println(page.Name() + ": external wiki '" + *tooltip + "' does not exist")
+		*ok = false
+		return
+	}
+
+	// default tooltip for no section
+	*tooltip = ext.Name + ": " + *target // e.g. Wikipedia: Some Page
+
+	// split by # to get section
+	section := ""
+	split := strings.SplitN(*target, "#", 2)
+	if len(split) == 2 {
+		*target = strings.TrimSpace(split[0])
+		section = strings.TrimSpace(split[1])
+		*tooltip = *target + " # " + section
+	}
+
+	// normalize based on type
+	switch ext.Type {
+
+	// convert all non-alphanumerics to underscore
+	case PageOptExternalTypeQuiki:
+		*target = PageNameLink(*target, false)
+		section = PageNameLink(section, false)
+
+	// convert space to underscore, URI escape the rest
+	case PageOptExternalTypeMediaWiki:
+		*target = html.EscapeString(strings.ReplaceAll(*target, " ", "_"))
+		section = html.EscapeString(strings.ReplaceAll(section, " ", "_"))
+
+	// no special normalization, just URI escapes
+	default: // (PageOptExternalTypeNone)
+		*target = html.EscapeString(*target)
+		section = html.EscapeString(*target)
+	}
+
+	// add the wiki page root
+	*target = ext.Root + "/" + *target
+
+	// add the section back
+	if section != "" {
+		*target += "#" + section
+	}
 }

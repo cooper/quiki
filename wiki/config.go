@@ -38,6 +38,9 @@ var defaultWikiOpt = wikifier.PageOpt{
 	Search: wikifier.PageOptSearch{
 		Enable: true,
 	},
+	External: map[string]wikifier.PageOptExternal{
+		"wp": wikifier.PageOptExternal{"Wikipedia", "https://en.wikipedia.org/wiki", wikifier.PageOptExternalTypeMediaWiki},
+	},
 }
 
 func (w *Wiki) readConfig(file string) error {

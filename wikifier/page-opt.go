@@ -29,6 +29,8 @@ type PageOpt struct {
 	Image        PageOptImage
 	Category     PageOptCategory
 	Search       PageOptSearch
+	Link         PageOptLink
+	External     map[string]PageOptExternal
 	Navigation   []PageOptNavigation
 }
 
@@ -78,6 +80,38 @@ type PageOptSearch struct {
 	Enable bool
 }
 
+// A PageOptLinkFunction sanitizes a link target.
+type PageOptLinkFunction func(page *Page, ok *bool, target, tooltip, displayDefault *string)
+
+// PageOptLink describes functions to assist with link targets.
+type PageOptLink struct {
+	ParseInternal PageOptLinkFunction // internal page links
+	ParseExternal PageOptLinkFunction // external wiki page links
+	ParseCategory PageOptLinkFunction // category links
+}
+
+// PageOptExternalType describes
+type PageOptExternalType string
+
+const (
+	// PageOptExternalTypeQuiki is the external type for quiki sites.
+	PageOptExternalTypeQuiki PageOptExternalType = "quiki"
+
+	// PageOptExternalTypeMediaWiki is the external type for MediaWiki sites.
+	PageOptExternalTypeMediaWiki = "mediawiki"
+
+	// PageOptExternalTypeNone is an external type that can be used for websites that
+	// perform no normalization of page targets beyond normal URI escaping.
+	PageOptExternalTypeNone = "none"
+)
+
+// PageOptExternal describes an external wiki that we can use for link targets.
+type PageOptExternal struct {
+	Name string              // long name (e.g. Wikipedia)
+	Root string              // wiki page root (no trailing slash)
+	Type PageOptExternalType // wiki type
+}
+
 // PageOptNavigation represents an ordered navigation item.
 type PageOptNavigation struct {
 	Link    string // link
@@ -117,6 +151,14 @@ var defaultPageOpt = PageOpt{
 	},
 	Search: PageOptSearch{
 		Enable: true,
+	},
+	Link: PageOptLink{
+		ParseInternal: defaultInternalLink,
+		ParseExternal: defaultExternalLink,
+		ParseCategory: nil,
+	},
+	External: map[string]PageOptExternal{
+		"wp": PageOptExternal{"Wikipedia", "https://en.wikipedia.org/wiki", PageOptExternalTypeMediaWiki},
 	},
 }
 
