@@ -56,9 +56,6 @@ func SizedImageFromName(name string) SizedImage {
 		name = matches[3]
 	}
 
-	// default true width and height to the same
-	trueW, trueH := w, h
-
 	// extract extension
 	nameNE := name
 	ext := ""
@@ -74,8 +71,6 @@ func SizedImageFromName(name string) SizedImage {
 		nameNE = matches[1]
 		scale, _ = strconv.Atoi(matches[2])
 		name = matches[1] + "." + ext
-		trueW *= scale
-		trueH *= scale
 	}
 
 	// put it all together

@@ -100,7 +100,6 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 }
 
 func (p *parser) parseByte(b byte, page *Page) error {
-	// log.Printf("parseByte(%s, last: %s, next: %s)", string(b), string(p.last), string(p.next))
 
 	// fix extra newline added to code{} blocks
 	if p.braceLevel == 0 && b == '{' && p.next == '\n' {
@@ -145,7 +144,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// next byte
 		p.commentLevel++
-		// log.Println("increased comment level to", p.commentLevel)
 		return p.nextByte(b)
 	}
 
@@ -159,7 +157,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// decrease comment level and skip this and next byte
 		p.commentLevel--
-		// log.Println("decreased comment level to", p.commentLevel)
 		p.skip++
 		return p.nextByte(b)
 	}
@@ -189,7 +186,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		} else {
 			var inBlockName, charsScanned int
 			lastContent := p.catch.lastString()
-			// log.Printf("LAST CONTENT: %v", lastContent)
 
 			// if there is no lastContent, give up because the block has no type
 			if len(lastContent) == 0 {
@@ -203,7 +199,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 				// enter/exit block name
 				if lastChar == ']' {
-					// log.Println("entering block name")
 					// entering block name
 					inBlockName++
 
@@ -212,7 +207,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 						continue
 					}
 				} else if lastChar == '[' {
-					// log.Println("exiting block name")
 
 					// exiting block name
 					inBlockName--
@@ -239,14 +233,12 @@ func (p *parser) parseByte(b byte, page *Page) error {
 					continue
 				} else {
 					// not sure. give this byte back and bail
-					// log.Printf("giving up due to: %v", string(lastChar))
 					charsScanned--
 					break
 				}
 			}
 
 			// overwrite last content with the title and name stripped out
-			// log.Printf("Setting last content to: %v", lastContent[:len(lastContent)-charsScanned])
 			p.catch.setLastContent(lastContent[:len(lastContent)-charsScanned])
 
 			// if the block contains dots, it has classes
@@ -277,7 +269,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		// create the block
-		// log.Printf("Creating block: %s[%s]{}", blockType, blockName)
 		block := newBlock(blockType, blockName, blockClasses, p.block, p.catch, p.pos)
 
 		// TODO: produce a warning if the block has a name but the type does not support it
@@ -434,7 +425,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// entering a variable declaration
 		if (b == '@' || b == '%') && p.catch == p.block {
-			// log.Println("variable declaration", string(b))
 
 			// disable interpolation if it's %var
 			if b == '%' {
@@ -468,14 +458,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			if len(p.varName) == 0 {
 				return errors.New("Variable has no name")
 			}
-			// log.Printf("VALUE VAR NAME: %v", p.varName)
 
 			// now catch the value
 			catch := newVariableValue()
 			catch.parent = p.catch
 			p.catch = catch
-
-			// log.Printf("SETTING CATCH FOR VAR: %+v", p.catch)
 
 			return p.nextByte(b)
 		}
@@ -491,7 +478,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			if len(p.varName) == 0 {
 				return errors.New("Variable has no name")
 			}
-			// log.Printf("BOOLEAN VAR NAME: %v", p.varName)
 
 			// set the value
 			page.Set(p.varName, !p.varNegated)
@@ -508,22 +494,15 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				return errors.New("Variable has no name")
 			}
 
-			fmt.Println("Fix values:", p.catch.content())
-
 			// fetch content and clear catch
 			value := fixValuesForStorage(p.catch.content(), page)
-
-			fmt.Println("after:", value)
 			p.catch = p.catch.parentCatch()
-
-			// log.Println("Variable values = ", value)
 
 			switch val := value.(type) {
 			case []interface{}:
 				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
 
 			case string:
-				// log.Println("Got var str:", val)
 
 				// format it unless told not to
 				if !p.varNotInterpolated {
@@ -541,7 +520,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				// once later when it is injected..
 				// just cuz there is no way to tell that it has been done already
 				val.parse(page)
-				// log.Println("Got var block:", val)
 
 			case nil:
 				// empty string
@@ -552,7 +530,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// set the value
-			// log.Println("Setting", p.varName, value)
 			page.Set(p.varName, value)
 
 			p.clearVariableState()
@@ -574,7 +551,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 // (NEXT DEFAULT)
 func (p *parser) handleByte(b byte) error {
-	// log.Println("handleByte", string(b))
 
 	// if we have someplace to append this content, do that
 	if p.catch == nil {
@@ -629,7 +605,6 @@ func (p *parser) handleByte(b byte) error {
 
 // (NEXT BYTE)
 func (p *parser) nextByte(b byte) error {
-	// log.Println("nextByte", string(b))
 
 	// if current byte is \, set escape for the next
 	if b == '\\' && !p.escape && p.braceLevel == 0 {
