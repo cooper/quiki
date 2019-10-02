@@ -25,11 +25,12 @@ var (
 
 // ImageInfo represents a full-size image on the wiki.
 type ImageInfo struct {
-	File     string     `json:"file"`               // filename
-	Width    int        `json:"width,omitempty"`    // full-size width
-	Height   int        `json:"height,omitempty"`   // full-size height
-	Created  *time.Time `json:"created,omitempty"`  // creation time
-	Modified *time.Time `json:"modified,omitempty"` // modify time
+	File       string     `json:"file"`               // filename
+	Width      int        `json:"width,omitempty"`    // full-size width
+	Height     int        `json:"height,omitempty"`   // full-size height
+	Created    *time.Time `json:"created,omitempty"`  // creation time
+	Modified   *time.Time `json:"modified,omitempty"` // modify time
+	Dimensions [][]int    `json:"-"`                  // dimensions used throughout the wiki
 }
 
 // SizedImage represents an image in specific dimensions.
@@ -263,8 +264,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// so, commit a pregeneration request for each scaled version.
 	if img.Scale <= 1 && generateOK {
 		for _, scale := range w.Opt.Image.Retina {
-			scaledImage := img // copy
-			img.Scale = scale  // set scale
+			scaledImage := img        // copy
+			scaledImage.Scale = scale // set scale
 			w.DisplaySizedImageGenerate(scaledImage, true)
 		}
 	}
@@ -368,6 +369,9 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 		info.Width = imageCat.ImageInfo.Width
 		info.Height = imageCat.ImageInfo.Height
 		info.Created = imageCat.Created // category creation time, not image
+		for _, entry := range imageCat.Pages {
+			info.Dimensions = append(info.Dimensions, entry.Dimensions...)
+		}
 		return
 	}
 
