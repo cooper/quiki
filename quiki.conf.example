@@ -29,19 +29,21 @@
 
 
 /* WIKI CONFIGURATIONS --
-   you can configure any number of wikis to be served by this quiki server.
-   below is a working configuration for the included example wiki. */
-   
-/* tells the server to enable the wiki. */
+   you can configure any number of wikis to be served by this quiki */
+
+/* working configuration for the included example wiki --
+   the wiki shortcode (in this case, 'mywiki') will only appear in logs/debug info */
+@server.wiki.mywiki: {
+
+    /* optionally set this to the host to serve this wiki on, according to the HTTP
+       Host header. if unspecified, the wiki will be accessible from all hosts.
+    host: mywiki.com; */
+
+    /* each wiki requires its own configuration file, specified here. see
+       wikis/mywiki/wiki.conf for an example wiki configuration. */
+    config: [@repo]/wikis/mywiki/wiki.conf;
+
+};
+
+/* tells the server to enable mywiki. */
 @server.wiki.mywiki.enable;
-
-/* optionally set this to the host to serve this wiki on, according to the HTTP
-   Host header. if unspecified, the wiki will be accessible from all hosts.
-   this is useful if you are running multiple wikis with clashing roots
-   (e.g. trying to run two wikis on /).
-@server.wiki.mywiki.host: mywiki.com; */
-
-/* now, each wiki requires its own configuration. see wikis/mywiki/wiki.conf
-   for an example wiki configuration. */
-
-@server.wiki.mywiki.config: [@repo]/wikis/mywiki/wiki.conf;
