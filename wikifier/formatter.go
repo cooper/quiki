@@ -573,8 +573,8 @@ func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *
 
 	// convert space to underscore, URI escape the rest
 	case PageOptExternalTypeMediaWiki:
-		*target = html.EscapeString(strings.ReplaceAll(*target, " ", "_"))
-		section = html.EscapeString(strings.ReplaceAll(section, " ", "_"))
+		*target = html.EscapeString(strings.Replace(*target, " ", "_", -1))
+		section = html.EscapeString(strings.Replace(section, " ", "_", -1))
 
 	// no special normalization, just URI escapes
 	default: // (PageOptExternalTypeNone)
