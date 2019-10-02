@@ -271,10 +271,6 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 			return errors.New("navigation: must be map{}")
 		}
 
-		// since this runs in vars only mode,
-		// have to force generate html to evalute variables
-		navMap.html(page, navMap.el())
-
 		for _, display := range navMap.OrderedKeys() {
 			link, err := navMap.GetStr(display)
 			display = strings.Replace(display, "_", " ", -1)
