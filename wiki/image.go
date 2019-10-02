@@ -383,7 +383,7 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 	width, height := img.TrueWidth(), img.TrueHeight()
 
 	// open the full-size image
-	fsImage, err := imaging.Open(bigPath)
+	bigImage, err := imaging.Open(bigPath)
 	if err != nil {
 		return DisplayError{
 			Error:         "Image does not exist.",
@@ -401,7 +401,7 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 	}
 
 	// create resized image
-	newImage := imaging.Resize(fsImage, width, height, imaging.Lanczos)
+	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)
 
 	// generate the image in the source format and write
 	newImagePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
