@@ -436,10 +436,7 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 		return
 	}
 	scalePath := w.Opt.Dir.Cache + "/image/" + img.ScaleName()
-	_, err := os.Lstat(scalePath)
-	if err != nil {
-		os.Symlink(name, scalePath)
-	}
+	os.Symlink(name, scalePath)
 }
 
 func getImageDimensions(path string) (w, h int) {
