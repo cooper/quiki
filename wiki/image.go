@@ -161,15 +161,12 @@ type DisplayImage struct {
 	// suitable for use in the Content-Length header
 	Length int64 `json:"length,omitempty"`
 
-	// UNIX timestamp of when the image was last modified.
+	// time when the image was last modified.
 	// if Generated is true, this is the current time.
 	// if FromCache is true, this is the modified date of the cache file.
 	// otherwise, this is the modified date of the image file itself.
-	ModUnix int64 `json:"mod_unix,omitempty"`
-
-	// like ModUnix except in HTTP date format
-	// suitable for Last-Modified header
-	Modified string `json:"modified,omitempty"`
+	Modified     *time.Time `json:"modified,omitempty"`
+	ModifiedHTTP string     `json:"modified_http,omitempty"` // HTTP format for Last-Modified
 
 	// true if the content being sered was read from a cache file.
 	// opposite of Generated
@@ -248,8 +245,9 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 
 	// if both dimensions are missing, display the full-size version of the image
 	if img.Width == 0 && img.Height == 0 {
-		r.Modified = httpdate.Time2Str(fi.ModTime())
-		r.ModUnix = fi.ModTime().Unix()
+		mod := fi.ModTime()
+		r.Modified = &mod
+		r.ModifiedHTTP = httpdate.Time2Str(mod)
 		r.Length = fi.Size()
 		return r
 	}
@@ -290,11 +288,12 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		} else {
 
 			// it exists and the cache file is newer
+			mod := cacheFi.ModTime()
 			r.Path = cachePath
 			r.File = filepath.Base(cachePath)
 			r.FromCache = true
-			r.Modified = httpdate.Time2Str(cacheFi.ModTime())
-			r.ModUnix = cacheFi.ModTime().Unix()
+			r.Modified = &mod
+			r.ModifiedHTTP = httpdate.Time2Str(mod)
 			r.Length = cacheFi.Size()
 
 			// symlink if necessary
@@ -416,11 +415,12 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 	newImageFi, _ := os.Lstat(newImagePath)
 
 	// inject info from the newly generated image
+	mod := newImageFi.ModTime()
 	r.Path = newImagePath
 	r.File = filepath.Base(newImagePath)
 	r.Generated = true
-	r.Modified = httpdate.Time2Str(newImageFi.ModTime())
-	r.ModUnix = newImageFi.ModTime().Unix()
+	r.Modified = &mod
+	r.ModifiedHTTP = httpdate.Time2Str(mod)
 	r.Length = newImageFi.Size()
 	r.CacheGenerated = true
 
