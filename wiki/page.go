@@ -255,8 +255,8 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 
 	// generate page info
 	info := pageJSONManifest{
-		CSS:        page.CSS(),
-		Categories: []string{}, // TODO
+		CSS:        r.CSS,
+		Categories: r.Categories,
 		Warnings:   []string{}, // TODO
 		Error:      "",         // TODO
 		PageInfo:   page.Info(),
