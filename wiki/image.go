@@ -196,18 +196,33 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	var r DisplayImage
 
 	// check if the file exists
-	path := w.pathForImage(img.FullSizeName())
-	fi, err := os.Lstat(path)
+	bigPath := w.pathForImage(img.FullSizeName())
+	fi, err := os.Lstat(bigPath)
 	if err != nil {
 		return DisplayError{
 			Error:         "Image does not exist.",
-			DetailedError: "Image '" + path + "' error: " + err.Error(),
+			DetailedError: "Image '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
+	// get full size dimensions
+	bigW, bigH := getImageDimensions(bigPath)
+
+	// find missing dimension
+	// note: we haven't checked if both are 0 yet, but this will return 0, 0 in that case
+	oldName := img.FullName()
+	img.Width, img.Height = calculateImageDimensions(bigW, bigH, img.Width, img.Height)
+
+	// check if the name has changed after this adjustment.
+	// if so, redirect
+	fullName := img.FullName()
+	if fullName != oldName {
+		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + fullName}
+	}
+
 	// image name and full path
-	r.Path = path
-	r.FullsizePath = path
+	r.Path = bigPath
+	r.FullsizePath = bigPath
 	r.File = filepath.Base(r.Path)
 
 	// image type and mime type
@@ -220,7 +235,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	} else {
 		return DisplayError{
 			Error:         "Unknown image type.",
-			DetailedError: "Image '" + path + "' is neither png nor jpeg",
+			DetailedError: "Image '" + bigPath + "' is neither png nor jpeg",
 		}
 	}
 
@@ -257,8 +272,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// #=========================#
 
 	// look for cached version
-	cachePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
-	wikifier.MakeDir(w.Opt.Dir.Cache+"/image/", img.FullName())
+	cachePath := w.Opt.Dir.Cache + "/image/" + fullName
+	wikifier.MakeDir(w.Opt.Dir.Cache+"/image/", fullName)
 	cacheFi, err := os.Lstat(cachePath)
 
 	// it exists
@@ -279,7 +294,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 			r.Length = cacheFi.Size()
 
 			// symlink if necessary
-			w.symlinkScaledImage(img, img.FullName())
+			w.symlinkScaledImage(img, fullName)
 
 			return r
 		}
@@ -303,7 +318,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// }
 
 	// generate the image
-	if dispErr := w.generateImage(img, &r); dispErr != nil {
+	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
 		return dispErr
 	}
 
@@ -360,28 +375,15 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 	return
 }
 
-func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
+func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) interface{} {
+	width, height := img.TrueWidth(), img.TrueHeight()
 
-	// open the full size image
-	fsPath := w.pathForImage(img.FullSizeName())
-	bigW, bigH := getImageDimensions(fsPath)
-
-	// find missing dimension
-	width, height := calculateImageDimensions(bigW, bigH, img.TrueWidth(), img.TrueHeight())
-
-	// inject new dimensions
-	img.Width, img.Height = width, height
-	if img.Scale > 1 {
-		img.Width /= img.Scale
-		img.Height /= img.Scale
-	}
-
-	// decode it
-	fsImage, err := imaging.Open(fsPath)
+	// open the full-size image
+	fsImage, err := imaging.Open(bigPath)
 	if err != nil {
 		return DisplayError{
 			Error:         "Image does not exist.",
-			DetailedError: "Decode image '" + fsPath + "' error: " + err.Error(),
+			DetailedError: "Decode image '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
@@ -403,7 +405,7 @@ func (w *Wiki) generateImage(img SizedImage, r *DisplayImage) interface{} {
 	if err != nil {
 		return DisplayError{
 			Error:         "Failed to generate image.",
-			DetailedError: "Save image '" + fsPath + "' error: " + err.Error(),
+			DetailedError: "Save image '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
@@ -446,6 +448,9 @@ func getImageDimensions(path string) (w, h int) {
 
 // determine missing dimensions
 func calculateImageDimensions(bigW, bigH, width, height int) (int, int) {
+	if width == 0 && height == 0 {
+		return 0, 0
+	}
 	if width == 0 {
 		tmpW := float64(height) * float64(bigW) / float64(bigH)
 		width = int(math.Max(1.0, math.Floor(tmpW+0.5)))
