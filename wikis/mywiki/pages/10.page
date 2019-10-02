@@ -6,3 +6,7 @@
 This page should be second in line because it has an explicit 0 creation time value.
 
 It references [[ another page | 11 ]]. 
+
+It links to [[ Google | https://google.com ]].
+
+It also links to [[ an actual absolute HTTP path | $ /somelink ]].

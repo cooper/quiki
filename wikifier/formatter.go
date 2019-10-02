@@ -10,7 +10,7 @@ import (
 
 var (
 	variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
-	linkRegex     = regexp.MustCompile(`^((\w+)://|\$)`)
+	linkRegex     = regexp.MustCompile(`^((\w+)://|\$)\s*`)
 	mailRegex     = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
 	colorRegex    = regexp.MustCompile(`(?i)^#[\da-f]+$`)
 	wikiRegex     = regexp.MustCompile(`^(\w+):(.*)$`)
@@ -453,7 +453,6 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
-	var handler PageOptLinkFunction
 
 	// nothing in, nothing out
 	if link == "" {
@@ -472,13 +471,22 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	tooltip = target
 	displayDefault = target
 
+	var handler PageOptLinkFunction
 	if matches := linkRegex.FindStringSubmatch(target); len(matches) != 0 {
 		// http://google.com or $/something (see wikifier issue #68)
 
 		linkType = "other"
 
-		// erase the scheme or $
-		displayDefault = linkRegex.ReplaceAllString(matches[1], "")
+		// tooltip can't really add any value
+		tooltip = ""
+
+		// erase the scheme or $ from display
+		displayDefault = linkRegex.ReplaceAllString(target, "")
+
+		// erase the $ from target
+		if target[0] == '$' {
+			target = displayDefault
+		}
 
 	} else if strings.HasPrefix(target, "mailto:") {
 		// mailto:someone@example.com

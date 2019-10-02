@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
@@ -368,7 +367,6 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 
 	}
 
-	fmt.Println("preserve", cat.Path, preserve)
 	return !preserve
 }
 
