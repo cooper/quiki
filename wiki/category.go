@@ -466,7 +466,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 		}
 
 		// TODO: check for @category.name.main
-		// and if present, set CreatedUnix = infinity
+		// and if present, set Created = infinity
 
 		// store page result
 		pages = append(pages, pageR)
