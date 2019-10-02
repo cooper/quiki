@@ -1,6 +1,6 @@
 // Package monitor provides a file monitor that pre-generates
 // wiki pages and images each time a change is detected on the filesystem.
-package main
+package monitor
 
 import (
 	"fmt"
@@ -19,7 +19,8 @@ type wikiMonitor struct {
 	watching map[string]bool
 }
 
-func watchWiki(w *wiki.Wiki) {
+// WatchWiki starts a file monitor loop for the provided wiki.
+func WatchWiki(w *wiki.Wiki) {
 
 	// creates a new file watcher
 	watcher, _ := fsnotify.NewWatcher()
@@ -121,15 +122,6 @@ func watchWiki(w *wiki.Wiki) {
 	}()
 
 	<-done
-}
-
-// main
-func main() {
-	w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
-	if err != nil {
-		panic(err)
-	}
-	watchWiki(w)
 }
 
 func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {

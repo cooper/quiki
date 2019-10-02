@@ -9,6 +9,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/cooper/quiki/monitor"
 	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -70,18 +71,24 @@ func initWikis() error {
 		}
 
 		// create wiki
-		wi, err := wiki.NewWiki(wikiConfPath, privConfPath)
+		w, err := wiki.NewWiki(wikiConfPath, privConfPath)
 		if err != nil {
 			return err
 		}
-		w := &wikiInfo{Wiki: wi, host: wikiHost, name: wikiName}
+		wi := &wikiInfo{Wiki: w, host: wikiHost, name: wikiName}
 
-		// set up the wiki
-		if err := setupWiki(w); err != nil {
+		// pregenerate
+		w.Pregenerate()
+
+		// monitor for changes
+		go monitor.WatchWiki(w)
+
+		// set up the wiki for webserver
+		if err := setupWiki(wi); err != nil {
 			return err
 		}
 
-		wikis[wikiName] = w
+		wikis[wikiName] = wi
 	}
 
 	// still no wikis?
