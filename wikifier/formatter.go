@@ -452,14 +452,14 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
+	displayDefault := ""
 	if len(split) == 2 {
 		display = page.formatText(strings.TrimSpace(split[0]))
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
+		displayDefault = target
 	}
-
-	displayDefault := ""
 
 	if matches := linkRegex.FindStringSubmatch(target); len(matches) != 0 {
 		// http://google.com or $/something (see wikifier issue #68)
@@ -499,6 +499,8 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 
 	} else if strings.HasPrefix(target, "~") {
 		// ~ some category
+
+		linkType = "category"
 
 		tooltip = strings.TrimPrefix(target, "~")
 		target = page.Opt.Root.Category + "/" + CategoryNameNE(tooltip, false)
