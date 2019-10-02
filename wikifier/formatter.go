@@ -459,7 +459,6 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	if link == "" {
 		return
 	}
-	fmt.Println("parseLink", link)
 
 	// split into display and target
 	split := strings.SplitN(link, "|", 2)
@@ -469,9 +468,9 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
-		displayDefault = target
 	}
 	tooltip = target
+	displayDefault = target
 
 	if matches := linkRegex.FindStringSubmatch(target); len(matches) != 0 {
 		// http://google.com or $/something (see wikifier issue #68)
@@ -522,9 +521,6 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		linkType = "internal"
 		target = page.Opt.Root.Page + "/" + PageNameNE(target)
 		handler = page.Opt.Link.ParseInternal
-		// if handler == nil {
-		// 	handler = defaultInternalLink
-		// }
 	}
 
 	// call link handler

@@ -4,3 +4,5 @@
 @category.mytopic;
 
 This page should be second in line because it has an explicit 0 creation time value.
+
+It references [[ another page | 11 ]]. 
