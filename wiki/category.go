@@ -424,7 +424,12 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		pageCat.addPageExtras(w, page, nil, lines)
 	}
 
-	// TODO: model categories
+	// model tracking categories
+	for modelName := range page.Models {
+		modelCat := w.GetSpecialCategory(modelName, CategoryTypeModel)
+		modelCat.Preserve = true // keep until there are no more references
+		modelCat.AddPage(w, page)
+	}
 }
 
 // DisplayCategoryPosts returns the display result for a category.
