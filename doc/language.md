@@ -1,8 +1,23 @@
 # Language
 
 quiki's source language is designed to be easily legible by the naked eye.
-That's the main goal: anyone can read it and know what's going on.
-(Have you tried looking at a Wikipedia page source?)
+That's the main goal: Anyone can read it and know what's going on.
+(Have you tried looking at a Wikipedia page source?) Anyone can write it, too.
+
+```
+infobox [quiki] {
+    image {
+        file: quiki-logo.png;
+    };
+    Type:           [[ Wiki ]] suite;
+    Established:    February 2013;
+    Author:         [[ Mitchell Cooper | https://github.com/cooper ]];
+    Website:        [[ https://quiki.mitchellcooper.me ]];
+    Code:           [[ quiki on GitHub | https://github.com/cooper/quiki ]];
+}
+
+quiki is a file-based wiki suite and standalone web server.
+```
 
 * [Language](#language)
   * [Syntax](#syntax)
@@ -11,6 +26,7 @@ That's the main goal: anyone can read it and know what's going on.
   * [Blocks](#blocks)
       * [Nameless blocks](#nameless-blocks)
       * [Named blocks](#named-blocks)
+      * [Inferred block types](#inferred-block-types)
       * [Model shorthand](#model-shorthand)
       * [Data types](#data-types)
   * [Variables](#variables)
