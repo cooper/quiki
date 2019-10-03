@@ -255,10 +255,7 @@ Once variables are assigned, they are typically used in
 [formatted text](#text-formatting) or [conditionals](#conditionals). You can use
 variables anywhere that formatted text is accepted like this:
 ```
-sec {
-    This is a paragraph inside a section. I am allow to use [b]bold text[/b],
-    as well as [@variables].
-}
+I am allow to use [b]bold text[/b], as well as [@variables].
 ```
 
 If the variable contains a block, you can display it using `{@var_name}`. This
@@ -270,7 +267,7 @@ like with the `[@var_name]` syntax. So if you have:
     States:         50;
 };
 ```
-You would display the infobox later using:
+You can display the infobox later using:
 ```
 {@my_box}
 ```
@@ -298,7 +295,7 @@ Variables can have **attributes**. This helps to organize things:
 ```
 
 You don't have to worry about whether a variable exists to define attributes on
-it. A new [`map{}`](blocks.md#map) will be created on the fly if necessary
+it. A new [`map{}`](blocks.md#map) is created on the fly if necessary
 (in the above example, `@page` does not initially exist, but an empty map is
 allocated automatically).
 
@@ -389,7 +386,7 @@ parser. Therefore if you do something like:
 ```
 @my_text: This string variable has [b]bold text[/b];
 ```
-and then try to display it with `[%my_text]`, the variable will be
+and then try to display it with `[%my_text]`, the variable is
 double-formatted, resulting in ugly escaped HTML tags visible to clients.
 
 ### Special variables
