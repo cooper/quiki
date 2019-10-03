@@ -495,7 +495,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// fetch content and clear catch
-			value := fixValuesForStorage(p.catch.content(), page)
+			value := fixValuesForStorage(p.catch.content(), page, true)
 			p.catch = p.catch.parentCatch()
 
 			switch val := value.(type) {

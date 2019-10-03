@@ -116,7 +116,7 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 		// terminates a value
 
 		// store the value
-		valueToStore := fixValuesForStorage(p.values, page)
+		valueToStore := fixValuesForStorage(p.values, page, true)
 		l.list = append(l.list, &listEntry{
 			value: valueToStore,               // string, block, or mixed []interface{}
 			typ:   getValueType(valueToStore), // type of value
