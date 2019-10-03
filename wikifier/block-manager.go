@@ -30,14 +30,18 @@ func newBlock(blockType, blockName string, blockClasses []string, parentBlock bl
 	if alias, exist := blockAliases[blockType]; exist {
 		blockType = alias
 	}
+	el := newElement("div", blockType)
+	for _, class := range blockClasses {
+		el.addClass("!qc-" + class)
+	}
 	underlying := &parserBlock{
 		openPos:      pos,
 		parentB:      parentBlock,
 		parentC:      parentCatch,
 		typ:          blockType,
 		name:         blockName,
-		classes:      blockClasses, // TODO: add them to the element with prefix qc-
-		element:      newElement("div", blockType),
+		classes:      blockClasses,
+		element:      el,
 		genericCatch: &genericCatch{},
 	}
 	if init, ok := blockInitializers[blockType]; ok {
