@@ -2,4 +2,5 @@
 
 @category.mytopic;
 
-Page three.
+Page three. It uses a model:
+$obnoxious { worksWith: variables; }

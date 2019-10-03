@@ -25,6 +25,7 @@ type Page struct {
 	parser     *parser            // wikifier parser instance
 	main       block              // main block
 	Images     map[string][][]int // references to images
+	Models     map[string]bool    // references to models
 	PageLinks  map[string][]int   // references to other pages
 	sectionN   int
 	headingIDs map[string]int
@@ -52,6 +53,7 @@ func NewPage(filePath string) *Page {
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
 		Images:        make(map[string][][]int),
+		Models:        make(map[string]bool),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
 	}
@@ -342,6 +344,10 @@ func (p *Page) Info() PageInfo {
 		info.Created = &create
 	}
 	return info
+}
+
+func (p *Page) mainBlock() block {
+	return p.main
 }
 
 // resets the parser

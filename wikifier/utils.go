@@ -383,6 +383,11 @@ func CategoryNameNE(name string, noLower bool) string {
 	return strings.TrimSuffix(PageNameLink(name, noLower), ".cat")
 }
 
+// ModelName returns a clean model name.
+func ModelName(name string) string {
+	return PageNameExt(name, ".model")
+}
+
 // MakeDir creates directories recursively.
 func MakeDir(dir, name string) {
 	pfx := filepath.Dir(name)

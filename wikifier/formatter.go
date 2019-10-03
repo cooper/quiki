@@ -335,6 +335,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 			val, err := page.Get(formatType[1:])
 			if err != nil {
 				// TODO: Produce warning wrapping error unless noWarnings
+				log.Printf("parseFormatType(%s): %v", formatType, err)
 				return HTML("(error)")
 			}
 			if val == nil {
@@ -344,9 +345,17 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 			// format text if this is %var
 			strVal, ok := val.(string)
+			if !ok {
+				var htmlVal HTML
+				htmlVal, ok = val.(HTML)
+				if ok {
+					strVal = string(htmlVal)
+				}
+			}
 			if formatType[0] == '%' {
 				if !ok {
 					// TODO: Produce warning that attempted to interpolate non-string
+					log.Printf("parseFormatType(%s): tried to interpolate non-string: %v", formatType, val)
 					return HTML("(error)")
 				}
 				return page.formatTextOpts(strVal, fmtOpt{noVariables: true})
@@ -531,6 +540,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		linkType = "internal"
 
 		// determine page prefix
+		// TODO: resolve . and .. safely
 		pfx := page.Prefix()
 		if pfx != "" {
 			pfx += "/"
