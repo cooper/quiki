@@ -190,8 +190,48 @@ blocktype [block name] {
 Example
 ```
 sec [Statistics] {
-    NoTrollPlzNet Library's online division currently hosts
+    This website currently hosts
     [@stats.site.articles] articles.
+}
+```
+
+#### Block type inference
+
+quiki assumes block type `sec{}` for any named block whose type is unspecified.
+
+That example from just above can be more conveniently written as
+
+```
+[Statistics] {
+    This website currently hosts
+    [@stats.site.articles] articles.
+}
+```
+
+The one exception to this is that if the immediate parent is `infobox{}`, an
+`infosec{}` is assumed instead:
+
+```
+infobox [United States of America] {
+
+    Capital:        [! Washington, DC !];  
+    Largest city:   [! New York City !];   
+
+    [Goverment] {
+        :[! Federal presidential constitutional republic | Republic !];   
+        President:              [! Donald Trump !];
+        Vice President:         [! Mike Pence !];
+        Speaker of the House:   [! Paul Ryan !];
+        Chief Justice:          [! John Roberts !];
+    };
+    
+    [Independence[nl]from [! Great Britain !]] {
+        Declaration:            July 4, 1776;
+        Confederation:          March 1, 1781;
+        Treaty of Paris:        September 3, 1783;
+        Constitution:           June 21, 1788;
+        Last polity admitted:   March 24, 1976;
+    };
 }
 ```
 
@@ -313,10 +353,9 @@ Some block types support attribute fetching and/or setting:
 
 /* access attributes from it elsewhere
    btw this works for all map-based block types */
-sec {
-    Did you know that [@person.First_name] [@person.Last_name] is
-    [@person.Age] years old?
-}
+
+Did you know that [@person.First_name] [@person.Last_name] is
+[@person.Age] years old?
 ```
 
 Some data types may not support attributes at all. Others might only support
