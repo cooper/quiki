@@ -1,11 +1,13 @@
 # Language
 
 quiki's source language is designed to be easily legible by the naked eye.
+That's the main goal: anyone can read it and know what's going on.
+(Have you tried looking at a Wikipedia page source?)
 
 * [Language](#language)
   * [Syntax](#syntax)
     * [Comments](#comments)
-    * [Escaping](#escaping)
+    * [Escapes](#escapes)
   * [Blocks](#blocks)
       * [Nameless blocks](#nameless-blocks)
       * [Named blocks](#named-blocks)
@@ -29,7 +31,7 @@ quiki's source language is designed to be easily legible by the naked eye.
 ## Syntax
 
 The quiki source language is [parsed hierarchically](technical/parsing.md).
-The source is divided into components called [blocks](#blocks), each of which
+The source is divided into [blocks](#blocks), each of which
 is responsible for parsing its inner contents. The master parser is
 concerned only with the most basic syntax:
 * Dividing the source into [blocks](#blocks)
@@ -58,7 +60,7 @@ These can span multiple lines and be nested within each other:
 */
 ```
 
-### Escaping
+### Escapes
 
 Some characters must be escaped for literal use. The escape character (`\`)
 denotes the character immediately following it as escaped.
