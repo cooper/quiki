@@ -24,13 +24,13 @@ go get github.com/cooper/quiki
 
 ## configure
 
+quiki ships with a working example configuration.  
+there is also a detailed [configuration spec](doc/configuration.md).
+
 ```sh
 cp quiki.conf.example quiki.conf
 nano -w quiki.conf
 ```
-
-there is a detailed [configuration spec](doc/configuration.md)
-in addition to the example configuration
 
 ## run
 

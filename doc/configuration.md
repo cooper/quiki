@@ -39,8 +39,10 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [admin\.[username]\.password](#adminusernamepassword)
   * [Webserver options](#server-options)
     * [server\.dir\.wiki](#serverdirwiki)
-    * [server\.socket\.path](#serversocketpath)
     * [server\.enable\.pregeneration](#serverenablepregeneration)
+    * [server\.enable\.monitor](#serverenablemonitor)
+    * [server\.http\.port](#serverhttpport)
+    * [server\.http\.bind](#serverhttpbind)
     * [server\.wiki\.[name]\.enable](#serverwikinameenable)
     * [server\.wiki\.[name]\.config](#serverwikinameconfig)
     * [server\.wiki\.[name]\.private](#serverwikinameprivate)
@@ -463,12 +465,20 @@ __Required__. Port for HTTP server to listen on.
 server.http.port: 8080;
 ```
 
+You can also say `unix` to listen on a UNIX socket.
+
 ### server.http.bind
 
 _Optional_. Host to bind to.
 
 ```
 @server.http.bind: 127.0.0.1;
+```
+
+Or, you can listen on a UNIX socket:
+```
+@server.http.port:  unix;
+@server.http.bind:  /var/run/quiki.sock;
 ```
 
 __Default__: none (bind to all available hosts)
