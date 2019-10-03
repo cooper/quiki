@@ -9,7 +9,6 @@ it sports caching, image generation, category management,
 [templates](doc/models.md),
 [markdown integration](doc/markdown.md),
 git-based revision tracking, and much more.
-
 [adminifier](https://github.com/cooper/adminifier), a sister project, is an
 administrative panel featuring a web-based editor.
 
@@ -25,13 +24,13 @@ go get github.com/cooper/quiki
 
 ## configure
 
-copy and edit the example configuration:
 ```sh
 cp quiki.conf.example quiki.conf
 nano -w quiki.conf
 ```
 
-there is also a detailed [configuration spec](doc/configuration.md).
+there is a detailed [configuration spec](doc/configuration.md)
+in addition to the example configuration
 
 ## run
 
