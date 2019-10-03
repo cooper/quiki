@@ -15,10 +15,10 @@ blocks, see [Language](language.md#blocks).
   * [Infobox](#infobox) - Table to summarize article information
   * [Invisible](#invisible) - Silences all other blocks
   * [List](#list) - An ordered list datatype as well as `<ul>`
-  * [Model](#model) - wikifier templates
+  * [Model](#model) - quiki templates
   * [Paragraph](#paragraph) - `<p>`
   * [Section](#section) - Article section with optional header
-  * [Style](#style) - Use CSS with wikifier
+  * [Style](#style) - Use CSS with quiki
 
 ## Clear
 
@@ -82,7 +82,7 @@ used with [models](#model).
 format {
     <div>
         This is some HTML.
-        [b]wikifier formatting[/b] is allowed.
+        [b]quiki formatting[/b] is allowed.
     </div>
 }
 ```
@@ -154,7 +154,7 @@ infobox [My Article] {
 
 **Attributes**. Maps and all map-based block types support attribute fetching
 and assignment, which allows you to retrieve and set their values using the
-wikifier variable attribute syntax.
+quiki variable attribute syntax.
 ```
 /* define the infobox in a variable so we can access attributes */
 @person: infobox [Britney Spears] {
@@ -400,7 +400,7 @@ list {
 ```
 
 **Attributes**. Lists support attribute fetching and assignment, which allows
-you to retrieve and set their values using the wikifier variable attribute
+you to retrieve and set their values using the quiki variable attribute
 syntax.
 ```
 @alphabet: list {
@@ -480,7 +480,7 @@ sec [More stuff] {
 
 ## Style
 
-Allows you to use CSS with Wikifier.
+Allows you to use CSS with quiki.
 
 See [Styling](styling.md).
 

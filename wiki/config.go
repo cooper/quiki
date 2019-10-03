@@ -29,7 +29,6 @@ var defaultWikiOpt = wikifier.PageOpt{
 	Image: wikifier.PageOptImage{
 		Retina:     []int{2, 3},
 		SizeMethod: "server",
-		Rounding:   "normal",
 		Calc:       defaultImageCalc,
 		Sizer:      defaultImageSizer,
 	},

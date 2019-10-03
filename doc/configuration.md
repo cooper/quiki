@@ -1,51 +1,43 @@
 # Configuration
 
 This document describes all of the available configuration options. The options
-are categorized by the lowest-level wikifier interface at which they are used.
+are categorized by the lowest-level quiki interface at which they are used.
 Some are required for the generation of a single page, others for the operation
 of a full wiki, and others yet for the operation of a wikiserver.
 
 * [Configuration](#configuration)
-    * [Configuration files](#configuration-files)
-    * [Configuration directly from code](#configuration-directly-from-code)
-  * [Wikifier::Page options](#wikifierpage-options)
+  * [Configuration files](#configuration-files)
+  * [Page options](#page-options)
     * [name](#name)
     * [root](#root)
     * [dir](#dir)
     * [external](#external)
     * [page\.enable\.title](#pageenabletitle)
-    * [page\.enable\.footer](#pageenablefooter)
     * [image\.size\_method](#imagesize_method)
     * [image\.calc](#imagecalc)
-    * [image\.rounding](#imagerounding)
     * [image\.sizer](#imagesizer)
-  * [Wikifier::Wiki public options](#wikifierwiki-public-options)
+  * [Wiki public options](#wiki-public-options)
+    * [page\.enable\.cache](#pageenablecache)
+    * [image\.retina](#imageretina)
     * [image\.type](#imagetype)
     * [image\.quality](#imagequality)
-    * [image\.enable\.retina](#imageenableretina)
-    * [image\.enable\.pregeneration](#imageenablepregeneration)
-    * [image\.enable\.tracking](#imageenabletracking)
-    * [image\.enable\.restriction](#imageenablerestriction)
-    * [image\.enable\.cache](#imageenablecache)
-    * [page\.enable\.cache](#pageenablecache)
     * [cat\.per\_page](#catper_page)
     * [cat\.[name]\.main](#catnamemain)
     * [cat\.[name]\.title](#catnametitle)
     * [var\.\*](#var)
-  * [Wikifier::Wiki extended options](#wikifierwiki-extended-options)
+  * [Wiki extended options](#wiki-extended-options)
     * [main\_page](#main_page)
     * [main\_redirect](#main_redirect)
     * [error\_page](#error_page)
     * [navigation](#navigation)
     * [template](#template)
     * [logo](#logo)
-  * [Wikifier::Wiki private options](#wikifierwiki-private-options)
+  * [Wiki private options](#wiki-private-options)
     * [admin\.[username]\.name](#adminusernamename)
     * [admin\.[username]\.email](#adminusernameemail)
     * [admin\.[username]\.crypt](#adminusernamecrypt)
     * [admin\.[username]\.password](#adminusernamepassword)
-  * [Wikifier::Server options](#wikifierserver-options)
-    * [server\.dir\.wikifier](#serverdirwikifier)
+  * [Webserver options](#server-options)
     * [server\.dir\.wiki](#serverdirwiki)
     * [server\.socket\.path](#serversocketpath)
     * [server\.enable\.pregeneration](#serverenablepregeneration)
@@ -54,66 +46,36 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [server\.wiki\.[name]\.private](#serverwikinameprivate)
     * [server\.wiki\.[name]\.password](#serverwikinamepassword)
 
-### Configuration files
+## Configuration files
 
 The primary method of configuration is to define options in a configuration
-file. All wikifier configuration files are written in the wikifier language:
+file. All quiki configuration files are written in the quiki language:
 
-    @name:          MyWiki;
-    @dir.wiki:      /home/www/mywiki;
-    @dir.page:      [@dir.wiki]/pages;
-    @image.enable.pregeneration;        /* enable a boolean option */
+    @name:          MyWiki;             /* assign a string option */
+    @dir.wiki:      /home/www/mywiki;   
+    @dir.page:      [@dir.wiki]/pages;  /* string option with embeded variable */
+    @page.enable.cache;                 /* enable a boolean option */
     -@page.enable.title;                /* disable a boolean option */
 
-If you are using a **wikiserver**, you must have a dedicated configuration file
-for the server. This tells it where to listen and where to find the wikis you
-have configured on the server. This is typically called `wikiserver.conf`, and
-it is required as the first argument to the `wikiserver` executable.
+If you are using **quiki webserver**, you must have a dedicated configuration
+file for the webserver. This tells it where to listen and where to find the
+wikis you have configured on the server. This is typically called `quiki.conf`,
+and it is required as the first argument to the `quiki` executable.
 
-**Every wiki** also requires its own configuration file. It may make sense to
-store your wiki configuration file at a path outside of the wiki root, just in
-case it contains sensitive information. If you are using a wikiserver, the path
-of each wiki's configuration file is defined in the server configuration using
-the [`server.wiki.[name].config`](#serverwikinameconfig) option. If you are
-using Wikifier::Wiki directly, the path to the wiki configuration must be
-provided to the constructor:
-```perl
-my $wiki = Wikifier::Wiki->new(config_file => '/home/www/mywiki/wiki.conf');
-```
+**Every wiki** also requires its own configuration file, usually called
+`wiki.conf` at the root level of the wiki directory.
+When using webserver, the path of each wiki's configuration file is defined in
+the server configuration (`quiki.conf`) by
+[`server.wiki.[name].config`](#serverwikinameconfig).
 
 Each wiki can optionally have a **private configuration** file. This is where
-the credentials of administrators can exist more securely than in the primary
-configuration. This file certainly should not be within the wiki root because
-that would probably allow anyone to download it from the web server. If you are
-using a wikiserver, the path of the private configuration is defined by
-[`server.wiki.[name].private`](#serverwikinameprivate). If you are using
-Wikifier::Wiki directly, the path to the private configuration may be provided
-to the constructor:
-```perl
-my $wiki = Wikifier::Wiki->new(
-    config_file  => '/home/www/mywiki/wiki.conf',
-    private_file => '/home/www/mywiki-private.conf',
-);
-```
+the administrative credentials and any other sensitive data can be stored.
+This file is located elsewhere than the wiki directory so as to void any
+possibility of it being served to HTTP clients.
+When using webserver, this is defined by
+[`server.wiki.[name].private`](#serverwikinameprivate).
 
-### Configuration directly from code
-
-Another method of defining configuration values (rather than in a configuration
-file) is to do so directly from the code where you initialize the interface.
-This is probably only useful if you are using Wikifier::Page directly:
-
-```perl
-my $page = Wikifier::Page->new(
-    file_path => $path,
-    opts => {
-        'name' => 'MyWiki',
-        'root.wiki' => '/wiki',
-        'root.page' => '/wiki/page'
-    }
-);
-```
-
-## Wikifier::Page options
+## Page options
 
 ### name
 
@@ -140,14 +102,6 @@ It may be useful to use `root.wiki` within the definitions of the rest:
     @root.page:     [@root.wiki]/page;
     @root.image:    [@root.wiki]/images;
 
-If you are using Wikifier::Wiki (or a wikiserver) in conjunction with
-[`image.enable.cache`](#imageenablecache) and
-[`image.enable.pregeneration`](#imageenablepregeneration), you should set
-root.image to wherever your cache directory can be found on the HTTP root. This
-is where generated images are cached, and full-sized images are symbolically
-linked to. This allows the web server to deliver images directly, which is
-certainly most efficient.
-
 If you specify `root.file`, the entire wiki directory (as specified by
 [`dir.wiki`](#dir)) will be indexed by the web server at this path. Note
 that this will likely expose your wiki configuration.
@@ -156,8 +110,7 @@ that this will likely expose your wiki configuration.
 
 | Option            | Description                                           |
 | -----             | -----                                                 |
-| `dir.wikifier`    | wikifier repository                                   |
-| `dir.wiki`        | Wiki root directory                                   |
+| `dir.wiki`        | Wiki root directory (usually inferred)                |
 | `dir.page`        | Page files stored here                                |
 | `dir.image`       | Image originals stored here                           |
 | `dir.model`       | Model files stored here                               |
@@ -166,18 +119,17 @@ that this will likely expose your wiki configuration.
 
 Directories on the filesystem. It is strongly recommended that they are
 absolute paths; otherwise they will be dictated by whichever directory the
-script is started from. All are required except `dir.wikifier` and `dir.wiki`.
+program is started from. 
 
-It is recommended that all of the files related to one wiki exist within
-a master wiki directory (`dir.wiki`), but this is not technically required
-unless you are using Wikifer::Wiki's built-in revision tracking.
+Best practice to achieve this is to reference `dir.wiki` within each. With
+webserver, `dir.wiki` is predefined as long as your wiki exists within
+[`server.dir.wiki`](#serverdirwiki).
 
-    @dir.wiki:      /home/www/mywiki;
     @dir.page:      [@dir.wiki]/pages;
+    @dir.image:     [@dir.wiki]/images;
+    @dir.model:     [@dir.wiki]/models;
+    @dir.md:        [@dir.wiki]/md;
     @dir.cache:     [@dir.wiki]/cache;
-
-`dir.wikifier` can be inferred from [`server.dir.wikifier`](#serverdirwikifier)
-if you are using a wikiserver with this directive set.
 
 ### external
 
@@ -190,10 +142,10 @@ identifier `[wiki_id]` consisting of word-like characters.
 | -----                         | -----       | -----
 | `external.[wiki_id].name`     | External wiki name, displayed in link tooltips |
 | `external.[wiki_id].root`     | External wiki page root |
-| `external.[wiki_id].type`     | External wiki type | *wikifier*
+| `external.[wiki_id].type`     | External wiki type | *quiki*
 
 Accepted values for `type`
-* *wikifier* (this is default)
+* *quiki* (this is default)
 * *mediawiki*
 * *none* (URI encode only)
 
@@ -201,7 +153,7 @@ The default configuration includes the `wp` identifier for the
 [English Wikipedia](http://en.wikipedia.org):
 
     @external.wp: {
-        name: Wikipedia;
+        name: Wikipedia;  /* appears in tooltip */
         root: http://en.wikipedia.org/wiki;
         type: mediawiki;
     };
@@ -212,159 +164,99 @@ From the page source, this looks like:
 
 ### page.enable.title
 
-If enabled, the first section's title will be the title of the page. You
-may want to disable this if your wiki content is embedded within a template
-that has its own place for the page title.
+If enabled, the first section's heading defaults to the title of the
+page, and all other headings on the page are sized down one.
+
+You may want to disable this at the wiki level if your wiki content is
+embedded within a template that has its own place for the page title:
+
+    -@page.enable.title;
 
 __Default__: Enabled
 
 ### image.size_method
 
-The method which the wikifier should use to scale images.
+The method which quiki should use to scale images.
+
+This is here for purposes of documentation only; there's probably no reason
+to ever stray away from the default for whichever quiki interface is used.
 
 **Accepted values**
 * _javascript_ - JavaScript-injected image sizing
 * _server_ - server-side image sizing using [`image.sizer`](#imagesizer) and
   [`image.calc`](#imagecalc) (recommended)
 
-When set to _server_, the options [`image.calc`](#imagecalc) and
-[`image.sizer`](#imagesizer) are required. If using Wikifier::Page directly,
-`image.calc` is provided but requires that you install
-[Image::Size](https://metacpan.org/pod/Image::Size). In that
-case, you are required to provide a custom `image.sizer` routine. If using
-Wikifier::Wiki, `image.calc` and `image.sizer` are both provided, but
-[GD](https://metacpan.org/pod/GD) must be
-installed from the CPAN.
+__Default__ (webserver): _server_
 
-__Default__ (Page): _javascript_
-
-__Default__ (Wiki): _server_
+__Default__ (low-level): _javascript_
 
 ### image.calc
 
-A code reference that calculates a missing dimension of an image.
+A function reference that calculates a missing dimension of an image.
 This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
-Returns `(scaled width, scaled height, full width, full height, fullsize)`.
-`fullsize` is true if the scaled dimensions are equal to the full-sized
-dimensions.
+This is here for purposes of documentation only and can only be configured
+using quiki's wikifier engine API directly.
 
-__Default__ (Page): built in, uses [Image::Size](https://metacpan.org/pod/Image::Size)
-
-__Default__ (Wiki): built in, uses [GD](https://metacpan.org/pod/GD)
-
-### image.rounding
-
-The desired rounding method used when determining image dimensions. Used by
-the default [`image.calc`](#imagecalc). If a custom `image.calc` is provided,
-this will not be utilized.
-
-**Accepted values**
-* _normal_ - round up from .5 or more, down for less
-* _up_ - always round up
-* _down_ - always round down
-
-__Default__: _normal_
+__Default__: (webserver) built-in function
 
 ### image.sizer
 
-A code reference that returns the URL to a sized version of an image. After
+A function reference that returns the URL to a sized version of an image. After
 using [`image.calc`](#imagecalc) to find the dimensions of an image,
 `image.sizer` is called to generate a URL for the image at those dimensions.
 
-If using [`image.size_method`](#imagesize_method) _server_, `image.sizer` must
-be provided (unless using Wikifier::Wiki, which provides its own).
+This is here for purposes of documentation only and can only be configured
+using quiki's wikifier engine API directly.
 
-Returns a URL.
+__Default__: (webserver) built-in function
 
-__Default__ (Page): none; custom code required
-
-__Default__ (Wiki): built in
-
-## Wikifier::Wiki public options
+## Wiki public options
 
 ### image.type
 
-The desired file type for generated images. This is used by Wikifier::Wiki
-when generating images of different dimensions. All resulting images will be
-in this format, regardless of their original format.
+The desired file type for generated images.
+
+When configured, all resulting images will be in this format, regardless of
+their original format. Unless you have a specific reason to do this, omit
+this option to preserve original image formats.
 
 **Accepted values**
 * _png_ - larger, lossless compression
 * _jpeg_ - smaller, lossy compression
 
-__Default__: *png*
+__Default__: none (preserve original format)
 
 ### image.quality
 
-The desired quality of generated images. This is only utilized if
-[`image.type`](#imagetype) is set to *jpeg*.
+The desired quality of generated images with lossy compression. This is only
+utilized if [`image.type`](#imagetype) is set to *jpeg*.
 
 __Default__: *100*
 
-### image.enable.retina
+### image.retina
 
-Enable retina display support. Wikifier::Wiki will interpret and properly
-handle @2x or larger scaled versions of images.
+Image scales to enable for displays with a greater than 1:1 pixel ratio.
 
-The value of this option is the max scale to support; e.g.
+For instance, to support both @2x and @3x scaling:
 
-    @image.enable.retina: 3;
+    @image.retina: 2, 3;
 
-to support both @2x and @3x scaling.
-
-__Default__: *3*
-
-### image.enable.pregeneration
-
-Enable pregeneration of images. Images will be generated as pages that
-require them are generated. This contrasts from the default behavior in
-which images are generated as they are requested.
-
-The advantage of this option is that it allows images to be served directly
-by a web server without summoning any wikifier software, decreasing the page
-load time.
-
-The disadvantage is slower page generation time if new images have been
-added since the last generation time.
-
-__Requires__: [`image.enable.cache`](#imageenablecache)
-
-__Default__: Enabled
-
-### image.enable.tracking
-
-If enabled, Wikifier::Wiki will create page categories that track image
-usage. This is particularly useful for a Wikifier::Server feature that
-allows images and pages to be generated as they are modified.
-
-__Default__: Enabled
-
-### image.enable.restriction
-
-If enabled, Wikifier::Wiki will only generate images in dimensions used by
-pages on the wiki. This prevents useless resource usage and abuse.
-
-__Default__: Enabled
-
-### image.enable.cache
-
-Enable caching of generated images.
-
-__Required by__: [`image.enable.pregeneration`](#imageenablepregeneration),
-[`image.enable.restriction`](#imageenablerestriction)
-
-__Default__: Enabled
+__Default__: *2, 3*
 
 ### page.enable.cache
 
 Enable caching of generated pages.
 
+For best performance, page caching is enabled by default, and quiki will
+only generate pages if the source file has been modified since the cache
+file was last written.
+
 __Default__: Enabled
 
 ### cat.per_page
 
-Number of pages to display on a single category posts page.
+Maximum number of pages to display on a single category posts page.
 
 __Default__: _5_
 
@@ -381,18 +273,15 @@ source itself, like so:
 
 If multiple pages are marked as the main page of a category, the one with
 the most recent creation time is preferred. If this option is provided,
-however, the page specified by it will always be preferred.
+however, the page specified by it will always take precedence.
 
-__Default__: None; show newest at top
+__Default__: none (show newest first)
 
 ### cat.[name].title
 
 Sets the human-readable title for the category by the name of `[name]`.
 
-You can also set the title of a category from within the category file
-itself using the "title" key.
-
-__Default__: None; page filename displayed as title
+__Default__: none
 
 ### var.*
 
@@ -402,54 +291,64 @@ particular page.
 
 Example (in config):
 
-    @var.site.url: http://mywiki.example.com
+    @var.site.url: http://mywiki.example.com;
     @var.site.display_name: MyWiki;
 
 Example (on main page):
 
     Welcome to [@site.display_name]!
 
-## Wikifier::Wiki extended options
+## Wiki extended options
 
-These options are not used by Wikifier::Wiki directly, but may be required by
-frontends or admin panels. They are documented here for consistency across
-software built atop wikifier.
+These options are not used by the wiki API directly but are respected
+by webserver and perhaps other frontends.
 
 ### main_page
 
-Name of the main page. This should not be the page's title but rather a
+Name of the main page.
+
+This should not be the page's title but rather a
 filename, relative to [`dir.page`](#dir). The `.page` extension is not
 necessary.
 
+```
+@main_page: Welcome Page; /* normalized to welcome_page.page */
+```
+
 ### main_redirect
+
+If enabled, the wiki root redirects to the main page rather than just
+rendering it at the root location.
 
 ```
 @main_redirect;
 ```
 
-If enabled, the wiki root will redirect to the main page rather than just
-displaying it at the root location.
-
 ### error_page
 
-```
-@error_page: some_page;
-```
+Name of the error page.
 
-Name of the error page. This should not be the page's title but rather a
-filename, relative to [`dir.page`](https://github.com/cooper/wikifier/blob/master/doc/configuration.md#dir).
-The `.page` extension is not necessary.
+This should not be the page's title but rather a
+filename, relative to [`dir.page`](#dir). The `.page` extension is not
+necessary.
+
+```
+@error_page: Error; /* normalized to error.page */
+```
 
 ### navigation
 
-A map of navigation items. Keys are unformatted text to be displayed, with
-spaces permitted. Values are URLs, relative to the current page (NOT the wiki
-root).
+Navigation items.
+
+Keys are unformatted text to be displayed, with spaces permitted.
+Values are URLs, relative to the current page (NOT the wiki root).
+
+It is good practice to refer to [`root`](#root):
 
 ```
-@navigation: map {
-    Main page: /page/welcome;
-    Rules: /page/rules;
+@navigation: {
+    Main page:  [@root.page]/welcome_page;
+    Rules:      [@root.page]/rules;
 };
 ```
 
@@ -457,9 +356,9 @@ You can nest maps to create sublists at any level, but the number of levels
 supported depends on the frontend or template being used by the wiki.
 
 ```
-@navigation: map {
+@navigation: {
     Home: /page/welcome;
-    About: map {
+    About: {
         Company info: /page/our_company;
         Facebook: http://facebook.com/our.company;
     };
@@ -475,38 +374,42 @@ Name or path of the template used by the wiki.
 @template: default;
 ```
 
+__Default__ (webserver): *default*
+
 ### logo
 
 Filename for the wiki logo, relative to [`dir.image`](#dir).
 
-Frontends should automatically generate the logo in whatever dimensions are
-needed and display it where appropriate.
+Frontends like webserver automatically generate the logo in whatever dimensions
+are needed and display it where appropriate.
 
 ```
 @logo: logo.png;
 ```
 
-## Wikifier::Wiki private options
+## Wiki private options
 
-Private Wikifier::Wiki options may be in a separation configuration file.
-This is where administrator credentials are stored. You can also put them in the
-primary configuration file, but this is not recommended.
+Private wiki options may be in a separation configuration file.
+This is where administrator credentials are stored.
 
 ### admin.[username].name
 
-The real name for the administrator `[username]`. This is used to attribute
-page creation, image upload, etc. to the user. It may be displayed to the
-public as the author or maintainer of a page or the owner of some file.
-It is also used for Wikifier::Wiki's built-in revision tracking.
+Real name for the administrator `[username]`.
+
+This is used to for revision tracking to attribute page creation,
+image upload, etc. to the user. Depending on the frontend and/or template,
+it may be displayed to the public as the author or maintainer of a page or
+the owner of some file.
 
 ### admin.[username].email
 
-The email address of the administrator `[username]`. Currently this is used
-only for Wikifier::Wiki's built-in revision tracking.
+Email address of the administrator `[username]`.
+
+Used for revision tracking.
 
 ### admin.[username].crypt
 
-The type of encryption used for the password of administrator `[username]`.
+Ttype of encryption used for the password of administrator `[username]`.
 
 **Accepted values**
 * _none_ (plain text)
@@ -518,63 +421,92 @@ __Default__: *sha1*
 
 ### admin.[username].password
 
-The password of the administrator `[username]`. It must be encrypted in
+Password of the administrator `[username]`.
+
+It must be encrypted in
 the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
 
-## Wikifier::Server options
+## Webserver options
 
-### server.dir.wikifier
-
-Path to the wikifier repository. This is optional but strongly recommended.
-Specifying it here is preferred over the [`dir.wikifier`](#dir) wiki option.
+These options are respected by the quiki webserver.
 
 ### server.dir.wiki
 
-Path to some directory where wikis are stored. Your wikis do not all have to be
-in the same directory, so this is optional. But if you do choose to do it that
-way, this is used to infer [`dir.wiki`](#dir) and
-[`server.wiki.[name].config`](#serverwikinameconfig).
+Path to some directory where wikis are stored.
 
-### server.socket.path
-
-The path of a UNIX socket to listen on.
-
-If unspecified, the server will not listen on a UNIX socket.
+Your wikis do not all have to be in the same directory, so this is optional.
+However, if you make use of this, quiki can infer [`dir.wiki`](#dir) and
+[`server.wiki.[name].config`](#serverwikinameconfig) for each wiki.
 
 ### server.enable.pregeneration
 
-If enabled, the Wikifier::Server will generate all pages upon the first
-start. It will then monitor all page files and regenerate them as soon as
-they are modified, greatly reducing the first page load time.
+If enabled, webserver pre-generates all pages and images upon start.
 
 __Requires__: [`page.enable.cache`](#pageenablecache)
 
-__Default__: Disabled (but strongly recommended)
+__Default__: Enabled
+
+### server.enable.monitor
+
+If enabled, webserver uses operating system facilities to monitor wiki
+directories and pre-generate content when the source files are changed.
+
+__Requires__: [`page.enable.cache`](#pageenablecache)
+
+__Default__: Enabled
+
+### server.http.port
+
+__Required__. Port for HTTP server to listen on.
+
+```
+server.http.port: 8080;
+```
+
+### server.http.bind
+
+_Optional_. Host to bind to.
+
+```
+@server.http.bind: 127.0.0.1;
+```
+
+__Default__: none (bind to all available hosts)
+
+### server.dir.template
+
+_Optional_. Template search paths.
+
+```
+@server.dir.template: /home/www/wiki-templates;
+```
+
+This is a comma-separated list of paths to look for templates when they are
+specified by name in the wiki configuration. If you're running multiple wikis
+that share a template, or if you are using the default template, this optional
+is useful. Otherwise, you can just specify the absolute path to each wiki's
+template in the [template](#template) directive.
 
 ### server.wiki.[name].enable
 
-Enables the wiki by the name of `[name]`. Any wikis configured that do not have
-this option present will be skipped. Any number of wikis can be configured on a
-single server using this.
+Enable the wiki by the name of `[name]`.
+
+Any wikis configured that do not have this option present are skipped.
+Any number of wikis can be configured on a single server using this.
 
 ### server.wiki.[name].config
 
-The path to the configuration file for the wiki by the name of `[name]`. This is
-required for each wiki unless [`server.dir.wiki`](#serverdirwiki) is set.
+Ppath to the configuration file for the wiki by the name of `[name]`.
+
+This is required for each wiki unless [`server.dir.wiki`](#serverdirwiki) is
+set and the wiki is located there.
 
 __Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]/wiki.conf`
 
 ### server.wiki.[name].private
 
 The path to the PRIVATE configuration file for the wiki by the name of
-`[name]`. This is where administrator credentials are stored. If it is not
-provided, it will be assumed that this information is in the primary
-configuration file. Be sure that the private configuration is not inside
-the HTTP server root or has proper permissions to deny access to it.
+`[name]`.
 
-### server.wiki.[name].password
-
-The read authentication password for the wiki by the name of `[name]`
-in plain text. This is required unless the wikiserver is reached via standard
-I/O (such as with the default [quiki](https://github.com/cooper/quiki)
-configuration).
+This is where administrative credentials are stored. Be sure that the
+private configuration is not inside the HTTP server root.

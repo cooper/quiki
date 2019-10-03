@@ -1,9 +1,8 @@
 # Models
 
-The `model{}` block type is a mechanism by which you can include wikifier
-source code from another file. This allows you to create reusable templates
-for consistency across your wiki, or to eliminate repetitive code in your
-page files.
+Models are pieces of quiki source code that can be borrowed by multiple pages.
+This allows you to create reusable templates for consistency across your wiki
+and eliminate repetitious page source code.
 
 * [Models](#models)
   * [Creating models](#creating-models)
@@ -11,11 +10,11 @@ page files.
 
 ## Creating models
 
-For safety, you cannot include any page file. Instead, models should be in a
-dedicated directory within your wiki root. This directory is determined by the
-`@dir.model` configuration value, which defaults to `models`.
+For safety, you cannot include any old page file into another. Instead, models are
+stored in a dedicated directory within your wiki root, configured by
+[`@dir.model`](configuration.md#dir), which defaults to `models`.
 
-Model source files can contain any wikifier code, but it is common to use them
+Model source files can contain any quiki code, but it is common to use them
 in conjunction with [`html{}`](blocks.md#html) or [`format{}`](blocks.md#format)
 to make HTML templates. The result is that your actual page files are far less
 cluttered, with all the ugly HTML hidden behind a model.
@@ -25,7 +24,7 @@ options provided to the model from the main page.
 
 ## Using models
 
-wikifier has a special syntax for using models. Write them like any block,
+quiki has a special syntax for using models. Write them like any block,
 except prefix the model name with a dollar sign (`$`).
 ```
 $my_model {

@@ -1,6 +1,6 @@
 # Language
 
-wikifier's source language is designed to be easily legible by the naked eye.
+quiki's source language is designed to be easily legible by the naked eye.
 
 * [Language](#language)
   * [Syntax](#syntax)
@@ -28,7 +28,7 @@ wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Syntax
 
-The wikifier source language is [parsed hierarchically](technical/parsing.md).
+The quiki source language is [parsed hierarchically](technical/parsing.md).
 The source is divided into components called [blocks](#blocks), each of which
 is responsible for parsing its inner contents. The master parser is
 concerned only with the most basic syntax:
@@ -116,7 +116,7 @@ code {{
 
 ## Blocks
 
-The fundamental component of the wikifier language is the **block**.
+The fundamental component of the quiki language is the **block**.
 The syntax for a block is as follows:
 
 ```
@@ -179,7 +179,7 @@ sec [Statistics] {
 
 #### Model shorthand
 
-wikifier has a special syntax for using [**models**](models.md). Write them like
+quiki has a special syntax for using [**models**](models.md). Write them like
 any block, except prefix the model name with a dollar sign (`$`).
 
 ```
@@ -207,7 +207,7 @@ array datatype.
 
 ## Variables
 
-wikifier supports string, boolean, and block variables.
+quiki supports string, boolean, and block variables.
 
 ### Assignment
 
@@ -379,14 +379,13 @@ double-formatted, resulting in ugly escaped HTML tags visible to clients.
 `@page` contains information about the current page. Its attributes are set
 at the very top of a page source file.
 
-* `@page.title` - Human-readable page title. Utilized internally by the
-  Wikifier, so it is required for most purposes. Often used as the `<title>` of
+* `@page.title` - Human-readable page title. Utilized internally quiki, so it
+  is required for most purposes. Often used as the `<title>` of
   the page, as well as in the `<h1>` above the first `section{}` block. The
   title can contain [formatted text](#text-formatting), but it may be stripped
   down to plaintext in certain places.
 * `@page.created` - UNIX timestamp or HTTP date format of the page creation
-  time. This is not used in the wikifier itself, but can be used in frontends
-  for sorting the page list by creation date.
+  time. Used for sorting the pages by creation date.
 * `@page.author` - Name of the page author. This is also optional but may be
   used by frontends to organize pages by author.
 * `@page.draft` - [Boolean](#assignment) value which marks the page as a draft.

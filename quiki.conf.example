@@ -40,8 +40,10 @@
     host: mywiki.com; */
 
     /* each wiki requires its own configuration file, specified here. see
-       wikis/mywiki/wiki.conf for an example wiki configuration. */
-    config: [@repo]/wikis/mywiki/wiki.conf;
+       wikis/mywiki/wiki.conf for an example wiki configuration.
+       note: this can be omitted and inferred if the config is at
+       @server.dir.wiki/<shortcode>/wiki.conf
+    config: [@repo]/wikis/mywiki/wiki.conf; */
 
 };
 

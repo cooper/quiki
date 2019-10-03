@@ -1,6 +1,6 @@
 # Styling
 
-wikifier provides a simple solution to styling with CSS from within the wiki
+quiki provides a simple solution to styling with CSS from within the wiki
 language. Rules can be added to specific blocks and/or children of specific
 blocks, and selectors like classes and block types can also narrow down the
 matched elements.
