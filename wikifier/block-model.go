@@ -25,6 +25,9 @@ func (mb *modelBlock) parse(page *Page) {
 	// consider: is there any reason we'd need to check if this Page is a model elsewhere?
 	model := NewPage(path)
 
+	// copy wiki opt from this page
+	model.Opt = page.Opt
+
 	// assign the underlying Map of the model{} block to @m
 	model.Set("m", mb.Map)
 
