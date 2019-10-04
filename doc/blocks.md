@@ -4,23 +4,23 @@ This is the list of built-in block types. For a syntactical explanation of
 blocks, see [Language](language.md#blocks).
 
 * [Blocks](#blocks)
-  * [Clear](#clear) - CSS clear
-  * [Code](#code) - Block of code (`<pre>` and `<code>`)
-  * [Format](#format) - Embedded HTML with formatted text
-  * [Map](#map) - Key-value datatype
-  * [History](#history) - Table of chronological events
-  * [Html](#html) - Embedded HTML
-  * [Image](#image) - `<img>`
-  * [Imagebox](#imagebox) - `<img>` with border, link, and description
-  * [Infobox](#infobox) - Table to summarize article information
-  * [Invisible](#invisible) - Silences all other blocks
-  * [List](#list) - An ordered list datatype as well as `<ul>`
-  * [Model](#model) - quiki templates
-  * [Paragraph](#paragraph) - `<p>`
-  * [Section](#section) - Article section with optional header
-  * [Style](#style) - Use CSS with quiki
+  * [clear{}](#clear) - CSS clear
+  * [code{}](#code) - block of code
+  * [fmt{}](#fmt) - embedded HTML with formatted text
+  * [map{}](#map) - key-value datatype
+  * [history{}](#history) - table of chronological events
+  * [html{}](#html) - embedded HTML
+  * [image{}](#image) - image
+  * [imagebox{}](#imagebox) - image with border, link, and description
+  * [infobox{}](#infobox) - table summarizing article information
+  * [invisible{}](#invisible) - silences all blocks inside it
+  * [list{}](#list) - list datatype and visible unordered list
+  * [model{}](#model) - quiki templates
+  * [p{}](#p) - paragraph
+  * [sec{}](#sec) - article section with optional header
+  * [style{}](#style) - use CSS with quiki
 
-## Clear
+## clear{}
 
 Creates an empty `<div>` with `clear: both`.
 
@@ -28,7 +28,7 @@ Creates an empty `<div>` with `clear: both`.
 clear{}
 ```
 
-This is mostly useless now that the built-in wiki classes `clear`, `clear-left`,
+This is mostly useless now that the built-in quiki classes `clear`, `clear-left`,
 and `clear-right` can be used on any block:
 
 ```
@@ -45,52 +45,57 @@ p.clear-right {
 }
 ```
 
-## Code
+## code{}
 
-Used to wrap some code. The contents will not be formatted. Using the
-[brace escape](language.md#escaping) is recommended so that you do not have to
-escape curly brackets within the code. Note also that, unlike usually, the
-leading whitespace is significant and will be displayed.
+Wraps a block of code.
+
+The contents is not formatted. When used with [brace escape](language.md#escaping)
+(extra `{` and `}`, e.g. `code{{ }}`), there is no need to escape curly brackets
+within the code, as long as there is a closing bracket corresponding to each
+opening bracket. So, you can paste code right in.
+
+quiki detects the indentation depth of the code based on the first line and
+preserves it.
 
 ```
 code {{
-someCode();
-function someCode() {
-    return true;
-}
+    someCode();
+    function someCode() {
+        return true;
+    }
 }}
 ```
 
-The language may be specified as the name of the block. This is used for syntax
-highlighting with Google
-[code-prettify](https://github.com/google/code-prettify). Look there for a list
-of supported languages.
+A language may be specified as the name of the block for syntax
+highlighting with [code-prettify](https://github.com/google/code-prettify).
+Look there for a list of supported languages.
 
 ```
 code [perl] {{
-$_ = "wftedskaebjgdpjgidbsmnjgc";
-tr/a-z/oh, turtleneck Phrase Jar!/; print;    
+    $_ = "wftedskaebjgdpjgidbsmnjgc";
+    tr/a-z/oh, turtleneck Phrase Jar!/; print;    
 }}
 ```
 
-## Format
+## fmt{}
 
-Same as [`html{}`](#html), except that text formatting is permitted. Often
+Like [`html{}`](#html), except that text formatting is permitted. Often
 used with [models](#model).
 
 ```
-format {
+fmt {
     <div>
         This is some HTML.
-        [b]quiki formatting[/b] is allowed.
+        [b]quiki formatting[/b] is allowed, such as [@variables].
     </div>
 }
 ```
 
-## Map
+## map{}
 
-An *ordered* key-value map data type. Many other block types inherit from this
-when they accept key-value options.
+An *ordered* key-value map data type.
+
+Many other block types are built atop map to accept key-value pairs.
 
 Yields no HTML.
 
@@ -101,15 +106,25 @@ map {
 }
 ```
 
+**Shorthand**. A nameless block is assumed to be a map:
+
+```
+@myMap: {
+    key:        value;
+    other key:  another value;
+};
+```
+
 **Syntax for pairs**. Each pair is separated by a colon (`:`). The left side is
 the key; the right is the value. The key must be plain text (no formatting
-permitted). Colons (`:`) can be included in the key be prefixing them with the
+permitted). Colons (`:`) can be included in the key by prefixing them with the
 escape character (`\`). The value may contain
 [formatted text](language.md#text-formatting) or a single
-[block](language.md#blocks) but not both simultaneously. Values are terminated
+[block](language.md#blocks) but not both together. Values are terminated
 with the semicolon (`;`). If the value is text, semicolons can be included by
 prefixing them with the escape character (`\`). Colons (`:`) do not need to be
 escaped in the value.
+
 ```
 map {
     /* the value of this pair is a block */
@@ -120,7 +135,7 @@ map {
     };
 
     /* the value of this pair is text with an escaped semicolon */
-    other key:  another value\; with a semicolon;
+    other key:  another value\; this one has a semicolon;
 }
 ```
 
@@ -131,16 +146,9 @@ text, it should be prefixed with a colon (`:`). The advantage of this is that
 colons consequently need not be escaped in the value. For blocks, this prefixing
 colon is not required. Semicolons (`;`) can be included in standalone text
 values by prefixing them with the escape character (`\`).
+
 ```
 infobox [My Article] {
-
-    /* this is here to demonstrate that "invisible" blocks (those which
-       yield no HTML) are NOT map values and therefore do NOT need to be
-       terminated with the semicolon
-    */
-    style {
-        border: 1px solid red;
-    }
 
     /* this anonymous value is a block */
     image {
@@ -168,10 +176,8 @@ quiki variable attribute syntax.
 
 /* access attributes from it elsewhere
    btw this works for all map-based block types */
-sec {
-    Did you know that [@person.First_name] [@person.Last_name] is
-    [@person.Age] years old?
-}
+Did you know that [@person.First_name] [@person.Last_name] is
+[@person.Age] years old?
 ```
 
 **Duplicate keys**. As some block types such as [`infobox{}`](#infobox) and
@@ -199,7 +205,7 @@ infobox {
 }
 ```
 
-## History
+## history{}
 
 Displays a timeline of chronological events in a table.
 
@@ -210,28 +216,26 @@ history {
 }
 ```
 
-## Html
+## html{}
 
-Used to embed some HTML. The contents will not be formatted. Using the
-[brace escape](language.md#escaping) is recommended so that you do not have to
-escape curly brackets within. Note also that, unlike usually, the
-leading whitespace is significant and will be displayed.
+Used to embed some HTML.
 
-See also [`format{}`](#format).
+The contents are not formatted. If formatting is desired,
+use [`fmt{}`](#fmt).
 
 ```
 html {{
-<div>
-    This is HTML. Nothing inside will be changed,
-    but please note that curly brackets \{ and \}
-    must be escaped.
-</div>
+    <div>
+        This is HTML.
+    </div>
 }}
 ```
 
-## Image
+## image{}
 
-A simple image element. Typically for embedding standalone images with a nice
+Image.
+
+Typically for embedding standalone images with a nice
 border and optional caption you should use [`imagebox{}`](#imagebox) instead.
 However, `image{}` is often used inside other block types.
 
@@ -241,9 +245,9 @@ infobox [Planet Earth] {
         file: planet-earth.jpg;
         desc: Earth from space;
     };
-    Type: Planet;
+    Type:       Planet;
     Population: 23 billion;
-    Galaxy: Milky Way;
+    Galaxy:     Milky Way;
 }
 ```
 
@@ -263,17 +267,17 @@ unless its size is constrained by a container. In the above
 [`infobox{}`](#infobox) example, the image size is automatically constrained by
 the width of the infobox, so dimensions do not need to be specified.
 
-## Imagebox
+## imagebox{}
 
-Embeds an image with an automatic border. It will be either left or right
-aligned. It can have an optional caption. Also, clicking it takes you to the
-full-sized image.
+Embeds an image with a border and optional caption.
+
+It will be either left or right aligned. Links to the full-sized image.
 
 ```
 imagebox {
     file:   planet-earth.jpg;
     width:  300px;
-    align:  right;
+    float:  right;  /* this is default */
     desc:   Earth from space;
 }
 ```
@@ -282,25 +286,26 @@ imagebox {
 * __file__ - _required_, filename of the full-size image.
 * __width__ - image width in pixels.
 * __height__ - image height in pixels.
-* __align__ - `left` or `right` to specify which side of the container the
+* __float__ - `left` or `right` to specify which side of the container the
   imagebox should clear. defaults to `right`.
-* __float__ - alias for __align__.
+* __align__ - alias for float.
 
 If neither __width__ nor __height__ is specified, the image will be full-size,
 unless its size is constrained by a container.
 
-## Infobox
+## infobox{}
 
-Displays a summary of information for an article. Usually there is just one
-per article, and it occurs before the first section.
+Displays a summary of information for an article.
+
+Usually there is just one per article, and it occurs before the first section.
 
 ```
 @page.title: Earth;
 
 infobox [Planet Earth] {
 
-    /* many infoboxes start with an image of the subject */
-    /* the image dimensions are dictated by the infobox  */
+    /* many infoboxes start with an image of the subject.
+       the image dimensions are dictated by the infobox  */
     image {
         file: planet-earth.jpg;
     };
@@ -313,29 +318,30 @@ infobox [Planet Earth] {
     Galaxy:         Milky Way;
 }
 
-sec {
-    [b]Earth[/b] is the planet on which we live.
-}
+[b]Earth[/b] is the planet on which we live.
 ```
 
 You can organize the information in sections with `infosec{}`. Each can
-optionally have a title as well.
+optionally have a title as well. The block type can be omitted within
+`infobox{}`.
+
 ```
 @page.title: United States;
 
 infobox [United States of America] {
-    infosec {  
-        Capital:        [! Washington, DC !];  
-        Largest city:   [! New York City !];    
-    };
-    infosec [Goverment] {
+
+    Capital:        [! Washington, DC !];  
+    Largest city:   [! New York City !];    
+
+    [Goverment] {
         :[! Federal presidential constitutional republic | Republic !];   
         President:              [! Donald Trump !];
         Vice President:         [! Mike Pence !];
         Speaker of the House:   [! Paul Ryan !];
         Chief Justice:          [! John Roberts !];
     };
-    infosec [Independence[nl]from [! Great Britain !]] {
+
+    [Independence[nl]from [! Great Britain !]] {
         Declaration:            July 4, 1776;
         Confederation:          March 1, 1781;
         Treaty of Paris:        September 3, 1783;
@@ -344,36 +350,36 @@ infobox [United States of America] {
     };
 }
 
-sec {
-    [b]The United States[/b] ([b]USA[/b], [b]US[/b], [b]America[/b], officially
-    [b]the United States of America[/b]) is the country in which 100% of
-    American residents live.
-}
+[b]The United States[/b] ([b]USA[/b], [b]US[/b], [b]America[/b], officially
+[b]the United States of America[/b]) is the country in which 100% of
+American residents live.
 ```
 
-## Invisible
+## invisible{}
 
 Silences whatever's inside.
 
 ```
 invisible {
-    sec {
+    p {
         Normally this would show a paragraph.
         But since it's inside an invisible block, it shows nothing.
     }
 }
 ```
 
-## List
+## list{}
 
-An ordered list datatype. It may be used by other block types. By itself though,
+An ordered list datatype.
+
+It may be used by other block types. By itself though,
 it yields an unordered list element (`<ul>`).
 
 ```
 list {
     Item one;
     Item two;
-    Item three can have an escaped semicolon\; I think;
+    Item three has an escaped semicolon\; I believe;
 }
 ```
 
@@ -384,15 +390,6 @@ by the semicolon (`;`). If the value is text, additional semicolons may be
 included by prefixing them with the escape character (`\`).
 ```
 list {
-
-    /* this is here to demonstrate that "invisible" blocks (those which
-       yield no HTML) are NOT list values and therefore do NOT need to be
-       terminated with the semicolon
-    */
-    style {
-        border: 1px solid red;
-    }
-
     Item one;
     Item two;
     Item three can have an escaped semicolon\; I think;
@@ -410,21 +407,21 @@ syntax.
     ... the rest;
 };
 
-sec {
-    Breaking News: [@alphabet.0] is the first letter of the alphabet,
-    and [@alphabet.25] is the last.
-}
+Breaking News: [@alphabet.0] is the first letter of the alphabet,
+and [@alphabet.25] is the last.
 ```
 
-## Model
+## model{}
 
 Allows you to embed a template. See [Models](models.md).
 
-## Paragraph
+## p{}
 
-The name says it all. You can call it `paragraph{}` or `p{}`. Or you can
-call it nothing because stray text within `sec{}` blocks is assumed to be a
-paragraph.
+Paragraph.
+
+You can call it `paragraph{}` or `p{}`. Or you can
+call it nothing because stray text within `sec{}` blocks and at document level is
+broken down by blank lines into paragraphs.
 
 ```
 sec [My Section] {
@@ -439,22 +436,20 @@ sec [My Section] {
 
 Same as
 ```
-sec [My Section] {
+[My Section] {
     A paragraph.
 
     Another.
 }
 ```
 
-## Section
+## sec{}
+
+Section.
 
 You can organize the content of an article by dividing it into sections.
-Sections typically have title headers, except for the first one. The first
-section on a page is considered the introduction. It always has the page title
-as its header, so even if specify some text there, it will not be considered. As
-for the rest, the header will be displayed at the appropriate level.
-
-Also spelled `sec{}`.
+Sections typically have headings, except for the first one, which is
+considered the article introduction and uses the page name for the heading.
 
 ```
 sec {
@@ -472,6 +467,29 @@ sec [More stuff] {
     You can also put sections inside each other.
 
     sec [Little header] {
+        This section will have a smaller header, since it is nested deeper
+        than the top-level sections.
+    }
+}
+```
+
+quiki assumes document-level stray text to be in a section. The block type
+`sec` may also be omitted for sections that have headings. So, the above example 
+can be more conveiently written as:
+```
+This is my intro section. No need to put a title here, since the page title
+will be displayed atop this section.
+
+[Info] {
+    Here we go. This one has a title.
+
+    By the way, a blank line starts a new paragraph.
+}
+
+[More stuff] {
+    You can also put sections inside each other.
+
+    [Little header] {
         This section will have a smaller header, since it is nested deeper
         than the top-level sections.
     }
