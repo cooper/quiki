@@ -11,12 +11,13 @@ import (
 type parser struct {
 	pos position
 
-	last   byte // last byte
-	this   byte // current byte
-	next   byte // next byte
-	next2  byte // next-next byte
-	escape bool // this byte is escaped
-	skip   int  // number of next bytes to skip
+	last       byte // last byte
+	this       byte // current byte
+	next       byte // next byte
+	next2      byte // next-next byte
+	escape     bool // this byte is escaped
+	parserChar bool // this character is handled by the master parser (for escapes)
+	skip       int  // number of next bytes to skip
 
 	catch catch // current parser catch
 	block block // current parser block
@@ -101,10 +102,10 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 
 func (p *parser) parseByte(b byte, page *Page) error {
 
-	// fix extra newline added to code{} blocks
-	if p.braceLevel == 0 && b == '{' && p.next == '\n' {
-		p.skip++
-	}
+	// // fix extra newline added to code{} blocks
+	// if p.braceLevel == 0 && b == '{' && p.next == '\n' {
+	// 	p.skip++
+	// }
 
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
@@ -136,6 +137,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	// entrance
 	if b == '/' && p.next == '*' {
+		p.parserChar = true
 
 		// this is escaped
 		if p.escape {
@@ -170,6 +172,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	if b == '{' {
 		// opens a block
+		p.parserChar = true
 
 		// this is escaped
 		if p.escape {
@@ -300,6 +303,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	if b == '}' {
 		// closes a block
+		p.parserChar = true
 		accepting := p.catch.parentCatch()
 
 		// this is escaped
@@ -418,6 +422,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	// FIXME: these tokens in stray text in the main block cause issues
 	if p.block.blockType() == "main" && variableTokens[b] && p.last != '[' {
+		// p.parserChar = true ???
 
 		if p.escape {
 			return p.handleByte(b)
@@ -564,7 +569,7 @@ func (p *parser) handleByte(b byte) error {
 	// pretend it's not escaped by reinjecting a backslash. this allows
 	// further parsers to handle escapes (in particular, Formatter.)
 	add := string(b)
-	if p.escape {
+	if p.escape && !p.parserChar {
 		add = string([]byte{p.last, b})
 	}
 
@@ -597,6 +602,12 @@ func (p *parser) handleByte(b byte) error {
 		return errors.New(err)
 	}
 
+	// so um, if the content is whitespace/newline
+	// and the catch has no content yet, ignore this
+	if len(p.catch.content()) == 0 && (b == '\n') {
+		return p.nextByte(b)
+	}
+
 	// append
 	p.catch.appendContent(add, p.pos)
 
@@ -613,6 +624,7 @@ func (p *parser) nextByte(b byte) error {
 		p.escape = false
 	}
 
+	p.parserChar = false
 	p.last = b
 	return nil
 }

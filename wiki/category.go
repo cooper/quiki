@@ -452,9 +452,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// category has no pages
 	// (probably shouldn't happen for normal categories, but check anyway)
 	if len(cat.Pages) == 0 {
-		return DisplayError{
-			Error: "Category is empty.",
-		}
+		return DisplayError{Error: "Category is empty."}
 	}
 
 	// load each page

@@ -539,11 +539,17 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		// normal page link
 		linkType = "internal"
 
-		// determine page prefix
-		// TODO: resolve . and .. safely
-		pfx := page.Prefix()
-		if pfx != "" {
-			pfx += "/"
+		pfx := ""
+		if target[0] == '/' && len(target) > 1 {
+			// if target starts with /, ignore prefix
+			target = target[1:]
+		} else {
+			// determine page prefix
+			// TODO: resolve . and .. safely
+			pfx = page.Prefix()
+			if pfx != "" {
+				pfx += "/"
+			}
 		}
 
 		target = page.Opt.Root.Page + "/" + pfx + PageNameNE(target)

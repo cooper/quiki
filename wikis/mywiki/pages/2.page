@@ -2,4 +2,4 @@
 
 @category.mytopic;
 
-Page two.
+Page two. It references a [[ subpage | subpages/my ]].

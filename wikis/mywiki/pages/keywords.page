@@ -1,0 +1,1708 @@
+@page.title:     ;
+@page.author:    Markdown;
+@page.generator: quiki/markdown;
+@page.generated;
+
+~sec [Keywords] {
+
+~p {
+This documentation explains the uses of each compile-time keyword. All of these
+keywords are reserved for these purposes only and may not be used for the names
+of variables, functions, classes, or any other types of symbols.
+}
+~sec [Document-level] {
+~sec [package] {
+
+~code {
+package <name> [<version>]
+}
+
+~p {
+Declares the current package.
+}
+
+~p {
+The name declared with the [c]package[/c] keyword is
+absolute (root level), not relative to the current package. Anywhere that a
+package has not been declared, [c]package main[/c] is inferred.
+}
+
+~code {
+package Hello 1.0
+}
+
+~p {
+Packages may be organized into different namespaces using the namespace
+separator ([c]::[/c]). Packages inherit from the namespaces above them. For example,
+[c]Math::Trig[/c] inherits all symbols from the [c]Math[/c] package.
+}
+
+~code {
+package A::B    # A::B inherits all of A's symbols
+}
+
+~p {
+Multiple packages may exist in a single file. Once declared, a package extends
+until the first occurrence of the following:
+* a corresponding [[ [c]end[/c] | #end ]] keyword, which sets the package back to [c]main[/c]
+* another [c]package[/c] declaration
+* the end of the file
+}
+
+~p {
+See [[ Contexts | Scopes.md#context ]] for general information on namespaces.
+}
+
+}
+~sec [class] {
+
+~code {
+class <name> [<version>]
+}
+
+~p {
+Declares a class.
+}
+
+~p {
+Many class declarations can exist within a single document.
+Terminated with the [[ [c]end[/c] | #end ]] keyword or another [c]class[/c] declaration.
+}
+
+~code {
+class Person 1.0
+}
+
+~p {
+See [[ Classes | Classes ]] for general information on classes.
+}
+
+}
+~sec [end] {
+
+~code {
+end
+}
+
+~p {
+Terminates a [[ [c]class[/c] | #class ]] or [[ [c]package[/c] | #class ]].
+}
+
+}
+~sec [load] {
+
+~code {
+load <package_name>
+}
+
+~p {
+Explicitly indicates that a package should be loaded.
+}
+
+~p {
+Packages are loaded
+automatically simply by referencing their names, so [c]load[/c] is [b]almost never
+required[/b]. Its occasional use case is when a package should be loaded but is
+not otherwise explicitly referenced.
+}
+
+~p {
+With normal autoloading, all requirements referenced anywhere with in the file
+are loaded before beginning the execution of the code within the file. When
+using [c]load[/c], this is not the case; instead, the requirement is loaded when the
+execution within the file reaches the [c]load[/c] statement.
+}
+
+~code {
+load My::Package
+}
+
+}
+
+}
+~sec [Constants] {
+~sec [true] {
+
+~code {
+true
+}
+
+~p {
+Represents the boolean true value, a global object.
+}
+
+~code {
+1.odd   # true
+1.even  # false
+}
+
+}
+~sec [false] {
+
+~code {
+false
+}
+
+~p {
+Represents the boolean false value, a global object.
+}
+
+~code {
+1.odd   # true
+1.even  # false
+}
+
+}
+~sec [undefined] {
+
+~code {
+undefined
+}
+
+~p {
+Represents the undefined value, a global object. This represents the absence of
+a meaningful value.
+}
+
+~code {
+$x = 1
+delete $x
+# $x is now undefined
+}
+
+}
+
+}
+~sec [Variable declarations] {
+
+~p {
+Simple variable declarations require no keyword. Simply assign to a previously
+unused variable, and the compiler will detect that it is a first occurrence.
+}
+~sec [share] {
+
+~code {
+share $<name> [= <value>]
+}
+
+~p {
+Shared variable declaration.
+}
+
+~p {
+The keyword is named such to reflect its behavior, which is
+to share a variable from a package or class.
+}
+
+~p {
+Sharing a variable inside a class makes it a public property of the class
+itself. Sharing a variable at file scope makes it a public variable of the
+current package. The keyword is also used to access public package variables
+in files other than where they are declared.
+}
+
+~p {
+[c]share[/c] is valid only at file and class scopes.
+}
+
+~code {
+package Hello
+share $x        # perhaps $x already exists in another
+                # file with the same package name
+$x              # no reference error since shared
+}
+
+}
+~sec [var] {
+
+~code {
+var $<name> [= <value>]
+}
+
+~p {
+Local variable declaration.
+}
+
+~p {
+When a variable is declared with this keyword, the
+operations involving the variable will not affect a variable of the same name in
+any outer scope. Because a simple assignment to a nonexistent variable has the
+same effect, [c]var[/c] is typically used as a convenient way to declare a variable
+with no initial value. However, it is also useful when creating a new
+variable distinct from another of the same name in an external scope.
+}
+
+~code {
+$x = 1
+
+func wontChangeX \{
+    var $x = 2
+    -> $x
+\}
+
+wontChangeX()   # returns 2
+
+# out here, $x is still 1
+}
+
+}
+~sec [want] {
+
+~code {
+want ($ | @)<argument_name>[: <type>] [= <fallback_value>]
+}
+
+~p {
+Function optional argument declaration.
+}
+
+~p {
+Typically used at the start of a function body to indicate the name and type of
+an optional argument. Multiple comma-separated declarations can exist with a
+single [c]want[/c] statement.
+}
+
+~p {
+If the bareword [c]type[/c] is provided, the value of the variable will be undefined
+if the passed argument is not of that type.
+}
+
+~p {
+If [c]fallback_value[/c] is provided, the variable will be set to that value when the
+argument is not provided or is of an incorrect type.
+}
+
+~p {
+Within a class method, [c]want[/c] may contain instance variables. This is especially
+useful for providing initial property values within [[ [c]init \{\}[/c] | #init ]].
+}
+
+~code {
+func sayHello \{
+    want $name: Str = "Guest"
+    say("Hello $name!")
+\}
+
+sayHello("Steve")   # "Hello Steve!"
+sayHello()          # "Hello Guest!"
+sayHello(7)         # "Hello Guest!"
+}
+
+}
+~sec [need] {
+
+~code {
+need ($ | @)<argument_name>[: <type>] [= <required_value>]
+}
+
+~p {
+Function required argument declaration.
+}
+
+~p {
+Typically used at the start of a function body to indicate the name and type of
+a required argument. Multiple comma-separated declarations can exist with a
+single [c]need[/c] keyword.
+}
+
+~p {
+If the bareword [c]type[/c] is provided, the function will not be executed if the
+passed argument is not of that type.
+}
+
+~p {
+If [c]required_value[/c] is provided, the function will only be executed when the
+passed argument is equal to that value (according to the
+[[ [c]==[/c] | Operators.md#equality-operator ]] operator). This is useful for events
+where certain callbacks are only applicable to specific argument values.
+}
+
+~p {
+Within a class method, [c]need[/c] may contain instance variables. This is especially
+useful for providing initial property values within [[ [c]init \{\}[/c] | #init ]].
+}
+
+~code {
+func sayHello \{
+    want $name: Str = "Guest"
+    say("Hello $name!")
+\}
+
+on sayHello, :askWeather \{
+    need $sunny: Bool = true
+    say("Nice weather we're having, huh?")
+\}
+
+sayHello(name: "Steve")                 # "Hello Steve!" other callback ignored
+sayHello(name: "Steve", sunny: true)    # "Hello Steve!" "Nice weather..."
+sayHello(name: "Steve", sunny: false)   # "Hello Steve!" other callback ignored
+
+# the last one is not executed because,
+# although false is Bool, it does not == true
+}
+
+}
+
+}
+~sec [Property modifiers] {
+
+~p {
+These modifiers can be used on mutable variables, properties, and indices.
+}
+~sec [delete] {
+
+~code {
+delete <variable_name>
+}
+
+~code {
+delete <object>.<property_name>
+}
+
+~code {
+delete <object>[<index>]
+}
+
+~p {
+Deletes the association between the given variable, property, or index and its
+value.
+}
+
+~p {
+This does NOT necessarily destroy an object; it only destroys the reference to
+it. Garbage collection will only destroy the object if no other references
+exist.
+}
+
+~code {
+delete $noLongerNeeded
+delete $message.temporaryValue
+delete $myList[7]
+}
+
+}
+~sec [weaken] {
+
+~code {
+weaken <variable_name>
+}
+
+~code {
+weaken <object>.<property_name>
+}
+
+~code {
+weaken <object>[<index>]
+}
+
+~p {
+Weakens the association between the given variable, property, or index and its
+value.
+}
+
+~p {
+In other words, this keyword decreases the value's reference count by one. This
+is useful in the case of cyclical references.
+}
+
+~p {
+If the object is not referred to elsewhere, it will be immediately consumed by
+the garbage collector upon the [c]weaken[/c] statement.
+}
+
+~code {
+weaken $cyclical
+weaken $person.parent
+weaken $myHash["somewhere"]
+}
+
+}
+
+}
+~sec [Functions and events] {
+~sec [func] {
+
+~code {
+func [<name>] \{ <statements> \}
+}
+
+~p {
+Declares an event or anonymous function.
+}
+
+~p {
+If [c]name[/c] is provided, the event will be assigned to a property of the
+[[ scope of interest | Scopes.md#scope-of-interest ]]. Named functions can be nested
+within one another.
+}
+
+~p {
+Without a name, [c]func[/c] becomes an expression representing an anonymous function.
+Anonymous functions are permitted everywhere that expressions are accepted.
+}
+
+~code {
+func spam \{
+    want $start: Num = 1, $end: Num = 100
+    func nested \{
+        need $which
+        say("$which of $end")
+    \}
+    for $i in $start..$end
+        nested($i)
+\}
+
+spam(end: 30)
+}
+
+~code {
+# Anonymous function
+$anon = func \{
+    need $x: Num, $y: Num
+    -> $x + $y
+\}
+
+doSomethingWithAnon($anon, $other_args)
+}
+
+~p {
+See also the function argument declarations [[ [c]want[/c] | #want ]] and [[ [c]need[/c] | #need ]].
+}
+
+}
+~sec [on] {
+
+~code {
+on <event>[ <priority_hints>][, :<callback_name>] \{ <statements> \}
+}
+
+~p {
+Attaches an event callback.
+}
+
+~p {
+The [c]event[/c] may be a bareword, variable, or property only. Other expressions,
+such as the return value of a function call, will raise a compile-time error.
+}
+
+~p {
+The [c]event[/c] must evaluate at runtime to either an existing Event or [c]undefined[/c].
+In the case of [c]undefined[/c], a new event is created. Other values will throw a
+runtime error.
+}
+
+~p {
+Callbacks are specific to the object on which they are attached. An exception to
+this is when you attach a callback directly to a class prototype object, in
+which case all instances of the class will respect the callback.
+}
+
+~p {
+The order of callback execution for a given event depends on [c]priority_hints[/c]
+associated with each of its callbacks. See the below example and the
+[[ [c]before[/c] | #before ]] and [[ [c]after[/c] | #after ]] keywords for info about priorities.
+}
+
+~p {
+The use of a [[ symbol | Variables.md#symbols ]] [c]callback_name[/c] is optional but
+strongly recommended. This allows the callback to be referred to in priority
+hints among other purposes.
+}
+
+~p {
+Within the callback body, [[ this variables | Variables.md#this-variables ]] refer to
+the object on which the event was called.
+}
+
+~code {
+# suppose class Person exists and has a method haveBirthday
+# which increments the person's age
+
+$jake = Person(name: "Jake", sex: :male, age: 22)
+
+# the below callback has a 'before' hint,
+# so that %age will not yet be updated
+
+on $jake.haveBirthday before :default, :sayHappy \{
+    say("Happy Birthday %name. Say goodbye to %age!")
+\}
+
+# example of a callback with no priority hints or callback name.
+# it will be executed after :default, and %age will be updated.
+#
+# also, it is attached to the prototype,
+# so it applies to all Persons, not just Jake.
+
+on Person.proto.haveBirthday \{
+    say("%name is now %age!")
+\}
+}
+
+}
+~sec [before] {
+
+~code {
+before :<callback_name>
+}
+
+~p {
+Indicates a "call before" priority hint for an event callback.
+}
+
+~p {
+When hints are supplied, the runtime will do its best to resolve priorities
+if at all possible. Many space-separated priority hints may be utilized for a
+single callback.
+}
+
+~code {
+on $obj.someEvent before :lateCallback after :earlyCallback \{ ... \}
+}
+
+}
+~sec [after] {
+
+~code {
+after :<callback_name>
+}
+
+~p {
+Indicates a "call after" priority" hint for an event callback.
+}
+
+~p {
+When hints are supplied, the runtime will do its best to resolve priorities
+if at all possible. Many space-separated priority hints may be utilized for a
+single callback.
+}
+
+~code {
+on $obj.someEvent before :lateCallback after :earlyCallback \{ ... \}
+}
+
+}
+~sec [stop] {
+
+~code {
+stop
+}
+
+~p {
+Stops the propagation of the event and cancels all remaining callbacks for this
+particular call.
+}
+
+~p {
+This does not affect any future calls, only the current one. Also note that it
+does not emulate a function return; any statements below it will still execute
+unless it is followed by an explicit [c]->[/c] statement.
+}
+
+~code {
+# on INT, ask "are you sure?"
+# then kill on the second INT
+
+$asked = false
+
+on Signal.INT.trap before :default \{
+    if !$asked \{
+        say("Are you sure?")
+        $asked = true
+        stop    # cancel further callbacks
+        ->      # note that stop does not affect the remainder of the callback
+    \}
+    say("Got second INT. Terminating!")
+\}
+}
+
+}
+~sec [detail] {
+
+~code {
+$ret = detail someFunction()
+}
+
+~p {
+Requests "more detail" in the return value of a function call.
+}
+
+~p {
+This means that, regardless of any explicit [c]->[/c] statements that may exist,
+the call will always return the [[ return object | Functions.md#return-objects ]].
+}
+
+~p {
+If at least one explicit [c]->[/c] did exist, the most recent one determines the
+value of the [c]result[/c] property of the return object.
+}
+
+~p {
+Consider this example:
+}
+
+~code {
+func A \{
+    x -> "a return value"
+    y -> "another value"
+    -> "the ultimate value"
+\}
+A()
+}
+
+~p {
+[c]A()[/c] will always be [c]"the ultimate value"[/c], and the others are inaccessible.
+Detail fixes this with:
+}
+
+~code {
+$ret = detail A()
+$ret.x          # "a return value"
+$ret.y          # "another value"
+$ret.result     # "the ultimate value"
+}
+
+}
+
+}
+~sec [Classes] {
+
+~p {
+These keywords are to be used within classes only.
+}
+~sec [method] {
+
+~code {
+method <name> \{ <statements> \}
+}
+
+~p {
+Declares a class instance method.
+}
+
+~p {
+All methods are implemented as events. The event will be assigned to the
+property [c]name[/c] of the class's prototype object.
+}
+
+~code {
+class Person
+
+method haveBirthday \{
+    @age++
+\}
+}
+
+}
+~sec [hook] {
+
+~code {
+hook <name> [\{ <statements> \}]
+}
+
+~p {
+Exactly the same as the [[ [c]method[/c] | #method ]] keyword, except that it is used by
+convention for event hooks and produces different documentation.
+}
+
+~p {
+Usually the body is omitted, but you can still provide one if your class needs
+a default responder for its own hook.
+}
+
+~code {
+class MySocket 1.0
+
+hook connected
+hook disconnected
+}
+
+}
+~sec [init] {
+
+~code {
+init \{ <statements> \}
+}
+
+~p {
+Declares a class instance initializer.
+}
+
+~p {
+A class may have any number of initializers. Initialization succeeds as long as
+at least one of them is satisfied. The first one found is considered default and
+dictates the [c]init[/c] signature. Thus, you have to specify arg names for all
+initializers besides the default one.
+}
+
+~code {
+class Person
+
+# default initializer since it occurs first
+init \{
+    need @fullName: Str, @age: Num, @gender: Sym
+\}
+
+# secondary initializer
+# this one happens to refer to the default one, but that is not required
+init \{
+    need $firstName: Str, $lastName: Str
+    need $age: Num, $gender: Sym
+    -> Person("$firstName $lastName", $age, $gender)
+\}
+
+end
+
+# OK, uses default init signature
+$john = Person("John Doe", 43, :male)
+
+# uses secondary initializer.
+# note the args for a secondary initializer must be explicit.
+$jane = Person(firstName: "Jane", lastName: "Doe", age: 42, gender: :female)
+}
+
+}
+~sec [op] {
+
+~code {
+op <op> \{ <statements> \}
+}
+
+~p {
+Exactly the same as the [[ [c]method[/c] | #method ]] keyword, except that it is used by
+convention for operator implementations.
+}
+
+~p {
+Defines an operator overload method for the operator [c]op[/c]. This allows you to
+add custom operator implementations involving the instances of the class.
+}
+
+~p {
+The implementation should [[ [c]need[/c] | #need ]] one of [c]$rhs[/c], [c]$lhs[/c], or [c]$ehs[/c]:
+* [c]$rhs[/c] - Right operand.
+* [c]$lhs[/c] - Left operand. This will only be used if an implementation from the
+  left operand could not be resolved.
+* [c]$ehs[/c] - Either operand. This is useful for commutative operations where the
+  side of the operand does not matter (e.g. scalar addition and multiplication).
+}
+
+~p {
+For all operations, the Ferret runtime first attempts to resolve it
+left-to-right. If the left operand offers an implementation observing [c]$rhs[/c] or
+[c]$ehs[/c] with the given types, that is what determines the result of the
+operation.
+}
+
+~p {
+If the left operand does not offer a suitable implementation, the runtime will
+look to the right operand for an implementation observing [c]$lhs[/c] or [c]$ehs[/c] for
+the given types.
+}
+
+~p {
+If no implementation exists for a given operation, a runtime error is thrown.
+}
+
+~code {
+package Time
+class Duration
+
+operator + \{
+    need $ehs: Duration # the side does not matter for addition
+    -> @addDuration($rhs)
+\}
+
+operator - \{
+    need $rhs: Duration # the side matters for subtraction
+    -> @subtractDuration($rhs)
+\}
+}
+
+}
+
+}
+~sec [Control flow] {
+~sec [if] {
+
+~code {
+if <condition> \{ <statements> \}
+}
+
+~p {
+Conditional statement.
+}
+
+~p {
+The code within the block will be executed only if [c]condition[/c] represents a true
+value. In Ferret, all values are true other than [c]false[/c],
+[c]undefined[/c], and empty [[ return objects | Functions.md#return-objects ]].
+}
+
+~p {
+If the body of the conditional is a single statement, the curly brackets [c]\{[/c] and
+[c]\}[/c] may be omitted, provided that the statement occurs on a separate line from
+the condition.
+}
+
+~code {
+# this will be executed
+if 1.odd \{
+    doSomething()
+    doSomethingElse()
+\}
+
+# this will not be executed
+if 1.even \{
+    doStuff()
+    doOtherStuff()
+\}
+
+# one-statement conditional
+if "hi".length == 2
+    doOneThingOnly()
+}
+
+}
+~sec [else] {
+
+~code {
+else \{ <statements> \}
+}
+
+~p {
+Compliment to [[ [c]if[/c] | #if ]]. Specifies an alternate set of instructions in the
+case of a false condition.
+}
+
+~p {
+If the body of the else is a single statement, the curly brackets [c]\{[/c] and
+[c]\}[/c] may be omitted, provided that the statement occurs on a separate line from
+the [c]else[/c] keyword.
+}
+
+~code {
+if false \{
+    say("Nothing here will happen")
+\}
+
+else \{
+    say("This will be said")
+\}
+
+# one-statement conditional
+if false
+    say("Nothing here will happen")
+else
+    say("This will be said")
+}
+
+}
+~sec [else if] {
+
+~p {
+Allows you to chain [[ [c]if[/c] | #if ]] conditional statements.
+}
+
+~p {
+The [c]if[/c]/[c]else if[/c] chain will continue until one of the conditions has a boolean
+true value. In that case, none of the remaining [c]else if[/c] or [c]else[/c] statements
+will be executed.
+}
+
+~p {
+If the body of the [c]else if[/c] is a single statement, the curly brackets [c]\{[/c] and
+[c]\}[/c] may be omitted, provided that the statement occurs on a separate line from
+the [c]else if[/c] keyword.
+}
+
+~code {
+if false \{
+    say("Nothing here will happen")
+\}
+
+else if true \{
+    say("This will be said")
+\}
+
+else \{
+    say("This will not be reached")
+\}
+
+# one-statement conditional
+if false
+    say("Nothing here will happen")
+else if true
+    say("This will be said")
+else
+    say("This will not be reached")
+}
+
+}
+~sec [for] {
+
+~p {
+[c]for[/c] is a diverse keyword whose behavior depends on its arguments. The single
+keyword is used for all forms of loops. See the proper section.
+}
+
+list {
+[[ [b]Iterations[/b] | #for-iteration ]]: [c]for..in \{\}[/c]\; like [c]foreach[/c].;
+[[ [b]Conditional loops[/b] | #for-conditional ]]: [c]for condition \{\}[/c]\; like [c]while[/c].;
+[[ [b]Infinite loops[/b] | #for-infinite ]]: [c]for \{\}[/c]\; like [c]while (true)[/c].;
+}
+}
+~sec [for (iteration)] {
+
+~code {
+for $<value_var> in <collection> \{ <statements> \}
+}
+
+~code {
+for ($<key_var>, $<value_var>) in <collection> \{ <statements> \}
+}
+
+~p {
+Performs an iteration over a collection.
+}
+
+~p {
+Right of the [c]for[/c] keyword must be a lexical variable whose value is set to each
+subsequent element of the iteration. If the collection offers two-variable
+iteration, such as with a hash key or list index, you may optionally specify two
+lexical variables in the form of [c]($key, $val)[/c].
+}
+
+~p {
+The parentheses are required when using two variables and forbidden when using
+one. The variable(s) are defined only within the body of the [c]for[/c] statement.
+}
+
+~code {
+$list = [ 1, 2, 3 ]
+for $x in $list \{
+    say("Found $x")
+\}
+}
+
+~code {
+$hash = [ hi: "there", how: "are you" ]
+for ($firstWord, $others) in $hash \{
+    say("$firstWord $others")
+\}
+}
+
+}
+~sec [for (conditional)] {
+
+~code {
+for <condition> \{ <statements> \}
+}
+
+~p {
+Loops while the provided [c]condition[/c] is true.
+}
+
+~p {
+The statements in the block will be executed repeatedly until the first time the
+condition evaluates to boolean false or an exit of the loop via [[ [c]last[/c] | #last ]]
+or some other form of goto statement.
+}
+
+~p {
+If the [c]condition[/c] is not true at the time when the [c]for[/c] is reached, the block
+will never be executed.
+}
+
+~p {
+This is functionally equivalent to [c]while (condition)[/c] in C and others alike.
+}
+
+~code {
+$fiveEs = ""
+
+for $fiveEs.length < 5 \{
+    $fiveEs += "e"
+\}
+
+say($fiveEs)    # eeeee
+}
+
+}
+~sec [for (infinite)] {
+
+~code {
+for \{ <statements> \}
+}
+
+~p {
+Loops indefinitely.
+}
+
+~p {
+The statements in the block will be executed repeatedly until a possible exit of
+the loop via [[ [c]last[/c] | #last ]] or some other form of goto statement.
+}
+
+~p {
+Only use [c]for \{\}[/c] when you have intentions of eventually exiting the loop.
+It is not advisable to base a program around a master loop. The runtime itself
+is a master loop which manages asynchronous I/O among other things, so truly
+infinite loops will block it. Instead utilize runtime notifiers.
+}
+
+~p {
+This is functionally equivalent to [c]while (true)[/c] or [c]while (1)[/c] in many
+languages.
+}
+
+~code {
+$dontSayIt = true
+
+for \{
+    if $dontSayIt
+        last
+    say("Hey!")
+    last
+\}
+}
+
+}
+~sec [in] {
+
+~p {
+Compliment to [[ [c]for[/c] | #for-iteration ]] while iterating over a collection.
+Expects an expression over which to iterate.
+}
+
+}
+
+}
+~sec [next] {
+
+~code {
+next
+}
+
+~p {
+Jumps to the next iteration of the current [[ [c]for[/c] | #for ]] loop.
+}
+
+~p {
+This is like [c]continue[/c] in C.
+}
+
+}
+~sec [last] {
+
+~code {
+last
+}
+
+~p {
+Immediately exits the current [[ [c]for[/c] | #for ]] loop.
+}
+
+~p {
+This is like [c]break[/c] in C.
+}
+
+}
+~sec [redo] {
+
+~code {
+redo
+}
+
+~p {
+Restarts the current [[ [c]for[/c] | #for ]] loop iteration without reevaluating the
+conditional.
+}
+~sec [__END__] {
+
+~code {
+__END__
+}
+
+~p {
+Terminates the document before the EOF.
+}
+
+~code {
+$x = 1
+doStuff()
+
+__END__
+
+non-code down here
+}
+
+}
+~sec [defer] {
+
+~code {
+defer \{ <statements> \}
+}
+
+~p {
+Postpones the execution of code until the current routine reaches its end.
+}
+
+~p {
+This is useful to guarantee that something be done after a routine executes,
+regardless of whether it terminated early by [c]->[/c] or other means.
+}
+
+~p {
+[c]defer[/c] can only exist within functions, methods, and callbacks.
+If multiple instances of [c]defer[/c] occur in a routine, they are executed in the
+order that the keyword was reached, with normal control flow in consideration.
+}
+
+~code {
+func ok \{
+    defer: say("goodbye")
+    say("hello")
+\}
+
+ok()    # says "hello" then "goodbye"
+}
+
+}
+
+}
+~sec [Type interfaces] {
+~sec [type] {
+
+~code {
+type[?] <name> \{ <conditions/transforms/expressions> \}
+}
+
+~p {
+Defines a type interface for dynamic type checking.
+}
+
+~p {
+This is especially useful for functions or methods utilizing [[ [c]want[/c] | #want ]] or
+[[ [c]need[/c] | #need ]].
+}
+
+~p {
+Interfaces are generally declared at document or class level, but they are valid
+within almost any scope.
+}
+
+~p {
+In order for an object to conform to an interface, it must meet [b]all[/b] of the
+provided conditions. These keywords can be used in a type declaration:
+}
+
+list {
+[[ [c]isa[/c] | #isa ]] - specifies another type to which the object must conform.;
+[[ [c]satisfies[/c] | #satisfies ]] - specifies a condition which the object must meet.;
+[[ [c]can[/c] | #can ]] - specifies a method or computed property which the object must
+implement.;
+[[ [c]transform[/c] | #transform ]] - specifies an object transformation.;
+}
+~p {
+Conditions are checked in the order that they are specified. Transforms are also
+executed in the provided order. See the documentation for each of the above
+keywords for additional information on their usage.
+}
+
+~p {
+A [c]type[/c] construct can also contain standalone expressions. They must occur
+below any possible conditions or transforms. If expression(s) are provided, an
+object will conform to the type only if it is equal
+(according to the [[ [c]==[/c] | Operators.md#equality-operator ]] operator)
+to at least [b]one[/b] of them. Although this feature is most
+often used with [[ symbols | Variables.md#symbols ]], any expressions are valid.
+}
+
+~code {
+type Gender \{
+    :male
+    :female
+\}
+}
+
+~p {
+Anywhere within the [c]type[/c] construct, the test object is the object of
+interest for [[ property variables | Variables.md#property-variables ]]. Therefore,
+the test object's properties can be easily accessed using the [c].property[/c]
+syntax. If you need to access the object itself, use the topic variable [c]$_[/c].
+}
+
+~code {
+type Even \{
+    isa Num
+    satisfies .even
+\}
+}
+
+~p {
+Behind the scenes, [c]type[/c] creates a function which tests an object's
+conformance. If an object matches, [c]TypeName($obj)[/c] will output that object
+or another object returned by a [[ [c]transform[/c] | #transform ]]. If it fails,
+[c]undefined[/c] is returned.
+}
+
+~p {
+The finished type function will be available only within the
+[[ scope of interest | Scopes.md#scope-of-interest ]].
+}
+
+~p {
+If the keyword is spelled [c]type?[/c] with a question mark, the interface
+is marked as lazy. Lazy interfaces are evaluated only once per object. If an
+object conforms to the interface once, it will be assumed to conform
+permanently, and all further checks will be skipped.
+}
+
+~p {
+Below is an example with only expressions provided. For examples with various
+conditions or transforms, see the respective keywords.
+}
+
+~code {
+type Gender \{
+    :male
+    :female
+\}
+
+func announce \{
+    need $name: Str, $gender: Gender
+    $what = Str($gender).trimPrefix(":")
+    say("$name is $what")
+\}
+
+announce("Robert", :male)
+announce("Kris", :female)
+announce("Kylie", :female)
+announce("Caitlyn", :other) # ignored
+}
+
+}
+~sec [isa] {
+
+~p {
+Used within a [[ [c]type[/c] | #type ]] construct to specify another type to which the
+test object must conform.
+}
+
+~code {
+type EvenNumber \{
+    isa Num
+    satisfies .even
+\}
+}
+
+~p {
+Note that the type in the example exists in the standard library as
+[c]Number::Even[/c].
+}
+
+}
+~sec [satisfies] {
+
+~p {
+Used within a [[ [c]type[/c] | #type ]] construct to specify a condition which must be
+true.
+}
+
+~p {
+If the provided expression does not evaluate to boolean true, the test object
+will not conform to the type.
+}
+
+~code {
+type NonEmptyString \{
+    isa String
+    satisfies .length != 0
+\}
+}
+
+~p {
+Note that the type in the example exists in the standard library as
+[c]String::NonEmpty[/c].
+}
+
+}
+~sec [can] {
+
+~code {
+can .<methodName>(<arguments>)
+}
+
+~p {
+Used within a [[ [c]type[/c] | #type ]] construct to specify a method requirement.
+}
+
+~p {
+If the test object lacks a responder for the provided method, with any possibly
+provided arguments, the object will not conform to the type.
+}
+
+}
+~sec [transform] {
+
+~code {
+transform (<function>|<expression>)
+}
+
+~p {
+Used within a [[ [c]type[/c] | #type ]] construct to perform a transformation on a test
+object.
+}
+
+~p {
+If the provided value is a function or event, it will be called, and the return
+value will overwrite the current test object. Otherwise, the provided value
+itself will overwrite the object.
+}
+
+~p {
+If the provided value or returned value is undefined, the test object will not
+conform to the type. Otherwise, it will conform, and the test will yield
+whatever object was returned by the transformation.
+}
+
+~code {
+type UCString \{
+    isa String
+    transform .uppercase
+\}
+
+func sayUC \{
+    need $str: UCString
+    say($str)
+\}
+
+sayUC("Hello World!")   # HELLO WORLD!
+}
+
+~p {
+Note that the type in the example exists in the standard library as
+[c]String::UC[/c].
+}
+
+}
+
+}
+~sec [Error handling] {
+~sec [throw] {
+
+~code {
+throw <error_expression>
+}
+
+~p {
+Throws a fatal exception.
+}
+
+~p {
+[c]throw[/c] requires one argument: an error object.
+}
+
+~p {
+When [c]throw[/c] is reached, the default behavior is to print the human-readable
+version of the error and terminate the process with a nonzero status. This is
+similar to Perl's [[ [c]die[/c] | http://perldoc.perl.org/functions/die.html ]] function.
+}
+
+~p {
+However, these "fatal" errors can be handled with a [[ [c]catch[/c] | #catch ]] statement.
+If a fatal error occurs in an instruction with a [c]catch[/c] clause, that clause
+will be executed, and the process will continue from the next statement,
+respecting standard control flow.
+}
+
+~code {
+func somethingFatal \{
+    throw Error(:Unimplemented, "This function is not yet implemented")
+\}
+
+somethingFatal() catch $e \{
+    say("Caught an error! $e")
+\}
+}
+
+}
+~sec [fail] {
+
+~code {
+fail <error_expression>
+}
+
+~p {
+Throws a nonfatal exception.
+}
+
+~p {
+[c]fail[/c] is valid only within functions, methods, and
+callbacks. It requires one argument: an error object.
+}
+
+~p {
+When [c]fail[/c] is reached, the [c]error[/c] return pair is set to the provided error
+object. The current function yields the
+[[ return object | Functions.md#return-objects ]] with this [c]error[/c]
+property set. If used within an event, it will stop the propagation, cancelling
+any remaining callbacks.
+}
+
+~p {
+This is useful because the [[ [c]catch[/c] | #catch ]] keyword relies on the [c]error[/c]
+property for nonfatal error handling.
+}
+
+~p {
+Based on its behavior, [c]fail $x[/c] is functionally equivalent to the following:
+[c]error -> $x; stop; ->[/c].
+}
+
+~code {
+func alwaysFails \{
+    fail Error(:Unimplemented, "This function is not yet implemented")
+
+    # this will never be reached because fail returns
+    say("goodbye")
+
+\}
+
+alwaysFails() catch $e \{
+
+    # this will be reached
+    say("Found an error! $e")
+
+\}
+}
+
+}
+~sec [catch] {
+
+~code {
+catch [$<err_var>] \{ <statements> \}
+}
+
+~p {
+Allows handling of both fatal and nonfatal exceptions.
+}
+
+~p {
+Unlike in many programming languages, [c]catch[/c] does not have a compliment keyword
+[c]try[/c]. Instead, [c]catch[/c] must occur at the end of a potentially failable
+instruction.
+}
+
+~p {
+If a fatal exception occurs in the execution of the instruction, the [c]catch[/c]
+block will be immediately executed, optionally with the error object as its
+sole argument.
+}
+
+~p {
+If no fatal exception occurs, and the instruction was a function or method call,
+[c]catch[/c] will look for a nonfatal exception within the call's return object. This
+[c]error[/c] property is generally set automatically by a [[ [c]fail[/c] | #fail ]] statement.
+}
+
+~p {
+Example involving a fatal exception
+}
+
+~code {
+undefined() catch $e \{
+    # this will be executed because cannot call undefined.
+    say("Found a fatal $e.type!")      # "Found a fatal :CallOnNonFunction!"
+\}
+}
+
+~p {
+Example involving a nonfatal exception
+}
+
+~code {
+func alwaysFails \{
+    fail Error(:Unimplemented, "This function is not yet implemented")
+\}
+
+alwaysFails() catch $e \{
+    # this will be reached
+
+    # "Found a nonfatal error! This function..."
+    say("Found a nonfatal error! $e")
+\}
+}
+
+}
+
+}
+~sec [Miscellaneous] {
+~sec [alias] {
+
+~code {
+alias[?] (<type_name>|<func_name>) = (<other_type_name>|<other_func_name>)
+}
+
+~p {
+Declares that a function, method, or type is an alias for another.
+}
+
+~p {
+For functions, this is similar to [c]func <func_name> \{ <other_func_name>() \}[/c],
+without considering arguments. For types, this is functionally equivalent to
+[c]type <type_name> \{ isa <other_type_name> \}[/c].
+}
+
+~p {
+If the keyword is spelled [c]alias?[/c] with a question mark, the alias
+will not be created until the first time it is referenced. This is only useful
+when the target itself is lazy-evaluated, such as a [c]type?[/c] or
+once-computed property. This works similarly to the
+[[ lazy assignment  operator [c]?=[/c] | Operators.md#lazy-assignment-operator ]].
+}
+
+~p {
+The finished type or function will be available only within the
+[[ scope of interest | Scopes.md#scope-of-interest ]].
+}
+
+~code {
+alias println = say
+alias Str = String
+}
+
+}
+~sec [inside] {
+
+~code {
+inside <object> \{ <statements> \}
+}
+
+~p {
+Temporarily sets the topic variable [c]$_[/c] to [c]<object>[/c].
+}
+
+~p {
+This is useful for a shorthand property syntax using
+[[ property variables | Variables.md#property-variables ]]. Rather than writing
+[c]$obj.x[/c], simply [c].x[/c] works within the block. This is useful when accessing or
+altering several properties at once.
+}
+
+~p {
+This is similar to JavaScript's
+[[ [c]with[/c] | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with ]],
+but it is safer and less ambiguous because the [c].[/c] sigil distinguishes
+properties from lexical variables which use [c]$[/c].
+}
+
+~code {
+$x = 5
+
+inside $person \{
+    .age  = $x * 4 + 6
+    .name = "Pam"
+    say("Hello " + .firstName)
+\}
+
+inspect($person) # (age: 26, name: "Pam")
+}
+
+}
+~sec [if inside] {
+
+~p {
+Provides a convenient way to write the common
+scenario of [[ [c]if[/c] | #if ]] and [[ [c]inside[/c] | #for ]] together:
+[c]if $x \{ inside $x \{ ... \} \}[/c] can be written simply as [c]if inside $x \{ ... \}[/c].
+}
+
+~code {
+func getNames \{
+    need $first: Str, $last: Str
+    firstName -> $first
+    lastName -> $last
+\}
+
+# this will work. it will say "Hello, Sam Smith!"
+if inside getNames("Sam", "Smith") \{
+    $name = .firstName + " " + .lastName
+    say("Hello, $name!")
+\}
+
+# this will do nothing because the second argument is unsatisfied,
+# and therefore, the function returns false.
+if inside getNames("Sam", 0) \{
+    $name = .firstName + " " + .lastName
+    say("Hello, $name!")
+\}
+else \{
+    say("This will be reached")
+\}
+}
+
+}
+~sec [gather] {
+
+~code {
+gather \{ <statements> \}
+}
+
+~p {
+Constructs a list by consolidating the provided expression values of each
+[[ [c]take[/c] | #take ]] statement within its body.
+}
+
+~p {
+[c]gather[/c] constructs are standard expressions and can therefore be used in
+assignments, function calls, and almost anywhere else.
+}
+
+~code {
+$evenSingleDigits = gather \{
+    for $n in 0..9 \{
+        if $n.even
+            take $n
+    \}
+\}
+
+inspect($evenSingleDigits)  # [ 0, 2, 4, 6, 8 ]
+}
+
+~p {
+See [[ [c]gather for[/c] | #gather-for ]] for an even better version of the above example.
+}
+
+}
+~sec [take] {
+
+~code {
+take <expression>
+}
+
+~p {
+Compliment to [[ [c]gather[/c] | #gather ]]. Adds a value to a consolidated list.
+}
+
+}
+~sec [gather for] {
+
+~p {
+Provides a convenient way to write the common
+scenario of [[ [c]gather[/c] | #gather ]] and [[ [c]for[/c] | #for ]] together:
+[c]gather \{ for \{ ... \} \}[/c] can be written simply as [c]gather for \{ ... \}[/c].
+}
+
+~code {
+$evenSingleDigits = gather for $n in 0..9 \{
+    if $n.even
+        take $n
+\}
+
+inspect($evenSingleDigits)  # [ 0, 2, 4, 6, 8 ]
+}
+
+}
+}
+}

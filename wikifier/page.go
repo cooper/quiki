@@ -3,6 +3,7 @@ package wikifier
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -99,6 +100,12 @@ func (p *Page) Parse() error {
 	}
 
 	// TODO: check if p.parser.catch != main block
+	if p.parser.catch != p.main {
+		if p.parser.catch == p.parser.block {
+			return fmt.Errorf("%s{} not closed; started at %d", p.parser.block.blockType(), p.parser.block.openPosition())
+		}
+		return errors.New(string(p.parser.catch.catchType()) + " not closed")
+	}
 
 	// parse the blocks, unless we only want vars
 	if !p.VarsOnly {

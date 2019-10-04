@@ -186,7 +186,7 @@ func (els *elements) generateIndented(indent int) []indentedLine {
 	}
 
 	// add each
-	for i, el := range els.elements {
+	for _, el := range els.elements {
 		theirLines := el.generateIndented(indent)
 		lines = append(lines, theirLines...)
 	}
