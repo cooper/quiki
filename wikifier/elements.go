@@ -1,7 +1,5 @@
 package wikifier
 
-import "fmt"
-
 // A collection of elements.
 type elements struct {
 	elements      []element
@@ -189,7 +187,6 @@ func (els *elements) generateIndented(indent int) []indentedLine {
 
 	// add each
 	for i, el := range els.elements {
-		fmt.Printf("el %v: %v\n", i, el.tag())
 		theirLines := el.generateIndented(indent)
 		lines = append(lines, theirLines...)
 	}

@@ -7,7 +7,7 @@ of a full wiki, and others yet for the operation of a wikiserver.
 
 * [Configuration](#configuration)
   * [Configuration files](#configuration-files)
-  * [Page options](#page-options)
+  * [wikifier options](#page-options)
     * [name](#name)
     * [root](#root)
     * [dir](#dir)
@@ -16,7 +16,7 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [image\.size\_method](#imagesize_method)
     * [image\.calc](#imagecalc)
     * [image\.sizer](#imagesizer)
-  * [Wiki public options](#wiki-public-options)
+  * [wiki public options](#wiki-public-options)
     * [page\.enable\.cache](#pageenablecache)
     * [image\.retina](#imageretina)
     * [image\.type](#imagetype)
@@ -25,19 +25,19 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [cat\.[name]\.main](#catnamemain)
     * [cat\.[name]\.title](#catnametitle)
     * [var\.\*](#var)
-  * [Wiki extended options](#wiki-extended-options)
+  * [wiki extended options](#wiki-extended-options)
     * [main\_page](#main_page)
     * [main\_redirect](#main_redirect)
     * [error\_page](#error_page)
     * [navigation](#navigation)
     * [template](#template)
     * [logo](#logo)
-  * [Wiki private options](#wiki-private-options)
+  * [wiki private options](#wiki-private-options)
     * [admin\.[username]\.name](#adminusernamename)
     * [admin\.[username]\.email](#adminusernameemail)
     * [admin\.[username]\.crypt](#adminusernamecrypt)
     * [admin\.[username]\.password](#adminusernamepassword)
-  * [Webserver options](#server-options)
+  * [webserver options](#webserver-options)
     * [server\.dir\.wiki](#serverdirwiki)
     * [server\.enable\.pregeneration](#serverenablepregeneration)
     * [server\.enable\.monitor](#serverenablemonitor)
@@ -77,7 +77,10 @@ possibility of it being served to HTTP clients.
 When using webserver, this is defined by
 [`server.wiki.[name].private`](#serverwikinameprivate).
 
-## Page options
+## wikifier options
+
+These options are available to the wikifier engine, the lowest level API 
+for rendering pages.
 
 ### name
 
@@ -215,6 +218,8 @@ __Default__: (webserver) built-in function
 
 ## Wiki public options
 
+These options are available to the wiki website interface.
+
 ### image.type
 
 The desired file type for generated images.
@@ -302,8 +307,8 @@ Example (on main page):
 
 ## Wiki extended options
 
-These options are not used by the wiki API directly but are respected
-by webserver and perhaps other frontends.
+These options are not used by the wiki API directly but are standardized 
+here so that there is consistency amongst various frontends such as webserver.
 
 ### main_page
 
@@ -428,7 +433,7 @@ Password of the administrator `[username]`.
 It must be encrypted in
 the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
 
-## Webserver options
+## webserver options
 
 These options are respected by the quiki webserver.
 
