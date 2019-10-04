@@ -49,7 +49,7 @@ p.clear-right {
 
 Wraps a block of code.
 
-The contents is not formatted. When used with [brace escape](language.md#escaping)
+The contents is not formatted. When used with [brace escape](language.md#escapes)
 (extra `{` and `}`, e.g. `code{{ }}`), there is no need to escape curly brackets
 within the code, as long as there is a closing bracket corresponding to each
 opening bracket. So, you can paste code right in.
@@ -496,7 +496,7 @@ will be displayed atop this section.
 }
 ```
 
-## Style
+## style{}
 
 Allows you to use CSS with quiki.
 

@@ -108,7 +108,7 @@ characters must also be escaped:
 **Brace-escape**. Sometimes it may be desirable to disable all parsing within a
 particular block. This is especially useful for things like
 [`code{}`](blocks.md#code), [`html{}`](blocks.md#html), and
-[`format{}`](blocks.md#format) because then you do not have to escape every
+[`fmt{}`](blocks.md#fmt) because then you do not have to escape every
 instance of special characters like `{`, `}`, and `\`. It works as long as there
 is a closing bracket `{` to correspond with every opening bracket `}`. To enable
 brace-escape mode, open and close the block with double curly brackets:

@@ -298,6 +298,6 @@ table.q-table th {
 
 /* built-in classes */
 
-.q-class-clear, .q-clear { clear: both; }
-.q-class-clear-left { clear: left; }
-.q-class-clear-right { clear: right; }
+.qc-clear, .q-clear { clear: both; }
+.qc-clear-left { clear: left; }
+.qc-clear-right { clear: right; }
