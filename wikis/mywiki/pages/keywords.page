@@ -50,7 +50,7 @@ until the first occurrence of the following:
 }
 
 ~p {
-See [[ Contexts | Scopes.md#context ]] for general information on namespaces.
+See [[ Contexts | Scopes#context ]] for general information on namespaces.
 }
 
 }
@@ -313,7 +313,7 @@ passed argument is not of that type.
 ~p {
 If [c]required_value[/c] is provided, the function will only be executed when the
 passed argument is equal to that value (according to the
-[[ [c]==[/c] | Operators.md#equality-operator ]] operator). This is useful for events
+[[ [c]==[/c] | Operators#equality-operator ]] operator). This is useful for events
 where certain callbacks are only applicable to specific argument values.
 }
 
@@ -432,7 +432,7 @@ Declares an event or anonymous function.
 
 ~p {
 If [c]name[/c] is provided, the event will be assigned to a property of the
-[[ scope of interest | Scopes.md#scope-of-interest ]]. Named functions can be nested
+[[ scope of interest | Scopes#scope-of-interest ]]. Named functions can be nested
 within one another.
 }
 
@@ -504,13 +504,13 @@ associated with each of its callbacks. See the below example and the
 }
 
 ~p {
-The use of a [[ symbol | Variables.md#symbols ]] [c]callback_name[/c] is optional but
+The use of a [[ symbol | Variables#symbols ]] [c]callback_name[/c] is optional but
 strongly recommended. This allows the callback to be referred to in priority
 hints among other purposes.
 }
 
 ~p {
-Within the callback body, [[ this variables | Variables.md#this-variables ]] refer to
+Within the callback body, [[ this variables | Variables#this-variables ]] refer to
 the object on which the event was called.
 }
 
@@ -628,7 +628,7 @@ Requests "more detail" in the return value of a function call.
 
 ~p {
 This means that, regardless of any explicit [c]->[/c] statements that may exist,
-the call will always return the [[ return object | Functions.md#return-objects ]].
+the call will always return the [[ return object | Functions#return-objects ]].
 }
 
 ~p {
@@ -835,7 +835,7 @@ Conditional statement.
 ~p {
 The code within the block will be executed only if [c]condition[/c] represents a true
 value. In Ferret, all values are true other than [c]false[/c],
-[c]undefined[/c], and empty [[ return objects | Functions.md#return-objects ]].
+[c]undefined[/c], and empty [[ return objects | Functions#return-objects ]].
 }
 
 ~p {
@@ -1213,9 +1213,9 @@ keywords for additional information on their usage.
 A [c]type[/c] construct can also contain standalone expressions. They must occur
 below any possible conditions or transforms. If expression(s) are provided, an
 object will conform to the type only if it is equal
-(according to the [[ [c]==[/c] | Operators.md#equality-operator ]] operator)
+(according to the [[ [c]==[/c] | Operators#equality-operator ]] operator)
 to at least [b]one[/b] of them. Although this feature is most
-often used with [[ symbols | Variables.md#symbols ]], any expressions are valid.
+often used with [[ symbols | Variables#symbols ]], any expressions are valid.
 }
 
 ~code {
@@ -1227,7 +1227,7 @@ type Gender \{
 
 ~p {
 Anywhere within the [c]type[/c] construct, the test object is the object of
-interest for [[ property variables | Variables.md#property-variables ]]. Therefore,
+interest for [[ property variables | Variables#property-variables ]]. Therefore,
 the test object's properties can be easily accessed using the [c].property[/c]
 syntax. If you need to access the object itself, use the topic variable [c]$_[/c].
 }
@@ -1248,7 +1248,7 @@ or another object returned by a [[ [c]transform[/c] | #transform ]]. If it fails
 
 ~p {
 The finished type function will be available only within the
-[[ scope of interest | Scopes.md#scope-of-interest ]].
+[[ scope of interest | Scopes#scope-of-interest ]].
 }
 
 ~p {
@@ -1445,7 +1445,7 @@ callbacks. It requires one argument: an error object.
 ~p {
 When [c]fail[/c] is reached, the [c]error[/c] return pair is set to the provided error
 object. The current function yields the
-[[ return object | Functions.md#return-objects ]] with this [c]error[/c]
+[[ return object | Functions#return-objects ]] with this [c]error[/c]
 property set. If used within an event, it will stop the propagation, cancelling
 any remaining callbacks.
 }
@@ -1559,12 +1559,12 @@ If the keyword is spelled [c]alias?[/c] with a question mark, the alias
 will not be created until the first time it is referenced. This is only useful
 when the target itself is lazy-evaluated, such as a [c]type?[/c] or
 once-computed property. This works similarly to the
-[[ lazy assignment  operator [c]?=[/c] | Operators.md#lazy-assignment-operator ]].
+[[ lazy assignment  operator [c]?=[/c] | Operators#lazy-assignment-operator ]].
 }
 
 ~p {
 The finished type or function will be available only within the
-[[ scope of interest | Scopes.md#scope-of-interest ]].
+[[ scope of interest | Scopes#scope-of-interest ]].
 }
 
 ~code {
@@ -1585,7 +1585,7 @@ Temporarily sets the topic variable [c]$_[/c] to [c]<object>[/c].
 
 ~p {
 This is useful for a shorthand property syntax using
-[[ property variables | Variables.md#property-variables ]]. Rather than writing
+[[ property variables | Variables#property-variables ]]. Rather than writing
 [c]$obj.x[/c], simply [c].x[/c] works within the block. This is useful when accessing or
 altering several properties at once.
 }

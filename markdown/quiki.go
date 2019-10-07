@@ -348,8 +348,12 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		} else {
 			if entering {
 				link := string(r.addAbsPrefix(dest))
-				r.linkDest = strings.TrimSuffix(quikiEscLink(link), ".md")
-
+				link = quikiEscLink(link)
+				if hashIdx := strings.IndexByte(link, '#'); hashIdx != -1 {
+					r.linkDest = strings.TrimSuffix(link[:hashIdx], ".md") + link[hashIdx:]
+				} else {
+					r.linkDest = strings.TrimSuffix(link, ".md")
+				}
 				r.addText(w, "[[ ")
 
 				// TODO: anything we can do with node.LinkData.Title?
