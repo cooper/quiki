@@ -673,6 +673,9 @@ func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 
 func quikiEsc(s string) string {
 
+	// escape existing escapes
+	s = strings.Replace(s, "\\", "\\\\", -1)
+
 	// ecape curly brackets
 	s = strings.Replace(s, "{", "\\{", -1)
 	s = strings.Replace(s, "}", "\\}", -1)

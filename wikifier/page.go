@@ -87,7 +87,9 @@ func (p *Page) Parse() error {
 		if err != nil {
 			return err
 		}
-		reader = bytes.NewReader(markdown.Run(md))
+		d := markdown.Run(md)
+		fmt.Println(string(d))
+		reader = bytes.NewReader(d)
 	} else if p.FilePath != "" {
 		file, err := os.Open(p.FilePath)
 		if err != nil {
