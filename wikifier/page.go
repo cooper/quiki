@@ -2,9 +2,11 @@ package wikifier
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,6 +14,7 @@ import (
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
+	"github.com/cooper/quiki/markdown"
 	strip "github.com/grokify/html-strip-tags-go"
 )
 
@@ -31,6 +34,7 @@ type Page struct {
 	sectionN   int
 	headingIDs map[string]int
 	Wiki       interface{} // only available during Parse() and HTML()
+	markdown   bool        // true if FilePath points to a markdown source
 	*variableScope
 }
 
@@ -57,6 +61,7 @@ func NewPage(filePath string) *Page {
 		Models:        make(map[string]bool),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
+		markdown:      strings.HasSuffix(filePath, ".md"),
 	}
 }
 
@@ -77,6 +82,12 @@ func (p *Page) Parse() error {
 	var reader io.Reader
 	if p.Source != "" {
 		reader = strings.NewReader(p.Source)
+	} else if p.markdown && p.FilePath != "" {
+		md, err := ioutil.ReadFile(p.FilePath)
+		if err != nil {
+			return err
+		}
+		reader = bytes.NewReader(markdown.Run(md))
 	} else if p.FilePath != "" {
 		file, err := os.Open(p.FilePath)
 		if err != nil {

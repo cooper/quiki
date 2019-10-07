@@ -316,9 +316,11 @@ func PageName(name string) string {
 
 // PageNameNE returns a clean page name with No Extension.
 func PageNameNE(name string) string {
+	// TODO: make this less ugly
 	name = strings.TrimSuffix(PageName(name), ".page")
 	name = strings.TrimSuffix(name, ".model")
 	name = strings.TrimSuffix(name, ".conf")
+	name = strings.TrimSuffix(name, ".md")
 	return name
 }
 
@@ -337,7 +339,8 @@ func PageNameExt(name, ext string) string {
 	lastDot := strings.LastIndexByte(name, '.')
 	if lastDot != -1 && lastDot < len(name)-1 {
 		existing := name[lastDot:]
-		if existing != ".page" && existing != ".model" && existing != ".conf" {
+		if existing != ".page" && existing != ".model" && existing != ".conf" && existing != ".md" {
+			// TODO: make above prettier
 			name += ext
 		}
 	} else {

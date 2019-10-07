@@ -90,9 +90,20 @@ type pageJSONManifest struct {
 	wikifier.PageInfo
 }
 
-// NewPage creates a Page given its filepath and configures it for
+// NewPage creates a Page given its name and configures it for
 // use with this Wiki.
 func (w *Wiki) NewPage(name string) *wikifier.Page {
+	p := w._newPage(name)
+	if p.Exists() {
+		return p
+	}
+	if mdp := w._newPage(name + ".md"); mdp.Exists() {
+		return mdp
+	}
+	return p
+}
+
+func (w *Wiki) _newPage(name string) *wikifier.Page {
 	p := wikifier.NewPage(w.pathForPage(name, false, ""))
 	p.Wiki = w
 	p.Opt = &w.Opt
