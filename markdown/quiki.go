@@ -1,29 +1,19 @@
-// Package markdown translates markdown to quiki source code.
-
-package main
+// Package markdown translates Markdown to quiki source code.
+package markdown
 
 import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
-	"os"
 	"strings"
 
 	"gopkg.in/russross/blackfriday.v2"
 )
 
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("usage: " + os.Args[0] + " /path/to/markdown.md")
-	}
-	s, err := ioutil.ReadFile(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
+// Run parses Markdown and renders quiki soure code.
+func Run(input []byte) []byte {
 	r := NewQuikiRenderer(QuikiRendererParameters{})
-	fmt.Println(string(blackfriday.Run(s, blackfriday.WithRenderer(r))))
+	return blackfriday.Run(input, blackfriday.WithRenderer(r))
 }
 
 // QuikiFlags is renderer configuration options.
@@ -665,9 +655,11 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 	return blackfriday.GoToNext
 }
 
+// RenderFooter renders the page footer (not used).
 func (r *QuikiRenderer) RenderFooter(w io.Writer, ast *blackfriday.Node) {
 }
 
+// RenderHeader renders the page header, which includes @page variable definitions.
 func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 	if r.Flags&PartialPage != 0 {
 		return

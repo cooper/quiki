@@ -1,4 +1,4 @@
-package main
+package markdown
 
 // Test if a character is a whitespace character.
 func isspace(c byte) bool {
