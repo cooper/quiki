@@ -100,6 +100,15 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 		return
 	}
 	pageName := strings.TrimPrefix(*target, page.Opt.Root.Page+"/") // I don't like this
+	if hashIdx := strings.IndexByte(pageName, '#'); hashIdx != -1 {
+		// remove section when checking if page exists
+		// note: whitespace like My Page # Section has been trimmed already
+		pageName = pageName[:hashIdx]
+		if pageName == "" {
+			*ok = true
+			return
+		}
+	}
 	pageName = wikifier.PageNameLink(pageName, false)
 	page.PageLinks[pageName] = append(page.PageLinks[pageName], 1) // FIXME: line number
 	*ok = w.NewPage(pageName).Exists()

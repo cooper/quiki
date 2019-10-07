@@ -539,6 +539,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		// normal page link
 		linkType = "internal"
 
+		// prefix
 		pfx := ""
 		if target[0] == '/' && len(target) > 1 {
 			// if target starts with /, ignore prefix
@@ -552,7 +553,22 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 			}
 		}
 
-		target = page.Opt.Root.Page + "/" + pfx + PageNameNE(target)
+		// section
+		sec := ""
+		if hashIdx := strings.IndexByte(target, '#'); hashIdx != -1 && len(target) >= hashIdx {
+			sec = "#" + PageNameNE(strings.TrimSpace(target[hashIdx+1:]))
+			target = strings.TrimSpace(target[:hashIdx])
+		}
+
+		// determine actual target
+		if target == "" && sec != "" && sec[0] == '#' {
+			// section on same page
+			target = sec
+		} else {
+			// other page link
+			target = page.Opt.Root.Page + "/" + pfx + PageNameNE(target) + sec
+		}
+
 		handler = page.Opt.Link.ParseInternal
 	}
 
