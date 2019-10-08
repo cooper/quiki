@@ -24,7 +24,7 @@ func (w *Wiki) relPath(absPath string) string {
 }
 
 func (w *Wiki) allPageFiles() []string {
-	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, []string{"page"}, false)
+	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, []string{"page", "md"}, false)
 	return files
 }
 
@@ -44,11 +44,6 @@ func (w *Wiki) allModelFiles() []string {
 
 func (w *Wiki) allImageFiles() []string {
 	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Image, []string{"png", "jpg", "jpeg"}, false)
-	return files
-}
-
-func (w *Wiki) allMarkdownFiles() []string {
-	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Markdown, []string{"md"}, false)
 	return files
 }
 

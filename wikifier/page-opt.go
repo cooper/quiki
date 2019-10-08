@@ -171,7 +171,6 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		"dir.image":     &opt.Dir.Image,     // image directory
 		"dir.page":      &opt.Dir.Page,      // page directory
 		"dir.model":     &opt.Dir.Model,     // model directory
-		"dir.markdown":  &opt.Dir.Markdown,  // markdown directory
 		"dir.cache":     &opt.Dir.Cache,     // cache directory
 		"root.wiki":     &opt.Root.Wiki,     // http path to wiki
 		"root.image":    &opt.Root.Image,    // http path to images

@@ -47,10 +47,9 @@ func WatchWiki(w *wiki.Wiki) {
 	}
 
 	roots := map[string]func(mon wikiMonitor, event fsnotify.Event, abs string){
-		w.Opt.Dir.Page:     handlePageEvent,
-		w.Opt.Dir.Image:    handleImageEvent,
-		w.Opt.Dir.Model:    handleModelEvent,
-		w.Opt.Dir.Markdown: handleMarkdownEvent,
+		w.Opt.Dir.Page:  handlePageEvent,
+		w.Opt.Dir.Image: handleImageEvent,
+		w.Opt.Dir.Model: handleModelEvent,
 	}
 
 	// watch each of the content roots
@@ -151,5 +150,3 @@ func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
 func handleImageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {}
 
 func handleModelEvent(mon wikiMonitor, event fsnotify.Event, abs string) {}
-
-func handleMarkdownEvent(mon wikiMonitor, event fsnotify.Event, abs string) {}

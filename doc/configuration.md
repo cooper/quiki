@@ -119,7 +119,6 @@ that this will likely expose your wiki configuration.
 | `dir.page`        | Page files stored here                                |
 | `dir.image`       | Image originals stored here                           |
 | `dir.model`       | Model files stored here                               |
-| `dir.md`          | Markdown files stored here                            |
 | `dir.cache`       | Generated content and metadata stored here            |
 
 Directories on the filesystem. It is strongly recommended that they are
@@ -133,7 +132,6 @@ webserver, `dir.wiki` is predefined as long as your wiki exists within
     @dir.page:      [@dir.wiki]/pages;
     @dir.image:     [@dir.wiki]/images;
     @dir.model:     [@dir.wiki]/models;
-    @dir.md:        [@dir.wiki]/md;
     @dir.cache:     [@dir.wiki]/cache;
 
 ### external
