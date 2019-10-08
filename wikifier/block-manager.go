@@ -19,6 +19,7 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"list":      newListBlock,
 	"code":      newCodeBlock,
 	"fmt":       newFmtBlock,
+	"html":      newHTMLBlock,
 	"history":   newHistoryBlock,
 	"style":     newStyleBlock,
 	"imagebox":  newImagebox,

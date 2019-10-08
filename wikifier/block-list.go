@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -88,7 +89,7 @@ func (l *List) parse(page *Page) {
 
 		// string
 		case string:
-
+			fmt.Println("STR:", item)
 			item = strings.TrimSpace(item)
 			if item == "" {
 				continue
@@ -129,12 +130,17 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 	} else {
 		// any other character
 
+		// if it was escaped but not a parser char, add the \
+		add := string(c)
+		if p.escape && c != ';' {
+			add = "\\" + add
+		}
 		p.escape = false
 
 		// first item
 		if len(p.values) == 0 {
 			p.startPos = p.pos
-			p.values = append(p.values, string(c))
+			p.values = append(p.values, add)
 			return
 		}
 
@@ -143,12 +149,12 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 		if lastStr, ok := last.(string); ok {
 			// previous item was a string, so append it
 
-			p.values[len(p.values)-1] = lastStr + string(c)
+			p.values[len(p.values)-1] = lastStr + add
 		} else {
 			// previous item was not a string,
 			// so start a new string item
 
-			p.values = append(p.values, string(c))
+			p.values = append(p.values, add)
 		}
 	}
 }
@@ -158,6 +164,7 @@ func (l *List) html(page *Page, el element) {
 	for i, entry := range l.list {
 
 		// prepare the value for inclusion in HTML element
+		fmt.Println("prepareForHTML:", entry.value)
 		value := prepareForHTML(entry.value, page, entry.pos)
 		l.list[i].value = value
 

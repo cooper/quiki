@@ -147,10 +147,10 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) in
 		lastStr, lastWasStr := lastValue.(string)
 		thisHTML, isHTML := value.(HTML)
 		lastHTML, lastWasHTML := lastValue.(HTML)
-		if isStr && lastWasStr {
-			valuesToStore[len(valuesToStore)-1] = lastStr + thisStr
-		} else if isHTML && lastWasHTML {
+		if isHTML && lastWasHTML {
 			valuesToStore[len(valuesToStore)-1] = HTML(lastHTML + thisHTML)
+		} else if isStr && lastWasStr {
+			valuesToStore[len(valuesToStore)-1] = lastStr + thisStr
 		} else {
 			valuesToStore = append(valuesToStore, value)
 		}
@@ -173,9 +173,16 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) in
 }
 
 func fixSingleValue(value interface{}, pageMaybe *Page, fmtText bool) interface{} {
+	fmt.Println("fixSingleValue(", value, ")")
+
 	switch v := value.(type) {
+	case HTML:
+		fmt.Println("..html")
+		return v
 	case string:
 		v = strings.TrimSpace(v)
+		fmt.Println("..str")
+
 		if v == "" {
 			return nil
 		}
@@ -185,6 +192,8 @@ func fixSingleValue(value interface{}, pageMaybe *Page, fmtText bool) interface{
 		return v
 	case block:
 		// just in case
+		fmt.Println("..blk")
+
 		if v == nil {
 			return nil
 		}

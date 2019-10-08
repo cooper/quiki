@@ -238,7 +238,7 @@ var (
 
 var (
 	hrTag         = []byte("<hr />")
-	tableTag      = []byte("<table>")
+	tableTag      = []byte(`<table class="q-table">`)
 	tableCloseTag = []byte("</table>")
 	tdTag         = []byte("<td")
 	tdCloseTag    = []byte("</td>")
