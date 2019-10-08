@@ -32,6 +32,7 @@ type Page struct {
 	Models     map[string]bool    // references to models
 	PageLinks  map[string][]int   // references to other pages
 	sectionN   int
+	name       string
 	headingIDs map[string]int
 	Wiki       interface{} // only available during Parse() and HTML()
 	markdown   bool        // true if FilePath points to a markdown source
@@ -69,6 +70,13 @@ func NewPage(filePath string) *Page {
 func NewPageSource(source string) *Page {
 	p := NewPage("")
 	p.Source = source
+	return p
+}
+
+// NewPageNamed creates a page given its filepath and relative name.
+func NewPageNamed(filePath, name string) *Page {
+	p := NewPage(filePath)
+	p.name = name
 	return p
 }
 
@@ -162,12 +170,12 @@ func (p *Page) CacheExists() bool {
 // and DOES include the page prefix if applicable.
 //
 func (p *Page) Name() string {
-	dir := pageAbs(p.Opt.Dir.Page)
-	path := p.Path()
-	name := strings.TrimPrefix(path, dir)
-	name = strings.TrimPrefix(name, "/")
-	if strings.Index(path, dir) != 0 {
-		return filepath.Base(p.RelPath())
+	dir := pageAbs(p.Opt.Dir.Page)        // /path/to/quiki/wikis/mywiki/pages
+	path := p.Path()                      // /path/to/quiki/doc/language.md
+	name := strings.TrimPrefix(path, dir) // /path/to/quiki/doc/language.md
+	name = strings.TrimPrefix(name, "/")  // path/to/quiki/doc/language.md
+	if strings.Index(path, dir) != 0 {    // if path does not start with /path/to/quiki/wikis/mywiki/pages
+		return p.RelName() // return language.md
 	}
 	return name
 }
@@ -200,8 +208,11 @@ func (p *Page) Path() string {
 // This does NOT take symbolic links into account.
 // It is not guaranteed to exist.
 func (p *Page) RelName() string {
-	dir := pageAbs(p.Opt.Dir.Page)
-	path := p.RelPath()
+	if p.name != "" {
+		return p.name
+	}
+	dir := pageAbs(p.Opt.Dir.Page) // /path/to/quiki/wikis/mywiki/pages
+	path := p.RelPath()            // doc/parsing.md
 	name := strings.TrimPrefix(path, dir)
 	name = strings.TrimPrefix(name, "/")
 	if strings.Index(path, dir) == 0 {
@@ -222,7 +233,10 @@ func (p *Page) RelNameNE() string {
 // It may be a relative or absolute path.
 // It is not guaranteed to exist.
 func (p *Page) RelPath() string {
-	return p.FilePath
+	if p.FilePath != "" {
+		return p.FilePath
+	}
+	return p.Opt.Dir.Page + "/" + p.name
 }
 
 // Redirect returns the location to which the page redirects, if any.

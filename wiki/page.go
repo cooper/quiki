@@ -104,7 +104,7 @@ func (w *Wiki) NewPage(name string) *wikifier.Page {
 }
 
 func (w *Wiki) _newPage(name string) *wikifier.Page {
-	p := wikifier.NewPage(w.pathForPage(name, false, ""))
+	p := wikifier.NewPageNamed(w.pathForPage(name, false, ""), name)
 	p.Wiki = w
 	p.Opt = &w.Opt
 	return p
