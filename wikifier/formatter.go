@@ -459,6 +459,12 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 	//     return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type" class="wiki-ref-anchor">[$type]</a></sup>};
 	// }
 
+	// inline html
+	// [html:x<sup>2</sup>]
+	if strings.HasPrefix(formatType, "html:") {
+		return HTML(strings.TrimPrefix(formatType, "html:"))
+	}
+
 	return HTML("")
 }
 

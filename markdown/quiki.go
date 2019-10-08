@@ -320,10 +320,8 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		if r.Flags&SkipHTML != 0 {
 			break
 		}
-		// TODO: count opening and closing brackets.
-		// if they match, use brace-escape rather than quikiEsc()
-		html := quikiEsc(string(node.Literal))
-		r.addText(w, "~html {"+html+"}")
+		html := quikiEscFmt(string(node.Literal))
+		r.addText(w, "[html:"+html+"]")
 
 	// link
 	case blackfriday.Link:

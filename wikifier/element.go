@@ -387,12 +387,12 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 
 func generateIndentedLines(lines []indentedLine) HTML {
 	generated := ""
-	for i, line := range lines {
+	for _, line := range lines {
 		generated += strings.Repeat("    ", line.indent) + line.line
-		if len(lines) >= i+2 && lines[i+1].indent == 0 {
-			// next peice is noIndent, so no newline before either
-			continue
-		}
+		// if len(lines) >= i+2 && lines[i+1].indent == 0 {
+		// 	// next peice is noIndent, so no newline before either
+		// 	continue
+		// }
 		if line.line == "" || line.line[len(line.line)-1] != '\n' {
 			generated += "\n"
 		}
