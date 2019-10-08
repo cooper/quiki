@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -89,7 +88,6 @@ func (l *List) parse(page *Page) {
 
 		// string
 		case string:
-			fmt.Println("STR:", item)
 			item = strings.TrimSpace(item)
 			if item == "" {
 				continue
@@ -164,7 +162,6 @@ func (l *List) html(page *Page, el element) {
 	for i, entry := range l.list {
 
 		// prepare the value for inclusion in HTML element
-		fmt.Println("prepareForHTML:", entry.value)
 		value := prepareForHTML(entry.value, page, entry.pos)
 		l.list[i].value = value
 

@@ -249,6 +249,12 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 
 	} else {
 		// any other character; add to key or value
+
+		// if it was escaped but not a parser char, add the \
+		add := string(c)
+		if p.escape && c != ';' {
+			add = "\\" + add
+		}
 		p.escape = false
 
 		// this is part of the value
@@ -257,7 +263,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 			// first item
 			if len(p.values) == 0 {
 				p.startPos = p.pos
-				p.values = append(p.values, string(c))
+				p.values = append(p.values, add)
 				return
 			}
 
@@ -266,12 +272,12 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 			if lastStr, ok := last.(string); ok {
 				// previous item was a string, so append it
 
-				p.values[len(p.values)-1] = lastStr + string(c)
+				p.values[len(p.values)-1] = lastStr + add
 			} else {
 				// previous item was not a string,
 				// so start a new string item
 
-				p.values = append(p.values, string(c))
+				p.values = append(p.values, add)
 			}
 
 			return
@@ -282,7 +288,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		// starting a new key
 		if p.key == nil {
 			p.startPos = p.pos
-			p.key = string(c)
+			p.key = add
 			return
 		}
 
@@ -290,8 +296,8 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		if lastStr, ok := p.key.(string); ok {
 			// already working on a string key, so append it
 
-			p.key = lastStr + string(c)
-		} else if strings.TrimSpace(string(c)) != "" {
+			p.key = lastStr + add
+		} else if strings.TrimSpace(add) != "" {
 			// previous item was not a string
 			// trying to add text to a non-text key...
 			// (above ignores whitespace chars)
