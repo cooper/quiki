@@ -208,6 +208,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 					// we just entered the block name
 					if inBlockName == 1 {
+						inHeadingID = false
 						continue
 					}
 				} else if lastChar == '[' {

@@ -5,10 +5,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 
 	"gopkg.in/russross/blackfriday.v2"
 )
+
+var punctuationRegex = regexp.MustCompile(`[^\w\- ]`)
 
 // Run parses Markdown and renders quiki soure code.
 func Run(input []byte) []byte {
@@ -71,6 +74,7 @@ type QuikiRenderer struct {
 	// Track heading IDs to prevent ID collision in a single generation.
 	headingIDs map[string]int
 
+	heading     string // heading text stored until end of heading
 	headerLevel int    // section depth
 	indent      int    // indent level
 	linkDest    string // link destination stored until end of link text
@@ -277,6 +281,9 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			r.addText(w, quikiEscListMapValue(s))
 		} else if node.Parent.Type == blackfriday.Item {
 			r.addText(w, quikiEscListMapValue(s))
+		} else if node.Parent.Type == blackfriday.Heading {
+			r.heading += s
+			r.addText(w, quikiEscFmt(s))
 		} else {
 			r.addText(w, quikiEscFmt(s))
 		}
@@ -474,16 +481,6 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			// if node.IsTitleblock {
 			// 	attrs = append(attrs, `class="title"`)
 			// }
-			// if node.HeadingID != "" {
-			// 	id := r.ensureUniqueHeadingID(node.HeadingID)
-			// 	if r.HeadingIDPrefix != "" {
-			// 		id = r.HeadingIDPrefix + id
-			// 	}
-			// 	if r.HeadingIDSuffix != "" {
-			// 		id = id + r.HeadingIDSuffix
-			// 	}
-			// 	attrs = append(attrs, fmt.Sprintf(`id="%s"`, id))
-			// }
 
 		} else {
 			// r.out(w, closeTag)
@@ -494,18 +491,28 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			// $indent++;
 			r.indent++
 			//     $add_text->("$current_text] {\n");
-			r.addText(w, "] {\n")
+			r.addText(w, "]")
 
-			//     # figure the anchor. modeled after what github uses:
-			//     # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
-			//     # the -n suffixes are added automatically as needed in Section.pm
-			//     my $section_id = $current_text;
-			//     $section_id =~ tr/A-Z/a-z/;                 # ASCII downcase
-			//     $section_id =~ s/$punctuation_re//g;        # remove punctuation
-			//     $section_id =~ s/ /-/g;                     # replace spaces with dashes
-			//     $section_id = md_escape_fmt($section_id);
-			//     $add_text->("meta { section: $section_id; }\n");
-			//     undef $current_text;
+			// figure the anchor for github compatibility
+			id := node.HeadingID
+			if node.HeadingID == "" {
+				// https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
+				// $section_id =~ tr/A-Z/a-z/;                 # ASCII downcase
+				id = strings.ToLower(r.heading)                // downcase
+				id = punctuationRegex.ReplaceAllString(id, "") // remove punctuation
+				id = strings.Replace(id, " ", "-", -1)         // replace spaces with dashes
+				r.heading = ""
+			}
+
+			// heading ID
+			id = r.ensureUniqueHeadingID(id)
+			if r.HeadingIDPrefix != "" {
+				id = r.HeadingIDPrefix + id
+			}
+			if r.HeadingIDSuffix != "" {
+				id = id + r.HeadingIDSuffix
+			}
+			r.addText(w, id+"# {\n")
 		}
 
 	// horizontal rule
