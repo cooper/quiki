@@ -50,12 +50,14 @@ The quiki source language is [parsed hierarchically](technical/parsing.md).
 The source is divided into [blocks](#blocks), each of which
 is responsible for parsing its inner contents. The master parser is
 concerned only with the most basic syntax:
+
 * Dividing the source into [blocks](#blocks)
 * Stripping [comments](#comments)
 * [Variable assignment](#assignment)
 * [Conditionals](#conditionals)
 
 Further parsing is provided by:
+
 * [Text formatter](#text-formatting)
 * [Map](blocks.md#map) base block type
 * [List](blocks.md#list) base block type
@@ -459,6 +461,7 @@ at the very top of a page source file.
 `@category` is used to mark the page as belonging to a category. Each
 attribute of it is a boolean. If present, the page belongs to that category.
 Example:
+
 * `@category.news;`
 * `@category.important;`
 

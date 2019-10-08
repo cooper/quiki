@@ -269,17 +269,17 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 	attrs := []string{}
 	switch node.Type {
 
-	// TODO: escape for quiki
 	case blackfriday.Text:
 		s := string(node.Literal)
 		if node.Parent.Type == blackfriday.Link {
 			r.addText(w, quikiEscLink(s))
 		} else if node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
 			r.addText(w, quikiEscListMapValue(s))
+		} else if node.Parent.Type == blackfriday.Item {
+			r.addText(w, quikiEscListMapValue(s))
 		} else {
 			r.addText(w, quikiEscFmt(s))
 		}
-		// }
 
 	// newline
 	case blackfriday.Softbreak:
@@ -374,7 +374,14 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 
 	// inline code
 	case blackfriday.Code:
-		r.addText(w, "[c]"+quikiEscFmt(string(node.Literal))+"[/c]")
+		var code string
+		if node.Parent != nil && node.Parent.Parent != nil &&
+			node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
+			code = quikiEscListMapValue(string(node.Literal))
+		} else {
+			code = quikiEscFmt(string(node.Literal))
+		}
+		r.addText(w, "[c]"+code+"[/c]")
 
 	// document
 	case blackfriday.Document:
