@@ -95,7 +95,10 @@ func (sec *secBlock) html(page *Page, el element) {
 		// TODO: meta section heading ID
 
 		// heading ID
-		headingID := PageNameLink(title, false)
+		headingID := sec.headingID
+		if headingID == "" {
+			headingID = PageNameLink(title, false)
+		}
 
 		// add -n as needed if this is already used
 		n := page.headingIDs[headingID]
@@ -156,7 +159,7 @@ func (sec *secBlock) createParagraph(page *Page, el element, pcs []posContent) {
 	}
 
 	// create a paragraph at first text node position
-	p := newBlock("p", "", nil, sec, sec, pcs[0].position)
+	p := newBlock("p", "", "", nil, sec, sec, pcs[0].position)
 	p.appendContent(pcs, pcs[0].position)
 
 	// parse and generate

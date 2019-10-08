@@ -80,7 +80,7 @@ func (mb *mainBlock) createSection(page *Page, pcs []posContent) block {
 	}
 
 	// create a section at first text node position
-	sec := newBlock("sec", "", nil, mb, mb, pcs[0].position)
+	sec := newBlock("sec", "", "", nil, mb, mb, pcs[0].position)
 	sec.appendContent(pcs, pcs[0].position)
 
 	// parse

@@ -50,7 +50,7 @@ func (pos position) none() bool {
 }
 
 func newParser() *parser {
-	mb := newBlock("main", "", nil, nil, nil, position{})
+	mb := newBlock("main", "", "", nil, nil, nil, position{})
 	return &parser{block: mb, catch: mb}
 }
 
@@ -180,7 +180,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		var blockClasses []string
-		var blockType, blockName string
+		var blockType, blockName, headingID string
+		var inHeadingID bool
 
 		// if the next char is @, this is {@some_var}
 		if p.next == '@' {
@@ -200,7 +201,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				lastChar := lastContent[i]
 				charsScanned++
 
-				// enter/exit block name
+				// enter/exit block name or heading ID
 				if lastChar == ']' && blockType == "" {
 					// entering block name
 					inBlockName++
@@ -218,12 +219,21 @@ func (p *parser) parseByte(b byte, page *Page) error {
 					if inBlockName != 1 {
 						continue
 					}
+				} else if lastChar == '#' && blockName == "" && blockType == "" {
+					// enter/exit heading ID
+					inHeadingID = headingID == ""
+					continue
 				}
 
 				// block type/name
 				if inBlockName != 0 {
 					// we're currently in the block name
 					blockName = string(lastChar) + blockName
+				} else if inHeadingID {
+					// we're currently in the heading ID
+					if lastChar != ' ' && lastChar != '\t' {
+						headingID = string(lastChar) + headingID
+					}
 				} else if matched, _ := regexp.Match(`[\w\-\$\.]`, []byte{lastChar}); matched {
 					// this could be part of the block type
 					blockType = string(lastChar) + blockType
@@ -272,7 +282,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		// create the block
-		block := newBlock(blockType, blockName, blockClasses, p.block, p.catch, p.pos)
+		block := newBlock(blockType, blockName, headingID, blockClasses, p.block, p.catch, p.pos)
 
 		// TODO: produce a warning if the block has a name but the type does not support it
 

@@ -35,6 +35,7 @@ type parserBlock struct {
 	parentB   block
 	parentC   catch
 	element   element
+	headingID string
 	*genericCatch
 }
 
