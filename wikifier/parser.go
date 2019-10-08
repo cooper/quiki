@@ -201,7 +201,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				charsScanned++
 
 				// enter/exit block name
-				if lastChar == ']' {
+				if lastChar == ']' && blockType == "" {
 					// entering block name
 					inBlockName++
 
