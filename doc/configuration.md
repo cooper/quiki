@@ -3,11 +3,11 @@
 This document describes all of the available configuration options. The options
 are categorized by the lowest-level quiki interface at which they are used.
 Some are required for the generation of a single page, others for the operation
-of a full wiki, and others yet for the operation of a wikiserver.
+of a full wiki, and others yet for the operation of a webserver or frontend.
 
 * [Configuration](#configuration)
   * [Configuration files](#configuration-files)
-  * [wikifier options](#page-options)
+  * [wikifier options](#wikifier-options)
     * [name](#name)
     * [root](#root)
     * [dir](#dir)

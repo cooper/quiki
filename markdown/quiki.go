@@ -512,7 +512,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			if r.HeadingIDSuffix != "" {
 				id = id + r.HeadingIDSuffix
 			}
-			r.addText(w, id+"# {\n")
+			r.addText(w, " "+id+"# {\n")
 		}
 
 	// horizontal rule
