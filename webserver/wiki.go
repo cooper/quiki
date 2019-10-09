@@ -134,10 +134,12 @@ func setupWiki(wi *wikiInfo) error {
 		si.Width = logoInfo.Width
 		si.Height = logoInfo.Height
 		res := wi.DisplaySizedImageGenerate(si, true)
-		if di, ok := res.(wiki.DisplayImage); ok {
-			log.Printf("[%s] generated logo: %s", wi.name, di.File)
-			wi.logo = wi.Opt.Root.Image + "/" + di.File
-		} else {
+		switch disp := res.(type) {
+		case wiki.DisplayImage:
+			wi.logo = wi.Opt.Root.Image + "/" + disp.File
+		case wiki.DisplayRedirect:
+			wi.logo = disp.Redirect
+		default:
 			log.Printf("[%s] generate logo failed: %+v", wi.name, res)
 		}
 	}
