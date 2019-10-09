@@ -130,7 +130,10 @@ func setupWiki(wi *wikiInfo) error {
 	logoInfo := wi.template.manifest.Logo
 	logoName := wi.Opt.Logo
 	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
-		res := wi.DisplaySizedImageGenerate(wiki.SizedImageFromName(logoName), true)
+		si := wiki.SizedImageFromName(logoName)
+		si.Width = logoInfo.Width
+		si.Height = logoInfo.Height
+		res := wi.DisplaySizedImageGenerate(si, true)
 		if di, ok := res.(*wiki.DisplayImage); ok {
 			log.Printf("[%s] generated logo: %s", wi.name, di.File)
 			wi.logo = wi.Opt.Root.Image + "/" + di.File
