@@ -17,6 +17,7 @@ import (
 type wikiInfo struct {
 	name     string // wiki shortname
 	title    string // wiki title from @name in the wiki config
+	logo     string
 	host     string
 	template wikiTemplate
 	*wiki.Wiki
@@ -125,18 +126,17 @@ func setupWiki(wi *wikiInfo) error {
 	}
 	wi.template = template
 
-	// TODO: generate logo according to template
-	// logoInfo := wiki.template.manifest.Logo
-	// logoName := wiki.conf.Get("logo")
-	// if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
-	// 	log.Printf("[%s] generating logo %s; %dx%d\n",
-	// 		wiki.name, logoName, logoInfo.Width, logoInfo.Height)
-	// 	wiki.client = wikiclient.NewClient(tr, wiki.defaultSess, 10*time.Second)
-	// 	res, _ := wiki.client.DisplayImageOverride(logoName, logoInfo.Width, logoInfo.Height)
-	// 	if file, ok := res.Args["file"].(string); ok && file != "" {
-	// 		wiki.logo = file
-	// 	}
-	// }
+	// generate logo according to template
+	logoInfo := wi.template.manifest.Logo
+	logoName := wi.Opt.Logo
+	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
+		log.Printf("[%s] generating logo %s; %dx%d\n",
+			wi.name, logoName, logoInfo.Width, logoInfo.Height)
+		res := wi.DisplaySizedImageGenerate(wiki.SizedImageFromName(logoName), true)
+		if di, ok := res.(*wiki.DisplayImage); ok {
+			wi.logo = wi.Opt.Root.Image + "/" + di.File
+		}
+	}
 
 	type wikiHandler struct {
 		rootType string

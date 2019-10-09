@@ -18,6 +18,7 @@ import (
 // PageOpt describes wiki/website options to a Page.
 type PageOpt struct {
 	Name         string // wiki name
+	Logo         string // logo filename, relative to image dir
 	MainPage     string // name of main page
 	ErrorPage    string // name of error page
 	Template     string // name of template
@@ -164,6 +165,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	// easy string options
 	pageOptString := map[string]*string{
 		"name":       &opt.Name,      // wiki name
+		"logo":       &opt.Logo,      // logo filename, relative to image dir
 		"main_page":  &opt.MainPage,  // main page name
 		"error_page": &opt.ErrorPage, // error page name
 		"template":   &opt.Template,  // template name

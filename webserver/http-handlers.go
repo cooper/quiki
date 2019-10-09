@@ -231,8 +231,8 @@ func wikiPageFromRes(wi *wikiInfo, res wiki.DisplayPage) wikiPage {
 
 func wikiPageWith(wi *wikiInfo) wikiPage {
 	return wikiPage{
-		WikiTitle: wi.title,
-		// WikiLogo:   w.getLogo(), FIXME:
+		WikiTitle:  wi.title,
+		WikiLogo:   wi.logo,
 		WikiRoot:   wi.Opt.Root.Wiki,
 		Root:       wi.Opt.Root,
 		StaticRoot: wi.template.staticRoot,
