@@ -246,5 +246,6 @@ func (p wikiPage) Logo() template.HTML {
 		h += ` srcset="` + srcset + `"`
 	}
 
+	h += ` />`
 	return template.HTML(h)
 }
