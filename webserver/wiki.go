@@ -138,7 +138,7 @@ func setupWiki(wi *wikiInfo) error {
 			log.Printf("[%s] generated logo: %s", wi.name, di.File)
 			wi.logo = wi.Opt.Root.Image + "/" + di.File
 		} else {
-			log.Printf("[%s] generate logo failed: %v", di)
+			log.Printf("[%s] generate logo failed: %+v", wi.name, di)
 		}
 	}
 
