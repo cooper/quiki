@@ -3,6 +3,7 @@ package wiki
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -117,6 +118,7 @@ func (w *Wiki) NewPage(name string) *wikifier.Page {
 			return err
 		}
 		path = strings.ToLower(strings.TrimPrefix(path, w.Opt.Dir.Page+"/"))
+		fmt.Println("checking", path, strings.ToLower(name)+".page")
 		if path == strings.ToLower(name)+".page" || path == strings.ToLower(name)+".md" {
 			foundName = path
 			return filepath.SkipDir
