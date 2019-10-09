@@ -174,22 +174,7 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	// FIXME: if true -> if the image is not full-size
 	srcset := ""
 	if true && len(page.Opt.Image.Retina) != 0 {
-
-		// find image name and extension
-		imageName, ext := image.path, ""
-		if lastDot := strings.LastIndexByte(image.path, '.'); lastDot != -1 {
-			imageName = image.path[:lastDot]
-			ext = image.path[lastDot:]
-		}
-
-		// rewrite a.jpg to a@2x.jpg
-		scales := make([]string, len(page.Opt.Image.Retina))
-		for i, scale := range page.Opt.Image.Retina {
-			scaleStr := strconv.Itoa(scale) + "x"
-			scales[i] = imageName + "@" + scaleStr + ext + " " + scaleStr
-		}
-
-		srcset = strings.Join(scales, ", ")
+		srcset = ScaleString(image.path, page.Opt.Image.Retina)
 	}
 
 	// determine link

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -398,4 +399,24 @@ func ModelName(name string) string {
 func MakeDir(dir, name string) {
 	pfx := filepath.Dir(name)
 	os.MkdirAll(dir+"/"+pfx, 0755)
+}
+
+// ScaleString returns a string of scaled image names for use in srcset.
+func ScaleString(name string, retina []int) string {
+
+	// find image name and extension
+	imageName, ext := name, ""
+	if lastDot := strings.LastIndexByte(name, '.'); lastDot != -1 {
+		imageName = name[:lastDot]
+		ext = name[lastDot:]
+	}
+
+	// rewrite a.jpg to a@2x.jpg
+	scales := make([]string, len(retina))
+	for i, scale := range retina {
+		scaleStr := strconv.Itoa(scale) + "x"
+		scales[i] = imageName + "@" + scaleStr + ext + " " + scaleStr
+	}
+
+	return strings.Join(scales, ", ")
 }

@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
@@ -225,25 +224,8 @@ func (p wikiPage) Logo() template.HTML {
 	h := `<img alt="` + html.EscapeString(p.WikiTitle) + `" src="` + p.WikiLogo + `"`
 
 	// retina
-	srcset := ""
 	if len(p.retina) != 0 {
-
-		// find image name and extension
-		imageName, ext := p.WikiLogo, ""
-		if lastDot := strings.LastIndexByte(p.WikiLogo, '.'); lastDot != -1 {
-			imageName = p.WikiLogo[:lastDot]
-			ext = p.WikiLogo[lastDot:]
-		}
-
-		// rewrite a.jpg to a@2x.jpg
-		scales := make([]string, len(p.retina))
-		for i, scale := range p.retina {
-			scaleStr := strconv.Itoa(scale) + "x"
-			scales[i] = imageName + "@" + scaleStr + ext + " " + scaleStr
-		}
-
-		srcset = strings.Join(scales, ", ")
-		h += ` srcset="` + srcset + `"`
+		h += ` srcset="` + wikifier.ScaleString(p.WikiLogo, p.retina) + `"`
 	}
 
 	h += ` />`
