@@ -493,6 +493,11 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			//     $add_text->("$current_text] {\n");
 			r.addText(w, "]")
 
+			// assume page title as first heading
+			if r.Title == "" {
+				r.Title = r.heading
+			}
+
 			// figure the anchor for github compatibility
 			id := node.HeadingID
 			if node.HeadingID == "" {
@@ -676,7 +681,6 @@ func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 	if r.Flags&PartialPage != 0 {
 		return
 	}
-	// TODO: assume title from first heading if not present
 	io.WriteString(w, "@page.title:     "+quikiEscFmt(r.Title)+";\n")
 	io.WriteString(w, "@page.author:    Markdown;\n")
 	io.WriteString(w, "@page.generator: quiki/markdown;\n")
