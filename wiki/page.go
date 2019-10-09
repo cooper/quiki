@@ -3,11 +3,8 @@ package wiki
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	strip "github.com/grokify/html-strip-tags-go"
@@ -106,29 +103,6 @@ func (w *Wiki) NewPage(name string) *wikifier.Page {
 	// lowercase .md exists
 	if mdp := w._newPage(name + ".md"); mdp.Exists() {
 		return mdp
-	}
-
-	// ok let's try searching the page dir
-	foundName := ""
-	filepath.Walk(w.Opt.Dir.Page, func(path string, info os.FileInfo, err error) error {
-		if foundName != "" {
-			return filepath.SkipDir
-		}
-		if err != nil {
-			return err
-		}
-		path = strings.ToLower(strings.TrimPrefix(path, w.Opt.Dir.Page+"/"))
-		fmt.Println("checking", path, strings.ToLower(name)+".page")
-		if path == strings.ToLower(name)+".page" || path == strings.ToLower(name)+".md" {
-			foundName = path
-			return filepath.SkipDir
-		}
-		return nil
-	})
-	if foundName != "" {
-		if fp := w._newPage(foundName); fp.Exists() {
-			return fp
-		}
 	}
 
 	return p
