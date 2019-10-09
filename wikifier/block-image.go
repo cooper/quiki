@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -170,10 +171,13 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 		el.addClass("image-" + image.float)
 	}
 
+	url, _ := url.Parse(image.path)
+	isAbsolute := url != nil && url.IsAbs()
+
 	// retina
 	// FIXME: if true -> if the image is not full-size
 	srcset := ""
-	if true && len(page.Opt.Image.Retina) != 0 {
+	if true && !isAbsolute && len(page.Opt.Image.Retina) != 0 {
 		srcset = ScaleString(image.path, page.Opt.Image.Retina)
 	}
 
