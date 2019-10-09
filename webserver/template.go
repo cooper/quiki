@@ -5,12 +5,14 @@ package webserver
 import (
 	"encoding/json"
 	"errors"
+	"html"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
@@ -171,8 +173,8 @@ type wikiPage struct {
 	WholeTitle  string                       // optional, shown in <title> as-is
 	Title       string                       // page title
 	WikiTitle   string                       // wiki titled
-	WikiLogo    string                       // path to wiki logo image
-	WikiRoot    string                       // wiki HTTP root (depreciated, use Root.Wiki)
+	WikiLogo    string                       // path to wiki logo image (deprecated, use Logo)
+	WikiRoot    string                       // wiki HTTP root (deprecated, use Root.Wiki)
 	Root        wikifier.PageOptRoot         // all roots
 	StaticRoot  string                       // path to static resources
 	Pages       []wikiPage                   // more pages for category posts
@@ -182,6 +184,7 @@ type wikiPage struct {
 	NumPages    int                          // for category posts, the number of pages
 	PageCSS     template.CSS                 // css
 	HTMLContent template.HTML                // html
+	retina      []int                        // retina scales for logo
 }
 
 func (p wikiPage) VisibleTitle() string {
@@ -213,4 +216,35 @@ func (p wikiPage) PageNumbers() []int {
 		numbers[i-1] = i
 	}
 	return numbers
+}
+
+func (p wikiPage) Logo() template.HTML {
+	if p.WikiLogo == "" {
+		return template.HTML("")
+	}
+	h := `<img alt="` + html.EscapeString(p.WikiTitle) + `" src="` + p.WikiLogo + `"`
+
+	// retina
+	srcset := ""
+	if len(p.retina) != 0 {
+
+		// find image name and extension
+		imageName, ext := p.WikiLogo, ""
+		if lastDot := strings.LastIndexByte(p.WikiLogo, '.'); lastDot != -1 {
+			imageName = p.WikiLogo[:lastDot]
+			ext = p.WikiLogo[lastDot:]
+		}
+
+		// rewrite a.jpg to a@2x.jpg
+		scales := make([]string, len(p.retina))
+		for i, scale := range p.retina {
+			scaleStr := strconv.Itoa(scale) + "x"
+			scales[i] = imageName + "@" + scaleStr + ext + " " + scaleStr
+		}
+
+		srcset = strings.Join(scales, ", ")
+		h += ` srcset="` + srcset + `"`
+	}
+
+	return template.HTML(h)
 }

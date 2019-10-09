@@ -237,5 +237,6 @@ func wikiPageWith(wi *wikiInfo) wikiPage {
 		Root:       wi.Opt.Root,
 		StaticRoot: wi.template.staticRoot,
 		Navigation: wi.Opt.Navigation,
+		retina:     wi.Opt.Image.Retina,
 	}
 }
