@@ -4,7 +4,7 @@ package webserver
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"html"
 	"html/template"
 	"io/ioutil"
@@ -84,7 +84,7 @@ func findTemplate(name string) (wikiTemplate, error) {
 	}
 
 	// never found a template
-	return wikiTemplate{}, errors.New("unable to find template " + name)
+	return wikiTemplate{}, fmt.Errorf("unable to find template '%s' in any of %v", name, templateDirs)
 }
 
 // load a template from its known path
