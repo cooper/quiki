@@ -5,13 +5,13 @@ package webserver
 // quiki - a standalone web server for wikifier
 
 import (
-	"errors"
 	"log"
 	"net"
 	"net/http"
 	"os"
 
 	"github.com/cooper/quiki/wikifier"
+	"github.com/pkg/errors"
 )
 
 var conf *wikifier.Page
@@ -30,7 +30,7 @@ func Run() {
 	conf = wikifier.NewPage(os.Args[1])
 	conf.VarsOnly = true
 	if err := conf.Parse(); err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
 	var port, dirStatic string
@@ -48,12 +48,12 @@ func Run() {
 
 	// set up wikis
 	if err := initWikis(); err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "init wikis"))
 	}
 
 	// setup static files from wikifier
 	if err := setupStatic(dirStatic); err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
 	log.Println("quiki ready")
@@ -70,12 +70,12 @@ func Run() {
 	if port == "unix" {
 		listener, err := net.Listen("unix", bind)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(errors.Wrap(err, "listen"))
 		}
 		server.Serve(listener)
 	} else {
 		server.Addr = bind + ":" + port
-		log.Fatal(server.ListenAndServe())
+		log.Fatal(errors.Wrap(server.ListenAndServe(), "listen"))
 	}
 }
 
