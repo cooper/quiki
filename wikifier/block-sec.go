@@ -71,10 +71,10 @@ func (sec *secBlock) html(page *Page, el element) {
 	// HEADING
 
 	// determine if this is the intro section
-	typ := "section-title"
+	typ := "sec-title"
 	level := sec.headerLevel
 	if sec.isIntro {
-		typ = "section-page-title"
+		typ = "sec-page-title"
 	}
 
 	// use the page title if no other title is provided and @page.enable.title
