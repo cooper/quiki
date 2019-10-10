@@ -24,6 +24,7 @@ func (mb *modelBlock) parse(page *Page) {
 	// create page
 	// consider: is there any reason we'd need to check if this Page is a model elsewhere?
 	model := NewPage(path)
+	model.name = name
 
 	// copy wiki opt from this page
 	model.Opt = page.Opt
