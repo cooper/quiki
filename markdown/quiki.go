@@ -16,7 +16,7 @@ var punctuationRegex = regexp.MustCompile(`[^\w\- ]`)
 // Run parses Markdown and renders quiki soure code.
 func Run(input []byte) []byte {
 	r := NewQuikiRenderer(QuikiRendererParameters{})
-	return blackfriday.Run(input, blackfriday.WithRenderer(r))
+	return blackfriday.Run(input, blackfriday.WithRenderer(r), blackfriday.WithExtensions(blackfriday.NoEmptyLineBeforeBlock|blackfriday.CommonExtensions))
 }
 
 // QuikiFlags is renderer configuration options.
