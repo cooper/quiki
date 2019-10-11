@@ -249,11 +249,6 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 			opts.pos.column++
 		}
 
-		// if the char was escaped but not an escape we handle, add the \ again
-		if escaped && char != '[' && char != ']' {
-			str += "\\"
-		}
-
 		if char == '[' && !escaped {
 			// marks the beginning of a formatting element
 			formatDepth++

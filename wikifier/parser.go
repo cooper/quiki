@@ -423,7 +423,6 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 	if b == '\\' {
 		// the escape will be handled later
-		p.parserChar = true
 		if p.escape {
 			return p.handleByte(b)
 		}
