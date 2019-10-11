@@ -112,7 +112,7 @@ particular block. This is especially useful for things like
 [`code{}`](blocks.md#code), [`html{}`](blocks.md#html), and
 [`fmt{}`](blocks.md#fmt) because then you do not have to escape every
 instance of special characters like `{`, `}`, and `\`. It works as long as there
-is a closing bracket `{` to correspond with every opening bracket `}`. To enable
+is a closing bracket `}` to correspond with every opening bracket `{`. To enable
 brace-escape mode, open and close the block with double curly brackets:
 
 ```javascript

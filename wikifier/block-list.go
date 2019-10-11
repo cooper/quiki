@@ -130,7 +130,7 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 
 		// if it was escaped but not a parser char, add the \
 		add := string(c)
-		if p.escape && c != ';' {
+		if p.escape && c != ';' && c != '\\' {
 			add = "\\" + add
 		}
 		p.escape = false

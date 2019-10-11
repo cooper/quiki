@@ -1,2 +1,0 @@
-Static files to be used with wikifier. You may want to directly serve this
-directory, or symlink whatever files you need to your HTTP root.
