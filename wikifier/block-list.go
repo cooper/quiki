@@ -163,7 +163,15 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 }
 
 func (l *List) html(page *Page, el element) {
-	el.setTag("ul")
+
+	// ol or ul
+	if l.ordered {
+		el.setTag("ol")
+	} else {
+		el.setTag("ul")
+	}
+
+	// add each li
 	for i, entry := range l.list {
 
 		// prepare the value for inclusion in HTML element
