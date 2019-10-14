@@ -15,6 +15,7 @@ blocks, see [Language](language.md#blocks).
   * [infobox{}](#infobox) - table summarizing article information
   * [invisible{}](#invisible) - silences all blocks inside it
   * [list{}](#list) - list datatype and visible unordered list
+  * [olist{}](#olist) - ordered list
   * [model{}](#model) - quiki templates
   * [p{}](#p) - paragraph
   * [sec{}](#sec) - article section with optional header
@@ -410,6 +411,11 @@ syntax.
 Breaking News: [@alphabet.0] is the first letter of the alphabet,
 and [@alphabet.25] is the last.
 ```
+
+## olist{}
+
+The same as [`list{}`](#list) in all ways, except items are numbered to
+indicate a specific order.
 
 ## model{}
 
