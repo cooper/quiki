@@ -297,7 +297,7 @@ Once variables are assigned, they are typically used in
 [formatted text](#text-formatting) or [conditionals](#conditionals). You can use
 variables anywhere that formatted text is accepted like this:
 ```
-I am allow to use [b]bold text[/b], as well as [@variables].
+I am allowed to use [b]bold text[/b], as well as [@variables].
 ```
 
 If the variable contains a block, you can display it using `{@var_name}`. This
