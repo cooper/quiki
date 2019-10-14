@@ -9,6 +9,7 @@ import (
 // List represents a list of items.
 // It is a quiki data type as well as the base of many block types.
 type List struct {
+	ordered  bool
 	didParse bool
 	list     []*listEntry
 	*parserBlock
@@ -46,11 +47,15 @@ func NewList(mb block) *List {
 		element:      newElement("div", "list"),
 		genericCatch: &genericCatch{},
 	}
-	return &List{false, nil, underlying}
+	return &List{false, false, nil, underlying}
 }
 
 func newListBlock(name string, b *parserBlock) block {
-	return &List{false, nil, b}
+	return &List{false, false, nil, b}
+}
+
+func newOlistBlock(name string, b *parserBlock) block {
+	return &List{true, false, nil, b}
 }
 
 func (l *List) parse(page *Page) {
