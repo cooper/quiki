@@ -6,6 +6,8 @@ import (
 )
 
 type secBlock struct {
+	title       string
+	fmtTitle    HTML
 	n           int
 	isIntro     bool
 	headerLevel int
@@ -63,6 +65,20 @@ func (sec *secBlock) parse(page *Page) {
 
 	sec.headerLevel = level
 
+	// determine section title
+	// use the page title if no other title is provided and @page.enable.title
+	sec.title, sec.fmtTitle = sec.blockName(), HTML("")
+	if sec.isIntro && sec.title == "" {
+		sec.title = page.Title()
+		sec.fmtTitle = page.FmtTitle()
+	}
+
+	// determine heading ID
+	// heading ID
+	if sec.headingID == "" {
+		sec.headingID = PageNameLink(sec.title, false)
+	}
+
 	// this must come last so the section order is correct
 	sec.parserBlock.parse(page)
 }
@@ -77,40 +93,27 @@ func (sec *secBlock) html(page *Page, el element) {
 		typ = "sec-page-title"
 	}
 
-	// use the page title if no other title is provided and @page.enable.title
-	title, fmtTitle := sec.blockName(), HTML("")
-	if sec.isIntro && title == "" {
-		title = page.Title()
-		fmtTitle = page.FmtTitle()
-	}
-
 	// we have a title
-	if title != "" {
+	if sec.title != "" {
 
 		// format title if we still need to
-		if fmtTitle == "" {
-			fmtTitle = page.formatTextOpts(title, fmtOpt{pos: sec.openPos})
+		if sec.fmtTitle == "" {
+			sec.fmtTitle = page.formatTextOpts(sec.title, fmtOpt{pos: sec.openPos})
 		}
 
 		// TODO: meta section heading ID
 
-		// heading ID
-		headingID := sec.headingID
-		if headingID == "" {
-			headingID = PageNameLink(title, false)
-		}
-
 		// add -n as needed if this is already used
-		n := page.headingIDs[headingID]
-		page.headingIDs[headingID]++
+		n := page.headingIDs[sec.headingID]
+		page.headingIDs[sec.headingID]++
 		if n != 0 {
-			headingID += "-" + strconv.Itoa(n)
+			sec.headingID += "-" + strconv.Itoa(n)
 		}
 
 		// create the heading
 		h := el.createChild("h"+strconv.Itoa(level), typ)
-		h.setAttr("id", "qa-"+headingID)
-		h.addHTML(fmtTitle)
+		h.setAttr("id", "qa-"+sec.headingID)
+		h.addHTML(sec.fmtTitle)
 	}
 
 	// CONTENT

@@ -1,0 +1,22 @@
+@page.title: Page with Table of Contents;
+
+toc{}
+
+Intro section.
+
+[A] {
+
+}
+
+[B] {
+    [B1] {}
+    [B2] {}
+}
+
+[C] {
+
+}
+
+[D has [i]formatted text[/i]] {
+    Hope that's ok.
+}

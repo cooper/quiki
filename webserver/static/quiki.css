@@ -18,7 +18,7 @@ p.q-p {
 h1.q-sec-title,
 h1.q-sec-page-title {
     margin: 0 0 15px 0;
-    clear: left;
+    /* clear: left; */
     border-bottom: 1px solid #ccc;
     line-height: 40px;
     overflow: hidden;
@@ -27,7 +27,7 @@ h1.q-sec-page-title {
 h2.q-sec-title {
     border-bottom: 1px solid #ccc;
     line-height: 38px;
-    clear: left;
+    /* clear: left; */
 }
 
 h2.q-sec-title,
@@ -161,6 +161,32 @@ img.q-imagebox-img,
 img.q-image-img {
     max-width: 100%;
     overflow: hidden;
+}
+
+/* table of contents */
+
+ul.q-toc {
+    list-style-type: none;
+    margin: 0.5em 1em 0.5em 0;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    padding: 8px;
+    float: left;
+}
+
+ul.q-toc.qc-right {
+    margin: 0.5em 0 0.5em 1em;
+}
+
+ul.q-toc li {
+    padding: 0;
+    margin: 0;
+}
+
+ul.q-toc ul {
+    list-style-type: none;
+    padding: 0;
+    margin-left: 2em;
 }
 
 /* links */
