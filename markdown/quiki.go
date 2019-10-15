@@ -672,8 +672,12 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 	return blackfriday.GoToNext
 }
 
-// RenderFooter renders the page footer (not used).
+// RenderFooter renders the page footer.
 func (r *QuikiRenderer) RenderFooter(w io.Writer, ast *blackfriday.Node) {
+	// title must be done after the heading is extracted
+	if r.Title != "" {
+		io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.Title)+";\n")
+	}
 }
 
 // RenderHeader renders the page header, which includes @page variable definitions.
@@ -681,7 +685,6 @@ func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 	if r.Flags&PartialPage != 0 {
 		return
 	}
-	io.WriteString(w, "@page.title:     "+quikiEscFmt(r.Title)+";\n")
 	io.WriteString(w, "@page.author:    Markdown;\n")
 	io.WriteString(w, "@page.generator: quiki/markdown;\n")
 	io.WriteString(w, "@page.generated;\n\n")
