@@ -240,6 +240,10 @@ ul.q-list {
     line-height: 1.6em;
 }
 
+li.q-list-item {
+    margin: .4em 0 .5em 0;
+}
+
 /* references */
 
 ul.q-references {
