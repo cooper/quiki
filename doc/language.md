@@ -19,31 +19,6 @@ infobox [quiki] {
 quiki is a file-based wiki suite and standalone web server.
 ```
 
-* [Language](#language)
-  * [Syntax](#syntax)
-    * [Comments](#comments)
-    * [Escapes](#escapes)
-  * [Blocks](#blocks)
-      * [Nameless blocks](#nameless-blocks)
-      * [Named blocks](#named-blocks)
-      * [Inferred block types](#inferred-block-types)
-      * [Model shorthand](#model-shorthand)
-      * [Data types](#data-types)
-  * [Variables](#variables)
-    * [Assignment](#assignment)
-    * [Retrieval](#retrieval)
-    * [Formatted variables](#formatted-variables)
-    * [Attributes](#attributes)
-    * [Conditionals](#conditionals)
-    * [Interpolable variables](#interpolable-variables)
-    * [Special variables](#special-variables)
-  * [Text formatting](#text-formatting)
-    * [Basic formatting](#basic-formatting)
-    * [Variables](#variables-1)
-    * [Links](#links)
-    * [References](#references)
-    * [Characters](#characters)
-
 ## Syntax
 
 The quiki source language is [parsed hierarchically](technical/parsing.md).
@@ -155,7 +130,7 @@ Type [Name] { Content }
 
 See [Blocks](blocks.md) for a list of built-in block types.
 
-#### Nameless blocks
+### Nameless blocks
 
 The `[block name]` field may be omitted for block types that do not require it.
 
@@ -175,7 +150,7 @@ imagebox {
 }
 ```
 
-#### Named blocks
+### Named blocks
 
 For block types that support a `[block name]` field, it should follow the block
 type and be delimited by square brackets `[` and `]`. The name field may
@@ -197,7 +172,7 @@ sec [Statistics] {
 }
 ```
 
-#### Block type inference
+### Block type inference
 
 quiki assumes block type `sec{}` for any named block whose type is unspecified.
 
@@ -237,7 +212,7 @@ infobox [United States of America] {
 }
 ```
 
-#### Model shorthand
+### Model shorthand
 
 quiki has a special syntax for using [**models**](models.md). Write them like
 any block, except prefix the model name with a dollar sign (`$`).
@@ -259,7 +234,7 @@ model [my_model] {
 }
 ```
 
-#### Data types
+### Data types
 
 [`map{}`](blocks.md#map) provides a key-value map datatype. It serves as the
 base of many other block types. Likewise, [`list{}`](blocks.md#list) provides an

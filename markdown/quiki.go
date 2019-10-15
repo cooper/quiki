@@ -15,7 +15,7 @@ var punctuationRegex = regexp.MustCompile(`[^\w\- ]`)
 
 // Run parses Markdown and renders quiki soure code.
 func Run(input []byte) []byte {
-	r := NewQuikiRenderer(QuikiRendererParameters{})
+	r := NewQuikiRenderer(QuikiRendererParameters{Flags: TableOfContents})
 	return blackfriday.Run(input, blackfriday.WithRenderer(r), blackfriday.WithExtensions(blackfriday.NoEmptyLineBeforeBlock|blackfriday.CommonExtensions))
 }
 
@@ -29,6 +29,7 @@ const (
 	SkipImages                                 // Skip embedded images
 	SkipLinks                                  // Skip all links
 	PartialPage                                // If true, no @page vars at start
+	TableOfContents                            // If true, include TOC
 	FootnoteReturnLinks                        // Generate a link at the end of a footnote to return to the source
 )
 
@@ -688,6 +689,9 @@ func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 	io.WriteString(w, "@page.author:    Markdown;\n")
 	io.WriteString(w, "@page.generator: quiki/markdown;\n")
 	io.WriteString(w, "@page.generated;\n\n")
+	if r.Flags&TableOfContents != 0 {
+		io.WriteString(w, "toc{}\n\n")
+	}
 }
 
 func quikiEsc(s string) string {

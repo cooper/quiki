@@ -10,7 +10,7 @@ func newTocBlock(name string, b *parserBlock) block {
 
 func (toc *tocBlock) html(page *Page, el element) {
 	el.setTag("ul")
-
+	el.addHTML(HTML("<strong>Contents</strong>"))
 	// add each top-level section
 	for _, child := range page.main.blockContent() {
 		if sec, ok := child.(*secBlock); ok {
@@ -22,16 +22,18 @@ func (toc *tocBlock) html(page *Page, el element) {
 func tocAdd(sec *secBlock, addTo element) {
 
 	// create an item for this section
+	var subList element
 	if !sec.isIntro {
 		li := addTo.createChild("li", "")
 		a := li.createChild("a", "link-internal")
 		a.setAttr("href", "#"+sec.headingID)
 		a.addText(sec.title)
 		addTo = li
+	} else {
+		subList = addTo
 	}
 
 	// create a sub-list for each section underneath
-	var subList element
 	for _, child := range sec.blockContent() {
 		if secChild, ok := child.(*secBlock); ok {
 			if subList == nil {

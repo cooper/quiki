@@ -167,15 +167,21 @@ img.q-image-img {
 
 ul.q-toc {
     list-style-type: none;
-    margin: 0.5em 1em 0.5em 0;
+    margin: 0.5em 0 0.5em 1em;
     background-color: #f7f7f7;
     border: 1px solid #ccc;
     padding: 8px;
+    float: right;
+}
+
+ul.q-toc.qc-left {
+    margin: 0.5em 1em 0.5em 0;
     float: left;
 }
 
 ul.q-toc.qc-right {
     margin: 0.5em 0 0.5em 1em;
+    float: right;
 }
 
 ul.q-toc li {
@@ -187,6 +193,11 @@ ul.q-toc ul {
     list-style-type: none;
     padding: 0;
     margin-left: 2em;
+}
+
+ul.q-toc a.q-link-internal {
+    margin-top: 0.3em;
+    display: inline-block;
 }
 
 /* links */

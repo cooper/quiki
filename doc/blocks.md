@@ -3,24 +3,6 @@
 This is the list of built-in block types. For a syntactical explanation of
 blocks, see [Language](language.md#blocks).
 
-* [Blocks](#blocks)
-  * [clear{}](#clear) - CSS clear
-  * [code{}](#code) - block of code
-  * [fmt{}](#fmt) - embedded HTML with formatted text
-  * [map{}](#map) - key-value datatype
-  * [history{}](#history) - table of chronological events
-  * [html{}](#html) - embedded HTML
-  * [image{}](#image) - image
-  * [imagebox{}](#imagebox) - image with border, link, and description
-  * [infobox{}](#infobox) - table summarizing article information
-  * [invisible{}](#invisible) - silences all blocks inside it
-  * [list{}](#list) - list datatype and visible unordered list
-  * [model{}](#model) - quiki templates
-  * [olist{}](#olist) - ordered list
-  * [p{}](#p) - paragraph
-  * [sec{}](#sec) - article section with optional header
-  * [style{}](#style) - use CSS with quiki
-
 ## clear{}
 
 Creates an empty `<div>` with `clear: both`.
