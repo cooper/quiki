@@ -15,8 +15,8 @@ blocks, see [Language](language.md#blocks).
   * [infobox{}](#infobox) - table summarizing article information
   * [invisible{}](#invisible) - silences all blocks inside it
   * [list{}](#list) - list datatype and visible unordered list
-  * [olist{}](#olist) - ordered list
   * [model{}](#model) - quiki templates
+  * [olist{}](#olist) - ordered list
   * [p{}](#p) - paragraph
   * [sec{}](#sec) - article section with optional header
   * [style{}](#style) - use CSS with quiki
@@ -371,7 +371,7 @@ invisible {
 
 ## list{}
 
-An ordered list datatype.
+A list datatype.
 
 It may be used by other block types. By itself though,
 it yields an unordered list element (`<ul>`).
@@ -412,14 +412,16 @@ Breaking News: [@alphabet.0] is the first letter of the alphabet,
 and [@alphabet.25] is the last.
 ```
 
-## olist{}
-
-The same as [`list{}`](#list) in all ways, except items are numbered to
-indicate a specific order.
+See also [`olist{}`](#olist).
 
 ## model{}
 
 Allows you to embed a template. See [Models](models.md).
+
+## olist{}
+
+The same as [`list{}`](#list) in all ways, except items are numbered to
+indicate a specific order.
 
 ## p{}
 
