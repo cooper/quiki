@@ -346,10 +346,10 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 	// note that we track references to not-yet-existent content too,
 	// but if we made it to here, there are no pages referencing this
 
-	// for page links, check if the page still exists
+	// for page links, check if the page still exists.
+	// use NewPage because it considers all possible page extensions
 	case CategoryTypePage:
-		_, err := os.Lstat(w.pathForPage(nameNE, false, ""))
-		preserve = err != nil
+		preserve = w.NewPage(nameNE).Exists()
 
 	// for images, check if the image still exists
 	case CategoryTypeImage:
@@ -399,7 +399,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 
 	// page metadata category
 	info := page.Info()
-	pageCat := w.GetSpecialCategory(page.Name(), CategoryTypePage)
+	pageCat := w.GetSpecialCategory(page.NameNE(), CategoryTypePage)
 	pageCat.PageInfo = &info
 	pageCat.Preserve = true // keep until page no longer exists
 	pageCat.addPageExtras(w, nil, nil, nil)
