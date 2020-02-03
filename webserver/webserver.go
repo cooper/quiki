@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
@@ -37,6 +38,7 @@ func New(confFile string) *Server {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
+	// extract strings
 	var port, bind, dirStatic string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &port,
@@ -50,6 +52,10 @@ func New(confFile string) *Server {
 		}
 		*ptr = str
 	}
+
+	// normalize paths
+	templateDirs = filepath.FromSlash(templateDirs)
+	dirStatic = filepath.FromSlash(dirStatic)
 
 	// set up wikis
 	if err := initWikis(); err != nil {
