@@ -10,16 +10,15 @@ of a full wiki, and others yet for the operation of a webserver or frontend.
 The primary method of configuration is to define options in a configuration
 file. All quiki configuration files are written in the quiki language:
 
-    @name:          MyWiki;             /* assign a string option */
-    @dir.wiki:      /home/www/mywiki;   
-    @dir.page:      [@dir.wiki]/pages;  /* string option with embeded variable */
-    @page.enable.cache;                 /* enable a boolean option */
-    -@page.enable.title;                /* disable a boolean option */
+    @name:      MyWiki;             /* assign a string option */
+    @dir.page:  [@dir.wiki]/pages;  /* string option with embeded variable */
+    @page.enable.cache;             /* enable a boolean option */
+    -@page.enable.title;            /* disable a boolean option */
 
 If you are using **quiki webserver**, you must have a dedicated configuration
 file for the webserver. This tells it where to listen and where to find the
 wikis you have configured on the server. This is typically called `quiki.conf`,
-and it is required as the first argument to the `quiki` executable.
+and is required as the first argument to the `quiki` executable.
 
 **Every wiki** also requires its own configuration file, usually called
 `wiki.conf` at the root level of the wiki directory.
@@ -44,6 +43,18 @@ for rendering pages.
 Name of the wiki.
 
 __Default__: *Wiki*
+
+### host
+
+| Option        | Description   | Default        |
+| -----         | -----         | -----          |
+| `host.wiki`   | Wiki host     | '' (all hosts) |
+
+Hostname for the wiki.
+
+It may be overridden in the server configuration by
+[`server.wiki.[name].host`](#serverwikinamehost). If specified in neither
+place, the wiki is accessible from all available hosts.
 
 ### root
 
