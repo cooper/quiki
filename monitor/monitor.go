@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/cooper/quiki/wiki"
 	"github.com/fsnotify/fsnotify"
@@ -46,21 +45,21 @@ func WatchWiki(w *wiki.Wiki) {
 		return nil
 	}
 
-	roots := map[string]func(mon wikiMonitor, event fsnotify.Event, abs string){
+	dirs := map[string]func(mon wikiMonitor, event fsnotify.Event, abs string){
 		w.Opt.Dir.Page:  handlePageEvent,
 		w.Opt.Dir.Image: handleImageEvent,
 		w.Opt.Dir.Model: handleModelEvent,
 	}
 
-	// watch each of the content roots
-	for root, handler := range roots {
-		delete(roots, root)
-		root, _ = filepath.Abs(root)
-		if root == "" {
+	// watch each of the content dirs
+	for dir, handler := range dirs {
+		delete(dirs, dir)
+		dir, _ = filepath.Abs(dir)
+		if dir == "" {
 			continue
 		}
-		roots[root] = handler
-		if err := filepath.Walk(root, walkDir); err != nil {
+		dirs[dir] = handler
+		if err := filepath.Walk(dir, walkDir); err != nil {
 			fmt.Println("ERROR", err)
 		}
 	}
@@ -106,8 +105,8 @@ func WatchWiki(w *wiki.Wiki) {
 				}
 
 				// file change; pass it on to handlers
-				for root, handler := range roots {
-					if strings.HasPrefix(abs, root+"/") {
+				for dir, handler := range dirs {
+					if _, err := filepath.Rel(dir, abs); err == nil {
 						handler(mon, event, abs)
 						break
 					}
@@ -124,26 +123,32 @@ func WatchWiki(w *wiki.Wiki) {
 }
 
 func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
+
+	// trim the page dir to get the actual name with prefix
+	osName := abs
 	dirPage, _ := filepath.Abs(mon.w.Opt.Dir.Page)
-	name := strings.TrimPrefix(abs, dirPage+string(filepath.Separator))
+	if relPath, err := filepath.Rel(dirPage, abs); err != nil {
+		osName = relPath
+	}
 
 	switch event.Op {
 
 	case fsnotify.Create, fsnotify.Write:
 
 		// this is a symlink; ignore it
-		// FIXME: only skip if the target is also in the page root?
+		// FIXME: only skip if the target is also in the page dir?
 		if fi, err := os.Lstat(abs); err == nil && fi.Mode()&os.ModeSymlink != 0 {
 			return
 		}
 
-		mon.w.DisplayPageDraft(name, true)
+		// force page to generate even if marked as draft
+		// page name will be normalized including os-specific path separator
+		mon.w.DisplayPageDraft(osName, true)
 
 	case fsnotify.Rename, fsnotify.Remove:
 		// TODO: w.PurgePage() or similar
-		os.Remove(mon.w.Opt.Dir.Cache + "/page/" + name + ".cache")
-		os.Remove(mon.w.Opt.Dir.Cache + "/page/" + name + ".txt")
-
+		os.Remove(filepath.Join(mon.w.Opt.Dir.Cache, "page", osName+".cache"))
+		os.Remove(filepath.Join(mon.w.Opt.Dir.Cache, "page", osName+".txt"))
 	}
 }
 
