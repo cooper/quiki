@@ -220,7 +220,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 	}
 
 	// no need for trailing /
-	if dir[len(dir)-1] == '/' {
+	if dir[len(dir)-1] == filepath.Separator {
 		dir = dir[:len(dir)-1]
 	}
 
@@ -228,7 +228,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 	var doDir func(pfx string)
 	doDir = func(pfx string) {
-		dir := dir + "/" + pfx
+		dir := filepath.Join(dir, pfx)
 
 		// can't open directory
 		files, err := ioutil.ReadDir(dir)
@@ -249,7 +249,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 			// this is a directory
 			if file.IsDir() {
 				if !thisDirOnly {
-					doDir(pfx + file.Name() + "/")
+					doDir(pfx + file.Name() + string(filepath.Separator))
 				}
 				continue
 			}
@@ -289,7 +289,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 			// file is in the same directory; otherwise use the original path
 			filename := path
 			if rel, err := filepath.Rel(dirAbs, abs); err == nil {
-				if strings.IndexByte(rel, '/') == -1 {
+				if strings.IndexByte(rel, filepath.Separator) == -1 {
 					filename = abs
 				}
 			}
@@ -398,7 +398,7 @@ func ModelName(name string) string {
 // MakeDir creates directories recursively.
 func MakeDir(dir, name string) {
 	pfx := filepath.Dir(name)
-	os.MkdirAll(dir+"/"+pfx, 0755)
+	os.MkdirAll(filepath.Join(dir, pfx), 0755)
 }
 
 // ScaleString returns a string of scaled image names for use in srcset.

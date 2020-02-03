@@ -1,6 +1,7 @@
 package wiki
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
@@ -70,7 +71,7 @@ func (w *Wiki) readConfig(file string) error {
 }
 
 func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int) {
-	path := page.Opt.Dir.Image + "/" + name
+	path := filepath.Join(page.Opt.Dir.Image, name)
 	bigW, bigH := getImageDimensions(path)
 
 	// original has no dimensions??

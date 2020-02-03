@@ -171,7 +171,7 @@ func (p *Page) CacheExists() bool {
 //
 func (p *Page) Name() string {
 	dir := pageAbs(p.Opt.Dir.Page)        // /path/to/quiki/wikis/mywiki/pages
-	path := p.Path()                      // /path/to/quiki/doc/language.md
+	path := filepath.ToSlash(p.Path())    // /path/to/quiki/doc/language.md
 	name := strings.TrimPrefix(path, dir) // /path/to/quiki/doc/language.md
 	name = strings.TrimPrefix(name, "/")  // path/to/quiki/doc/language.md
 	if strings.Index(path, dir) != 0 {    // if path does not start with /path/to/quiki/wikis/mywiki/pages
@@ -191,7 +191,7 @@ func (p *Page) NameNE() string {
 // For a page named a.page, this is an empty string.
 //
 func (p *Page) Prefix() string {
-	dir := strings.TrimSuffix(filepath.Dir(p.Name()), "/")
+	dir := strings.TrimSuffix(filepath.ToSlash(filepath.Dir(p.Name())), "/")
 	if dir == "." {
 		return ""
 	}
@@ -214,7 +214,7 @@ func (p *Page) RelName() string {
 	dir := pageAbs(p.Opt.Dir.Page) // /path/to/quiki/wikis/mywiki/pages
 	path := p.RelPath()            // doc/parsing.md
 	name := strings.TrimPrefix(path, dir)
-	name = strings.TrimPrefix(name, "/")
+	name = strings.TrimPrefix(filepath.ToSlash(name), "/")
 	if strings.Index(path, dir) == 0 {
 		return filepath.Base(p.RelPath())
 	}
@@ -236,7 +236,7 @@ func (p *Page) RelPath() string {
 	if p.FilePath != "" {
 		return p.FilePath
 	}
-	return p.Opt.Dir.Page + "/" + p.name
+	return filepath.Join(p.Opt.Dir.Page, p.name)
 }
 
 // Redirect returns the location to which the page redirects, if any.
@@ -245,7 +245,7 @@ func (p *Page) Redirect() string {
 
 	// symbolic link redirect
 	if p.IsSymlink() {
-		return pageAbs(p.Opt.Root.Page + "/" + p.NameNE())
+		return pageAbs(filepath.Join(p.Opt.Root.Page, p.NameNE()))
 	}
 
 	// @page.redirect

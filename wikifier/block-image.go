@@ -2,6 +2,7 @@ package wikifier
 
 import (
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -70,9 +71,8 @@ func (image *imageBlock) parse(page *Page) {
 		return
 	}
 
-	split := strings.Split(image.file, "/")
 	image.path = image.file
-	image.lastName = split[len(split)-1]
+	_, image.lastName = filepath.Split(image.file)
 
 	// ##############
 	// ### SIZING ###

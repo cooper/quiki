@@ -1,5 +1,7 @@
 package wikifier
 
+import "path/filepath"
+
 type modelBlock struct {
 	modelName   string
 	model       *Page
@@ -18,7 +20,7 @@ func (mb *modelBlock) parse(page *Page) {
 	// remember that the page uses this model
 	name := mb.blockName()
 	file := ModelName(name)
-	path := pageAbs(page.Opt.Dir.Model + "/" + file)
+	path := pageAbs(filepath.Join(page.Opt.Dir.Model, file))
 	page.Models[file] = true
 
 	// create page

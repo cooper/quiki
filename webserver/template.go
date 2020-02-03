@@ -67,7 +67,7 @@ func findTemplate(name string) (wikiTemplate, error) {
 	}
 
 	for _, templateDir := range strings.Split(templateDirs, ",") {
-		templatePath := templateDir + "/" + name
+		templatePath := filepath.Join(templateDir, name)
 		t, err := loadTemplate(name, templatePath)
 
 		// an error occurred in loading the template

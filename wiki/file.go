@@ -31,7 +31,7 @@ func (w *Wiki) allPageFiles() []string {
 func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	dir := w.Opt.Dir.Category
 	if catType != "" {
-		dir += "/" + string(catType)
+		dir = filepath.Join(dir, string(catType))
 	}
 	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, false)
 	return files
@@ -57,7 +57,7 @@ func (w *Wiki) pathForPage(pageName string, createOK bool, dirPage string) strin
 	if createOK {
 		wikifier.MakeDir(dirPage, pageName)
 	}
-	path, _ := filepath.Abs(dirPage + "/" + pageName)
+	path, _ := filepath.Abs(filepath.Join(dirPage, pageName))
 	return path
 }
 
@@ -65,26 +65,23 @@ func (w *Wiki) pathForPage(pageName string, createOK bool, dirPage string) strin
 // creates directories for the path components that do not exist.
 func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bool) string {
 	catName = wikifier.CategoryName(catName, false)
-	if catType != "" {
-		catType += "/"
-	}
-	dir := w.Opt.Dir.Cache + "/category"
+	dir := filepath.Join(w.Opt.Dir.Cache, "category")
 	if createOK {
-		wikifier.MakeDir(dir, string(catType)+catName)
+		wikifier.MakeDir(dir, filepath.Join(string(catType), catName))
 	}
-	path, _ := filepath.Abs(dir + "/" + string(catType) + catName)
+	path, _ := filepath.Abs(filepath.Join(dir, string(catType), catName))
 	return path
 }
 
 // pathForImage returns the absolute path for an image.
 func (w *Wiki) pathForImage(imageName string) string {
-	path, _ := filepath.Abs(w.Opt.Dir.Image + "/" + imageName)
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Image, imageName))
 	return path
 }
 
 // pathForModel returns the absolute path for a model.
 func (w *Wiki) pathForModel(modelName string) string {
 	modelName = wikifier.PageNameExt(modelName, ".model")
-	path, _ := filepath.Abs(w.Opt.Dir.Model + "/" + modelName)
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Model, modelName))
 	return path
 }

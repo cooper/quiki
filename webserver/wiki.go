@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/monitor"
@@ -68,7 +69,7 @@ func initWikis() error {
 			if err != nil {
 				return err
 			}
-			wikiConfPath = dirWiki + "/" + wikiName + "/wiki.conf"
+			wikiConfPath = filepath.Join(dirWiki, wikiName, "wiki.conf")
 		}
 
 		// create wiki
