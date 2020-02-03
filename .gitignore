@@ -12,5 +12,6 @@ wikis/mywiki/cache
 .DS_Store
 standalone/standalone
 irc/irc
+irc/irc.exe
 monitor/monitor
 markdown/markdown
