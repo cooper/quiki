@@ -164,25 +164,41 @@ func (p *Page) CacheExists() bool {
 	return err == nil
 }
 
-// Name returns the resolved page name, with or without extension.
+// Name returns the resolved page name with extension.
 //
-// This DOES take symbolic links into account
+// This DOES take symbolic links into account.
 // and DOES include the page prefix if applicable.
+// Any prefix will have forward slashes regardless of OS.
 //
 func (p *Page) Name() string {
-	dir := pageAbs(p.Opt.Dir.Page)        // /path/to/quiki/wikis/mywiki/pages
-	path := filepath.ToSlash(p.Path())    // /path/to/quiki/doc/language.md
-	name := strings.TrimPrefix(path, dir) // /path/to/quiki/doc/language.md
-	name = strings.TrimPrefix(name, "/")  // path/to/quiki/doc/language.md
-	if strings.Index(path, dir) != 0 {    // if path does not start with /path/to/quiki/wikis/mywiki/pages
+	dir := pageAbs(p.Opt.Dir.Page)                         // /path/to/quiki/wikis/mywiki/pages
+	path := p.Path()                                       // /path/to/quiki/doc/language.md
+	name := strings.TrimPrefix(path, dir)                  // /path/to/quiki/doc/language.md
+	name = strings.TrimPrefix(filepath.ToSlash(name), "/") // path/to/quiki/doc/language.md
+
+	// if path does not start with, for instance, /path/to/quiki/wikis/mywiki/pages
+	if strings.Index(path, dir) != 0 {
 		return p.RelName() // return language.md
 	}
+
 	return name
+}
+
+// OSName is like Name, except it uses the native path separator.
+// It should be used for file operations only.
+func (p *Page) OSName() string {
+	return filepath.FromSlash(p.Name())
 }
 
 // NameNE returns the resolved page name with No Extension.
 func (p *Page) NameNE() string {
 	return PageNameNE(p.Name())
+}
+
+// OSNameNE is like NameNE, except it uses the native path separator.
+// It should be used for file operations only.
+func (p *Page) OSNameNE() string {
+	return filepath.FromSlash(p.NameNE())
 }
 
 // Prefix returns the page prefix.
@@ -293,7 +309,7 @@ func (p *Page) Modified() time.Time {
 
 // CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
-	osName := filepath.FromSlash(p.Name()) + ".cache" // os-specific cache name
+	osName := p.OSName() + ".cache" // os-specific cache name
 	MakeDir(filepath.Join(p.Opt.Dir.Cache, "page"), osName)
 	return pageAbs(filepath.Join(p.Opt.Dir.Cache, "page", osName))
 }
@@ -306,7 +322,7 @@ func (p *Page) CacheModified() time.Time {
 
 // SearchPath returns the absolute path to the page search text file.
 func (p *Page) SearchPath() string {
-	osName := filepath.FromSlash(p.Name()) + ".txt" // os-specific text file name
+	osName := p.OSName() + ".txt" // os-specific text file name
 	MakeDir(filepath.Join(p.Opt.Dir.Cache, "page"), osName)
 	return pageAbs(filepath.Join(p.Opt.Dir.Cache, "page", osName))
 }

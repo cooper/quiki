@@ -365,6 +365,9 @@ func PageNameLink(name string, noLower bool) string {
 		return name
 	}
 
+	// just in case, convert any native path separtors to /
+	name = filepath.ToSlash(name)
+
 	// replace non-alphanumerics with _
 	name = nonAlphaRegex.ReplaceAllString(name, "_")
 

@@ -125,7 +125,7 @@ func WatchWiki(w *wiki.Wiki) {
 
 func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
 	dirPage, _ := filepath.Abs(mon.w.Opt.Dir.Page)
-	name := strings.TrimPrefix(abs, dirPage+"/")
+	name := strings.TrimPrefix(abs, dirPage+string(filepath.Separator))
 
 	switch event.Op {
 
