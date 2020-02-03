@@ -13,6 +13,7 @@
    accurately set to the path of the quiki repository. */
 @server.dir.static:     [@repo]/webserver/static;
 @server.dir.template:   [@repo]/webserver/templates;
+@server.dir.adminifier: [@repo]/adminifier;
 @server.dir.wiki:       [@repo]/wikis;
 
 /* HTTP server port to listen on. @server.http.bind can also be specified for

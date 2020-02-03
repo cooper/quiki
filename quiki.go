@@ -13,5 +13,6 @@ func main() {
 		log.Fatal("usage: " + os.Args[0] + " /path/to/quiki.conf")
 	}
 
-	webserver.New(os.Args[1]).Listen()
+	webserver.Configure(os.Args[1])
+	webserver.Listen()
 }

@@ -31,7 +31,7 @@ var wikis map[string]*wikiInfo
 func initWikis() error {
 
 	// find wikis
-	found, err := conf.Get("server.wiki")
+	found, err := Conf.Get("server.wiki")
 	if err != nil {
 		return err
 	}
@@ -51,21 +51,21 @@ func initWikis() error {
 		configPfx := "server.wiki." + wikiName
 
 		// not enabled
-		enable, _ := conf.GetBool(configPfx + ".enable")
+		enable, _ := Conf.GetBool(configPfx + ".enable")
 		if !enable {
 			continue
 		}
 
 		// host to accept (optional)
-		wikiHost, _ := conf.GetStr(configPfx + ".host")
+		wikiHost, _ := Conf.GetStr(configPfx + ".host")
 
 		// get wiki config path and password
-		wikiConfPath, _ := conf.GetStr(configPfx + ".config")
-		privConfPath, _ := conf.GetStr(configPfx + ".private")
+		wikiConfPath, _ := Conf.GetStr(configPfx + ".config")
+		privConfPath, _ := Conf.GetStr(configPfx + ".private")
 
 		if wikiConfPath == "" {
 			// config not specified, so use server.dir.wiki and wiki.conf
-			dirWiki, err := conf.GetStr("server.dir.wiki")
+			dirWiki, err := Conf.GetStr("server.dir.wiki")
 			if err != nil {
 				return err
 			}
@@ -195,7 +195,7 @@ func setupWiki(wi *wikiInfo) error {
 
 		// add the real handler
 		wi := wi // copy pointer so the handler below always refer to this one
-		mux.HandleFunc(wi.host+root, func(w http.ResponseWriter, r *http.Request) {
+		Mux.HandleFunc(wi.host+root, func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
@@ -216,7 +216,7 @@ func setupWiki(wi *wikiInfo) error {
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		mux.Handle(wi.host+rootFile, http.StripPrefix(rootFile, fileServer))
+		Mux.Handle(wi.host+rootFile, http.StripPrefix(rootFile, fileServer))
 		log.Printf("[%s] registered file root: %s (%s)", wi.name, wi.host+rootFile, dirWiki)
 	}
 

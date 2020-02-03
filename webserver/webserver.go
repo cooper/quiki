@@ -15,38 +15,32 @@ import (
 	"github.com/pkg/errors"
 )
 
-var conf *wikifier.Page
-var mux *http.ServeMux
-
-// Server represents a quiki webserver.
-type Server struct {
-	Server *http.Server
-	Mux    *http.ServeMux
-	Conf   *wikifier.Page
-	bind   string
-	port   string
-}
+var Conf *wikifier.Page
+var Mux *http.ServeMux
+var Server *http.Server
+var Bind string
+var Port string
 
 // New initializes the webserver and returns it.
-func New(confFile string) *Server {
-	mux = http.NewServeMux()
+func Configure(confFile string) {
+	Mux = http.NewServeMux()
 
 	// parse configuration
-	conf = wikifier.NewPage(confFile)
-	conf.VarsOnly = true
-	if err := conf.Parse(); err != nil {
+	Conf = wikifier.NewPage(confFile)
+	Conf.VarsOnly = true
+	if err := Conf.Parse(); err != nil {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
 	// extract strings
-	var port, bind, dirStatic string
+	var dirStatic string
 	for key, ptr := range map[string]*string{
-		"server.http.port":    &port,
-		"server.http.bind":    &bind,
+		"server.http.port":    &Port,
+		"server.http.bind":    &Bind,
 		"server.dir.template": &templateDirs,
 		"server.dir.static":   &dirStatic,
 	} {
-		str, err := conf.GetStr(key)
+		str, err := Conf.GetStr(key)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -70,32 +64,23 @@ func New(confFile string) *Server {
 	log.Println("quiki ready")
 
 	// create server with main handler
-	mux.HandleFunc("/", handleRoot)
-	server := &http.Server{Handler: mux}
-
-	// create webserver
-	return &Server{
-		Server: server,
-		Mux:    mux,
-		Conf:   conf,
-		port:   port,
-		bind:   bind,
-	}
+	Mux.HandleFunc("/", handleRoot)
+	Server = &http.Server{Handler: Mux}
 }
 
 // Listen runs the webserver indefinitely.
 //
 // If any errors occur, the program is terminated.
-func (s *Server) Listen() {
-	if s.port == "unix" {
-		listener, err := net.Listen("unix", s.bind)
+func Listen() {
+	if Port == "unix" {
+		listener, err := net.Listen("unix", Bind)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "listen"))
 		}
-		s.Server.Serve(listener)
+		Server.Serve(listener)
 	} else {
-		s.Server.Addr = s.bind + ":" + s.port
-		log.Fatal(errors.Wrap(s.Server.ListenAndServe(), "listen"))
+		Server.Addr = Bind + ":" + Port
+		log.Fatal(errors.Wrap(Server.ListenAndServe(), "listen"))
 	}
 }
 
@@ -107,6 +92,6 @@ func setupStatic(staticPath string) error {
 		return err
 	}
 	fileServer := http.FileServer(http.Dir(staticPath))
-	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	Mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 	return nil
 }

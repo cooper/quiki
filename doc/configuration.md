@@ -411,6 +411,11 @@ Your wikis do not all have to be in the same directory, so this is optional.
 However, if you make use of this, quiki can infer [`dir.wiki`](#dir) and
 [`server.wiki.[name].config`](#serverwikinameconfig) for each wiki.
 
+
+### server.dir.adminifier
+
+Path to adminifier resources.
+
 ### server.enable.pregeneration
 
 If enabled, webserver pre-generates all pages and images upon start.
