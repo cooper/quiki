@@ -1,7 +1,7 @@
 // Package webserver is the newest webserver.
 package webserver
 
-// Copyright (c) 2019, Mitchell Cooper
+// Copyright (c) 2020, Mitchell Cooper
 // quiki - a standalone web server for wikifier
 
 import (

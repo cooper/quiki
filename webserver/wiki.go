@@ -77,6 +77,14 @@ func initWikis() error {
 		if err != nil {
 			return err
 		}
+
+		// if wiki host was found in wiki config, use it ONLY when
+		// no host was specified in server config.
+		if wikiHost == "" {
+			wikiHost = w.Opt.Host.Wiki
+		}
+
+		// create wiki info for webserver
 		wi := &wikiInfo{Wiki: w, host: wikiHost, name: wikiName}
 
 		// pregenerate

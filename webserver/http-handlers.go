@@ -1,6 +1,6 @@
 package webserver
 
-// Copyright (c) 2019, Mitchell Cooper
+// Copyright (c) 2020, Mitchell Cooper
 
 import (
 	"bytes"

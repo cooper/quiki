@@ -25,6 +25,7 @@ type PageOpt struct {
 	Template     string // name of template
 	MainRedirect bool   // redirect on main page rather than serve root
 	Page         PageOptPage
+	Host         PageOptHost
 	Dir          PageOptDir
 	Root         PageOptRoot
 	Image        PageOptImage
@@ -39,6 +40,11 @@ type PageOpt struct {
 type PageOptPage struct {
 	EnableTitle bool // enable page title headings
 	EnableCache bool // enable page caching
+}
+
+// PageOptHost describes HTTP hosts for a wiki.
+type PageOptHost struct {
+	Wiki string // HTTP host for the wiki
 }
 
 // PageOptDir describes actual filepaths to wiki resources.
@@ -123,6 +129,9 @@ var defaultPageOpt = PageOpt{
 		EnableTitle: true,
 		EnableCache: false,
 	},
+	Host: PageOptHost{
+		Wiki: "", // aka all hosts
+	},
 	Dir: PageOptDir{
 		Wiki:     "",
 		Image:    "images",
@@ -170,6 +179,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		"main_page":  &opt.MainPage,  // main page name
 		"error_page": &opt.ErrorPage, // error page name
 		"template":   &opt.Template,  // template name
+		"host.wiki":  &opt.Host.Wiki, // wiki host
 		// "dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
 		"dir.image":     &opt.Dir.Image,     // image directory
 		"dir.page":      &opt.Dir.Page,      // page directory
