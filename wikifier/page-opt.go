@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -189,6 +190,19 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 			*ptr = str
 		}
 	}
+
+	// convert all directories to native path separator
+	opt.Dir.Image = filepath.FromSlash(opt.Dir.Image)
+	opt.Dir.Page = filepath.FromSlash(opt.Dir.Page)
+	opt.Dir.Model = filepath.FromSlash(opt.Dir.Model)
+	opt.Dir.Cache = filepath.FromSlash(opt.Dir.Cache)
+
+	// convert all HTTP roots to /
+	opt.Root.Wiki = filepath.ToSlash(opt.Root.Wiki)
+	opt.Root.Image = filepath.ToSlash(opt.Root.Image)
+	opt.Root.Category = filepath.ToSlash(opt.Root.Category)
+	opt.Root.Page = filepath.ToSlash(opt.Root.Page)
+	opt.Root.File = filepath.ToSlash(opt.Root.File)
 
 	// easy bool options
 	pageOptBool := map[string]*bool{

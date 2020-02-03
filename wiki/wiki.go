@@ -16,6 +16,7 @@ type Wiki struct {
 
 // NewWiki creates a Wiki given the public and private configuration files.
 func NewWiki(conf, privateConf string) (*Wiki, error) {
+	conf, privateConf = filepath.FromSlash(conf), filepath.FromSlash(privateConf)
 	w := &Wiki{ConfigFile: conf, PrivateConfigFile: privateConf, Opt: defaultWikiOpt}
 
 	// there's no config!
