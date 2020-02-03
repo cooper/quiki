@@ -17,25 +17,30 @@ import (
 var conf *wikifier.Page
 var mux *http.ServeMux
 
-// Run runs the webserver.
-func Run() {
+// Server represents a quiki webserver.
+type Server struct {
+	Server *http.Server
+	Mux    *http.ServeMux
+	Conf   *wikifier.Page
+	bind   string
+	port   string
+}
+
+// New initializes the webserver and returns it.
+func New(confFile string) *Server {
 	mux = http.NewServeMux()
 
-	// find config file
-	if len(os.Args) < 2 || os.Args[1] == "" {
-		log.Fatal("usage: " + os.Args[0] + " /path/to/quiki.conf")
-	}
-
 	// parse configuration
-	conf = wikifier.NewPage(os.Args[1])
+	conf = wikifier.NewPage(confFile)
 	conf.VarsOnly = true
 	if err := conf.Parse(); err != nil {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
-	var port, dirStatic string
+	var port, bind, dirStatic string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &port,
+		"server.http.bind":    &bind,
 		"server.dir.template": &templateDirs,
 		"server.dir.static":   &dirStatic,
 	} {
@@ -62,20 +67,29 @@ func Run() {
 	mux.HandleFunc("/", handleRoot)
 	server := &http.Server{Handler: mux}
 
-	// listen
-	bind, err := conf.GetStr("server.http.bind")
-	if err != nil {
-		log.Fatal(err)
+	// create webserver
+	return &Server{
+		Server: server,
+		Mux:    mux,
+		Conf:   conf,
+		port:   port,
+		bind:   bind,
 	}
-	if port == "unix" {
-		listener, err := net.Listen("unix", bind)
+}
+
+// Listen runs the webserver indefinitely.
+//
+// If any errors occur, the program is terminated.
+func (s *Server) Listen() {
+	if s.port == "unix" {
+		listener, err := net.Listen("unix", s.bind)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "listen"))
 		}
-		server.Serve(listener)
+		s.Server.Serve(listener)
 	} else {
-		server.Addr = bind + ":" + port
-		log.Fatal(errors.Wrap(server.ListenAndServe(), "listen"))
+		s.Server.Addr = s.bind + ":" + s.port
+		log.Fatal(errors.Wrap(s.Server.ListenAndServe(), "listen"))
 	}
 }
 

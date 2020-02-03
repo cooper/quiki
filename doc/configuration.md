@@ -46,9 +46,9 @@ __Default__: *Wiki*
 
 ### host
 
-| Option        | Description   | Default        |
-| -----         | -----         | -----          |
-| `host.wiki`   | Wiki host     | '' (all hosts) |
+| Option        | Description   | Default          |
+| -----         | -----         | -----            |
+| `host.wiki`   | Wiki host     | None (all hosts) |
 
 Hostname for the wiki.
 
@@ -58,12 +58,12 @@ place, the wiki is accessible from all available hosts.
 
 ### root
 
-| Option        | Description   | Default       |
-| -----         | -----         | -----         |
-| `root.wiki`   | Wiki root     | '' (i.e. /)   |
-| `root.page`   | Page root     | */page*       |
-| `root.image`  | Image root    | */images*     |
-| `root.file`   | File root     | None          |
+| Option        | Description   | Default        |
+| -----         | -----         | -----          |
+| `root.wiki`   | Wiki root     | None (i.e. /)  |
+| `root.page`   | Page root     | */page*        |
+| `root.image`  | Image root    | */images*      |
+| `root.file`   | File root     | None           |
 
 HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
 They are used for link targets and image URLs; they will never be used to
