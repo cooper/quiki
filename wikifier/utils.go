@@ -371,10 +371,10 @@ func PageNameLink(name string, noLower bool) string {
 	// replace non-alphanumerics with _
 	name = nonAlphaRegex.ReplaceAllString(name, "_")
 
-	// // lowercase
-	// if !noLower {
-	// 	name = strings.ToLower(name)
-	// }
+	// lowercase
+	if !noLower {
+		name = strings.ToLower(name)
+	}
 
 	return name
 }

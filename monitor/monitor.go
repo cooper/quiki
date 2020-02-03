@@ -127,7 +127,7 @@ func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
 	// trim the page dir to get the actual name with prefix
 	osName := abs
 	dirPage, _ := filepath.Abs(mon.w.Opt.Dir.Page)
-	if relPath, err := filepath.Rel(dirPage, abs); err != nil {
+	if relPath, err := filepath.Rel(dirPage, abs); err == nil {
 		osName = relPath
 	}
 

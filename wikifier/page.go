@@ -171,17 +171,20 @@ func (p *Page) CacheExists() bool {
 // Any prefix will have forward slashes regardless of OS.
 //
 func (p *Page) Name() string {
-	dir := pageAbs(p.Opt.Dir.Page)                         // /path/to/quiki/wikis/mywiki/pages
-	path := p.Path()                                       // /path/to/quiki/doc/language.md
-	name := strings.TrimPrefix(path, dir)                  // /path/to/quiki/doc/language.md
-	name = strings.TrimPrefix(filepath.ToSlash(name), "/") // path/to/quiki/doc/language.md
+	dir := pageAbs(p.Opt.Dir.Page)
+	path := p.Path()
 
-	// if path does not start with, for instance, /path/to/quiki/wikis/mywiki/pages
-	if strings.Index(path, dir) != 0 {
-		return p.RelName() // return language.md
+	// make relative to page directory
+	if name, err := filepath.Rel(dir, path); err == nil {
+
+		// remove possible leading slash
+		name = strings.TrimPrefix(filepath.ToSlash(name), "/") // path/to/quiki/doc/language.md
+		return name
 	}
 
-	return name
+	// if the path cannot be made relative to the page dir,
+	// it is probably a symlink to something external
+	return p.RelName() // return the filename only
 }
 
 // OSName is like Name, except it uses the native path separator.
@@ -224,17 +227,26 @@ func (p *Page) Path() string {
 // This does NOT take symbolic links into account.
 // It is not guaranteed to exist.
 func (p *Page) RelName() string {
+
+	// name is predetermined
 	if p.name != "" {
 		return p.name
 	}
-	dir := pageAbs(p.Opt.Dir.Page) // /path/to/quiki/wikis/mywiki/pages
-	path := p.RelPath()            // doc/parsing.md
-	name := strings.TrimPrefix(path, dir)
-	name = strings.TrimPrefix(filepath.ToSlash(name), "/")
-	if strings.Index(path, dir) == 0 {
-		return filepath.Base(p.RelPath())
+
+	dir := pageAbs(p.Opt.Dir.Page)
+	path := p.RelPath() // this is what makes it different from Name()
+
+	// make relative to page directory
+	if name, err := filepath.Rel(dir, path); err == nil {
+
+		// remove possible leading slash
+		name = strings.TrimPrefix(filepath.ToSlash(name), "/") // path/to/quiki/doc/language.md
+		return name
 	}
-	return name
+
+	// if the path cannot be made relative to the page dir,
+	// it is probably a symlink to something external
+	return path
 }
 
 // RelNameNE returns the unresolved page name with No Extension, relative to
