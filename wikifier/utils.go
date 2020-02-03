@@ -239,7 +239,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 		// check each file
 		for _, file := range files {
-			path := dir + file.Name()
+			path := filepath.Join(dir, file.Name())
 
 			// skip hidden files
 			if file.Name()[0] == '.' {
