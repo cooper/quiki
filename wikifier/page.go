@@ -293,8 +293,9 @@ func (p *Page) Modified() time.Time {
 
 // CachePath returns the absolute path to the page cache file.
 func (p *Page) CachePath() string {
-	MakeDir(p.Opt.Dir.Cache+"/page", p.Name())
-	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".cache")
+	osName := filepath.FromSlash(p.Name()) + ".cache" // os-specific cache name
+	MakeDir(filepath.Join(p.Opt.Dir.Cache, "page"), osName)
+	return pageAbs(filepath.Join(p.Opt.Dir.Cache, "page", osName))
 }
 
 // CacheModified returns the page cache file time.
@@ -305,8 +306,9 @@ func (p *Page) CacheModified() time.Time {
 
 // SearchPath returns the absolute path to the page search text file.
 func (p *Page) SearchPath() string {
-	MakeDir(p.Opt.Dir.Cache+"/page", p.Name())
-	return pageAbs(p.Opt.Dir.Cache + "/page/" + p.Name() + ".txt")
+	osName := filepath.FromSlash(p.Name()) + ".txt" // os-specific text file name
+	MakeDir(filepath.Join(p.Opt.Dir.Cache, "page"), osName)
+	return pageAbs(filepath.Join(p.Opt.Dir.Cache, "page", osName))
 }
 
 // Draft returns true if the page is marked as a draft.
