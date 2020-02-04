@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 	"time"
 
@@ -227,6 +228,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		}
 	}
 
+	log.Printf("DisplayPage: %+v", r)
 	return r
 }
 

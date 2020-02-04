@@ -184,7 +184,7 @@ func (p *Page) Name() string {
 
 	// if the path cannot be made relative to the page dir,
 	// it is probably a symlink to something external
-	return p.RelName() // return the filename only
+	return p.RelName()
 }
 
 // OSName is like Name, except it uses the native path separator.
