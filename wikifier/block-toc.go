@@ -27,7 +27,7 @@ func tocAdd(sec *secBlock, addTo element) {
 		li := addTo.createChild("li", "")
 		a := li.createChild("a", "link-internal")
 		a.setAttr("href", "#"+sec.headingID)
-		a.addText(sec.title)
+		a.addHTML(sec.fmtTitle)
 		addTo = li
 	} else {
 		subList = addTo
