@@ -177,6 +177,11 @@ func (p *Page) Name() string {
 	// make relative to page directory
 	if name, err := filepath.Rel(dir, path); err == nil {
 
+		// if it refers to an outside dir, forget this
+		if strings.Index(name, "..") != -1 {
+			return p.RelName()
+		}
+
 		// remove possible leading slash
 		name = strings.TrimPrefix(filepath.ToSlash(name), "/") // path/to/quiki/doc/language.md
 		return name

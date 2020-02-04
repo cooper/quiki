@@ -160,5 +160,30 @@ func main() {
 		},
 	})
 
+	mybot.AddTrigger(hbot.Trigger{
+		func(bot *hbot.Bot, mes *hbot.Message) bool {
+			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".names ")
+		},
+		func(irc *hbot.Bot, mes *hbot.Message) bool {
+			pageName := strings.TrimPrefix(mes.Content, ".names ")
+			w, _ := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
+			page := w.NewPage(pageName)
+			reply := fmt.Sprintf("%+v", struct {
+				Name, NameNE, RelName, RelNameNE, Path, RelPath string
+			}{
+				Name:      page.Name(),
+				NameNE:    page.NameNE(),
+				RelName:   page.RelName(),
+				RelNameNE: page.RelNameNE(),
+				Path:      page.Path(),
+				RelPath:   page.RelPath(),
+			})
+			for _, line := range strings.Split(reply, "\n") {
+				irc.Send("PRIVMSG " + mes.To + " :" + line)
+			}
+			return false
+		},
+	})
+
 	mybot.Run() // Blocks until exit
 }
