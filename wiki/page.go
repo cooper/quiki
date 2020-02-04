@@ -228,7 +228,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		}
 	}
 
-	log.Printf("DisplayPage: %+v", r)
+	log.Printf("DisplayPage: %+v\n", r)
 	return r
 }
 
