@@ -14,12 +14,12 @@ func (toc *tocBlock) html(page *Page, el element) {
 	// add each top-level section
 	for _, child := range page.main.blockContent() {
 		if sec, ok := child.(*secBlock); ok {
-			tocAdd(sec, el)
+			tocAdd(sec, el, page)
 		}
 	}
 }
 
-func tocAdd(sec *secBlock, addTo element) {
+func tocAdd(sec *secBlock, addTo element, page *Page) {
 
 	// create an item for this section
 	var subList element
@@ -27,7 +27,7 @@ func tocAdd(sec *secBlock, addTo element) {
 		li := addTo.createChild("li", "")
 		a := li.createChild("a", "link-internal")
 		a.setAttr("href", "#"+sec.headingID)
-		a.addHTML(sec.fmtTitle)
+		a.addHTML(page.formatTextOpts(sec.title, fmtOpt{pos: sec.openPos}))
 		addTo = li
 	} else {
 		subList = addTo
@@ -39,7 +39,7 @@ func tocAdd(sec *secBlock, addTo element) {
 			if subList == nil {
 				subList = addTo.createChild("ul", "")
 			}
-			tocAdd(secChild, subList)
+			tocAdd(secChild, subList, page)
 		}
 	}
 }
