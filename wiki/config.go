@@ -22,9 +22,9 @@ var defaultWikiOpt = wikifier.PageOpt{
 	},
 	Root: wikifier.PageOptRoot{
 		Wiki:     "", // aka /
+		Page:     "", // aka /
 		Image:    "/images",
 		Category: "/topic",
-		Page:     "/page",
 		File:     "", // (i.e., disabled)
 	},
 	Image: wikifier.PageOptImage{

@@ -182,6 +182,12 @@ func setupWiki(wi *wikiInfo) error {
 	for _, item := range wikiRoots {
 		rootType, root, handler := item.rootType, item.root, item.handler
 
+		// if this is the page root and it's blank, skip it
+		if rootType == "page" && root == "" {
+			log.Printf("[%s] pages will be handled at wiki root: %s/", wi.name, wi.host+wikiRoot)
+			continue
+		}
+
 		// if it doesn't already have the wiki root as the prefix, add it
 		if !strings.HasPrefix(root, wikiRoot) {
 			log.Printf(

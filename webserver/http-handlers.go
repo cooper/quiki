@@ -67,6 +67,13 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// if the page root is blank, this may be a page
+		if delayedWiki.Opt.Root.Page == "" {
+			relPath := strings.TrimLeft(strings.TrimPrefix(r.URL.Path, wikiRoot), "/")
+			handlePage(delayedWiki, relPath, w, r)
+			return
+		}
+
 		// show the 404 page for the delayed wiki
 		handleError(delayedWiki, "Page not found.", w, r)
 		return

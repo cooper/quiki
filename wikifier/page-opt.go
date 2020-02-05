@@ -142,9 +142,9 @@ var defaultPageOpt = PageOpt{
 	},
 	Root: PageOptRoot{
 		Wiki:     "", // aka /
+		Page:     "", // aka /
 		Image:    "/images",
 		Category: "/topic",
-		Page:     "/page",
 		File:     "",
 	},
 	Image: PageOptImage{
