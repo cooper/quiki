@@ -15,13 +15,34 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Conf is the webserver configuration page.
+//
+// It is available only after Configure is called.
 var Conf *wikifier.Page
+
+// Mux is the *http.ServeMux.
+//
+// It is available only after Configure is called.
 var Mux *http.ServeMux
+
+// Server is the *http.Server.
+//
+// It is available only after Configure is called.
 var Server *http.Server
+
+// Bind is the string to bind to, as extracted from the configuration file.
+//
+// It is available only after Configure is called.
 var Bind string
+
+// Port is the port to bind to or "unix" for a UNIX socket, as extracted from the configuration file.
+//
+// It is available only after Configure is called.
 var Port string
 
-// New initializes the webserver and returns it.
+// Configure parses a configuration file and initializes webserver.
+//
+// If any errors occur, the program is terminated.
 func Configure(confFile string) {
 	Mux = http.NewServeMux()
 
@@ -70,6 +91,7 @@ func Configure(confFile string) {
 
 // Listen runs the webserver indefinitely.
 //
+// Configure must be called first.
 // If any errors occur, the program is terminated.
 func Listen() {
 	if Port == "unix" {

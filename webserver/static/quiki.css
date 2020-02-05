@@ -52,6 +52,7 @@ table.q-infobox {
     font-size: 0.88em;
     border-collapse: collapse;
     padding: 0;
+    border-radius: 3px;
 }
 
 th.q-infobox-title {
@@ -114,6 +115,7 @@ div.q-imagebox {
     direction: ltr;
     display: block;
     border: 1px solid #ccc;
+    border-radius: 3px;
 }
 
 div.q-imagebox-inner {
@@ -167,11 +169,13 @@ img.q-image-img {
 
 ul.q-toc {
     list-style-type: none;
-    margin: 0.5em 0 0.5em 1em;
+    font-size: 0.95em;
+    margin: 0.5em 0 0.5em 2em;
     background-color: #f7f7f7;
     border: 1px solid #ccc;
-    padding: 8px;
+    padding: 0.8em 1em;
     float: right;
+    border-radius: 3px;
 }
 
 ul.q-toc.qc-left {
