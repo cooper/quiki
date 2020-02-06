@@ -1,7 +1,7 @@
 /* QUIKI WEBSERVER CONFIGURATION */
 
 
-/* Directories-- */
+/* directories-- */
 
 @repo: .;   /* set this variable to the absolute path of the quiki repository */
 @server.dir.static:     [@repo]/webserver/static;     /* static files that ship with quiki */

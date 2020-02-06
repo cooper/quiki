@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/cooper/quiki/adminifier"
 	"github.com/cooper/quiki/webserver"
@@ -11,7 +12,7 @@ import (
 func main() {
 	// find config file
 	if len(os.Args) < 2 || os.Args[1] == "" {
-		log.Fatal("usage: " + os.Args[0] + " /path/to/quiki.conf")
+		log.Fatal("usage: " + os.Args[0] + " " + filepath.Join("path", "to", "quiki.conf"))
 	}
 
 	// configure webserver using conf file

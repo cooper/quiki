@@ -82,8 +82,6 @@ func Configure(confFile string) {
 		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
-	log.Println("quiki ready")
-
 	// create server with main handler
 	Mux.HandleFunc("/", handleRoot)
 	Server = &http.Server{Handler: Mux}
@@ -96,12 +94,14 @@ func Configure(confFile string) {
 func Listen() {
 	if Port == "unix" {
 		listener, err := net.Listen("unix", Bind)
+		log.Println("quiki ready: " + Bind)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "listen"))
 		}
 		Server.Serve(listener)
 	} else {
 		Server.Addr = Bind + ":" + Port
+		log.Println("quiki ready on port " + Port)
 		log.Fatal(errors.Wrap(Server.ListenAndServe(), "listen"))
 	}
 }
