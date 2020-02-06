@@ -15,10 +15,10 @@ import (
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	var delayedWiki *wikiInfo
+	var delayedWiki *WikiInfo
 
 	// try each wiki
-	for _, w := range wikis {
+	for _, w := range Wikis {
 
 		// wrong root
 		wikiRoot := w.Opt.Root.Wiki
@@ -27,11 +27,11 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// wrong host
-		if w.host != r.Host {
+		if w.Host != r.Host {
 
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
-			if w.host == "" && delayedWiki == nil {
+			if w.Host == "" && delayedWiki == nil {
 				delayedWiki = w
 			}
 
@@ -84,17 +84,17 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 // page request
-func handlePage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	handleResponse(wi, wi.DisplayPage(relPath), w, r)
 }
 
 // image request
-func handleImage(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+func handleImage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 	handleResponse(wi, wi.DisplayImage(relPath), w, r)
 }
 
 // topic request
-func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+func handleCategoryPosts(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
 
 	// extract page number from relPath
 	pageN := 0
@@ -110,7 +110,7 @@ func handleCategoryPosts(wi *wikiInfo, relPath string, w http.ResponseWriter, r 
 	handleResponse(wi, wi.DisplayCategoryPosts(catName, pageN), w, r)
 }
 
-func handleResponse(wi *wikiInfo, res interface{}, w http.ResponseWriter, r *http.Request) {
+func handleResponse(wi *WikiInfo, res interface{}, w http.ResponseWriter, r *http.Request) {
 	switch res := res.(type) {
 
 	// page content
@@ -159,7 +159,7 @@ func handleResponse(wi *wikiInfo, res interface{}, w http.ResponseWriter, r *htt
 // between handleError and handlePage
 var useLowLevelError bool
 
-func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) {
+func handleError(wi *WikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) {
 	status := http.StatusNotFound
 	msg := "An unknown error has occurred"
 	switch err := errMaybe.(type) {
@@ -215,7 +215,7 @@ func handleError(wi *wikiInfo, errMaybe interface{}, w http.ResponseWriter, r *h
 	http.Error(w, msg, status)
 }
 
-func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
+func renderTemplate(wi *WikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
 	var buf bytes.Buffer
 	err := wi.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
 	if err != nil {
@@ -226,7 +226,7 @@ func renderTemplate(wi *wikiInfo, w http.ResponseWriter, templateName string, do
 	w.Write(buf.Bytes())
 }
 
-func wikiPageFromRes(wi *wikiInfo, res wiki.DisplayPage) wikiPage {
+func wikiPageFromRes(wi *WikiInfo, res wiki.DisplayPage) wikiPage {
 	page := wikiPageWith(wi)
 	page.HTMLContent = template.HTML(res.Content)
 	page.PageCSS = template.CSS(res.CSS)
@@ -236,10 +236,10 @@ func wikiPageFromRes(wi *wikiInfo, res wiki.DisplayPage) wikiPage {
 	return page
 }
 
-func wikiPageWith(wi *wikiInfo) wikiPage {
+func wikiPageWith(wi *WikiInfo) wikiPage {
 	return wikiPage{
-		WikiTitle:  wi.title,
-		WikiLogo:   wi.logo,
+		WikiTitle:  wi.Title,
+		WikiLogo:   wi.Logo,
 		WikiRoot:   wi.Opt.Root.Wiki,
 		Root:       wi.Opt.Root,
 		StaticRoot: wi.template.staticRoot,

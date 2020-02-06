@@ -15,17 +15,18 @@ import (
 	"github.com/cooper/quiki/wikifier"
 )
 
-type wikiInfo struct {
-	name     string // wiki shortname
-	title    string // wiki title from @name in the wiki config
-	logo     string
-	host     string
+// WikiInfo represents a wiki hosted on this webserver.
+type WikiInfo struct {
+	Name     string // wiki shortname
+	Title    string // wiki title from @name in the wiki config
+	Logo     string
+	Host     string
 	template wikiTemplate
 	*wiki.Wiki
 }
 
-// all wikis served by this quiki
-var wikis map[string]*wikiInfo
+// Wikis is all wikis served by this webserver.
+var Wikis map[string]*WikiInfo
 
 // initialize all the wikis in the configuration
 func initWikis() error {
@@ -46,7 +47,7 @@ func initWikis() error {
 	}
 
 	// set up each wiki
-	wikis = make(map[string]*wikiInfo, len(wikiNames))
+	Wikis = make(map[string]*WikiInfo, len(wikiNames))
 	for _, wikiName := range wikiNames {
 		configPfx := "server.wiki." + wikiName
 
@@ -85,7 +86,7 @@ func initWikis() error {
 		}
 
 		// create wiki info for webserver
-		wi := &wikiInfo{Wiki: w, host: wikiHost, name: wikiName}
+		wi := &WikiInfo{Wiki: w, Host: wikiHost, Name: wikiName}
 
 		// pregenerate
 		w.Pregenerate()
@@ -98,11 +99,11 @@ func initWikis() error {
 			return err
 		}
 
-		wikis[wikiName] = wi
+		Wikis[wikiName] = wi
 	}
 
 	// still no wikis?
-	if len(wikis) == 0 {
+	if len(Wikis) == 0 {
 		return errors.New("none of the configured wikis are enabled")
 	}
 
@@ -110,7 +111,7 @@ func initWikis() error {
 }
 
 // initialize a wiki
-func setupWiki(wi *wikiInfo) error {
+func setupWiki(wi *WikiInfo) error {
 
 	// if not configured, use default template
 	templateNameOrPath := wi.Opt.Template
@@ -145,18 +146,18 @@ func setupWiki(wi *wikiInfo) error {
 		res := wi.DisplaySizedImageGenerate(si, true)
 		switch disp := res.(type) {
 		case wiki.DisplayImage:
-			wi.logo = wi.Opt.Root.Image + "/" + disp.File
+			wi.Logo = wi.Opt.Root.Image + "/" + disp.File
 		case wiki.DisplayRedirect:
-			wi.logo = disp.Redirect
+			wi.Logo = disp.Redirect
 		default:
-			log.Printf("[%s] generate logo failed: %+v", wi.name, res)
+			log.Printf("[%s] generate logo failed: %+v", wi.Name, res)
 		}
 	}
 
 	type wikiHandler struct {
 		rootType string
 		root     string
-		handler  func(*wikiInfo, string, http.ResponseWriter, *http.Request)
+		handler  func(*WikiInfo, string, http.ResponseWriter, *http.Request)
 	}
 
 	wikiRoots := []wikiHandler{
@@ -184,7 +185,7 @@ func setupWiki(wi *wikiInfo) error {
 
 		// if this is the page root and it's blank, skip it
 		if rootType == "page" && root == "" {
-			log.Printf("[%s] pages will be handled at wiki root: %s/", wi.name, wi.host+wikiRoot)
+			log.Printf("[%s] pages will be handled at wiki root: %s/", wi.Name, wi.Host+wikiRoot)
 			continue
 		}
 
@@ -201,7 +202,7 @@ func setupWiki(wi *wikiInfo) error {
 
 		// add the real handler
 		wi := wi // copy pointer so the handler below always refer to this one
-		Mux.HandleFunc(wi.host+root, func(w http.ResponseWriter, r *http.Request) {
+		Mux.HandleFunc(wi.Host+root, func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
@@ -213,7 +214,7 @@ func setupWiki(wi *wikiInfo) error {
 			handler(wi, relPath, w, r)
 		})
 
-		log.Printf("[%s] registered %s root: %s", wi.name, rootType, wi.host+root)
+		log.Printf("[%s] registered %s root: %s", wi.Name, rootType, wi.Host+root)
 	}
 
 	// file server
@@ -222,11 +223,11 @@ func setupWiki(wi *wikiInfo) error {
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		Mux.Handle(wi.host+rootFile, http.StripPrefix(rootFile, fileServer))
-		log.Printf("[%s] registered file root: %s (%s)", wi.name, wi.host+rootFile, dirWiki)
+		Mux.Handle(wi.Host+rootFile, http.StripPrefix(rootFile, fileServer))
+		log.Printf("[%s] registered file root: %s (%s)", wi.Name, wi.Host+rootFile, dirWiki)
 	}
 
 	// store the wiki info
-	wi.title = wi.Opt.Name
+	wi.Title = wi.Opt.Name
 	return nil
 }
