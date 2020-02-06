@@ -42,13 +42,15 @@ func Configure() {
 	}
 
 	// setup static files server
-	if err := setupStatic(host+root, filepath.Join(dirAdminifier, "adminifier-static")); err != nil {
+	if err := setupStatic(host, root, filepath.Join(dirAdminifier, "adminifier-static")); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier-static"))
 	}
+
+	log.Println("registered adminifier root: " + host + root)
 }
 
-func setupStatic(hostRoot, staticPath string) error {
-	hostRoot += "/adminifier-static/"
+func setupStatic(host, root, staticPath string) error {
+	root += "/adminifier-static/"
 	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
@@ -56,7 +58,6 @@ func setupStatic(hostRoot, staticPath string) error {
 		return err
 	}
 	fileServer := http.FileServer(http.Dir(staticPath))
-	mux.Handle(hostRoot, http.StripPrefix(hostRoot, fileServer))
-	log.Println("registered adminifier root: " + hostRoot)
+	mux.Handle(host+root, http.StripPrefix(root, fileServer))
 	return nil
 }
