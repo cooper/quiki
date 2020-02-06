@@ -2,6 +2,7 @@
 package adminifier
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -13,9 +14,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+var tmpl *template.Template
 var mux *http.ServeMux
 var conf *wikifier.Page
-var dirAdminifier string
+var host, root, dirAdminifier string
 
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
 func Configure() {
@@ -28,7 +30,6 @@ func Configure() {
 	}
 
 	// extract strings
-	var host, root string
 	for key, ptr := range map[string]*string{
 		"server.dir.adminifier": &dirAdminifier,
 		"adminifier.host":       &host,
@@ -41,16 +42,31 @@ func Configure() {
 		*ptr = str
 	}
 
+	dirAdminifier = filepath.FromSlash(dirAdminifier)
+	root += "/"
+
 	// setup static files server
-	if err := setupStatic(host, root, filepath.Join(dirAdminifier, "adminifier-static")); err != nil {
+	if err := setupStatic(filepath.Join(dirAdminifier, "adminifier-static")); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier-static"))
 	}
 
+	// create template
+	tmpl = template.Must(tmpl.ParseGlob(filepath.Join(dirAdminifier, "template", "*.tpl")))
+
+	// main handler
+	mux.HandleFunc(host+root, handleRoot)
 	log.Println("registered adminifier root: " + host + root)
+
+	// template handlers
+	for _, tmplName := range tmplHandlers {
+		mux.HandleFunc(host+root+tmplName, handleTemplate)
+	}
+
+	// TODO: handlers for each site at shortcode/
 }
 
-func setupStatic(host, root, staticPath string) error {
-	root += "/adminifier-static/"
+func setupStatic(staticPath string) error {
+	staticRoot := root + "adminifier-static/"
 	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
@@ -58,6 +74,6 @@ func setupStatic(host, root, staticPath string) error {
 		return err
 	}
 	fileServer := http.FileServer(http.Dir(staticPath))
-	mux.Handle(host+root, http.StripPrefix(root, fileServer))
+	mux.Handle(host+staticRoot, http.StripPrefix(staticRoot, fileServer))
 	return nil
 }
