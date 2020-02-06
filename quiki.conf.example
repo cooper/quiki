@@ -1,39 +1,46 @@
-/* QUIKI CONFIGURATION */
-
-/* @repo, the path to the quiki repository, is used in other config options
-   below. if you used the `go` tool to install quiki, just set @gopath to your
-   GOPATH, and the below @repo will be accurate. */
-@gopath:    /home/someone/go;
-@repo:      [@gopath]/src/github.com/cooper/quiki;
-
-/* or this is fine if running from the repo */
-@repo: .;
-
-/* other directory paths. the defaults below will work as long as @repo is
-   accurately set to the path of the quiki repository. */
-@server.dir.static:     [@repo]/webserver/static;
-@server.dir.template:   [@repo]/webserver/templates;
-@server.dir.adminifier: [@repo]/adminifier;
-@server.dir.wiki:       [@repo]/wikis;
-
-/* HTTP server port to listen on. @server.http.bind can also be specified for
-   a bind address, but quiki will use all addresses if unspecified. */
-@server.http.port: 8080;
+/* QUIKI WEBSERVER CONFIGURATION */
 
 
-/* WIKISERVER CONFIGURATION */
+/* Directories-- */
 
-/* if enabled, the wikiserver will watch page files for changes and generate
-   them immediately. it is recommended that you leave this as-is because it
-   significantly decreases page load time. */
+@repo: .;   /* set this variable to the absolute path of the quiki repository */
+@server.dir.static:     [@repo]/webserver/static;     /* static files that ship with quiki */
+@server.dir.template:   [@repo]/webserver/templates;  /* comma-separated template search paths */
+@server.dir.adminifier: [@repo]/adminifier;           /* static files for adminifier */
+@server.dir.wiki:       [@repo]/wikis;                /* where your site directories are located */
+
+
+/* HTTP server bindings-- */
+
+@server.http.bind: ;          /* leave blank to listen on all available addresses */
+@server.http.port: 8080;      /* port number or "unix" to listen on UNIX socket */
+
+
+/* pregeneration--
+
+   if enabled, quiki generates all pages and images at startup; then monitors for
+   changes as they occur. when disabled, quiki only generates content as it is requested
+   by clients. having this on makes pages load much faster. */
+
 @server.enable.pregeneration;
 
 
-/* WIKI CONFIGURATIONS --
-   you can configure any number of wikis to be served by this quiki */
+/* adminifier--
 
-/* working configuration for the included example wiki --
-   the wiki shortcode (in this case, 'mywiki') will only appear in logs/debug info */
+   this is quiki's web based admin panel and editor. you can use a single instance to
+   manage all the sites on this quiki webserver. */
+
+@adminifier.enable;           /* whether to enable adminifier */
+@adminifier.host: ;           /* HTTP host for adminifier. leave blank to use all hosts */
+@adminifier.root: /admin;     /* HTTP root for adminifier. leave blank to use /         */
+
+
+/* WEBSITE CONFIGURATIONS --
+
+   you can configure any number of wiki sites to be served by this quiki.
+   below is the working configuration for the included example site.
+   the shortcode (in this case, 'mywiki') will only appear in logs/debug info */
+
 @server.wiki.mywiki: {
 
     /* each wiki requires its own configuration file, specified here. see
