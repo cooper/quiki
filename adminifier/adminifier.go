@@ -62,6 +62,11 @@ func Configure() {
 		mux.HandleFunc(host+root+tmplName, handleTemplate)
 	}
 
+	// function handlers
+	for name, function := range funcHandlers {
+		mux.HandleFunc(host+root+name, function)
+	}
+
 	// TODO: handlers for each site at shortcode/
 }
 

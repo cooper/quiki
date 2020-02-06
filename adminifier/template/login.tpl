@@ -24,7 +24,7 @@
         <div style="text-align: center; margin-bottom: 20px;">
             <h1>quiki</h1>
         </div>
-        <form action="function/login" method="post">
+        <form action="func/login" method="post">
             <table>
                 <tr>
                     <td class="left">Username</td>
