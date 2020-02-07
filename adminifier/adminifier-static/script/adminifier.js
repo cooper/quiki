@@ -82,7 +82,7 @@ a.loadScripts = function (srcs) {
 		if (!src.length) return;
 
 		if (src == 'ace')
-			src = 'ext/ace/ace.js';
+			src = 'ext/ace/src-min/ace.js';
 		else if (src == 'pikaday')
 			src = 'ext/pikaday/pikaday.js';
 		else if (src == 'jquery')
