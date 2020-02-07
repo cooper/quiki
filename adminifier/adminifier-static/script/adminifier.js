@@ -1,6 +1,7 @@
 (function (a) {
 
 var pageScriptsDone = false;
+var wikiRootRgx = new RegExp((adminifier.wikiRoot + '/').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
 
 // this is for if pageScriptsDone event is added
 // and the page scripts are already done
@@ -122,22 +123,29 @@ a.fakeAdopt = function (child) {
     parent.appendChild(child);
 };
 
-window.addEvent('hashchange',	hashLoad);
-document.addEvent('domready', 	hashLoad);
+document.addEvent('domready', 	loadURL);
 document.addEvent('domready',	searchHandler);
+document.addEvent('domready',   addFrameClickHandler)
 document.addEvent('keyup',		handleEscapeKey);
 
 // PAGE LOADING
 
+// clicking a frame link
+function addFrameClickHandler () {
+    $$('a.frame-click').each(function (a) {
+        a.addEvent('click', function (e) {
+            e.preventDefault();
+            var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '');
+            console.log("href", a.href, "root+page", adminifier.wikiRoot + '/' + page);
+            history.pushState(page, '', adminifier.wikiRoot + '/' + page);
+            loadURL();
+        });
+    })
+}
+
 // load a page
 function frameLoad (page) {
-	
-	// skip this one
-	if (window.preventHashLoad) {
-		delete window.preventHashLoad;
-		return;
-	}
-	
+
 	// same page
     if (a.currentPage == page)
         return;
@@ -149,7 +157,7 @@ function frameLoad (page) {
 
 	a.updateIcon('circle-o-notch fa-spin');
     var request = new Request({
-        url: 'frames/' + page,
+        url: 'frame/' + page,
         onSuccess: function (html) {
 
             // the page may start with JSON metadata...
@@ -195,20 +203,10 @@ function frameLoad (page) {
     request.get();
 }
 
-// load page based on the current hash
-function hashLoad() {
-    var hash = window.location.hash;
-    if (hash.lastIndexOf('#!/', 0) === 0) {
-        hash = hash.substring(3);
-    }
-
-    // fall back to dashboard
-    else {
-        window.location.hash = '#!/dashboard';
-        return hashLoad();
-    }
-
-    frameLoad(hash);
+// load frame based on the current URL
+function loadURL() {
+    var loc = window.location.pathname
+    frameLoad(loc.replace(wikiRootRgx, ''));
 }
 
 // page options

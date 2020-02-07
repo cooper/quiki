@@ -11,7 +11,8 @@
 <script type="text/javascript">
 
 var adminifier = {
-    adminRoot:      null,
+    adminRoot:      '{{.AdminRoot}}',
+    wikiRoot:       '{{.Root}}',
     wikiShortName:  null,
     wikiName:       null,
     wikiPageRoot:   null,
@@ -42,11 +43,11 @@ var adminifier = {
 <div id="navigation-sidebar">
     <ul id="navigation">
         <li data-nav="dashboard"><a class="frame-click" href="{{.Root}}/dashboard"><i class="fa fa-home"></i> <span>Dashboard</span></a></li>
-        <li data-nav="pages"><a class="frame-click" href="{{.Root}/pages"><i class="fa fa-file-text"></i> <span>Pages</span></a></li>
-        <li data-nav="categories"><a class="frame-click" href="{{.Root}/categories"><i class="fa fa-list"></i> <span>Categories</span></a></li>
-        <li data-nav="images"><a class="frame-click" href="{{.Root}/images"><i class="fa fa-picture-o"></i> <span>Images</span></a></li>
-        <li data-nav="models"><a class="frame-click" href="{{.Root}/models"><i class="fa fa-cube"></i> <span>Models</span></a></li>
-        <li data-nav="settings"><a class="frame-click" href="{{.Root}/settings"><i class="fa fa-cog"></i> <span>Settings</a></li>
+        <li data-nav="pages"><a class="frame-click" href="{{.Root}}/pages"><i class="fa fa-file-text"></i> <span>Pages</span></a></li>
+        <li data-nav="categories"><a class="frame-click" href="{{.Root}}/categories"><i class="fa fa-list"></i> <span>Categories</span></a></li>
+        <li data-nav="images"><a class="frame-click" href="{{.Root}}/images"><i class="fa fa-picture-o"></i> <span>Images</span></a></li>
+        <li data-nav="models"><a class="frame-click" href="{{.Root}}/models"><i class="fa fa-cube"></i> <span>Models</span></a></li>
+        <li data-nav="settings"><a class="frame-click" href="{{.Root}}/settings"><i class="fa fa-cog"></i> <span>Settings</a></li>
         <li data-nav="help"><a class="frame-click" href="{{.Root}}/help"><i class="fa fa-question-circle"></i> <span>Help</a></li>
         <li><a href="logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
     </ul>

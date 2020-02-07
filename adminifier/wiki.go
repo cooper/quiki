@@ -8,14 +8,24 @@ import (
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	for _, which := range []string{"dashboard", "pages", "categories", "images", "models", "settings", "help"} {
-		mux.HandleFunc(host+root+shortcode+"/"+which, handleWiki)
+		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
+			handleWiki(shortcode, w, r)
+		})
 	}
+	mux.HandleFunc(host+root+shortcode+"/frame/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Frame content " + r.URL.Path))
+	})
 }
 
-func handleWiki(w http.ResponseWriter, r *http.Request) {
+func handleWiki(shortcode string, w http.ResponseWriter, r *http.Request) {
+	// TODO: session verify
 	tmpl.ExecuteTemplate(w, "wiki.tpl", struct {
-		Static string
+		Static    string
+		AdminRoot string
+		Root      string
 	}{
-		Static: root + "adminifier-static/",
+		AdminRoot: root,
+		Static:    root + "adminifier-static/",
+		Root:      root + shortcode,
 	})
 }
