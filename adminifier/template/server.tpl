@@ -3,6 +3,6 @@
 Available sites:
 <ul>
 {{range $shortcode, $wi := .Wikis}}
-    <li><a href="{{$shortcode}}/">{{$wi.Title}}</a></li>
+    <li><a href="{{$shortcode}}/dashboard">{{$wi.Title}}</a></li>
 {{end}}
 </ul>

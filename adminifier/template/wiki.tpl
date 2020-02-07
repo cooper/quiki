@@ -55,7 +55,7 @@ var adminifier = {
 <div id="content">
 </div>
 
-{{* ALL OF THE JS TEMPLATES *}}
+{{/* ALL OF THE JS TEMPLATES */}}
 
 </body>
 </html>

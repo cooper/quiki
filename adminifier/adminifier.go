@@ -74,7 +74,10 @@ func Configure() {
 		mux.HandleFunc(host+root+name, function)
 	}
 
-	// TODO: handlers for each site at shortcode/
+	// handlers for each site at shortcode/
+	for shortcode, wi := range webserver.Wikis {
+		setupWikiHandlers(shortcode, wi)
+	}
 }
 
 func setupStatic(staticPath string) error {
