@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -40,16 +41,20 @@ var Bind string
 // It is available only after Configure is called.
 var Port string
 
+// Auth is the server authentication service.
+var Auth *authenticator.Authenticator
+
 // Configure parses a configuration file and initializes webserver.
 //
 // If any errors occur, the program is terminated.
 func Configure(confFile string) {
+	var err error
 	Mux = http.NewServeMux()
 
 	// parse configuration
 	Conf = wikifier.NewPage(confFile)
 	Conf.VarsOnly = true
-	if err := Conf.Parse(); err != nil {
+	if err = Conf.Parse(); err != nil {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
@@ -73,18 +78,24 @@ func Configure(confFile string) {
 	dirStatic = filepath.FromSlash(dirStatic)
 
 	// set up wikis
-	if err := initWikis(); err != nil {
+	if err = initWikis(); err != nil {
 		log.Fatal(errors.Wrap(err, "init wikis"))
 	}
 
 	// setup static files from wikifier
-	if err := setupStatic(dirStatic); err != nil {
+	if err = setupStatic(dirStatic); err != nil {
 		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
 	// create server with main handler
 	Mux.HandleFunc("/", handleRoot)
 	Server = &http.Server{Handler: Mux}
+
+	// create authenticator
+	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confFile), "quiki-auth.json"))
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "initialize quiki authenticator"))
+	}
 }
 
 // Listen runs the webserver indefinitely.
