@@ -12,8 +12,15 @@ var funcHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	// TODO: if not logged in, temp redirect to login page
-	http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+
+	// if not logged in, temp redirect to login page
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	w.Write([]byte("You made it!"))
+
 	// TODO: if user has multiple sites OR server admin privs, go to server dashboard
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
 }
@@ -35,9 +42,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// start session and remember user info
 	sessMgr.Put(r.Context(), "user", &user)
 	sessMgr.Put(r.Context(), "loggedIn", true)
-	w.Write([]byte("Good job"))
+
+	// redirect to dashboard, which is now located at adminifier root
+	http.Redirect(w, r, "../", http.StatusTemporaryRedirect)
 }
 
 // parsePost confirms POST requests are well-formed and parameters satisfied
