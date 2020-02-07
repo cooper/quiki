@@ -3,6 +3,7 @@ package adminifier
 import (
 	"net/http"
 
+	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 )
 
@@ -19,10 +20,15 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("You made it!"))
-
-	// TODO: if user has multiple sites OR server admin privs, go to server dashboard
+	tmpl.ExecuteTemplate(w, "server.tpl", struct {
+		User  authenticator.User
+		Wikis map[string]*webserver.WikiInfo
+	}{
+		User:  sessMgr.Get(r.Context(), "user").(authenticator.User),
+		Wikis: webserver.Wikis,
+	})
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
+	// and deny access to the server admin panel
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
