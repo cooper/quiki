@@ -38,8 +38,30 @@ func (auth *Authenticator) NewUser(user User, password string) error {
 	}
 
 	// store the user
+	if auth.Users == nil {
+		auth.Users = make(map[string]User)
+	}
 	auth.Users[lcun] = user
 
 	// write to file
 	return auth.write()
+}
+
+// Login attempts a user login, returning the user on success.
+//
+func (auth *Authenticator) Login(username, password string) (User, error) {
+	lcun := strings.ToLower(username)
+
+	// user does not exist
+	user, exist := auth.Users[lcun]
+	if !exist {
+		return user, errors.New("user does not exist")
+	}
+
+	// bad password
+	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(password)); err != nil {
+		return user, errors.New("bad password")
+	}
+
+	return user, nil
 }

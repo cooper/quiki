@@ -3,6 +3,8 @@ package adminifier
 import (
 	"log"
 	"net/http"
+
+	"github.com/cooper/quiki/webserver"
 )
 
 // handlers that call functions
@@ -22,6 +24,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("got login request")
+
+	if _, err := webserver.Auth.Login(r.Form.Get("username"), r.Form.Get("password")); err != nil {
+		log.Println("login failed:", err)
+	}
+
+	log.Println("login OK")
 }
 
 func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool {
