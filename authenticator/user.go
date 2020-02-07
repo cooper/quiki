@@ -1,6 +1,7 @@
 package authenticator
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -64,4 +65,14 @@ func (auth *Authenticator) Login(username, password string) (User, error) {
 	}
 
 	return user, nil
+}
+
+// GobDecode allows users to be decoded from a session.
+func (user *User) GobDecode(data []byte) error {
+	return json.Unmarshal(data, user)
+}
+
+// GobEncode allows users to be encoded for storage in a session.
+func (user *User) GobEncode() ([]byte, error) {
+	return json.Marshal(user)
 }

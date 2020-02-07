@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/alexedwards/scs"
 	"github.com/cooper/quiki/webserver"
 	_ "github.com/cooper/quiki/webserver" // access existing ServeMux and config
 	"github.com/cooper/quiki/wikifier"
@@ -17,6 +18,7 @@ import (
 var tmpl *template.Template
 var mux *http.ServeMux
 var conf *wikifier.Page
+var sessMgr *scs.SessionManager
 var host, root, dirAdminifier string
 
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
@@ -44,6 +46,11 @@ func Configure() {
 
 	dirAdminifier = filepath.FromSlash(dirAdminifier)
 	root += "/"
+
+	// configure session manager
+	sessMgr = webserver.SessMgr
+	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
+	sessMgr.Cookie.Path = root
 
 	// setup static files server
 	if err := setupStatic(filepath.Join(dirAdminifier, "adminifier-static")); err != nil {

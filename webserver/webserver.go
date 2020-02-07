@@ -5,12 +5,14 @@ package webserver
 // quiki - a standalone web server for wikifier
 
 import (
+	"encoding/gob"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"github.com/alexedwards/scs"
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
@@ -44,12 +46,16 @@ var Port string
 // Auth is the server authentication service.
 var Auth *authenticator.Authenticator
 
+// SessMgr is the session manager service.
+var SessMgr *scs.SessionManager
+
 // Configure parses a configuration file and initializes webserver.
 //
 // If any errors occur, the program is terminated.
 func Configure(confFile string) {
 	var err error
 	Mux = http.NewServeMux()
+	gob.Register(authenticator.User{})
 
 	// parse configuration
 	Conf = wikifier.NewPage(confFile)
@@ -87,9 +93,12 @@ func Configure(confFile string) {
 		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
+	// create session manager
+	SessMgr = scs.New()
+
 	// create server with main handler
 	Mux.HandleFunc("/", handleRoot)
-	Server = &http.Server{Handler: Mux}
+	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
 	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confFile), "quiki-auth.json"))

@@ -1,7 +1,6 @@
 package adminifier
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/cooper/quiki/webserver"
@@ -20,18 +19,28 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
+
+	// missing parameters or malformed request
 	if !parsePost(w, r, "username", "password") {
 		return
 	}
-	log.Println("got login request")
 
-	if _, err := webserver.Auth.Login(r.Form.Get("username"), r.Form.Get("password")); err != nil {
-		log.Println("login failed:", err)
+	// any login attempt voids the current session
+	sessMgr.Destroy(r.Context())
+
+	// attempt login
+	user, err := webserver.Auth.Login(r.Form.Get("username"), r.Form.Get("password"))
+	if err != nil {
+		w.Write([]byte("Bad password"))
+		return
 	}
 
-	log.Println("login OK")
+	sessMgr.Put(r.Context(), "user", &user)
+	sessMgr.Put(r.Context(), "loggedIn", true)
+	w.Write([]byte("Good job"))
 }
 
+// parsePost confirms POST requests are well-formed and parameters satisfied
 func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool {
 
 	// check that it is a POST request
