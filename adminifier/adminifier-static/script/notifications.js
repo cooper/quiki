@@ -2,10 +2,11 @@
 
 var pingCount = 0;
 
-document.addEvent('domready', function () {
-    setInterval(pingServer, 20000);
-    pingServer();
-});
+// FIXME: Disabled for now.
+// document.addEvent('domready', function () {
+//     setInterval(pingServer, 20000);
+//     pingServer();
+// });
 
 function pingServer () {
     new Request.JSON({

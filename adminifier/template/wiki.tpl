@@ -12,6 +12,7 @@
 
 var adminifier = {
     adminRoot:      '{{.AdminRoot}}',
+    staticRoot:     '{{.Static}}',
     wikiRoot:       '{{.Root}}',
     wikiShortName:  null,
     wikiName:       null,
@@ -56,7 +57,7 @@ var adminifier = {
 <div id="content">
 </div>
 
-{{/* ALL OF THE JS TEMPLATES */}}
+{{/* TODO: ALL OF THE JS TEMPLATES */}}
 
 </body>
 </html>

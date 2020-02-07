@@ -19,13 +19,16 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 func handleWiki(shortcode string, w http.ResponseWriter, r *http.Request) {
 	// TODO: session verify
-	tmpl.ExecuteTemplate(w, "wiki.tpl", struct {
+	err := tmpl.ExecuteTemplate(w, "wiki.tpl", struct {
 		Static    string
 		AdminRoot string
 		Root      string
 	}{
 		AdminRoot: root,
-		Static:    root + "adminifier-static/",
+		Static:    root + "adminifier-static",
 		Root:      root + shortcode,
 	})
+	if err != nil {
+		panic(err)
+	}
 }

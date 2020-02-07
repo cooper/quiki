@@ -40,8 +40,5 @@
             </table>
         </form>
     </div>
-
-{{ template "tmpl-login-window.tpl" . }}
-
 </body>
 </html>

@@ -97,8 +97,8 @@ a.loadScripts = function (srcs) {
 		else
 			src = 'script/' + src + '.js';
 
-		var script = new Element('script', {
-			src:   src,
+        var script = new Element('script', {
+			src:   adminifier.staticRoot + src,
 			class: 'dynamic'
 		});
 		script.addEvent('load', scriptLoaded);
