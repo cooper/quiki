@@ -94,7 +94,7 @@ func Configure(confFile string) {
 	// create authenticator
 	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confFile), "quiki-auth.json"))
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "initialize quiki authenticator"))
+		log.Fatal(errors.Wrap(err, "init server authenticator"))
 	}
 }
 

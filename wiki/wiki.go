@@ -4,6 +4,7 @@ import (
 	"errors"
 	"path/filepath"
 
+	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
 )
 
@@ -12,6 +13,7 @@ type Wiki struct {
 	ConfigFile        string
 	PrivateConfigFile string
 	Opt               wikifier.PageOpt
+	Auth              *authenticator.Authenticator
 }
 
 // NewWiki creates a Wiki given the public and private configuration files.
@@ -41,6 +43,12 @@ func NewWiki(conf, privateConf string) (*Wiki, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// create authenticator
+	w.Auth, err = authenticator.Open(filepath.Join(filepath.Dir(conf), "auth.json"))
+	if err != nil {
+		return nil, errors.New("init authenticator")
 	}
 
 	// no errors occurred
