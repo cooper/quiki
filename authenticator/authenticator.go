@@ -5,17 +5,19 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"sync"
 )
 
 // Authenticator represents a quiki server or site authentication service.
 type Authenticator struct {
 	path string
+	mu   *sync.Mutex
 }
 
 // Open reads a user data file and returns an Authenticator for it.
 // If the path does not exist, a new data file is created.
 func Open(path string) (*Authenticator, error) {
-	auth := &Authenticator{path: path}
+	auth := &Authenticator{path: path, mu: new(sync.Mutex)}
 
 	// attempt to read the file
 	jsonData, err := ioutil.ReadFile(path)
@@ -46,6 +48,8 @@ func Open(path string) (*Authenticator, error) {
 
 // Write overwrites the data file with the current contents of the Authenticator.
 func (auth *Authenticator) write() error {
+	auth.mu.Lock()
+	defer auth.mu.Unlock()
 
 	// encode as JSON
 	jsonData, err := json.Marshal(auth)
