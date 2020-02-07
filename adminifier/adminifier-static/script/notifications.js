@@ -9,7 +9,7 @@ document.addEvent('domready', function () {
 
 function pingServer () {
     new Request.JSON({
-        url:        'functions/events.php',
+        url:        'func/events',
         secure:     true,
         onSuccess:  function (data) {
             
@@ -18,7 +18,7 @@ function pingServer () {
                 
                 // if this is the first time we've tried, redirect to login page
                 if (!pingCount) {
-                    window.location.href = a.adminRoot + '/login.php';
+                    window.location.href = a.adminRoot + '/login';
                     return;
                 }
                 
@@ -103,7 +103,7 @@ function displayLoginWindow () {
 
     // if some error we can't deal with occurs, redirect to real login
     var giveUp = function () {
-        window.location = 'logout.php';
+        window.location = 'logout';
     };
 
     // attempt to login remotely
@@ -118,7 +118,7 @@ function displayLoginWindow () {
         inputs.each(function (i) { i.set('disabled', true); });
 
         var req = new Request.JSON({
-            url: 'functions/login.php',
+            url: 'func/login',
             secure: true,
             onSuccess: function (data) {
                 

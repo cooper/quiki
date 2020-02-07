@@ -147,12 +147,6 @@ function frameLoad (page) {
     a.currentPage = page;
     console.log("Loading " + page);
 
-    // add .php extension, respecting GET arguments
-    var idx = page.indexOf('?');
-    if (idx == -1)
-        idx = page.length;
-    page = page.slice(0, idx) + '.php' + page.slice(idx);
-
 	a.updateIcon('circle-o-notch fa-spin');
     var request = new Request({
         url: 'frames/' + page,
@@ -190,7 +184,7 @@ function frameLoad (page) {
 				//
                 // // Used by specific pages
 				//
-                // 'data-sort'         // pages.php
+                // 'data-sort'         // pages
 
                 handlePageData(attrs);
             }

@@ -80,7 +80,7 @@ function displayRevisionViewer () {
 
     // request revision history
     var req = new Request.JSON({
-        url: 'functions/page-revisions.php' + (ae.isModel() ? '?model' : ''),
+        url: 'func/page-revisions' + (ae.isModel() ? '?model' : ''),
         onSuccess: finish,
         onFailure: function () {
             finish({ error: 'Failed to fetch revision history' });
@@ -226,7 +226,7 @@ function displayDiffViewer (box, from, to, message, which) {
 
     // request revision history
     var req = new Request.JSON({
-        url: 'functions/page-diff.php' + (ae.isModel() ? '?model' : ''),
+        url: 'func/page-diff' + (ae.isModel() ? '?model' : ''),
         onSuccess: finish,
         onFailure: function () {
             finish({ error: 'Failed to fetch page diff' });

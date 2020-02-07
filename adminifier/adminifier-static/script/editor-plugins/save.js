@@ -102,7 +102,7 @@ function displayDeleteConfirmation () {
 
         // delete request
         var req = new Request.JSON({
-            url: 'functions/delete-page.php' + (ae.isModel() ? '?model' : ''),
+            url: 'func/delete-page' + (ae.isModel() ? '?model' : ''),
             onSuccess: function (data) {
 
                 // deleted without error
@@ -276,7 +276,7 @@ function saveRequest (saveData, message, success, fail) {
 
     // do the request
     new Request.JSON({
-        url: 'functions/write-page.php' + (ae.isModel() ? '?model' : ''),
+        url: 'func/write-page' + (ae.isModel() ? '?model' : ''),
         secure: true,
         onSuccess: function (data) {
 

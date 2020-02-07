@@ -22,7 +22,7 @@ a.currentJSONMetadata.results.each(function (imageData) {
         Created:    imageData.created,
         Modified:   imageData.mod_unix
     });
-    entry.link = 'functions/image.php?file=' + imageData.file; // TODO
+    entry.link = 'func/image?file=' + imageData.file; // TODO
     imageList.addEntry(entry);
 });
 
