@@ -1,0 +1,41 @@
+#notification-popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: 1px solid #222;
+    background-color: #696969;
+    width: 340px;
+    height: 140px;
+    color: #fff;
+    overflow: hidden;
+    z-index: 500;
+}
+
+#notification-popup h3 {
+    margin: 0;
+    padding: 5px 10px;
+    background-color: #333;
+    border-bottom: 1px solid #222;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 20px;
+    font-size: 15px;
+    line-height: 20px;
+}
+
+#notification-popup i.fa {
+    float: left;
+    width: 80px;
+    height: 109px; /* 140px - 20px header - 10px margin - 1px border */
+    line-height: 109px;
+    font-size: 45px;
+    text-align: center;
+}
+
+#notification-popup div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 109px; /* 140px - 20px header - 10px margin - 1px border */
+    width: 250px; /* leaving out 10px for right side margin */
+}

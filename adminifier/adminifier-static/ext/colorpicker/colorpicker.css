@@ -1,0 +1,33 @@
+.colorpicker-container table {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.colorpicker-container {
+    background-color: #555;
+    color: #fff;
+    display: none;
+}
+
+.colorpicker-container input[type=text] {
+    border: 1px solid #333;
+    background-color: #777;
+    color: #fff;
+    padding: 2px 4px;
+}
+
+.colorpicker-arrow {
+    border: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: default;
+    color: #fff;
+    z-index: 1000;
+}
+
+#colorpicker-preview {
+    cursor: pointer;
+}

@@ -1,0 +1,320 @@
+#editor {
+    min-height: 500px;
+    position: fixed;
+    left: 50px;
+    top: 70px; /* with toolbar */
+    right: 0;
+    bottom: 0;
+    z-index: 150;
+}
+
+#editor .error-marker {
+    position: absolute;
+    background: rgba(255, 0, 0, 0.5);
+    z-index: 20;
+}
+
+/* toolbar */
+
+div.editor-toolbar-wrapper {
+    width: 100%;
+    height: 30px;
+    background-color: #696969;
+    z-index: 160;
+}
+
+ul.editor-toolbar {
+    padding: 0;
+    margin: 0;
+    height: 30px;
+    line-height: 30px;
+    color: #E2E2E2;
+    list-style-type: none;
+}
+
+ul.editor-toolbar:first-child {
+    margin-left: 50px; /* the line bar is actually 48px */
+}
+
+ul.editor-toolbar:last-child {
+    margin-right: 15px;
+}
+
+ul.editor-toolbar li {
+    float: left;
+    padding: 0 10px;
+    width: 15px;
+    height: 30px;
+    overflow: hidden;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+ul.editor-toolbar li.right {
+    float: right;
+    text-align: right;
+    direction: rtl;
+}
+
+ul.editor-toolbar li.disabled {
+    color: #aaa;
+    /* cursor: not-allowed; */
+    cursor: default;
+}
+
+/* shared in editor helpers */
+
+.editor-tool-large-button {
+    font-size: 14px;
+    line-height: 40px;
+    text-align: center;
+    background-color: #333;
+    height: 40px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.editor-tool-large-button:hover {
+    background-color: #2096ce;
+}
+
+.editor-tool-large-button.progress {
+    background-color: #2096ce !important;
+    cursor: default;
+}
+
+.editor-tool-large-button.success {
+    background-color: #51B068 !important;
+    cursor: default;
+}
+
+.editor-tool-large-button.warning {
+    background-color: #CC6E2F !important;
+    cursor: default;
+}
+
+.editor-tool-large-button.failure {
+    background-color: #D45D5D !important;
+    cursor: default;
+}
+
+.editor-full-width-input {
+    width: 268px; /* fallback 300px - 20px margin - 10px padding - 2px border */
+    width: calc(100% - 12px); /* 100% - 10px padding - 2px border */
+    padding: 5px;
+    border: 1px solid #333;
+    font-size: 15px;
+    margin-bottom: 8px;
+    margin-top: 5px;
+    background-color: #e2e2e2;
+}
+
+/* toolbar popups */
+
+div.editor-popup-box {
+    position: absolute;
+    overflow: hidden;
+    background-color: #555;
+    color: #e2e2e2;
+    width: 300px;
+    height: 0px;
+    z-index: 300;
+}
+
+/* color picker */
+
+div.editor-color-type {
+    width: 50%;
+}
+
+div.editor-color-cell {
+    height: 30px;
+    color: #fff;
+    line-height: 30px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#editor-color-names, #editor-color-picker {
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+
+#editor-color-names {
+    overflow-y: auto;
+    display: none;
+}
+
+/* link helper */
+
+div.editor-link-type {
+    width: 75px;
+}
+
+#editor-link-wrapper {
+    margin: 10px;
+    height: 125px;
+}
+
+#editor-link-wrapper span {
+    font-size: 14px;
+}
+
+/* save helper */
+
+#editor-save-wrapper {
+    margin: 10px;
+    height: 60px;
+}
+
+#editor-save-wrapper i.fa {
+    line-height: 60px;
+}
+
+/* delete confirmation */
+
+#editor-delete-wrapper {
+    text-align: center;
+    line-height: 105px;
+    height: 80px;
+}
+
+#editor-delete-button:hover {
+    background-color: #D45D5D;
+}
+
+/* page options modal window */
+
+#editor-options-window td {
+    border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	height: 30px;
+	padding: 5px;
+}
+
+#editor-options-window td.left {
+    width: 200px;
+    border-right: 1px dotted #bbb;
+}
+
+#editor-options-window td.left span {
+    cursor: help;
+}
+
+#editor-options-window tr.category td {
+    cursor: pointer;
+    user-select: none;
+}
+
+#editor-options-window h3 {
+    margin: 10px 0;
+}
+
+#editor-options-window table {
+    table-layout: fixed;
+	border-collapse: collapse;
+	width: 100%;
+    margin: 20px 0;
+}
+
+#editor-options-window input[type=text] {
+	font-size: 15px;
+    width: 90%;
+	height: 100%;
+    border: none;
+}
+
+#editor-options-window input:focus {
+    outline: none;
+}
+
+/* revision viewer */
+
+#editor-revisions {
+    float: left;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+    position: relative;
+}
+
+.editor-revision-row {
+    padding: 10px;
+    font-size: small;
+}
+
+.editor-revision-row:nth-child(even) {
+    background-color: #444;
+}
+
+.editor-revision-row:nth-child(odd) {
+    border-bottom: 1px solid #444;
+}
+
+.editor-revision-row.preview {
+    border-bottom: none;
+    padding: 20px 10px 0 10px;
+}
+
+.editor-revision-row:not(.preview):hover {
+    background-color: #333;
+    cursor: pointer;
+}
+
+.editor-revision-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #555;
+}
+
+.editor-revision-diff-button {
+    background-color: #444;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 10px;
+    white-space: nowrap;
+}
+
+.editor-revision-diff-button:first-child {
+    margin-top: 20px;
+}
+
+.editor-revision-diff-button:hover {
+    background-color: #333;
+    cursor: pointer;
+}
+
+/* small tabs used in various popups */
+
+div.editor-small-tab {
+    display: inline-block;
+    float: left; /* so that spaces don't matter */
+    background-color: #333;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    font-size: 15px;
+    color: #e2e2e2;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+
+div.editor-small-tab:hover {
+    background-color: #222;
+}
+
+div.editor-small-tab.active {
+    background-color: #555;
+}

@@ -1,0 +1,163 @@
+table.file-list {
+    /*table-layout: fixed;*/
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* all cells */
+
+table.file-list td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    height: 22px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+table.file-list td.checkbox,
+table.file-list th.checkbox {
+    width: 20px;
+    text-align: center;
+}
+
+table.file-list td.info,
+table.file-list th.info {
+    text-align: right;
+    max-width: 200px;
+}
+
+table.file-list td.info {
+    font-size: 85%;
+}
+
+table.file-list th.title,
+table.file-list td.title {
+    width: 99%;
+    white-space: normal;
+}
+
+/* head cells */
+
+table.file-list thead {
+}
+
+table.file-list thead th {
+    background-color: #696969;
+    color: #E2E2E2;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    padding: 8px;
+    height: 22px;
+    border: 1px solid #696969;
+    text-align: left;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+table.file-list thead th a {
+    color: #E2E2E2;
+}
+
+/* body cells */
+
+table.file-list tbody tr {
+    background-color: #fff;
+}
+
+table.file-list tbody tr:nth-child(even) {
+    background-color: #eee;
+}
+
+table.file-list span.file-info {
+    font-size: small;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #555;
+    margin: 0 8px;
+}
+
+/* toolbar */
+
+ul.file-list-toolbar li {
+    float: left;
+    padding: 0 10px;
+    display: inline-block;
+    height: 40px;
+    overflow: hidden;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+ul.file-list-toolbar li.right {
+    float: right;
+    text-align: right;
+    direction: rtl;
+}
+
+ul.file-list-toolbar li.disabled {
+    color: #aaa;
+    cursor: default;
+}
+
+/* filter editor */
+
+.filter-editor {
+    background-color: #696969;
+    color: rgb(226, 226, 226);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: fixed;
+    right: 0px;
+    top: 40px;
+    bottom: 0px;
+    width: 250px;
+}
+
+.filter-editor-title, .filter-row span {
+    height: 22px;
+    color: #E2E2E2;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 22px;
+    display: block;
+}
+
+.filter-editor-title {
+    padding: 9px;
+}
+
+.filter-row {
+    padding: 10px;
+    font-size: small;
+}
+
+.filter-row input[type=text] {
+    height: 24px;
+    padding: 0 5px;
+    border: none;
+    margin: 5px 0;
+    width: 200px;
+    width: calc(100% - 40px);
+    background-color: #eee;
+    color: #111;
+}
+
+.filter-row:nth-child(even) {
+    background-color: #777;
+}
+
+.filter-row-inner {
+    display: none;
+    padding-top: 8px;
+}
+
+.filter-item {
+    margin-top: 8px;
+}
+
+.filter-row-inner i[class~="fa-minus-circle"],
+.filter-row-inner i[class~="fa-plus-circle"] {
+    cursor: pointer;
+}

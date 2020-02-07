@@ -1,0 +1,6 @@
+[submodule "adminifier/adminifier-static/ext/pikaday"]
+	path = adminifier/adminifier-static/ext/pikaday
+	url = https://github.com/pikaday/pikaday.git
+[submodule "adminifier/adminifier-static/ext/ace"]
+	path = adminifier/adminifier-static/ext/ace
+	url = https://github.com/ajaxorg/ace-builds

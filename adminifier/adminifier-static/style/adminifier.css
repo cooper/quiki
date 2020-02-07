@@ -1,0 +1,129 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
+a {
+    color: rgb(70, 105, 140);
+    text-decoration: none;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+i.fa {
+    text-align: center;
+    width: 1.35em;
+}
+
+/* MODAL WINDOWS */
+
+.modal-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-window {
+    position: relative;
+    background-color: #fefefe;
+    width: 700px;
+    margin: 90px auto 20px auto;
+    padding: 0;
+    border: 1px solid #222;
+}
+
+.modal-content.padded {
+    padding: 10px 16px;
+}
+
+.modal-done-button {
+    float: right;
+    font-weight: bold;
+    display: inline-block;
+    background-color: #333;
+    border: 1px solid #222;
+    padding: 2px 12px;
+    font-size: 12px;
+    height: 25px;
+    line-height: 25px;
+    margin-left: 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.modal-done-button:hover {
+    background: #2096ce;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+	font-size: 22px;
+    padding: 8px 16px;
+    background-color: #555;
+    color: #fff;
+	border-bottom: 1px solid #222;
+}
+
+/* LOGIN MODAL WINDOW */
+
+#login-window td {
+    text-align: left;
+    font-size: larger;
+}
+
+#login-window input {
+    font-family: 'Open Sans', sans-serif;
+}
+
+#login-window input[type=text], input[type=password] {
+    width: 200px;
+    height: 25px;
+    font-size: 20px;
+    margin-left: 20px;
+    border: 1px solid #999;
+}
+
+#login-window input[type=submit] {
+    width: 50px;
+    margin-top: 10px;
+    height: 25px;
+    background-color: #fff;
+    border: 1px solid #999;
+}
+
+#login-window input[type=submit]:hover,
+#login-window input[type=submit]:active {
+    background-color: #eee;
+    color: #000;
+}
+
+#login-window table {
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    width: 90%;
+    margin: auto;
+}
+
+#login-window td.left {
+    width: 100px;
+    color: #111;
+}
+
+#login-window-check {
+    text-align: center;
+    line-height: 100px;
+    height: 100px;
+    color: #51B068;
+}
