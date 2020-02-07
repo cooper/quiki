@@ -10,8 +10,10 @@ import (
 
 // Authenticator represents a quiki server or site authentication service.
 type Authenticator struct {
-	path string
-	mu   *sync.Mutex
+	Users map[string]User `json:"users,omitempty"`
+
+	path string      // path to JSON file
+	mu   *sync.Mutex // data lock
 }
 
 // Open reads a user data file and returns an Authenticator for it.
