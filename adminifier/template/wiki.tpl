@@ -58,6 +58,7 @@ var adminifier = {
 </div>
 
 {{/* TODO: ALL OF THE JS TEMPLATES */}}
+{{.JSTemplates}}
 
 </body>
 </html>

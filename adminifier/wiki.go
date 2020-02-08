@@ -1,10 +1,15 @@
 package adminifier
 
 import (
+	"html/template"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 
 	"github.com/cooper/quiki/webserver"
 )
+
+var javascriptTemplates string
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	for _, which := range []string{"dashboard", "pages", "categories", "images", "models", "settings", "help"} {
@@ -18,15 +23,27 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 }
 
 func handleWiki(shortcode string, w http.ResponseWriter, r *http.Request) {
+
+	// load javascript templates
+	if javascriptTemplates == "" {
+		files, _ := filepath.Glob(dirAdminifier + "/template/js-tmpl/*.tpl")
+		for _, fileName := range files {
+			data, _ := ioutil.ReadFile(fileName)
+			javascriptTemplates += string(data)
+		}
+	}
+
 	// TODO: session verify
 	err := tmpl.ExecuteTemplate(w, "wiki.tpl", struct {
-		Static    string
-		AdminRoot string
-		Root      string
+		Static      string
+		AdminRoot   string
+		Root        string
+		JSTemplates template.HTML
 	}{
-		AdminRoot: root,
-		Static:    root + "adminifier-static",
-		Root:      root + shortcode,
+		AdminRoot:   root,
+		Static:      root + "adminifier-static",
+		Root:        root + shortcode,
+		JSTemplates: template.HTML(javascriptTemplates),
 	})
 	if err != nil {
 		panic(err)
