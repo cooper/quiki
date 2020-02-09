@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -46,8 +47,9 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	}
 
 	// frames to load via ajax
-	frameRoot := host + root + shortcode + "/frame/"
-	mux.HandleFunc(frameRoot, func(w http.ResponseWriter, r *http.Request) {
+	frameRoot := root + shortcode + "/frame/"
+	log.Println(frameRoot)
+	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if !sessMgr.GetBool(r.Context(), "loggedIn") {
