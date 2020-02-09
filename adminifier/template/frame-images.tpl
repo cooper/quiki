@@ -1,5 +1,4 @@
-<!--JSON
--->
+{{.JSON}}
 
 <meta
     data-nav="images"

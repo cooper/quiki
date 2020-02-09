@@ -324,7 +324,22 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 }
 
 // Images returns info about all the images in the wiki.
-func (w *Wiki) Images() map[string]ImageInfo {
+func (w *Wiki) Images() []ImageInfo {
+	imageNames := w.allImageFiles()
+	images := make([]ImageInfo, len(imageNames))
+
+	// images individually
+	i := 0
+	for _, name := range imageNames {
+		images[i] = w.ImageInfo(name)
+		i++
+	}
+
+	return images
+}
+
+// ImageMap returns a map of image filename to ImageInfo for all images in the wiki.
+func (w *Wiki) ImageMap() map[string]ImageInfo {
 	imageNames := w.allImageFiles()
 	images := make(map[string]ImageInfo, len(imageNames))
 

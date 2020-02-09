@@ -15,13 +15,13 @@ import (
 var javascriptTemplates string
 
 var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) interface{}{
-	"dashboard":  handleDashboardFrame,
-	"pages":      handleFileFrames,
-	"categories": handleFileFrames,
-	"images":     handleFileFrames,
-	"models":     handleFileFrames,
-	"settings":   handleSettingsFrame,
-	"edit-page":  handleEditPageFrame,
+	"dashboard": handleDashboardFrame,
+	// "pages":      handleFileFrames,
+	// "categories": handleFileFrames,
+	"images": handleImagesFrame,
+	// "models":     handleFileFrames,
+	"settings":  handleSettingsFrame,
+	"edit-page": handleEditPageFrame,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -113,10 +113,14 @@ func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo, r *http.Requ
 	return nil
 }
 
-func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+func handleImagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	return handleFileFrames(shortcode, wi, r, wi.Images(), "d")
+}
+
+func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request, results interface{}, extras ...string) interface{} {
 	res, err := json.Marshal(map[string]interface{}{
 		"sort_types": []string{"a", "c", "u", "m"},
-		"results":    wi.Images(),
+		"results":    results,
 	})
 	if err != nil {
 		panic(err)
