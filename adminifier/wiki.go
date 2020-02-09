@@ -16,7 +16,7 @@ var javascriptTemplates string
 
 var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) interface{}{
 	"dashboard": handleDashboardFrame,
-	// "pages":      handleFileFrames,
+	"pages":     handlePagesFrame,
 	// "categories": handleFileFrames,
 	"images": handleImagesFrame,
 	// "models":     handleFileFrames,
@@ -113,13 +113,17 @@ func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo, r *http.Requ
 	return nil
 }
 
+func handlePagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	return handleFileFrames(shortcode, wi, r, wi.Pages())
+}
+
 func handleImagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return handleFileFrames(shortcode, wi, r, wi.Images(), "d")
 }
 
 func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request, results interface{}, extras ...string) interface{} {
 	res, err := json.Marshal(map[string]interface{}{
-		"sort_types": []string{"a", "c", "u", "m"},
+		"sort_types": append([]string{"a", "c", "u", "m"}, extras...),
 		"results":    results,
 	})
 	if err != nil {

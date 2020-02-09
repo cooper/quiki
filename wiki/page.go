@@ -230,6 +230,62 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	return r
 }
 
+// Pages returns info about all the pages in the wiki.
+func (w *Wiki) Pages() []wikifier.PageInfo {
+	pageNames := w.allPageFiles()
+	pages := make([]wikifier.PageInfo, len(pageNames))
+
+	// pages individually
+	i := 0
+	for _, name := range pageNames {
+		pages[i] = w.PageInfo(name)
+		i++
+	}
+
+	return pages
+}
+
+// PageMap returns a map of page name to PageInfo for all pages in the wiki.
+func (w *Wiki) PageMap() map[string]wikifier.PageInfo {
+	pageNames := w.allPageFiles()
+	pages := make(map[string]wikifier.PageInfo, len(pageNames))
+
+	// pages individually
+	for _, name := range pageNames {
+		pages[name] = w.PageInfo(name)
+	}
+
+	return pages
+}
+
+// PageInfo is an inexpensive request for info on a page. It uses cached
+// metadata rather than generating the page and extracting variables.
+func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
+
+	// the page does not exist
+	path := w.pathForPage(name, false, "")
+	pgFi, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+
+	// find page category
+	pageCat := w.GetSpecialCategory(wikifier.PageNameNE(name), CategoryTypePage)
+
+	// if page category exists use that info
+	if pageCat.Exists() {
+		info = *pageCat.PageInfo
+	}
+
+	// this stuff is available to all
+	mod := pgFi.ModTime()
+	info.File = name
+	info.Modified = &mod // actual page mod time
+	// info.Created =
+
+	return
+}
+
 func (w *Wiki) writeRedirectCache(page *wikifier.Page) {
 
 	// caching isn't enabled
