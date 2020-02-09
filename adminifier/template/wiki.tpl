@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>WIKI TITLE</title>
+<title>{{.WikiTitle}}</title>
 <link type="text/css" rel="stylesheet" href="{{.Static}}/style/adminifier.css" />
 <link type="text/css" rel="stylesheet" href="{{.Static}}/style/navigation.css" />
 <link type="text/css" rel="stylesheet" href="{{.Static}}/style/notifications.css" />
@@ -14,8 +14,8 @@ var adminifier = {
     adminRoot:      '{{.AdminRoot}}',
     staticRoot:     '{{.Static}}',
     wikiRoot:       '{{.Root}}',
-    wikiShortName:  null,
-    wikiName:       null,
+    wikiShortName:  '{{.Shortcode}}',
+    wikiName:       '{{.WikiTitle}}',
     wikiPageRoot:   null,
     themeName:      null,
     autosave:       3000000
@@ -33,11 +33,11 @@ var adminifier = {
 <body>
 
 <div id="top-bar">
-    <span class="top-title account-title"><a href="#"><i class="fa fa-user"></i> USERNAME</a></span>
+    <span class="top-title account-title"><a href="#"><i class="fa fa-user"></i> {{.User.DisplayName}}</a></span>
     <span class="top-title top-button"><a class="frame-click" href="#"><i class="fa fa-git-square"></i> master</a></span>
     <span class="top-title top-button"><a class="frame-click" href="{{.Root}}/create-page"><i class="fa fa-plus-circle"></i> New page</a></span>
     <input id="top-search" type="text" placeholder="Quick Search..." />
-    <span class="top-title wiki-title">WIKI TITLE</span>
+    <span class="top-title wiki-title">{{.WikiTitle}}</span>
     <span id="page-title" class="top-title page-title"><i class="fa fa-home"></i> <span></span></span>
 </div>
 
@@ -50,7 +50,7 @@ var adminifier = {
         <li data-nav="models"><a class="frame-click" href="{{.Root}}/models"><i class="fa fa-cube"></i> <span>Models</span></a></li>
         <li data-nav="settings"><a class="frame-click" href="{{.Root}}/settings"><i class="fa fa-cog"></i> <span>Settings</a></li>
         <li data-nav="help"><a class="frame-click" href="{{.Root}}/help"><i class="fa fa-question-circle"></i> <span>Help</a></li>
-        <li><a href="logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
+        <li><a href="{{.AdminRoot}}/logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
     </ul>
 </div>
 
