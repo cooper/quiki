@@ -542,6 +542,53 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	}
 }
 
+// CategoryInfo represents metadata associated with a category.
+type CategoryInfo struct {
+	File     string     `json:"file"`               // filename
+	Created  *time.Time `json:"created,omitempty"`  // creation time
+	Modified *time.Time `json:"modified,omitempty"` // modify time
+}
+
+// Categories returns info about all the models in the wiki.
+func (w *Wiki) Categories() []CategoryInfo {
+	catNames := w.allCategoryFiles("")
+	cats := make([]CategoryInfo, len(catNames))
+
+	// cats individually
+	i := 0
+	for _, name := range catNames {
+		cats[i] = w.CategoryInfo(name)
+		i++
+	}
+
+	return cats
+}
+
+// CategoryMap returns a map of model name to CategoryInfo for all models in the wiki.
+func (w *Wiki) CategoryMap() map[string]CategoryInfo {
+	catNames := w.allCategoryFiles("")
+	cats := make(map[string]CategoryInfo, len(catNames))
+
+	// models individually
+	for _, name := range catNames {
+		cats[name] = w.CategoryInfo(name)
+	}
+
+	return cats
+}
+
+// CategoryInfo is an inexpensive request for info on a category.
+func (w *Wiki) CategoryInfo(name string) (info CategoryInfo) {
+	cat := w.GetCategory(name)
+
+	// this stuff is available to all
+	info.File = cat.File
+	info.Modified = cat.Modified
+	info.Created = cat.Created
+
+	return
+}
+
 // logic for sorting pages by time
 
 type pagesToSort []DisplayPage
