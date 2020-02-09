@@ -22,7 +22,7 @@ a.currentJSONMetadata.results.each(function (imageData) {
         Created:    imageData.created,
         Modified:   imageData.modified
     });
-    entry.link = adminifier.wikiRoot + 'func/image?file=' + imageData.file; // TODO
+    entry.link = adminifier.wikiRoot + '/func/image?file=' + imageData.file; // TODO
     imageList.addEntry(entry);
 });
 
