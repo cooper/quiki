@@ -19,8 +19,8 @@ var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) 
 	"dashboard": handleDashboardFrame,
 	"pages":     handlePagesFrame,
 	// "categories": handleFileFrames,
-	"images": handleImagesFrame,
-	// "models":     handleFileFrames,
+	"images":    handleImagesFrame,
+	"models":    handleModelsFrame,
 	"settings":  handleSettingsFrame,
 	"edit-page": handleEditPageFrame,
 }
@@ -121,6 +121,10 @@ func handlePagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request)
 
 func handleImagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return handleFileFrames(shortcode, wi, r, wi.Images(), "d")
+}
+
+func handleModelsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	return handleFileFrames(shortcode, wi, r, wi.Models())
 }
 
 func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request, results interface{}, extras ...string) interface{} {
