@@ -4,7 +4,7 @@ if (!FileList || !a.currentJSONMetadata || !a.currentJSONMetadata)
     return;
 
 var modelList = new FileList({
-    root: '#!/models',
+    root: 'models',
     columns: ['Title', 'Author', 'Created', 'Modified'],
     columnData: {
         Title:      { sort: 'a', isTitle: true },
@@ -22,7 +22,7 @@ a.currentJSONMetadata.results.each(function (modelData) {
         Created:    modelData.created,
         Modified:   modelData.mod_unix
     });
-    entry.link = '#!/edit-model?page=' + encodeURIComponent(modelData.file);
+    entry.link = adminifier.wikiRoot + '/edit-model?page=' + encodeURIComponent(modelData.file);
     modelList.addEntry(entry);
 });
 

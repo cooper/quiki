@@ -150,7 +150,7 @@ var FileList = exports.FileList = new Class({
                 var setSort = sort + '-';
                 if (a.currentData['data-sort'] == setSort)
                     setSort = sort + encodeURIComponent('+');
-                anchor.set('href', self.options.root + '?sort=' + setSort);
+                anchor.set('href', adminifier.wikiRoot + '/' + self.options.root + '?sort=' + setSort);
             }
         });
         

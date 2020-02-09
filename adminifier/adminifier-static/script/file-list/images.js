@@ -4,7 +4,7 @@ if (!FileList || !a.currentJSONMetadata)
     return;
 
 var imageList = new FileList({
-    root: '#!/images',
+    root: 'images',
     columns: ['Filename', 'Author', 'Created', 'Modified'],
     columnData: {
         Filename:   { sort: 'a', isTitle: true },
@@ -22,7 +22,7 @@ a.currentJSONMetadata.results.each(function (imageData) {
         Created:    imageData.created,
         Modified:   imageData.mod_unix
     });
-    entry.link = 'func/image?file=' + imageData.file; // TODO
+    entry.link = adminifier.wikiRoot + 'func/image?file=' + imageData.file; // TODO
     imageList.addEntry(entry);
 });
 

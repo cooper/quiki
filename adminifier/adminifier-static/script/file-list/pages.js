@@ -4,7 +4,7 @@ if (!FileList || !a.currentJSONMetadata)
     return;
 
 var pageList = new FileList({
-    root: '#!/pages',
+    root: 'pages',
     columns: ['Title', 'Author', 'Created', 'Modified'],
     columnData: {
         Title:      { sort: 'a', isTitle: true },
@@ -24,7 +24,7 @@ a.currentJSONMetadata.results.each(function (pageData) {
     });
     entry.setInfoState('Generated', pageData.generated);
     entry.setInfoState('Draft', pageData.draft);
-    entry.link = '#!/edit-page?page=' + encodeURIComponent(pageData.file);
+    entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });
 

@@ -4,7 +4,7 @@ if (!FileList || !a.currentJSONMetadata)
     return;
 
 var catList = new FileList({
-    root: '#!/categories',
+    root: 'categories',
     columns: ['Title', 'Author', 'Created', 'Modified'],
     columnData: {
         Title:      { sort: 'a', isTitle: true },
@@ -24,7 +24,7 @@ a.currentJSONMetadata.results.each(function (catData) {
     });
     entry.setInfoState('Generated', catData.generated);
     entry.setInfoState('Draft', catData.draft);
-    // entry.link = '#!/edit-cat?cat=' + encodeURIComponent(catData.file); TODO
+    // entry.link = adminifier.wikiRoot + '/edit-cat?cat=' + encodeURIComponent(catData.file); TODO
     catList.addEntry(entry);
 });
 
