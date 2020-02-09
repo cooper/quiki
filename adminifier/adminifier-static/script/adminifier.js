@@ -136,7 +136,6 @@ function addFrameClickHandler () {
         a.addEvent('click', function (e) {
             e.preventDefault();
             var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '');
-            console.log("href", a.href, "root+page", adminifier.wikiRoot + '/' + page);
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
             loadURL();
         });
@@ -192,7 +191,7 @@ function frameLoad (page) {
 				//
                 // // Used by specific pages
 				//
-                // 'data-sort'         // pages
+                // 'data-sort'         // sort option, used by file lists
 
                 handlePageData(attrs);
             }
@@ -348,9 +347,9 @@ function handlePageData (data) {
     // page redirect
     target = data['data-redirect'];
     if (target) {
-        var newHash = '#!/' + target;
-        console.log('Redirecting to ' + newHash);
-        window.location.hash = newHash;
+        console.log('Redirecting to ' + target);
+        history.pushState(page, '', adminifier.wikiRoot + '/' + target);
+        loadURL();
         return;
     }
 
