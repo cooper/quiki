@@ -83,22 +83,22 @@ a.loadScripts = function (srcs) {
 		if (!src.length) return;
 
 		if (src == 'ace')
-			src = 'ext/ace/src-min/ace.js';
+			src = adminifier.staticRoot + '/ext/ace/src-min/ace.js';
 		else if (src == 'pikaday')
-			src = 'ext/pikaday/pikaday.js';
+			src = adminifier.staticRoot + '/ext/pikaday/pikaday.js';
 		else if (src == 'jquery')
 			src = '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.js';
 		else if (src == 'diff2html')
-			src = 'ext/diff2html/dist/diff2html.js';
+			src = adminifier.staticRoot + '/ext/diff2html/dist/diff2html.js';
 		else if (src == 'colorpicker')
-			src = 'ext/colorpicker/DynamicColorPicker.js';
+			src = adminifier.staticRoot + '/ext/colorpicker/DynamicColorPicker.js';
 		else if (src == 'prettify')
 			src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
 		else
-			src = 'script/' + src + '.js';
+			src = adminifier.staticRoot + '/script/' + src + '.js';
 
         var script = new Element('script', {
-			src:   adminifier.staticRoot + src,
+			src:   src,
 			class: 'dynamic'
 		});
 		script.addEvent('load', scriptLoaded);
@@ -387,7 +387,7 @@ function handlePageData (data) {
 			href = 'style/' + style + '.css';
 		
         var link = new Element('link', {
-            href:  href,
+            href:   adminifier.staticRoot + '/' + href,
             class: 'dynamic',
             type:  'text/css',
             rel:   'stylesheet'

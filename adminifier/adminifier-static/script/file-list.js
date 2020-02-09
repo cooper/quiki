@@ -672,6 +672,7 @@ function filterFilter (entry) {
 
 function closeFilter () {
     var list = getList();
+    if (!list) return;
     delete list.filter;
 
     // filter not active

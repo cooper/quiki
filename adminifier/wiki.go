@@ -96,6 +96,15 @@ func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo) interface{} 
 }
 
 func handlePagesFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
+	return struct {
+		Type  string
+		Order string
+		wikiTemplate
+	}{
+		Type:         "Pages",
+		Order:        "m-",
+		wikiTemplate: getWikiTemplate(shortcode),
+	}
 }
 
 func handleCategoriesFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
