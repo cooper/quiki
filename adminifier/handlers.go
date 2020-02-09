@@ -2,6 +2,7 @@ package adminifier
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
@@ -10,6 +11,7 @@ import (
 // handlers that call functions
 var funcHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
 	"func/login": handleLogin,
+	"logout":     handleLogout,
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -17,6 +19,12 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
 		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	// make sure that this is admin root
+	if strings.TrimPrefix(r.URL.Path, root) != "" {
+		http.NotFound(w, r)
 		return
 	}
 
@@ -54,6 +62,14 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// redirect to dashboard, which is now located at adminifier root
 	http.Redirect(w, r, "../", http.StatusTemporaryRedirect)
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	// destory session
+	sessMgr.Destroy(r.Context())
+
+	// redirect to login
+	handleRoot(w, r)
 }
 
 // parsePost confirms POST requests are well-formed and parameters satisfied
