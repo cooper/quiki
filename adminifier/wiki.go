@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/cooper/quiki/webserver"
 )
@@ -17,8 +18,23 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			handleWiki(shortcode, w, r)
 		})
 	}
-	mux.HandleFunc(host+root+shortcode+"/frame/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Frame content " + r.URL.Path))
+	pfx := host + root + shortcode + "/frame/"
+	mux.HandleFunc(pfx, func(w http.ResponseWriter, r *http.Request) {
+		tmplName := "frame-" + strings.TrimPrefix(r.URL.Path, pfx) + ".tpl"
+
+		// frame template does not exist
+		if exists := tmpl.Lookup(tmplName); exists == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		// execute frame template
+		err := tmpl.ExecuteTemplate(w, tmplName, nil)
+
+		// error occurred in template execution
+		if err != nil {
+			panic(err)
+		}
 	})
 }
 
