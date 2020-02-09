@@ -20,7 +20,7 @@ a.currentJSONMetadata.results.each(function (catData) {
         Title:      catData.title || catData.file,
         Author:     catData.author,
         Created:    catData.created,
-        Modified:   catData.mod_unix
+        Modified:   catData.modified
     });
     entry.setInfoState('Generated', catData.generated);
     entry.setInfoState('Draft', catData.draft);

@@ -20,7 +20,7 @@ a.currentJSONMetadata.results.each(function (modelData) {
         Title:      modelData.title,
         Author:     modelData.author,
         Created:    modelData.created,
-        Modified:   modelData.mod_unix
+        Modified:   modelData.modified
     });
     entry.link = adminifier.wikiRoot + '/edit-model?page=' + encodeURIComponent(modelData.file);
     modelList.addEntry(entry);

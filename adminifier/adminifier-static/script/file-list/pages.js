@@ -20,7 +20,7 @@ a.currentJSONMetadata.results.each(function (pageData) {
         Title:      pageData.title || pageData.file,
         Author:     pageData.author,
         Created:    pageData.created,
-        Modified:   pageData.mod_unix
+        Modified:   pageData.modified
     });
     entry.setInfoState('Generated', pageData.generated);
     entry.setInfoState('Draft', pageData.draft);

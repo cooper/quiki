@@ -20,7 +20,7 @@ a.currentJSONMetadata.results.each(function (imageData) {
         Filename:   imageData.file,
         Author:     imageData.author,
         Created:    imageData.created,
-        Modified:   imageData.mod_unix
+        Modified:   imageData.modified
     });
     entry.link = adminifier.wikiRoot + 'func/image?file=' + imageData.file; // TODO
     imageList.addEntry(entry);

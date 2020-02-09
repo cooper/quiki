@@ -40,7 +40,7 @@ var FileList = exports.FileList = new Class({
             // convert date to object
             switch (self.getColumnData(col, 'dataType')) {
                 case 'date':
-                    val = new Date(parseInt(val) * 1000);
+                    val = Date.parse(val);//new Date(parseInt(val) * 1000);
                     break;
             }
             
@@ -343,7 +343,9 @@ function quickSearch (entry) {
 exports.dateToPreciseHR = dateToPreciseHR;
 function dateToPreciseHR (d) {
     if (typeof d == 'string')
-        d = new Date(parseInt(d) * 1000);
+        d = Date.parse(d);//new Date(parseInt(d) * 1000);
+    if (!d)
+        d = new Date(); 
     return d.toString();
 }
 
@@ -353,14 +355,14 @@ function dateToHRTimeAgo (time) {
         case 'number':
             break;
         case 'string':
-            time = +new Date(time);
+            time = +Date.parse(time);//+new Date(time);
             break;
         case 'object':
             if (time.constructor === Date)
                 time = time.getTime();
             break;
         default:
-            time = +new Date();
+            time = +new Date(0);
     }
     var time_formats = [
         [60,            'seconds',                          1           ],
@@ -631,7 +633,7 @@ function filterFilter (entry) {
                 
                 // date
                 if (typeOf(right) == 'date') {
-                    var left = new Date(rule[1]);
+                    var left = Date.parse(rule[1]);//new Date(rule[1]);
                      left.setHours(0, 0, 0, 0);  // lose precision
                     right.setHours(0, 0, 0, 0);
                     return left.getTime() == right.getTime();
@@ -644,14 +646,14 @@ function filterFilter (entry) {
             // date less than
             else if (rule[0] == 'Before' && typeOf(right) == 'date')
             someFuncsMustPass.push(function (entry) {
-                var left = new Date(rule[1]);
+                var left = Date.parse(rule[1]); //new Date(rule[1]);
                 return left > right;
             });
         
             // date greater than
             else if (rule[0] == 'After' && typeOf(right) == 'date')
             someFuncsMustPass.push(function (entry) {
-                var left = new Date(rule[1]);
+                var left = Date.parse(rule[1]); //new Date(rule[1]);
                 return left < right;
             });
             

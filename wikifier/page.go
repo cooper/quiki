@@ -410,6 +410,7 @@ func (p *Page) Info() PageInfo {
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {
 		info.Modified = &mod
+		info.Created = &mod // fallback
 	}
 	if !create.IsZero() {
 		info.Created = &create
