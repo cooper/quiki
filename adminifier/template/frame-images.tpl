@@ -6,7 +6,7 @@
     data-title="Images"
     data-icon="picture-o"
     data-buttons="image-mode filter actions"
-    data-button-image-mode="{'title': 'Grid view', 'icon': 'th', 'href': '#!/images'}"
+    data-button-image-mode="{'title': 'Grid view', 'icon': 'th', 'href': '{{.Root}}/images'}"
     data-scripts="file-list file-list/images pikaday"
 
     data-styles="file-list pikaday"

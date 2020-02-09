@@ -1,32 +1,37 @@
 package adminifier
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
 
+	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 )
 
 var javascriptTemplates string
 
-var frameHandlers = map[string]func(string, *webserver.WikiInfo) interface{}{
+var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) interface{}{
 	"dashboard":  handleDashboardFrame,
-	"pages":      handlePagesFrame,
-	"categories": handleCategoriesFrame,
-	"images":     handleImagesFrame,
-	"models":     handleModelsFrame,
+	"pages":      handleFileFrames,
+	"categories": handleFileFrames,
+	"images":     handleFileFrames,
+	"models":     handleFileFrames,
 	"settings":   handleSettingsFrame,
 	"edit-page":  handleEditPageFrame,
 }
 
 // wikiTemplate members are available to all wiki templates
 type wikiTemplate struct {
-	Static    string // adminifier-static root
-	AdminRoot string // adminifier root
-	Root      string // wiki root
+	User      authenticator.User // user
+	Shortcode string             // wiki shortcode
+	WikiTitle string             // wiki title
+	Static    string             // adminifier-static root
+	AdminRoot string             // adminifier root
+	Root      string             // wiki root
 }
 
 // TODO: verify session on ALL wiki handlers
@@ -36,13 +41,20 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	// each of these URLs generates wiki.tpl
 	for _, which := range []string{"dashboard", "pages", "categories", "images", "models", "settings", "help"} {
 		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
-			handleWiki(shortcode, w, r)
+			handleWiki(shortcode, wi, w, r)
 		})
 	}
 
 	// frames to load via ajax
 	frameRoot := host + root + shortcode + "/frame/"
 	mux.HandleFunc(frameRoot, func(w http.ResponseWriter, r *http.Request) {
+
+		// check logged in
+		if !sessMgr.GetBool(r.Context(), "loggedIn") {
+			http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+			return
+		}
+
 		frameName := strings.TrimPrefix(r.URL.Path, frameRoot)
 		tmplName := "frame-" + frameName + ".tpl"
 
@@ -55,7 +67,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		// call func to create template params
 		var dot interface{} = nil
 		if handler, exist := frameHandlers[frameName]; exist {
-			dot = handler(shortcode, wi)
+			dot = handler(shortcode, wi, r)
 		}
 
 		// execute frame template
@@ -68,7 +80,13 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	})
 }
 
-func handleWiki(shortcode string, w http.ResponseWriter, r *http.Request) {
+func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
+
+	// check logged in
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		return
+	}
 
 	// load javascript templates
 	if javascriptTemplates == "" {
@@ -84,46 +102,41 @@ func handleWiki(shortcode string, w http.ResponseWriter, r *http.Request) {
 		wikiTemplate
 	}{
 		template.HTML(javascriptTemplates),
-		getWikiTemplate(shortcode),
+		getWikiTemplate(shortcode, wi, r),
 	})
 	if err != nil {
 		panic(err)
 	}
 }
 
-func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
+func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return nil
 }
 
-func handlePagesFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
+func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	res, err := json.Marshal(map[string]interface{}{
+		"sort_types": []string{"a", "c", "u", "m"},
+		"results":    wi.Images(),
+	})
+	if err != nil {
+		panic(err)
+	}
 	return struct {
-		Type  string
+		JSON  template.HTML
 		Order string
 		wikiTemplate
 	}{
-		Type:         "Pages",
+		JSON:         template.HTML("<!--JSON\n" + string(res) + "\n-->"),
 		Order:        "m-",
-		wikiTemplate: getWikiTemplate(shortcode),
+		wikiTemplate: getWikiTemplate(shortcode, wi, r),
 	}
 }
 
-func handleCategoriesFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
+func handleSettingsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return nil
 }
 
-func handleImagesFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
-	return nil
-}
-
-func handleModelsFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
-	return nil
-}
-
-func handleSettingsFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
-	return nil
-}
-
-func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
+func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return struct {
 		Model   bool   // true if editing a model
 		Title   string // page title or filename
@@ -135,13 +148,16 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo) interface{} {
 		Title:        "Title",
 		File:         "File",
 		Content:      "Content",
-		wikiTemplate: getWikiTemplate(shortcode),
+		wikiTemplate: getWikiTemplate(shortcode, wi, r),
 	}
 }
 
-func getWikiTemplate(shortcode string) wikiTemplate {
+func getWikiTemplate(shortcode string, wi *webserver.WikiInfo, r *http.Request) wikiTemplate {
 	return wikiTemplate{
-		AdminRoot: root,
+		User:      sessMgr.Get(r.Context(), "user").(authenticator.User),
+		Shortcode: shortcode,
+		WikiTitle: wi.Title,
+		AdminRoot: strings.TrimRight(root, "/"),
 		Static:    root + "adminifier-static",
 		Root:      root + shortcode,
 	}
