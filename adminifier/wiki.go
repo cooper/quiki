@@ -16,13 +16,13 @@ import (
 var javascriptTemplates string
 
 var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) interface{}{
-	"dashboard": handleDashboardFrame,
-	"pages":     handlePagesFrame,
-	// "categories": handleFileFrames,
-	"images":    handleImagesFrame,
-	"models":    handleModelsFrame,
-	"settings":  handleSettingsFrame,
-	"edit-page": handleEditPageFrame,
+	"dashboard":  handleDashboardFrame,
+	"pages":      handlePagesFrame,
+	"categories": handleCategoriesFrame,
+	"images":     handleImagesFrame,
+	"models":     handleModelsFrame,
+	"settings":   handleSettingsFrame,
+	"edit-page":  handleEditPageFrame,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -125,6 +125,11 @@ func handleImagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request
 
 func handleModelsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
 	return handleFileFrames(shortcode, wi, r, wi.Models())
+}
+
+func handleCategoriesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	cats := wi.Categories()
+	return handleFileFrames(shortcode, wi, r, cats)
 }
 
 func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request, results interface{}, extras ...string) interface{} {

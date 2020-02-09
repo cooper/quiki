@@ -206,6 +206,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	opt.Dir.Page = filepath.FromSlash(opt.Dir.Page)
 	opt.Dir.Model = filepath.FromSlash(opt.Dir.Model)
 	opt.Dir.Cache = filepath.FromSlash(opt.Dir.Cache)
+	opt.Dir.Category = filepath.FromSlash(opt.Dir.Cache + "/category")
 
 	// convert all HTTP roots to /
 	opt.Root.Wiki = filepath.ToSlash(opt.Root.Wiki)
