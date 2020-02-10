@@ -279,6 +279,7 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 
 	// this stuff is available to all
 	mod := pgFi.ModTime()
+	info.Path = path
 	info.File = name
 	info.Modified = &mod // actual page mod time
 	// info.Created =

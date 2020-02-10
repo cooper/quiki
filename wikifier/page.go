@@ -41,6 +41,7 @@ type Page struct {
 
 // PageInfo represents metadata associated with a page.
 type PageInfo struct {
+	Path      string     `json:"omit"`                // absolute filepath
 	File      string     `json:"file,omitempty"`      // name with extension
 	Created   *time.Time `json:"created,omitempty"`   // creation time
 	Modified  *time.Time `json:"modified,omitempty"`  // modify time

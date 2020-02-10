@@ -28,17 +28,21 @@ type DisplayFile struct {
 }
 
 // DisplayFile returns the display result for a plain text file.
-func (w *Wiki) DisplayFile(file string) interface{} {
+func (w *Wiki) DisplayFile(path string) interface{} {
 	var r DisplayFile
+	path = filepath.FromSlash(path) // just in case
 
-	// get file info
-	path, err := filepath.Abs(filepath.Join(w.Opt.Dir.Wiki, file))
-	var fi os.FileInfo
-	if err == nil {
-		fi, err = os.Lstat(path)
+	// ensure it can be made relative to dir.wiki
+	relPath := w.relPath(path)
+	if relPath == "" {
+		return DisplayError{
+			Error:         "Bad filepath",
+			DetailedError: "File '" + path + "' cannot be made relative to dir.wiki",
+		}
 	}
 
-	// file does not exist
+	// file does not exist or can't be read
+	fi, err := os.Lstat(path)
 	if err != nil {
 		return DisplayError{
 			Error:         "File does not exist.",
@@ -57,7 +61,7 @@ func (w *Wiki) DisplayFile(file string) interface{} {
 
 	// results
 	mod := fi.ModTime()
-	r.File = file
+	r.File = filepath.ToSlash(relPath)
 	r.Path = path
 	r.Modified = &mod
 	r.Content = string(content)

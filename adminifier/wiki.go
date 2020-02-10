@@ -11,6 +11,7 @@ import (
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
+	"github.com/cooper/quiki/wiki"
 )
 
 var javascriptTemplates string
@@ -159,17 +160,25 @@ func handleSettingsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 }
 
 func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	// TODO: we need a way to present these errors
 	q := r.URL.Query()
-	log.Printf("%+v", q)
+
 	// no page filename provided
 	name := q.Get("page")
 	if name == "" {
 		return nil
 	}
 
-	// find the page
+	// find the page. if File is empty, it doesn't exist
 	info := wi.PageInfo(name)
 	if info.File == "" {
+		return nil
+	}
+
+	// call DisplayFile to get the content
+	res := wi.DisplayFile(info.Path)
+	fileRes, ok := res.(wiki.DisplayFile)
+	if !ok {
 		return nil
 	}
 
@@ -185,7 +194,7 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 		Model:        false,
 		Title:        info.Title,
 		File:         info.File,
-		Content:      "Content",
+		Content:      fileRes.Content,
 		wikiTemplate: getWikiTemplate(shortcode, wi, r),
 	}
 }
