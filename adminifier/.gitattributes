@@ -1,3 +1,4 @@
 *.tpl linguist-language=HTML
-adminifier/ext/* linguist-vendored
 doc/* linguist-documentation
+adminifier/adminifier-static/ext/* linguist-vendored
+webserver/static/mootools.min.js linguist-vendored
