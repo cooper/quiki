@@ -8,7 +8,7 @@ function loadedHandler () {
     ae = a.editor;
 
     // add toolbar functions
-    Object.append(ae.toolbarFunctions, {
+    ae.addToolbarFunctions({
         save:       displaySaveHelper,
         delete:     displayDeleteConfirmation
     });

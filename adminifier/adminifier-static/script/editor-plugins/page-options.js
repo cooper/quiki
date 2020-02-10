@@ -8,7 +8,7 @@ function loadedHandler () {
     ae = a.editor;
 
     // add toolbar function
-    Object.append(ae.toolbarFunctions, {
+    ae.addToolbarFunctions({
         options:    displayPageOptionsWindow
     });
 }
