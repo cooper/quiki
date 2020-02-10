@@ -360,11 +360,7 @@ var flagOptions = {
 				but.destroy();
 			});
 		}
-    },
-    dark: {
-        init:    function () { $('content').tween('background-color', '#000'); },
-        destroy: function () { $('content').setStyle('background-color', '#fff'); }
-    }
+	}
 };
 
 // handle page data on request completion
