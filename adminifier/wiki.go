@@ -40,7 +40,10 @@ type wikiTemplate struct {
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 	// each of these URLs generates wiki.tpl
-	for _, which := range []string{"dashboard", "pages", "categories", "images", "models", "settings", "help"} {
+	for _, which := range []string{
+		"dashboard", "pages", "categories",
+		"images", "models", "settings", "help", "edit-page",
+	} {
 		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
@@ -156,16 +159,32 @@ func handleSettingsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 }
 
 func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
+	q := r.URL.Query()
+	log.Printf("%+v", q)
+	// no page filename provided
+	name := q.Get("page")
+	if name == "" {
+		return nil
+	}
+
+	// find the page
+	info := wi.PageInfo(name)
+	if info.File == "" {
+		return nil
+	}
+
 	return struct {
+		Found   bool
 		Model   bool   // true if editing a model
 		Title   string // page title or filename
 		File    string // filename
 		Content string // file content
 		wikiTemplate
 	}{
+		Found:        true,
 		Model:        false,
-		Title:        "Title",
-		File:         "File",
+		Title:        info.Title,
+		File:         info.File,
 		Content:      "Content",
 		wikiTemplate: getWikiTemplate(shortcode, wi, r),
 	}

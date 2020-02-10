@@ -9,12 +9,15 @@
       data-nav="pages"
       data-icon="edit"
 {{end}}
-      data-title="{{.Title}}"
+      data-title="{{or .Title .File}}"
       data-scripts="ace jquery editor"
       data-styles="editor colorpicker diff2html"
       data-flags="no-margin compact-sidebar"
 />
 
+{{if not .Found}}
+    Not found.
+{{else}}
 <div class="editor-toolbar-wrapper">
     <ul class="editor-toolbar">
 
@@ -51,5 +54,6 @@
     </ul>
 </div>
 <div id="editor" data-file="{{.File}}"{{if .Model}} data-model{{end}}>
-{{.Content}}
+{{- .Content -}}
 </div>
+{{end}}
