@@ -132,6 +132,17 @@ div.navigation-popover {
     display: none;
 }
 
+#top-search::placeholder {
+    opacity: 1;
+    color: #ccc;
+}
+
+/* for some reason these have to be separate */
+#top-search::-ms-input-placeholder {
+    opacity: 1;
+    color: #ccc;
+}
+
 #top-search.invalid {
     background-color: #AB3F3F;
 }
