@@ -11,7 +11,7 @@
       data-title="{{or .Title .File}}"
       data-scripts="ace jquery editor"
       data-styles="editor colorpicker diff2html"
-      data-flags="no-margin compact-sidebar"
+      data-flags="no-margin compact-sidebar dark"
 />
 
 {{if not .Found}}

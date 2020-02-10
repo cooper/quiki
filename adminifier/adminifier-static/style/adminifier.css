@@ -18,6 +18,10 @@ i.fa {
     width: 1.35em;
 }
 
+#content {
+    background-color: #fff;
+}
+
 /* MODAL WINDOWS */
 
 .modal-container {
