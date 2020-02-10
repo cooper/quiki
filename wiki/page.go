@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"time"
 
 	strip "github.com/grokify/html-strip-tags-go"
@@ -280,7 +281,7 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 	// this stuff is available to all
 	mod := pgFi.ModTime()
 	info.Path = path
-	info.File = name
+	info.File = filepath.ToSlash(name)
 	info.Modified = &mod // actual page mod time
 	// info.Created =
 
