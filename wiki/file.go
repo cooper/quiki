@@ -1,10 +1,69 @@
 package wiki
 
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cooper/quiki/wikifier"
 )
+
+// DisplayFile represents a plain text file to display.
+type DisplayFile struct {
+
+	// file name relative to wiki root.
+	// path delimiter '/' is always used, regardless of OS.
+	File string `json:"file,omitempty"`
+
+	// absolute file path of the file.
+	// OS-specific path delimiter is used.
+	Path string `json:"path,omitempty"`
+
+	// the plain text file content
+	Content string
+
+	// time when the file was last modified
+	Modified *time.Time `json:"modified,omitempty"`
+}
+
+// DisplayFile returns the display result for a plain text file.
+func (w *Wiki) DisplayFile(file string) interface{} {
+	var r DisplayFile
+
+	// get file info
+	path, err := filepath.Abs(filepath.Join(w.Opt.Dir.Wiki, file))
+	var fi os.FileInfo
+	if err == nil {
+		fi, err = os.Lstat(path)
+	}
+
+	// file does not exist
+	if err != nil {
+		return DisplayError{
+			Error:         "File does not exist.",
+			DetailedError: "File '" + path + "' error: " + err.Error(),
+		}
+	}
+
+	// read file
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return DisplayError{
+			Error:         "Error reading file.",
+			DetailedError: "File '" + path + "' error: " + err.Error(),
+		}
+	}
+
+	// results
+	mod := fi.ModTime()
+	r.File = file
+	r.Path = path
+	r.Modified = &mod
+	r.Content = string(content)
+
+	return r
+}
 
 func (w *Wiki) checkDirectories() {
 	// TODO

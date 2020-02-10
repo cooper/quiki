@@ -20,7 +20,7 @@
  */
 (function (exports) {
     
-var pickerPath = 'ext/colorpicker';
+var pickerPath = adminifier.staticRoot + '/ext/colorpicker';
 
 var DynamicColorPicker = exports.DynamicColorPicker = new Class({
 
