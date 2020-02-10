@@ -248,6 +248,7 @@ ae.findPageVariable = function (exp, range) {
         range:  range,
         backwards: true // prefer the last occurrence
     });
+    return; // FIXME: search.find() is making editor hang.
     var found = search.find(editor.session);
     if (!found)
         return;
