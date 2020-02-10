@@ -204,8 +204,8 @@ function frameLoad (page) {
 
 // load frame based on the current URL
 function loadURL() {
-    var loc = window.location.pathname
-    frameLoad(loc.replace(wikiRootRgx, ''));
+    var loc = window.location.pathname;
+    frameLoad(loc.replace(wikiRootRgx, '') + window.location.search);
 }
 
 // page options
