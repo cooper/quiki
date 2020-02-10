@@ -79,11 +79,19 @@ function loadNextScript () {
 
 // load several scripts
 a.loadScripts = function (srcs) {
+    var sticky = false;
 	srcs.each(function (src) {
-		if (!src.length) return;
+        if (!src.length) return;
+        
+        // ace editor is special-- since it's large, load once and do not unload.
+		if (src == 'ace') {
+            if (window.ace)
+                return;
+            src = adminifier.staticRoot + '/ext/ace/src-min/ace.js';
+            sticky = true;
+        }
 
-		if (src == 'ace')
-			src = adminifier.staticRoot + '/ext/ace/src-min/ace.js';
+        // other distributions
 		else if (src == 'pikaday')
 			src = adminifier.staticRoot + '/ext/pikaday/pikaday.js';
 		else if (src == 'jquery')
@@ -93,15 +101,23 @@ a.loadScripts = function (srcs) {
 		else if (src == 'colorpicker')
 			src = adminifier.staticRoot + '/ext/colorpicker/DynamicColorPicker.js';
 		else if (src == 'prettify')
-			src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
+            src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
+            
+        // normal script
 		else
-			src = adminifier.staticRoot + '/script/' + src + '.js';
+            src = adminifier.staticRoot + '/script/' + src + '.js';
 
-        var script = new Element('script', {
-			src:   src,
-			class: 'dynamic'
-		});
-		script.addEvent('load', scriptLoaded);
+        // create script
+        var script = new Element('script', { src: src });
+
+        // remember it's dynamic so as to unload it later, UNLESS it's sticky
+        if (!sticky)
+            script.addClass('dynamic');
+
+        // on load, call scriptLoaded
+        script.addEvent('load', scriptLoaded);
+        
+        // add to the list to load
 		scriptsToLoad.push(script);
 	});
 	
@@ -125,21 +141,30 @@ a.fakeAdopt = function (child) {
 
 document.addEvent('domready', 	loadURL);
 document.addEvent('domready',	searchHandler);
-document.addEvent('domready',   addFrameClickHandler)
+document.addEvent('domready',   addDocumentFrameClickHandler);
 document.addEvent('keyup',		handleEscapeKey);
 
 // PAGE LOADING
 
+function addDocumentFrameClickHandler () {
+    addFrameClickHandler($$('a.frame-click'));
+}
+
 // clicking a frame link
-function addFrameClickHandler () {
-    $$('a.frame-click').each(function (a) {
+a.addFrameClickHandler = addFrameClickHandler;
+function addFrameClickHandler (where) {
+    if (typeOf(where) == 'element')
+        where = [where];
+    where.each(function (a) {
         a.addEvent('click', function (e) {
+            console.log("HANDLED IT FOR "+ a.href);
             e.preventDefault();
             var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '');
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
             loadURL();
         });
-    })
+    });
+    return where[0];
 }
 
 // load a page
@@ -165,8 +190,18 @@ function frameLoad (page) {
                 a.currentJSONMetadata = json;
             }
 
+            // // some frames (editor) might request not to change the innerHTML until an event is fired
+            // $('editor').setStyle('display', 'none');
+            // if (typeof a.currentJSONMetadata == 'object' && a.currentJSONMetadata.wait) 
+            //     document.addEvent(a.currentJSONMetadata.wait, function () {
+            //         $('editor').setStyle('display', 'block');
+            // });
+
             // set the content
             $('content').innerHTML = html;
+
+            // apply click handlers
+            addFrameClickHandler($('content').getElements('a'));
 
             // find HTML metadata
             var meta = $('content').getElement('meta');

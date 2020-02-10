@@ -35,6 +35,8 @@ function pageScriptsLoadedHandler () {
     // load required ace resources
     Range  = ace.require('ace/range').Range;
     Search = ace.require('ace/search').Search;
+
+    // initialize editor
     editor = ace.edit('editor');
     ae.lastSavedData = editor.getValue();
 

@@ -184,6 +184,7 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 
 	return struct {
 		Found   bool
+		JSON    template.HTML
 		Model   bool   // true if editing a model
 		Title   string // page title or filename
 		File    string // filename
@@ -191,6 +192,7 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 		wikiTemplate
 	}{
 		Found:        true,
+		JSON:         template.HTML("<!--JSON\n{\"wait\":\"editorLoaded\"}\n-->"), // TODO
 		Model:        false,
 		Title:        info.Title,
 		File:         info.File,

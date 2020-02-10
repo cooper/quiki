@@ -1,5 +1,4 @@
-<!--JSON
--->
+{{.JSON}}
 
 <meta
 {{if .Model}}
