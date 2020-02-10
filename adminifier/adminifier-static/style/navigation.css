@@ -74,6 +74,7 @@ div.navigation-popover {
     font-size: 18px;
     color: #fff;
     line-height: 40px;
+    float: left; /* fixes chrome */
 }
 
 #top-bar span.wiki-title {
