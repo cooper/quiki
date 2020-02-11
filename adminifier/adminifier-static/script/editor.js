@@ -159,6 +159,22 @@ ae.toolbarFunctions = {
     redo:   function () { editor.redo(); }
 };
 
+// add toolbar function
+ae.addToolbarFunctions = function (funcs) {
+
+    // on domready, make the associated toolbar buttons available
+    document.addEvent('domready', function () { 
+        Object.keys(funcs).each(function (funcName) {
+            var li = $$('.editor-toolbar li.hidden[data-action=' + funcName + ']');
+            if (!li || !li[0]) return;
+            li[0].setStyle('display', 'inline-block');
+        });
+    });
+
+    // remember the responders
+    Object.append(ae.toolbarFunctions, funcs);
+}
+
 // get current page filename
 ae.getFilename = function () {
     return $('editor').getProperty('data-file');
@@ -232,6 +248,7 @@ ae.findPageVariable = function (exp, range) {
         range:  range,
         backwards: true // prefer the last occurrence
     });
+    return; // FIXME: search.find() is making editor hang.
     var found = search.find(editor.session);
     if (!found)
         return;

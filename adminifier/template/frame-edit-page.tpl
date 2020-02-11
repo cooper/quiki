@@ -35,21 +35,21 @@
             <li style="float: right;"><i class="fa fa-cut"></i> Cut</li>
         -->
 
-        <li data-action="bold"><i class="fa fa-bold"></i> Bold</li>
-        <li data-action="italic"><i class="fa fa-italic"></i> Italic</li>
-        <li data-action="underline"><i class="fa fa-underline"></i> Underline</li>
-        <li data-action="strike"><i class="fa fa-strikethrough"></i> Strike</li>
-        <li data-action="font"><i class="fa fa-font"></i> Color</li>
+        <li class="hidden" data-action="bold"><i class="fa fa-bold"></i> Bold</li>
+        <li class="hidden" data-action="italic"><i class="fa fa-italic"></i> Italic</li>
+        <li class="hidden" data-action="underline"><i class="fa fa-underline"></i> Underline</li>
+        <li class="hidden" data-action="strike"><i class="fa fa-strikethrough"></i> Strike</li>
+        <li class="hidden" data-action="font"><i class="fa fa-font"></i> Color</li>
         <!--<li data-action="header"><i class="fa fa-header"></i> Header</li>-->
-        <li data-action="image"><i class="fa fa-picture-o"></i> Image</li>
-        <li data-action="link"><i class="fa fa-link"></i> Link</li>
-        <li data-action="file"><i class="fa fa-paperclip"></i> File</li>
-        <li data-action="list"><i class="fa fa-list-ul"></i> List</li>
-        <li data-action="list"><i class="fa fa-list-ol"></i> Num list</li>
-        <li data-action="model"><i class="fa fa-cube"></i> Model</li>
-        <li data-action="infobox"><i class="fa fa-info-circle"></i> Infobox</li>
-        <li data-action="code"><i class="fa fa-code"></i> Code</li>
-        <li data-action="cite"><i class="fa fa-copyright"></i> Citation</li>
+        <li class="hidden" data-action="image"><i class="fa fa-picture-o"></i> Image</li>
+        <li class="hidden" data-action="link"><i class="fa fa-link"></i> Link</li>
+        <li class="hidden" data-action="file"><i class="fa fa-paperclip"></i> File</li>
+        <li class="hidden" data-action="list"><i class="fa fa-list-ul"></i> List</li>
+        <li class="hidden" data-action="list"><i class="fa fa-list-ol"></i> Num list</li>
+        <li class="hidden" data-action="model"><i class="fa fa-cube"></i> Model</li>
+        <li class="hidden" data-action="infobox"><i class="fa fa-info-circle"></i> Infobox</li>
+        <li class="hidden" data-action="code"><i class="fa fa-code"></i> Code</li>
+        <li class="hidden" data-action="cite"><i class="fa fa-copyright"></i> Citation</li>
 
     </ul>
 </div>

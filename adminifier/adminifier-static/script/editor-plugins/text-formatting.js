@@ -38,7 +38,7 @@ function loadedHandler () {
     ae = a.editor;
 
     // add toolbar functions
-    Object.append(ae.toolbarFunctions, {
+    ae.addToolbarFunctions({
         font:       displayFontSelector,
         bold:       ae.wrapTextFunction('b'),
         italic:     ae.wrapTextFunction('i'),

@@ -42,7 +42,7 @@ type Page struct {
 // PageInfo represents metadata associated with a page.
 type PageInfo struct {
 	Path      string     `json:"omit"`                // absolute filepath
-	File      string     `json:"file,omitempty"`      // name with extension
+	File      string     `json:"file,omitempty"`      // name with extension, always with forward slashes
 	Created   *time.Time `json:"created,omitempty"`   // creation time
 	Modified  *time.Time `json:"modified,omitempty"`  // modify time
 	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
@@ -253,7 +253,7 @@ func (p *Page) RelName() string {
 
 	// if the path cannot be made relative to the page dir,
 	// it is probably a symlink to something external
-	return path
+	return filepath.ToSlash(path)
 }
 
 // RelNameNE returns the unresolved page name with No Extension, relative to

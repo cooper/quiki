@@ -65,6 +65,10 @@ ul.editor-toolbar li.disabled {
     cursor: default;
 }
 
+ul.editor-toolbar li.hidden {
+    display: none;
+}
+
 /* shared in editor helpers */
 
 .editor-tool-large-button {
