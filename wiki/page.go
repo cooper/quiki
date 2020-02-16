@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	strip "github.com/grokify/html-strip-tags-go"
@@ -95,15 +96,19 @@ type pageJSONManifest struct {
 // use with this Wiki.
 func (w *Wiki) NewPage(name string) *wikifier.Page {
 
-	// lowercase .page exists
+	// lowercase .page is default
 	p := w._newPage(name)
-	if p.Exists() {
-		return p
+
+	// if page doesn't exist, check for lowercase .md
+	if !p.Exists() {
+		if mdp := w._newPage(name + ".md"); mdp.Exists() {
+			p = mdp
+		}
 	}
 
-	// lowercase .md exists
-	if mdp := w._newPage(name + ".md"); mdp.Exists() {
-		return mdp
+	// create page lock
+	if _, exist := w.pageLocks[p.Name()]; !exist {
+		w.pageLocks[p.Name()] = new(sync.Mutex)
 	}
 
 	return p
@@ -189,6 +194,10 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		w.writeRedirectCache(page)
 		return DisplayRedirect{Redirect: redir}
 	}
+
+	// only generate once at a time
+	w.pageLocks[r.File].Lock()
+	defer w.pageLocks[r.File].Unlock()
 
 	// generate HTML and metadata
 	create := page.Created()
