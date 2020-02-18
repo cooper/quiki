@@ -199,13 +199,6 @@ function frameLoad (page) {
                 a.currentJSONMetadata = json;
             }
 
-            // // some frames (editor) might request not to change the innerHTML until an event is fired
-            // $('editor').setStyle('display', 'none');
-            // if (typeof a.currentJSONMetadata == 'object' && a.currentJSONMetadata.wait) 
-            //     document.addEvent(a.currentJSONMetadata.wait, function () {
-            //         $('editor').setStyle('display', 'block');
-            // });
-
             // set the content
             $('content').innerHTML = html;
 

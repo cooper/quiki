@@ -192,7 +192,7 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 		wikiTemplate
 	}{
 		Found:        true,
-		JSON:         template.HTML("<!--JSON\n{\"wait\":\"editorLoaded\"}\n-->"), // TODO
+		JSON:         template.HTML("<!--JSON\n{}\n-->"), // TODO
 		Model:        false,
 		Title:        info.Title,
 		File:         info.File,
