@@ -1,7 +1,10 @@
 (function (a) {
 
-var pageScriptsDone = false;
+// regex to remove the wiki root 
 var wikiRootRgx = new RegExp((adminifier.wikiRoot + '/').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+
+// whether this page's scripts have been loaded yet
+var pageScriptsDone = false;
 
 // this is for if pageScriptsDone event is added
 // and the page scripts are already done
@@ -12,6 +15,7 @@ Element.Events.pageScriptsLoaded = {
 	}
 };
 
+// onEnter event
 Element.implement('onEnter', function (func) {
     this.addEvent('keyup', function (e) {
         if (e.key != 'enter')
@@ -20,6 +24,7 @@ Element.implement('onEnter', function (func) {
     });
 });
 
+// "space-separated values" splitter
 function SSV (str) {
     if (typeof str != 'string' || !str.length)
         return [];
@@ -40,7 +45,7 @@ a.updateIcon = function (icon) {
 	$('page-title').getElement('i').set('class', 'fa fa-' + icon);
 };
 
-// safe page/category name
+// normalize page/category name
 a.safeName = function (name) {
     return name.replace(/[^\w\.\-]/g, '_');
 };
@@ -50,6 +55,7 @@ a.loadScript = function (src) {
 	a.loadScripts([src]);
 };
 
+// this is called when each script is loaded, so we can proceed to load the next
 var scriptsToLoad = [], firedPageScriptsLoaded;
 function scriptLoaded () {
 	if (typeof jQuery != 'undefined')
@@ -70,6 +76,7 @@ function scriptLoaded () {
 	firedPageScriptsLoaded = true;
 }
 
+// this is called when the next pending script should be loaded
 function loadNextScript () {
 	var script = scriptsToLoad.shift();
 	if (!script)
@@ -125,7 +132,7 @@ a.loadScripts = function (srcs) {
 	scriptLoaded();
 }
 
-// adopts an element to an invisible container in the DOM so that dimension
+// utility to adopt an element to an invisible container in the DOM so that dimension
 // properties become available before displaying it
 a.fakeAdopt = function (child) {
     var parent = $('fake-parent');
@@ -146,11 +153,13 @@ document.addEvent('keyup',		handleEscapeKey);
 
 // PAGE LOADING
 
+// this adds the frame click handler to all .frame-click anchors in the DOM
 function addDocumentFrameClickHandler () {
     addFrameClickHandler($$('a.frame-click'));
 }
 
-// clicking a frame link
+// export addFrameClickHandler so that dynamically created anchors from other scripts
+// can be handled properly 
 a.addFrameClickHandler = addFrameClickHandler;
 function addFrameClickHandler (where) {
     if (typeOf(where) == 'element')
@@ -237,7 +246,7 @@ function frameLoad (page) {
     request.get();
 }
 
-// load frame based on the current URL
+// extract the page from the current URL and load it
 function loadURL() {
     var loc = window.location.pathname;
     frameLoad(loc.replace(wikiRootRgx, '') + window.location.search);
@@ -245,6 +254,8 @@ function loadURL() {
 
 // page options
 var flagOptions = {
+
+    // disable margins on #content
     'no-margin': {
         init: function () {
             $('content').addClass('no-margin');
@@ -253,6 +264,8 @@ var flagOptions = {
             $('content').removeClass('no-margin');
         }
     },
+
+    // minimize the sidebar to just icons
     'compact-sidebar': {
         init: function () {
 			document.getElement('span.wiki-title').tween('min-width', '75px');
@@ -283,6 +296,8 @@ var flagOptions = {
             });
         }
     },
+
+    // display the search bar
 	search: {
 		init: function () {
 			$('top-search').set('value', '');
@@ -292,7 +307,9 @@ var flagOptions = {
 		destroy: function () {
 			$('top-search').setStyle('display', 'none');
 		}
-	},
+    },
+    
+    // top bar buttons
 	buttons: {
 		init: function () {
 			if (!a.currentData || !a.currentData['data-buttons'])
@@ -311,14 +328,15 @@ var flagOptions = {
 				if (!buttonStuff) {
 					console.warn('Failed to parse JSON for button ' + buttonID);
 					return;
-				}
-				
+                }
+                
+				// create button
 				var but = new Element('span', {
 					id:		'top-button-' + buttonID,
 					class: 	'top-title top-button injected'
 				});
 				
-				// hide
+				// hide if default state is to hide
 				if (buttonStuff.hide)
 					but.setStyle('display', 'none');
 				
@@ -338,7 +356,7 @@ var flagOptions = {
 					i.inject(anchor, 'top');
 				}
 				
-				// click event if func is provided
+				// click click event if callback func is provided
 				if (buttonStuff.func) anchor.addEvent('click', function (e) {
 					e.preventDefault();
 					var func = window[buttonStuff.func];
@@ -351,7 +369,8 @@ var flagOptions = {
 					}
 					func();
 				});
-			
+            
+                // inject the button
 				but.inject($$('.top-button').getLast(), 'after');
 			});
 		},
@@ -396,20 +415,24 @@ function handlePageData (data) {
     // highlight navigation item
     var li = $$('li[data-nav="' + data['data-nav'] + '"]')[0];
     if (li) {
-        $$('li.active').each(function (li) { li.removeClass('active') });
+        $$('li.active').each(function (li) { li.removeClass('active'); });
         li.addClass('active');
     }
 
-    // inject scripts
+    // destroy old scripts
     $$('script.dynamic').each(function (script) { script.destroy(); });
+
+    // load new scripts
 	firedPageScriptsLoaded = false;
     a.loadScripts(SSV(data['data-scripts']));
 
-    // inject styles
+
+    // destroy old styles
     $$('link.dynamic').each(function (link) { link.destroy(); });
+
+    // inject new styles
     SSV(data['data-styles']).each(function (style) {
         if (!style.length) return;
-		
 		var href;
 		if (style == 'colorpicker')
 			href = 'ext/colorpicker/colorpicker.css';
@@ -426,16 +449,16 @@ function handlePageData (data) {
             type:  'text/css',
             rel:   'stylesheet'
         });
-		// link.addEvent('load', scriptLoaded);
         document.head.appendChild(link);
     });
 
-    // handle page flags
-    if (a.currentFlags)
-        a.currentFlags.each(function (flag) {
-            if (flag.destroy)
-                flag.destroy();
-        });
+    // deinitialize old page flags
+    if (a.currentFlags) a.currentFlags.each(function (flag) {
+        if (flag.destroy)
+            flag.destroy();
+    });
+
+    // initialize new page flags
     a.currentFlags = [];
     SSV(data['data-flags']).each(function (flagName) {
         var flag = flagOptions[flagName];
@@ -456,22 +479,31 @@ function handleEscapeKey (e) {
 
 // SEARCH
 
+// domready event to add searchUpdate responder
 function searchHandler () {
 	$('top-search').addEvent('input', searchUpdate);
 }
 
+// callback for when search field changes
 function searchUpdate () {
-	var text = $('top-search').get('value');
+    var text = $('top-search').get('value');
+    
+    // the page with search function has since been destroyed
 	if (!a.currentData || !a.currentData['data-search'])
-		return;
+        return;
+        
+    // the page provides no search handler
 	var searchFunc = window[a.currentData['data-search']];
 	if (!searchFunc)
-		return;
+        return;
+        
+    // call the search handler provided by the page
 	searchFunc(text);
 }
 
 // COMPACT SIDEBAR
 
+// on mouseover, expand the text
 function handleCompactSidebarMouseenter (e) {
     var a = e.target;
     var p = a.retrieve('popover');
@@ -490,6 +522,7 @@ function handleCompactSidebarMouseenter (e) {
     });
 }
 
+// on mouseleave, retract to just icon
 function handleCompactSidebarMouseleave (e) {
     var a = e.target;
     var p = a.retrieve('popover');
