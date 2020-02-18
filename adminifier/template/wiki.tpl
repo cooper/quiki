@@ -35,7 +35,6 @@ var adminifier = {
 <div id="top-bar">
     <span class="top-title account-title"><a href="#"><i class="fa fa-user"></i> {{.User.DisplayName}}</a></span>
     <span class="top-title top-button"><a class="frame-click" href="#"><i class="fa fa-git-square"></i> master</a></span>
-    <span class="top-title top-button"><a class="frame-click" href="{{.Root}}/create-page"><i class="fa fa-plus-circle"></i> New page</a></span>
     <input id="top-search" type="text" placeholder="Quick Search..." />
     <span class="top-title wiki-title">{{.WikiTitle}}</span>
     <span id="page-title" class="top-title page-title"><i class="fa fa-home"></i> <span></span></span>
