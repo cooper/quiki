@@ -1,6 +1,0 @@
-@page.title: It works!;
-
-sec {
-    I've successfully set up my first wiki powered by
-    [[ quiki | https://github.com/cooper/quiki ]]!
-}

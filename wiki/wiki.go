@@ -3,6 +3,7 @@ package wiki
 import (
 	"errors"
 	"path/filepath"
+	"sync"
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
@@ -14,12 +15,18 @@ type Wiki struct {
 	PrivateConfigFile string
 	Opt               wikifier.PageOpt
 	Auth              *authenticator.Authenticator
+	pageLocks         map[string]*sync.Mutex
 }
 
 // NewWiki creates a Wiki given the public and private configuration files.
 func NewWiki(conf, privateConf string) (*Wiki, error) {
 	conf, privateConf = filepath.FromSlash(conf), filepath.FromSlash(privateConf)
-	w := &Wiki{ConfigFile: conf, PrivateConfigFile: privateConf, Opt: defaultWikiOpt}
+	w := &Wiki{
+		ConfigFile:        conf,
+		PrivateConfigFile: privateConf,
+		Opt:               defaultWikiOpt,
+		pageLocks:         make(map[string]*sync.Mutex),
+	}
 
 	// there's no config!
 	if conf == "" {
