@@ -10,6 +10,15 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
+// default options for commits made by quiki itself
+var quikiCommitOpts = &git.CommitOptions{
+	Author: &object.Signature{
+		Name:  "quiki",
+		Email: "quiki@quiki.app",
+		When:  time.Now(),
+	},
+}
+
 // repo fetches the wiki's git repository, creating it if needed.
 func (w *Wiki) repo() (repo *git.Repository, err error) {
 
@@ -74,13 +83,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 	}
 
 	// commit
-	_, err = wt.Commit("Initial commit", &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  "quiki",
-			Email: "quiki@quiki.app",
-			When:  time.Now(),
-		},
-	})
+	_, err = wt.Commit("Initial commit", quikiCommitOpts)
 	if err != nil {
 		return nil, err
 	}
