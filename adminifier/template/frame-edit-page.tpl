@@ -4,6 +4,9 @@
 {{if .Model}}
       data-nav="models"
       data-icon="cube"
+{{else if .Config}}
+      data-nav="settings"
+      data-icon="cog"
 {{else}}
       data-nav="pages"
       data-icon="edit"

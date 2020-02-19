@@ -42,6 +42,7 @@ type wikiRequest struct {
 	wi        *webserver.WikiInfo
 	w         http.ResponseWriter
 	r         *http.Request
+	tmplName  string
 	dot       interface{}
 	err       error
 }
@@ -74,12 +75,6 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		frameName := strings.TrimPrefix(r.URL.Path, frameRoot)
 		tmplName := "frame-" + frameName + ".tpl"
 
-		// frame template does not exist
-		if exist := tmpl.Lookup(tmplName); exist == nil {
-			http.NotFound(w, r)
-			return
-		}
-
 		// call func to create template params
 		var dot interface{} = nil
 		if handler, exist := frameHandlers[frameName]; exist {
@@ -91,6 +86,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 				w:         w,
 				r:         r,
 			}
+			dot = wr
 
 			// TODO: if working in another branch, override wr.wi to
 			// the wiki instance for that branch
@@ -104,7 +100,18 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			}
 
 			// handler was successful
-			dot = wr.dot
+			if wr.dot != nil {
+				dot = wr.dot
+			}
+			if wr.tmplName != "" {
+				tmplName = wr.tmplName
+			}
+		}
+
+		// frame template does not exist
+		if exist := tmpl.Lookup(tmplName); exist == nil {
+			http.NotFound(w, r)
+			return
 		}
 
 		// execute frame template with dot
@@ -191,6 +198,9 @@ func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
 }
 
 func handleSettingsFrame(wr *wikiRequest) {
+	// serve editor for the config file
+	wr.tmplName = "frame-edit-page.tpl"
+	handleEditor(wr, wr.wi.ConfigFile, "wiki.conf", "Configuration file", false, true)
 }
 
 func handleEditPageFrame(wr *wikiRequest) {
@@ -211,16 +221,21 @@ func handleEditPageFrame(wr *wikiRequest) {
 	}
 
 	// serve editor
-	handleEditor(wr, info.Path, info.File, info.Title)
+	handleEditor(wr, info.Path, info.File, info.Title, false, false)
 }
 
-func handleEditor(wr *wikiRequest, path, file, title string) {
+func handleEditor(wr *wikiRequest, path, file, title string, model, config bool) {
 
 	// call DisplayFile to get the content
-	res := wr.wi.DisplayFile(path)
-	fileRes, ok := res.(wiki.DisplayFile)
-	if !ok {
-		wr.err = errors.New("error occurred in DisplayFile")
+	var fileRes wiki.DisplayFile
+	switch r := wr.wi.DisplayFile(path).(type) {
+	case wiki.DisplayFile:
+		fileRes = r
+	case wiki.DisplayError:
+		wr.err = errors.New(r.DetailedError)
+		return
+	default:
+		wr.err = errors.New("unknown error occurred in DisplayFile")
 		return
 	}
 
@@ -228,6 +243,7 @@ func handleEditor(wr *wikiRequest, path, file, title string) {
 		Found   bool
 		JSON    template.HTML
 		Model   bool   // true if editing a model
+		Config  bool   // true if editing config
 		Title   string // page title or filename
 		File    string // filename
 		Content string // file content
@@ -235,7 +251,8 @@ func handleEditor(wr *wikiRequest, path, file, title string) {
 	}{
 		Found:        true,
 		JSON:         template.HTML("<!--JSON\n{}\n-->"), // TODO
-		Model:        false,
+		Model:        model,
+		Config:       config,
 		Title:        title,
 		File:         file,
 		Content:      fileRes.Content,

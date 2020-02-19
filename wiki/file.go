@@ -37,7 +37,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	if relPath == "" {
 		return DisplayError{
 			Error:         "Bad filepath",
-			DetailedError: "File '" + path + "' cannot be made relative to dir.wiki",
+			DetailedError: "File '" + path + "' cannot be made relative to '" + w.Opt.Dir.Wiki + "'",
 		}
 	}
 
@@ -75,14 +75,28 @@ func (w *Wiki) checkDirectories() {
 }
 
 // relPath returns a path relative to the wiki root
+// FIXME: check for ..???
 func (w *Wiki) relPath(absPath string) string {
 	wikiAbs, _ := filepath.Abs(w.Opt.Dir.Wiki)
+
+	// can't resolve wiki path
 	if wikiAbs == "" {
 		return ""
 	}
+
+	// made it relative as-is
 	if rel, err := filepath.Rel(wikiAbs, absPath); err == nil {
 		return rel
 	}
+
+	// try to make it relative by resolving absPath as absolute
+	absPath, _ = filepath.Abs(absPath)
+	if absPath != "" {
+		if rel, err := filepath.Rel(wikiAbs, absPath); err == nil {
+			return rel
+		}
+	}
+
 	return ""
 }
 
