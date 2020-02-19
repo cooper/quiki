@@ -2,9 +2,12 @@ package wiki
 
 import (
 	"log"
+	"time"
 
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 // repo fetches the wiki's git repository, creating it if needed.
@@ -21,18 +24,7 @@ func (w *Wiki) repo() (repo *git.Repository, err error) {
 
 	// it doesn't exist- let's initialize it
 	if err == git.ErrRepositoryNotExists {
-		repo, err = git.PlainInit(w.Opt.Dir.Wiki, false)
-
-		// error in init
-		if err != nil {
-			// TODO: better logging
-			log.Println("git:PlainInit error:", err)
-			return
-		}
-
-		// TODO: default .gitignore
-		// TODO: add all files and initial commit
-
+		repo, err = w.createRepo()
 	} else if err != nil {
 		// error in open other than nonexist
 
@@ -44,6 +36,56 @@ func (w *Wiki) repo() (repo *git.Repository, err error) {
 	// success
 	w._repo = repo
 	return
+}
+
+// create new repository
+func (w *Wiki) createRepo() (repo *git.Repository, err error) {
+
+	/// initialize new repo
+	repo, err = git.PlainInit(w.Opt.Dir.Wiki, false)
+
+	// error in init
+	if err != nil {
+		// TODO: better logging
+		log.Println("git:PlainInit error:", err)
+		return
+	}
+
+	// initialized ok
+
+	// create master branch
+	err = repo.CreateBranch(&config.Branch{Name: "master"})
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: default .gitignore
+
+	// add all files and initial commit
+	wt, err := repo.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	// add .
+	_, err = wt.Add(".")
+	if err != nil {
+		return nil, err
+	}
+
+	// commit
+	_, err = wt.Commit("Initial commit", &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "quiki",
+			Email: "quiki@quiki.app",
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return repo, nil
 }
 
 // // IsRepo returns true if the wiki directory is versioned by git.
