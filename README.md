@@ -8,9 +8,7 @@ is represented by a text file written in the clean and productive
 it sports caching, image generation, category management,
 [templates](doc/models.md),
 [markdown integration](doc/markdown.md),
-git-based revision tracking, and much more.
-[adminifier](https://github.com/cooper/adminifier), a sister project, is an
-administrative panel featuring a web-based editor.
+git-based revision tracking, a web-based editor, and much more.
 
 * [install](#install)
 * [configure](#configure)
