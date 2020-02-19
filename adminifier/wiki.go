@@ -12,11 +12,12 @@ import (
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
+	"github.com/pkg/errors"
 )
 
 var javascriptTemplates string
 
-var frameHandlers = map[string]func(string, *webserver.WikiInfo, *http.Request) interface{}{
+var frameHandlers = map[string]func(*wikiRequest){
 	"dashboard":  handleDashboardFrame,
 	"pages":      handlePagesFrame,
 	"categories": handleCategoriesFrame,
@@ -34,6 +35,15 @@ type wikiTemplate struct {
 	Static    string             // adminifier-static root
 	AdminRoot string             // adminifier root
 	Root      string             // wiki root
+}
+
+type wikiRequest struct {
+	shortcode string
+	wi        *webserver.WikiInfo
+	w         http.ResponseWriter
+	r         *http.Request
+	dot       interface{}
+	err       error
 }
 
 // TODO: verify session on ALL wiki handlers
@@ -73,10 +83,31 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		// call func to create template params
 		var dot interface{} = nil
 		if handler, exist := frameHandlers[frameName]; exist {
-			dot = handler(shortcode, wi, r)
+
+			// create wiki request
+			wr := &wikiRequest{
+				shortcode: shortcode,
+				wi:        wi,
+				w:         w,
+				r:         r,
+			}
+
+			// TODO: if working in another branch, override wr.wi to
+			// the wiki instance for that branch
+
+			// call handler
+			handler(wr)
+
+			// handler returned an error
+			if wr.err != nil {
+				panic(wr.err)
+			}
+
+			// handler was successful
+			dot = wr.dot
 		}
 
-		// execute frame template
+		// execute frame template with dot
 		err := tmpl.ExecuteTemplate(w, tmplName, dot)
 
 		// error occurred in template execution
@@ -108,81 +139,86 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 		wikiTemplate
 	}{
 		template.HTML(javascriptTemplates),
-		getWikiTemplate(shortcode, wi, r),
+		getGenericTemplate(&wikiRequest{
+			shortcode: shortcode,
+			wi:        wi,
+			w:         w,
+			r:         r,
+		}),
 	})
 	if err != nil {
 		panic(err)
 	}
 }
 
-func handleDashboardFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	return nil
+func handleDashboardFrame(wr *wikiRequest) {
 }
 
-func handlePagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	return handleFileFrames(shortcode, wi, r, wi.Pages())
+func handlePagesFrame(wr *wikiRequest) {
+	handleFileFrames(wr, wr.wi.Pages())
 }
 
-func handleImagesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	return handleFileFrames(shortcode, wi, r, wi.Images(), "d")
+func handleImagesFrame(wr *wikiRequest) {
+	handleFileFrames(wr, wr.wi.Images(), "d")
 }
 
-func handleModelsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	return handleFileFrames(shortcode, wi, r, wi.Models())
+func handleModelsFrame(wr *wikiRequest) {
+	handleFileFrames(wr, wr.wi.Models())
 }
 
-func handleCategoriesFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	cats := wi.Categories()
-	return handleFileFrames(shortcode, wi, r, cats)
+func handleCategoriesFrame(wr *wikiRequest) {
+	handleFileFrames(wr, wr.wi.Categories())
 }
 
-func handleFileFrames(shortcode string, wi *webserver.WikiInfo, r *http.Request, results interface{}, extras ...string) interface{} {
+func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
 	res, err := json.Marshal(map[string]interface{}{
 		"sort_types": append([]string{"a", "c", "u", "m"}, extras...),
 		"results":    results,
 	})
 	if err != nil {
-		panic(err)
+		wr.err = err
+		return
 	}
-	return struct {
+	wr.dot = struct {
 		JSON  template.HTML
 		Order string
 		wikiTemplate
 	}{
 		JSON:         template.HTML("<!--JSON\n" + string(res) + "\n-->"),
 		Order:        "m-",
-		wikiTemplate: getWikiTemplate(shortcode, wi, r),
+		wikiTemplate: getGenericTemplate(wr),
 	}
 }
 
-func handleSettingsFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	return nil
+func handleSettingsFrame(wr *wikiRequest) {
 }
 
-func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Request) interface{} {
-	// TODO: we need a way to present these errors
-	q := r.URL.Query()
+func handleEditPageFrame(wr *wikiRequest) {
+	q := wr.r.URL.Query()
 
 	// no page filename provided
 	name := q.Get("page")
 	if name == "" {
-		return nil
+		wr.err = errors.New("no page filename provided")
+		return
 	}
 
 	// find the page. if File is empty, it doesn't exist
-	info := wi.PageInfo(name)
+	info := wr.wi.PageInfo(name)
 	if info.File == "" {
-		return nil
+		wr.err = errors.New("page does not exist")
+		return
 	}
 
 	// call DisplayFile to get the content
-	res := wi.DisplayFile(info.Path)
+	res := wr.wi.DisplayFile(info.Path)
 	fileRes, ok := res.(wiki.DisplayFile)
 	if !ok {
-		return nil
+		wr.err = errors.New("error occurred in DisplayFile")
+		return
 	}
 
-	return struct {
+	wr.dot = struct {
 		Found   bool
 		JSON    template.HTML
 		Model   bool   // true if editing a model
@@ -197,17 +233,17 @@ func handleEditPageFrame(shortcode string, wi *webserver.WikiInfo, r *http.Reque
 		Title:        info.Title,
 		File:         info.File,
 		Content:      fileRes.Content,
-		wikiTemplate: getWikiTemplate(shortcode, wi, r),
+		wikiTemplate: getGenericTemplate(wr),
 	}
 }
 
-func getWikiTemplate(shortcode string, wi *webserver.WikiInfo, r *http.Request) wikiTemplate {
+func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 	return wikiTemplate{
-		User:      sessMgr.Get(r.Context(), "user").(authenticator.User),
-		Shortcode: shortcode,
-		WikiTitle: wi.Title,
+		User:      sessMgr.Get(wr.r.Context(), "user").(authenticator.User),
+		Shortcode: wr.shortcode,
+		WikiTitle: wr.wi.Title,
 		AdminRoot: strings.TrimRight(root, "/"),
 		Static:    root + "adminifier-static",
-		Root:      root + shortcode,
+		Root:      root + wr.shortcode,
 	}
 }
