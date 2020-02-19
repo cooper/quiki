@@ -210,8 +210,14 @@ func handleEditPageFrame(wr *wikiRequest) {
 		return
 	}
 
+	// serve editor
+	handleEditor(wr, info.Path, info.File, info.Title)
+}
+
+func handleEditor(wr *wikiRequest, path, file, title string) {
+
 	// call DisplayFile to get the content
-	res := wr.wi.DisplayFile(info.Path)
+	res := wr.wi.DisplayFile(path)
 	fileRes, ok := res.(wiki.DisplayFile)
 	if !ok {
 		wr.err = errors.New("error occurred in DisplayFile")
@@ -230,8 +236,8 @@ func handleEditPageFrame(wr *wikiRequest) {
 		Found:        true,
 		JSON:         template.HTML("<!--JSON\n{}\n-->"), // TODO
 		Model:        false,
-		Title:        info.Title,
-		File:         info.File,
+		Title:        title,
+		File:         file,
 		Content:      fileRes.Content,
 		wikiTemplate: getGenericTemplate(wr),
 	}
