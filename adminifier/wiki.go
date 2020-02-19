@@ -199,7 +199,6 @@ func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
 
 func handleSettingsFrame(wr *wikiRequest) {
 	// serve editor for the config file
-	wr.tmplName = "frame-edit-page.tpl"
 	handleEditor(wr, wr.wi.ConfigFile, "wiki.conf", "Configuration file", false, true)
 }
 
@@ -225,6 +224,7 @@ func handleEditPageFrame(wr *wikiRequest) {
 }
 
 func handleEditor(wr *wikiRequest, path, file, title string, model, config bool) {
+	wr.tmplName = "frame-editor.tpl"
 
 	// call DisplayFile to get the content
 	var fileRes wiki.DisplayFile
