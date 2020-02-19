@@ -1,9 +1,9 @@
 package wiki
 
 import (
-	"log"
 	"time"
 
+	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -37,8 +37,7 @@ func (w *Wiki) repo() (repo *git.Repository, err error) {
 	} else if err != nil {
 		// error in open other than nonexist
 
-		// TODO: better logging
-		log.Println("git:PlainOpen error:", err)
+		err = errors.Wrap(err, "git:PlainOpen")
 		return
 	}
 
@@ -55,9 +54,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 
 	// error in init
 	if err != nil {
-		// TODO: better logging
-		log.Println("git:PlainInit error:", err)
-		return
+		return nil, errors.Wrap(err, "git:PlainInit")
 	}
 
 	// initialized ok
@@ -65,7 +62,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 	// create master branch
 	err = repo.CreateBranch(&config.Branch{Name: "master"})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "git:repo:CreateBranch")
 	}
 
 	// TODO: default .gitignore
@@ -73,7 +70,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 	// add all files and initial commit
 	wt, err := repo.Worktree()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "git:repo:Worktree")
 	}
 
 	// add .
@@ -85,7 +82,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 	// commit
 	_, err = wt.Commit("Initial commit", quikiCommitOpts)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "git:worktree:Commit")
 	}
 
 	return repo, nil
