@@ -4,7 +4,7 @@ import (
 	"errors"
 	"path/filepath"
 	"sync"
-
+	"gopkg.in/src-d/go-git.v4"
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -16,6 +16,7 @@ type Wiki struct {
 	Opt               wikifier.PageOpt
 	Auth              *authenticator.Authenticator
 	pageLocks         map[string]*sync.Mutex
+	_repo *git.Repository
 }
 
 // NewWiki creates a Wiki given the public and private configuration files.
