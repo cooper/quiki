@@ -25,6 +25,7 @@ var frameHandlers = map[string]func(*wikiRequest){
 	"models":     handleModelsFrame,
 	"settings":   handleSettingsFrame,
 	"edit-page":  handleEditPageFrame,
+	"edit-model": handleEditModelFrame,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -221,6 +222,27 @@ func handleEditPageFrame(wr *wikiRequest) {
 
 	// serve editor
 	handleEditor(wr, info.Path, info.File, info.Title, false, false)
+}
+
+func handleEditModelFrame(wr *wikiRequest) {
+	q := wr.r.URL.Query()
+
+	// no page filename provided
+	name := q.Get("page")
+	if name == "" {
+		wr.err = errors.New("no model filename provided")
+		return
+	}
+
+	// find the model. if File is empty, it doesn't exist
+	info := wr.wi.ModelInfo(name)
+	if info.File == "" {
+		wr.err = errors.New("model does not exist")
+		return
+	}
+
+	// serve editor
+	handleEditor(wr, info.Path, info.File, info.File, true, false)
 }
 
 func handleEditor(wr *wikiRequest, path, file, title string, model, config bool) {

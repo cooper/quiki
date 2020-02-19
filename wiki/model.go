@@ -7,7 +7,8 @@ import (
 
 // ModelInfo represents metadata associated with a model.
 type ModelInfo struct {
-	File     string     `json:"file"`               // filename
+	File     string     `json:"file"` // filename
+	Path     string     `json:"path"`
 	Created  *time.Time `json:"created,omitempty"`  // creation time
 	Modified *time.Time `json:"modified,omitempty"` // modify time
 }
@@ -62,6 +63,7 @@ func (w *Wiki) ModelInfo(name string) (info ModelInfo) {
 	// this stuff is available to all
 	mod := mdFi.ModTime()
 	info.File = name
+	info.Path = path
 	info.Modified = &mod // actual model mod time
 	info.Created = &mod
 
