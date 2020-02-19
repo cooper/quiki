@@ -3,7 +3,7 @@
 <meta
     data-nav="images"
     data-title="Images"
-    data-icon="picture-o"
+    data-icon="images"
     data-buttons="upload image-mode filter actions"
     data-button-image-mode="{'title': 'Grid view', 'icon': 'th', 'href': '{{.Root}}/images'}"
     data-scripts="file-list file-list/images pikaday"

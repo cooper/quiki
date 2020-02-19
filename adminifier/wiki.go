@@ -55,7 +55,8 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	// each of these URLs generates wiki.tpl
 	for _, which := range []string{
 		"dashboard", "pages", "categories",
-		"images", "models", "settings", "help", "edit-page",
+		"images", "models", "settings", "help",
+		"edit-page", "edit-model", "switch-branch",
 	} {
 		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)

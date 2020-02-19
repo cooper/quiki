@@ -41,8 +41,9 @@ a.updatePageTitle = function (title, titleTagOnly) {
 };
 
 // update page icon
-a.updateIcon = function (icon) {
-	$('page-title').getElement('i').set('class', 'fa fa-' + icon);
+a.updateIcon = function (icon, b) {
+    b = b ? 'b' : '';
+	$('page-title').getElement('i').set('class', 'fa' + b + ' fa-' + icon);
 };
 
 // normalize page/category name
@@ -69,7 +70,7 @@ function scriptLoaded () {
 	
 	// this was the last one
 	$('content').setStyle('user-select', 'all');
-	a.updateIcon(a.currentData['data-icon']);
+	a.updateIcon(a.currentData['data-icon'], a.currentData['data-icon-b']);
 	pageScriptsDone = true;
 	if (firedPageScriptsLoaded) return;
 	document.fireEvent('pageScriptsLoaded');

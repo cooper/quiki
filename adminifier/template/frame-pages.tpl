@@ -3,7 +3,7 @@
 <meta
     data-nav="pages"
     data-title="Pages"
-    data-icon="file-text"
+    data-icon="file-alt"
     data-buttons="create filter actions"
     data-scripts="file-list file-list/pages pikaday"
 

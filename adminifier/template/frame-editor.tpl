@@ -43,7 +43,7 @@
         <li class="hidden" data-action="strike"><i class="fa fa-strikethrough"></i> Strike</li>
         <li class="hidden" data-action="font"><i class="fa fa-font"></i> Color</li>
         <!--<li data-action="header"><i class="fa fa-header"></i> Header</li>-->
-        <li class="hidden" data-action="image"><i class="fa fa-picture-o"></i> Image</li>
+        <li class="hidden" data-action="image"><i class="fa fa-image"></i> Image</li>
         <li class="hidden" data-action="link"><i class="fa fa-link"></i> Link</li>
         <li class="hidden" data-action="file"><i class="fa fa-paperclip"></i> File</li>
         <li class="hidden" data-action="list"><i class="fa fa-list-ul"></i> List</li>

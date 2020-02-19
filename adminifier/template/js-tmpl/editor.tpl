@@ -1,5 +1,5 @@
 <script type="text/x-tmpl" id="tmpl-link-helper">
-    <div id="editor-link-type-internal" class="editor-link-type editor-small-tab active" title="Page"><i class="fa fa-file-text"></i></div>
+    <div id="editor-link-type-internal" class="editor-link-type editor-small-tab active" title="Page"><i class="fa fa-file-alt"></i></div>
     <div id="editor-link-type-external" class="editor-link-type editor-small-tab" title="External wiki page"><i class="fa fa-globe"></i></div>
     <div id="editor-link-type-category" class="editor-link-type editor-small-tab" title="Category"><i class="fa fa-list"></i></div>
     <div id="editor-link-type-url" class="editor-link-type editor-small-tab" title="External URL"><i class="fa fa-external-link"></i></div>
