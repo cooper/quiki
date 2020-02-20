@@ -449,22 +449,31 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		// entering a variable declaration on a NEW LINE (quiki#3)
-		if (b == '@' || b == '%') && !p.lineHasStarted && p.catch == p.block {
+		potentiallyVar := false
+		if p.catch == p.block {
+			if b == '@' || b == '%' {
+				if p.varNegated && p.last == '-' {
+					// last char was - for negation, seems likely
+					potentiallyVar = true
+				} else if !p.lineHasStarted {
+					// @ or % started the line, seems likely
+					potentiallyVar = true
+				}
+			} else if b == '-' && !p.lineHasStarted {
+				p.varNegated = true
+			}
+		}
+
+		// ok we're gonna assume it's a variable declaration
+		if potentiallyVar {
 
 			// disable interpolation if it's %var
 			if b == '%' {
 				p.varNotInterpolated = true
 			}
 
-			// negate the value if -@var
-			pfx := string(b)
-			if p.last == '-' {
-				pfx = string(p.last) + pfx
-				p.varNegated = true
-			}
-
 			// catch the var name
-			catch := newVariableName(pfx, p.pos)
+			catch := newVariableName(string(b), p.pos)
 			catch.parent = p.catch
 			p.catch = catch
 
