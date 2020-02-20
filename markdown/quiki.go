@@ -542,9 +542,9 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			}
 
 			if node.ListFlags&blackfriday.ListTypeOrdered != 0 {
-				r.addText(w, "olist {")
+				r.addText(w, "numlist {")
 			} else if node.ListFlags&blackfriday.ListTypeDefinition != 0 {
-				r.addText(w, "dlist {")
+				r.addText(w, "definitions {")
 			} else {
 				r.addText(w, "list {")
 			}

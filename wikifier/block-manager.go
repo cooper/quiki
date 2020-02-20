@@ -17,7 +17,7 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"infosec":   newInfosec,
 	"invisible": newInvisibleBlock,
 	"list":      newListBlock,
-	"olist":     newOlistBlock,
+	"numlist":   newNumlistBlock,
 	"code":      newCodeBlock,
 	"fmt":       newFmtBlock,
 	"html":      newHTMLBlock,

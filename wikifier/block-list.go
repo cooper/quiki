@@ -54,7 +54,7 @@ func newListBlock(name string, b *parserBlock) block {
 	return &List{false, false, nil, b}
 }
 
-func newOlistBlock(name string, b *parserBlock) block {
+func newNumlistBlock(name string, b *parserBlock) block {
 	return &List{true, false, nil, b}
 }
 
