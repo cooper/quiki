@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/alexedwards/scs"
+	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
