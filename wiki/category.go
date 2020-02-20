@@ -249,7 +249,7 @@ func (cat *Category) update(w *Wiki) {
 	for pageName, entry := range cat.Pages {
 
 		// page no longer exists
-		path := w.pathForPage(pageName, false)
+		path := w.pathForPage(pageName)
 		pageFi, err := os.Lstat(path)
 		if err != nil {
 			changed = true

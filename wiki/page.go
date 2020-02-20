@@ -115,7 +115,7 @@ func (w *Wiki) NewPage(name string) *wikifier.Page {
 }
 
 func (w *Wiki) _newPage(name string) *wikifier.Page {
-	p := wikifier.NewPageNamed(w.pathForPage(name, false), name)
+	p := wikifier.NewPageNamed(w.pathForPage(name), name)
 	p.Wiki = w
 	p.Opt = &w.Opt
 	return p
@@ -273,7 +273,7 @@ func (w *Wiki) PageMap() map[string]wikifier.PageInfo {
 func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 
 	// the page does not exist
-	path := w.pathForPage(name, false)
+	path := w.pathForPage(name)
 	pgFi, err := os.Stat(path)
 	if err != nil {
 		return
