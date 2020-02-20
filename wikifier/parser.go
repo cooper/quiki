@@ -6,6 +6,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 type parser struct {
@@ -31,6 +32,8 @@ type parser struct {
 
 	conditional       bool // current conditional
 	conditionalExists bool
+
+	lineHasStarted bool // true once the first non-space has occurred
 }
 
 type position struct {
@@ -68,6 +71,7 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 	}
 
 	// handle each byte
+	p.lineHasStarted = false
 	for i, b := range line {
 
 		// skip this byte
@@ -95,6 +99,11 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 		// handle this byte and give up if error occurred
 		if err := p.parseByte(b, page); err != nil {
 			return err
+		}
+
+		// that was the very first non-space character on the line (quiki#3)
+		if !p.lineHasStarted && !unicode.IsSpace(rune(b)) {
+			p.lineHasStarted = true
 		}
 	}
 	return nil
@@ -439,8 +448,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			return p.handleByte(b)
 		}
 
-		// entering a variable declaration
-		if (b == '@' || b == '%') && p.catch == p.block {
+		// entering a variable declaration on a NEW LINE (quiki#3)
+		if (b == '@' || b == '%') && !p.lineHasStarted && p.catch == p.block {
 
 			// disable interpolation if it's %var
 			if b == '%' {

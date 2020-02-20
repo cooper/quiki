@@ -23,8 +23,8 @@ func main() {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quiki")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
-			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
-			page := wikifier.NewPageSource(line)
+			lines := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
+			page := wikifier.NewPageSource(strings.Replace(lines, "_NL_", "\n", -1))
 
 			var reply string
 
