@@ -33,6 +33,7 @@ type wikiTemplate struct {
 	User      authenticator.User // user
 	Shortcode string             // wiki shortcode
 	WikiTitle string             // wiki title
+	Branch    string             // selected branch
 	Static    string             // adminifier-static root
 	AdminRoot string             // adminifier root
 	Root      string             // wiki root
@@ -286,6 +287,7 @@ func handleEditor(wr *wikiRequest, path, file, title string, model, config bool)
 func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 	return wikiTemplate{
 		User:      sessMgr.Get(wr.r.Context(), "user").(authenticator.User),
+		Branch:    "master", // TODO
 		Shortcode: wr.shortcode,
 		WikiTitle: wr.wi.Title,
 		AdminRoot: strings.TrimRight(root, "/"),
