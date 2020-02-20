@@ -9,21 +9,21 @@ func newTocBlock(name string, b *parserBlock) block {
 }
 
 func (toc *tocBlock) html(page *Page, el element) {
-
-	// don't show the toc if there are <2 on the page
-	blocks := page.main.blockContent()
-	if len(blocks) < 2 {
-		el.hide()
-	}
-
+	secCount := 0
 	el.setTag("ul")
 	el.addHTML(HTML("<li><strong>Contents</strong></li>"))
 
 	// add each top-level section
-	for _, child := range blocks {
+	for _, child := range page.main.blockContent() {
 		if sec, ok := child.(*secBlock); ok {
 			tocAdd(sec, el, page)
+			secCount++
 		}
+	}
+
+	// don't show the toc if there are <2 on the page
+	if secCount < 2 {
+		el.hide()
 	}
 }
 
