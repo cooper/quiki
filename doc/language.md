@@ -246,6 +246,9 @@ quiki supports string, boolean, and block variables.
 
 ### Assignment
 
+Variables can be assigned at the document level only.
+Each assignment must occur on its own line.
+
 **String** variables look like this:
 ```
 @some_variable:     The value;
