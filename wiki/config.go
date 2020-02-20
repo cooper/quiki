@@ -103,19 +103,30 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 	if !good {
 		return
 	}
-	pageName := strings.TrimPrefix(*target, page.Opt.Root.Page+"/") // I don't like this
-	if hashIdx := strings.IndexByte(pageName, '#'); hashIdx != -1 {
+	targetNameNE := strings.TrimPrefix(*target, page.Opt.Root.Page+"/") // I don't like this
+	if hashIdx := strings.IndexByte(targetNameNE, '#'); hashIdx != -1 {
 		// remove section when checking if page exists
 		// note: whitespace like My Page # Section has been trimmed already
-		pageName = pageName[:hashIdx]
-		if pageName == "" {
+		targetNameNE = targetNameNE[:hashIdx]
+		if targetNameNE == "" {
 			*ok = true
 			return
 		}
 	}
-	pageName = wikifier.PageNameLink(pageName, false)
-	page.PageLinks[pageName] = append(page.PageLinks[pageName], 1) // FIXME: line number
-	*ok = w.FindPage(pageName).Exists()
+
+	// try to find the page regardless of format/case.
+	// if it exists, override name so case is correct
+	targetPage := w.FindPage(targetNameNE)
+	if targetPage.Exists() {
+		targetNameNE = targetPage.NameNE()
+		*ok = true
+	} else {
+		// default behavior is lowercase, normalize
+		targetNameNE = wikifier.PageNameLink(targetNameNE, false)
+	}
+
+	*target = page.Opt.Root.Page + "/" + targetNameNE
+	page.PageLinks[targetNameNE] = append(page.PageLinks[targetNameNE], 1) // FIXME: line number
 }
 
 func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
