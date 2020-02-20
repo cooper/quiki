@@ -8,7 +8,7 @@
 <link type="text/css" rel="stylesheet" href="{{.Static}}/style/notifications.css" />
 <link type="text/css" rel="stylesheet" href="{{.Static}}/ext/font-awesome/css/all.min.css" />
 <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" type="text/css" />
-<script type="text/javascript">
+<script>
 
 var adminifier = {
     adminRoot:      '{{.AdminRoot}}',
@@ -23,11 +23,11 @@ var adminifier = {
 };
 
 </script>
-<script type="text/javascript" src="{{.Static}}/ext/mootools.js"></script>
-<script type="text/javascript" src="{{.Static}}/ext/tmpl.min.js"></script>
-<script type="text/javascript" src="{{.Static}}/script/adminifier.js"></script>
-<script type="text/javascript" src="{{.Static}}/script/notifications.js"></script>
-<script type="text/javascript" src="{{.Static}}/script/modal-window.js"></script>
+<script src="{{.Static}}/ext/mootools.js"></script>
+<script src="{{.Static}}/ext/tmpl.min.js"></script>
+<script src="{{.Static}}/script/adminifier.js"></script>
+<script src="{{.Static}}/script/notifications.js"></script>
+<script src="{{.Static}}/script/modal-window.js"></script>
 
 </head>
 <body>

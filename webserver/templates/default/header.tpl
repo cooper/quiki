@@ -11,7 +11,7 @@
     </style>
 {{end}}
 {{range .Scripts}}
-    <script type="text/javascript" src="{{.}}"></script>
+    <script src="{{.}}"></script>
 {{end}}
 </head>
 
