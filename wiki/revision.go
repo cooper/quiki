@@ -1,7 +1,11 @@
 package wiki
 
 import (
+	"os"
+	"path/filepath"
 	"time"
+
+	"github.com/cooper/quiki/wikifier"
 
 	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
@@ -120,4 +124,23 @@ func (w *Wiki) Branches() ([]string, error) {
 		return nil
 	})
 	return names, nil
+}
+
+// checks out a branch in another directory. returns the directory
+func (w *Wiki) checkoutBranch(name string) (string, error) {
+	// TODO: make sure name is a simple string with no path elements
+
+	// make cache/branch/ if needed
+	wikifier.MakeDir(filepath.Join(w.Opt.Dir.Cache, "branch"), "")
+
+	// e.g. cache/branch/mybranchname
+	targetDir := filepath.Join(w.Opt.Dir.Cache, "branch", name)
+
+	// directory already exists, so I'm good with saying the branch is there
+	if fi, err := os.Stat(targetDir); err == nil && fi.IsDir() {
+		return targetDir, nil
+	}
+
+	// TODO: finish
+	return targetDir, nil
 }
