@@ -76,7 +76,7 @@ func (sec *secBlock) parse(page *Page) {
 	// determine heading ID
 	// heading ID
 	if sec.headingID == "" {
-		sec.headingID = PageNameLink(sec.title, false)
+		sec.headingID = PageNameLink(sec.title)
 	}
 
 	// this must come last so the section order is correct

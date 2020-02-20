@@ -315,23 +315,13 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 // PageName returns a clean page name.
 func PageName(name string) string {
-	return PageNameLC(name, true)
-}
-
-// PageNameLC is like PageName, but you can specify case sensitivity.
-func PageNameLC(name string, lc bool) string {
-	return PageNameExtLC(name, "", lc)
+	return PageNameExt(name, "")
 }
 
 // PageNameNE returns a clean page name with No Extension.
 func PageNameNE(name string) string {
-	return PageNameNELC(name, true)
-}
-
-// PageNameNELC is like PageNameNE, but you can specify case sensitivity.
-func PageNameNELC(name string, lc bool) string {
 	// TODO: make this less ugly
-	name = strings.TrimSuffix(PageNameLC(name, lc), ".page")
+	name = strings.TrimSuffix(PageName(name), ".page")
 	name = strings.TrimSuffix(name, ".model")
 	name = strings.TrimSuffix(name, ".conf")
 	name = strings.TrimSuffix(name, ".md")
@@ -340,11 +330,6 @@ func PageNameNELC(name string, lc bool) string {
 
 // PageNameExt returns a clean page name with the provided extension.
 func PageNameExt(name, ext string) string {
-	return PageNameExtLC(name, ext, true)
-}
-
-// PageNameExtLC is like PageNameExt, but you can specify case sensitivity.
-func PageNameExtLC(name, ext string, lc bool) string {
 	// 'Some Article' -> 'some_article.page'
 
 	if ext == "" {
@@ -352,7 +337,7 @@ func PageNameExtLC(name, ext string, lc bool) string {
 	}
 
 	// convert non-alphanumerics to _
-	name = PageNameLink(name, false)
+	name = PageNameLink(name)
 
 	// append the extension if it isn't already there
 	lastDot := strings.LastIndexByte(name, '.')
@@ -370,15 +355,9 @@ func PageNameExtLC(name, ext string, lc bool) string {
 }
 
 // PageNameLink returns a clean page name without the extension.
-func PageNameLink(name string, noLower bool) string {
-	return PageNameLinkLC(name, !noLower)
-}
-
-// PageNameLinkLC returns a clean page name without the extension.
-func PageNameLinkLC(name string, lc bool) string {
+func PageNameLink(name string) string {
 	name = strings.TrimSpace(name)
-	// 'Some Article' -> 'some_article'
-	// 'Some Article' -> 'Some_Article' (with noLower)
+	// 'Some Article' -> 'Some_Article'
 
 	// don't waste any time
 	if name == "" {
@@ -391,21 +370,12 @@ func PageNameLinkLC(name string, lc bool) string {
 	// replace non-alphanumerics with _
 	name = nonAlphaRegex.ReplaceAllString(name, "_")
 
-	// lowercase
-	if lc {
-		lowercased := strings.ToLower(filepath.Base(name))
-		if dir := filepath.Dir(name); dir != "" && dir != "." {
-			lowercased = filepath.Join(dir, lowercased)
-		}
-		return lowercased
-	}
-
 	return name
 }
 
 // CategoryName returns a clean category name.
-func CategoryName(name string, noLower bool) string {
-	name = PageNameLink(name, noLower)
+func CategoryName(name string) string {
+	name = PageNameLink(name)
 	if !strings.HasSuffix(name, ".cat") {
 		return name + ".cat"
 	}
@@ -413,8 +383,8 @@ func CategoryName(name string, noLower bool) string {
 }
 
 // CategoryNameNE returns a clean category with No Extension.
-func CategoryNameNE(name string, noLower bool) string {
-	return strings.TrimSuffix(PageNameLink(name, noLower), ".cat")
+func CategoryNameNE(name string) string {
+	return strings.TrimSuffix(PageNameLink(name), ".cat")
 }
 
 // ModelName returns a clean model name.

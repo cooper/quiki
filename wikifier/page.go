@@ -202,7 +202,7 @@ func (p *Page) OSName() string {
 
 // NameNE returns the resolved page name with No Extension.
 func (p *Page) NameNE() string {
-	return PageNameNELC(p.Name(), false)
+	return PageNameNE(p.Name())
 }
 
 // OSNameNE is like NameNE, except it uses the native path separator.
@@ -261,7 +261,7 @@ func (p *Page) RelName() string {
 // This does NOT take symbolic links into account.
 // It is not guaranteed to exist.
 func (p *Page) RelNameNE() string {
-	return PageNameNELC(p.RelName(), false)
+	return PageNameNE(p.RelName())
 }
 
 // RelPath returns the unresolved file path to the page.

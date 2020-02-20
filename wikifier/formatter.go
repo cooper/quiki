@@ -537,7 +537,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 		// ~ some category
 		linkType = "category"
 		tooltip = strings.TrimPrefix(target, "~")
-		target = page.Opt.Root.Category + "/" + CategoryNameNE(tooltip, false)
+		target = page.Opt.Root.Category + "/" + CategoryNameNE(tooltip)
 		displayDefault = tooltip
 		handler = page.Opt.Link.ParseCategory
 
@@ -623,8 +623,8 @@ func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *
 
 	// convert all non-alphanumerics to underscore
 	case PageOptExternalTypeQuiki:
-		*target = PageNameLink(*target, false)
-		section = PageNameLink(section, false)
+		*target = PageNameLink(*target)
+		section = PageNameLink(section)
 
 	// convert space to underscore, URI escape the rest
 	case PageOptExternalTypeMediaWiki:

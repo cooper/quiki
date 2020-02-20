@@ -133,7 +133,7 @@ func (w *Wiki) pathForPage(pageName string) string {
 
 	// it doesn't exist; try non-lowercased version (markdown/etc)
 	if _, err := os.Stat(path); err != nil {
-		normalPageName := wikifier.PageNameLC(pageName, false)
+		normalPageName := wikifier.PageName(pageName)
 		normalPath, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, normalPageName))
 		if _, err := os.Stat(normalPath); err == nil {
 			return normalPath
@@ -146,7 +146,7 @@ func (w *Wiki) pathForPage(pageName string) string {
 // pathForCategory returns the absolute path for a category. If necessary, it
 // creates directories for the path components that do not exist.
 func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bool) string {
-	catName = wikifier.CategoryName(catName, false)
+	catName = wikifier.CategoryName(catName)
 	dir := filepath.Join(w.Opt.Dir.Cache, "category")
 	if createOK {
 		wikifier.MakeDir(dir, filepath.Join(string(catType), catName))

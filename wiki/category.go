@@ -128,7 +128,7 @@ func (w *Wiki) GetCategory(name string) *Category {
 
 // GetSpecialCategory loads or creates a special category given the type.
 func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
-	name = wikifier.CategoryNameNE(name, false)
+	name = wikifier.CategoryNameNE(name)
 	path := w.pathForCategory(name, typ, true)
 
 	// load the category if it exists
@@ -279,11 +279,11 @@ func (cat *Category) update(w *Wiki) {
 
 			// for page links, check if the page still references the other
 			case CategoryTypePage:
-				_, stillMember = page.PageLinks[wikifier.CategoryNameNE(cat.Name, false)]
+				_, stillMember = page.PageLinks[wikifier.CategoryNameNE(cat.Name)]
 
 			// for images, check if the page still references the image
 			case CategoryTypeImage:
-				_, stillMember = page.Images[wikifier.CategoryNameNE(cat.Name, false)]
+				_, stillMember = page.Images[wikifier.CategoryNameNE(cat.Name)]
 
 			// for models, check if the page still uses the model
 			case CategoryTypeModel:
@@ -339,7 +339,7 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 		return false
 	}
 
-	nameNE := wikifier.CategoryNameNE(cat.Name, false)
+	nameNE := wikifier.CategoryNameNE(cat.Name)
 	preserve := false
 	switch cat.Type {
 

@@ -122,7 +122,7 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 		*ok = true
 	} else {
 		// default behavior is lowercase, normalize
-		targetNameNE = wikifier.PageNameLink(targetNameNE, false)
+		targetNameNE = wikifier.PageNameLink(targetNameNE)
 	}
 
 	*target = page.Opt.Root.Page + "/" + targetNameNE
@@ -134,6 +134,6 @@ func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayD
 	if !good {
 		return
 	}
-	catName := wikifier.CategoryName(*displayDefault, false)
+	catName := wikifier.CategoryName(*displayDefault)
 	*ok = w.GetCategory(catName).Exists()
 }

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -106,11 +107,11 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 
 	// try in this order
 	tryFiles := []string{
-		wikifier.PageNameLinkLC(base, false),           // exact match with no lowercasing
-		wikifier.PageNameLinkLC(base, false) + ".page", // .page with no lowercasing
-		wikifier.PageNameLinkLC(base, true) + ".page",  // .page with lowercasing
-		wikifier.PageNameLinkLC(base, false) + ".md",   // .md with no lowercasing
-		wikifier.PageNameLinkLC(base, true) + ".md",    // .md with lowercasing
+		wikifier.PageNameLink(base),                            // exact match with no lowercasing
+		wikifier.PageNameLink(base) + ".page",                  // .page with no lowercasing
+		strings.ToLower(wikifier.PageNameLink(base)) + ".page", // .page with lowercasing
+		wikifier.PageNameLink(base) + ".md",                    // .md with no lowercasing
+		strings.ToLower(wikifier.PageNameLink(base)) + ".md",   // .md with lowercasing
 	}
 	path := ""
 	for _, try := range tryFiles {
