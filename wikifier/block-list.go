@@ -97,8 +97,10 @@ func (l *List) parse(page *Page) {
 			if item == "" {
 				continue
 			}
+			startedLine := true
 			for i, c := range item {
-				l.handleChar(page, i, p, c)
+				l.handleChar(page, i, p, c, startedLine)
+				startedLine = false
 			}
 		}
 	}
@@ -110,7 +112,7 @@ func (l *List) parse(page *Page) {
 	}
 }
 
-func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
+func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine bool) {
 
 	if c == '\\' && !p.escape {
 		// escapes the next character
@@ -152,7 +154,13 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune) {
 		if lastStr, ok := last.(string); ok {
 			// previous item was a string, so append it
 
-			p.values[len(p.values)-1] = lastStr + add
+			// if this character started a line, inject a space
+			spaceMaybe := ""
+			if startedLine {
+				spaceMaybe = " "
+			}
+
+			p.values[len(p.values)-1] = lastStr + spaceMaybe + add
 		} else {
 			// previous item was not a string,
 			// so start a new string item
