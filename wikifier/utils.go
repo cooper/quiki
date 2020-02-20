@@ -325,8 +325,13 @@ func PageNameLC(name string, lc bool) string {
 
 // PageNameNE returns a clean page name with No Extension.
 func PageNameNE(name string) string {
+	return PageNameNELC(name, true)
+}
+
+// PageNameNELC is like PageNameNE, but you can specify case sensitivity.
+func PageNameNELC(name string, lc bool) string {
 	// TODO: make this less ugly
-	name = strings.TrimSuffix(PageName(name), ".page")
+	name = strings.TrimSuffix(PageNameLC(name, lc), ".page")
 	name = strings.TrimSuffix(name, ".model")
 	name = strings.TrimSuffix(name, ".conf")
 	name = strings.TrimSuffix(name, ".md")
