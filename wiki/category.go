@@ -496,13 +496,16 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 		n := 0
 		for len(pages) != 0 {
 
+			// the length of this pageOfPages is either
+			// len(pages) or limit, whichever is smaller
+			thisPageLength := len(pages)
+			if thisPageLength > limit {
+				thisPageLength = limit
+			}
+
 			// first one on the page
-			var thisPage pagesToSort
-			if pagesOfPages[n] != nil {
-				thisPage = pagesOfPages[n]
-			} else {
-				thisPage = make(pagesToSort, limit)
-				pagesOfPages[n] = thisPage
+			if pagesOfPages[n] == nil {
+				pagesOfPages[n] = make(pagesToSort, thisPageLength, limit)
 			}
 
 			// add up to limit pages
@@ -511,10 +514,9 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 				if len(pages) == 0 {
 					break
 				}
-				thisPage[i] = pages[0]
-				pages = pages[1:]
+				pagesOfPages[n][i] = pages[0] // add the next available page
+				pages = pages[1:]             // remove the page just added from pending
 			}
-			thisPage = thisPage[:i]
 
 			// if that was the page we wanted, stop
 			if n == pageN {
