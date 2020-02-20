@@ -288,12 +288,12 @@ func NewPage(filePath string) *Page
 ```
 NewPage creates a page given its filepath.
 
-#### func  NewPageNamed
+#### func  NewPagePath
 
 ```go
-func NewPageNamed(filePath, name string) *Page
+func NewPagePath(filePath, name string) *Page
 ```
-NewPageNamed creates a page given its filepath and relative name.
+NewPagePath creates a page given its filepath and relative name.
 
 #### func  NewPageSource
 

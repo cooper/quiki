@@ -167,7 +167,7 @@ func main() {
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
 			pageName := strings.TrimPrefix(mes.Content, ".names ")
 			w, _ := wiki.NewWiki("../wikis/mywiki/wiki.conf", "")
-			page := w.NewPage(pageName)
+			page := w.FindPage(pageName)
 			reply := fmt.Sprintf("%+v", struct {
 				Name, NameNE, RelName, RelNameNE, Path, RelPath string
 			}{

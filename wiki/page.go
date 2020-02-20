@@ -92,33 +92,54 @@ type pageJSONManifest struct {
 	wikifier.PageInfo
 }
 
-// NewPage creates a Page given its name and configures it for
-// use with this Wiki.
-func (w *Wiki) NewPage(name string) *wikifier.Page {
+// FindPage attempts to find a page on this wiki given its name,
+// regardless of the file format or filename case.
+//
+// If a page by this name exists, the returned page represents it.
+// Otherwise, a new page representing the lowercased, normalized .page
+// file is returned in the standard quiki filename format.
+//
+func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 
-	// lowercase .page is default
-	p := w._newPage(name)
+	// separate into prefix and base
+	pfx, base := filepath.Dir(name), filepath.Base(name)
 
-	// if page doesn't exist, check for lowercase .md
-	if !p.Exists() {
-		if mdp := w._newPage(name + ".md"); mdp.Exists() {
-			p = mdp
-		}
+	// try in this order
+	tryFiles := []string{
+		wikifier.PageNameLinkLC(base, false),           // exact match with no lowercasing
+		wikifier.PageNameLinkLC(base, false) + ".page", // .page with no lowercasing
+		wikifier.PageNameLinkLC(base, true) + ".page",  // .page with lowercasing
+		wikifier.PageNameLinkLC(base, false) + ".md",   // .md with no lowercasing
+		wikifier.PageNameLinkLC(base, true) + ".md",    // .md with lowercasing
 	}
+	path := ""
+	for _, try := range tryFiles {
+		path = filepath.Join(w.Opt.Dir.Page, pfx, try)
+		if fi, err := os.Stat(path); err == nil && !fi.IsDir() {
+			break
+		}
+		path = ""
+	}
+
+	// found a match!
+	if path != "" {
+		p = wikifier.NewPagePath(path, name) // consider: name case might be wrong?
+	} else {
+
+		// didn't find anything, so create one
+		p = wikifier.NewPagePath(w.pathForPage(wikifier.PageName(name)), name)
+	}
+
+	// these are available to all pages
+	p.Wiki = w
+	p.Opt = &w.Opt
 
 	// create page lock
 	if _, exist := w.pageLocks[p.Name()]; !exist {
 		w.pageLocks[p.Name()] = new(sync.Mutex)
 	}
 
-	return p
-}
-
-func (w *Wiki) _newPage(name string) *wikifier.Page {
-	p := wikifier.NewPageNamed(w.pathForPage(name), name)
-	p.Wiki = w
-	p.Opt = &w.Opt
-	return p
+	return
 }
 
 // DisplayPage returns the display result for a page.
@@ -135,7 +156,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	var r DisplayPage
 
 	// create the page
-	page := w.NewPage(name)
+	page := w.FindPage(name)
 
 	// file does not exist
 	if !page.Exists() {

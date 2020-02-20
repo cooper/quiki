@@ -12,7 +12,7 @@ func main() {
 	if len(os.Args) != 2 {
 		log.Fatal("wrong # of args")
 	}
-	page := wikifier.NewPage(os.Args[1])
+	page := wikifier.FindPage(os.Args[1])
 
 	// parse
 	err := page.Parse()

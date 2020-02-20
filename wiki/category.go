@@ -262,7 +262,7 @@ func (cat *Category) update(w *Wiki) {
 			// the page has been modified since we last parsed it;
 			// let's create a page that only reads variables
 			// FIXME: will images, models, etc. be set?
-			page := w.NewPage(pageName)
+			page := w.FindPage(pageName)
 			page.VarsOnly = true
 
 			// parse variables. if errors occur, leave as-is
@@ -349,7 +349,7 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 	// for page links, check if the page still exists.
 	// use NewPage because it considers all possible page extensions
 	case CategoryTypePage:
-		preserve = w.NewPage(nameNE).Exists()
+		preserve = w.FindPage(nameNE).Exists()
 
 	// for images, check if the image still exists
 	case CategoryTypeImage:

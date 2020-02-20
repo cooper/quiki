@@ -115,7 +115,7 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 	}
 	pageName = wikifier.PageNameLink(pageName, false)
 	page.PageLinks[pageName] = append(page.PageLinks[pageName], 1) // FIXME: line number
-	*ok = w.NewPage(pageName).Exists()
+	*ok = w.FindPage(pageName).Exists()
 }
 
 func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {

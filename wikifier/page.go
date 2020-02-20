@@ -75,8 +75,8 @@ func NewPageSource(source string) *Page {
 	return p
 }
 
-// NewPageNamed creates a page given its filepath and relative name.
-func NewPageNamed(filePath, name string) *Page {
+// NewPagePath creates a page given its filepath and relative name.
+func NewPagePath(filePath, name string) *Page {
 	p := NewPage(filePath)
 	p.name = name
 	return p
