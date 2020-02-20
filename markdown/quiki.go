@@ -281,7 +281,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		} else if node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
 			r.addText(w, quikiEscListMapValue(s))
 		} else if node.Parent.Type == blackfriday.Item {
-			r.addText(w, quikiEscListMapValue(s))
+			r.addText(w, quikiEscListMapValue(s)+" ")
 		} else if node.Parent.Type == blackfriday.Heading {
 			r.heading += s
 			r.addText(w, quikiEscFmt(s))
