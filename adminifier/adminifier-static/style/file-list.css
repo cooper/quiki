@@ -107,7 +107,6 @@ ul.file-list-toolbar li.disabled {
     background-color: #696969;
     color: rgb(226, 226, 226);
     overflow-x: hidden;
-    overflow-y: hidden;
     position: fixed;
     right: 0px;
     top: 40px;
