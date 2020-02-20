@@ -126,15 +126,12 @@ func (w *Wiki) allImageFiles() []string {
 
 // pathForPage returns the absolute path for a page. If necessary, it creates
 // diretories for the path components that do not exist.
-func (w *Wiki) pathForPage(pageName string, createOK bool, dirPage string) string {
-	if dirPage == "" {
-		dirPage = w.Opt.Dir.Page
-	}
+func (w *Wiki) pathForPage(pageName string, createOK bool) string {
 	pageName = wikifier.PageName(pageName)
 	if createOK {
-		wikifier.MakeDir(dirPage, pageName)
+		wikifier.MakeDir(w.Opt.Dir.Page, pageName)
 	}
-	path, _ := filepath.Abs(filepath.Join(dirPage, pageName))
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, pageName))
 	return path
 }
 
