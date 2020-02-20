@@ -463,7 +463,7 @@ ae.setLiLoading = function (li, loading, noCircle) {
         li.addClass('sticky');
         if (!noCircle) {
             i.store('oldClasses', i.get('class'));
-            i.set('class', 'fa fa-circle-o-notch fa-spin');
+            i.set('class', 'fa fa-circle-notch fa-spin');
         }
         return true;
     }

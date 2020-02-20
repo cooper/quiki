@@ -189,7 +189,7 @@ function frameLoad (page) {
     a.currentPage = page;
     console.log("Loading " + page);
 
-	a.updateIcon('circle-o-notch fa-spin');
+	a.updateIcon('circle-notch fa-spin');
     var request = new Request({
         url: 'frame/' + page,
         onSuccess: function (html) {
