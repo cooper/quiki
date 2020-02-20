@@ -132,7 +132,6 @@ func (w *Wiki) pathForPage(pageName string) string {
 	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, lcPageName))
 
 	// it doesn't exist; try non-lowercased version (markdown/etc)
-	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, pageName))
 	if _, err := os.Stat(path); err != nil {
 		normalPageName := wikifier.PageNameLC(pageName, false)
 		normalPath, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, normalPageName))
