@@ -315,7 +315,12 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 // PageName returns a clean page name.
 func PageName(name string) string {
-	return PageNameExt(name, "")
+	return PageNameLC(name, true)
+}
+
+// PageNameLC is like PageName, but you can specify case sensitivity.
+func PageNameLC(name string, lc bool) string {
+	return PageNameExtLC(name, "", lc)
 }
 
 // PageNameNE returns a clean page name with No Extension.
@@ -330,6 +335,11 @@ func PageNameNE(name string) string {
 
 // PageNameExt returns a clean page name with the provided extension.
 func PageNameExt(name, ext string) string {
+	return PageNameExtLC(name, ext, true)
+}
+
+// PageNameExtLC is like PageNameExt, but you can specify case sensitivity.
+func PageNameExtLC(name, ext string, lc bool) string {
 	// 'Some Article' -> 'some_article.page'
 
 	if ext == "" {
@@ -356,6 +366,11 @@ func PageNameExt(name, ext string) string {
 
 // PageNameLink returns a clean page name without the extension.
 func PageNameLink(name string, noLower bool) string {
+	return PageNameLinkLC(name, !noLower)
+}
+
+// PageNameLinkLC returns a clean page name without the extension.
+func PageNameLinkLC(name string, lc bool) string {
 	name = strings.TrimSpace(name)
 	// 'Some Article' -> 'some_article'
 	// 'Some Article' -> 'Some_Article' (with noLower)
@@ -372,8 +387,12 @@ func PageNameLink(name string, noLower bool) string {
 	name = nonAlphaRegex.ReplaceAllString(name, "_")
 
 	// lowercase
-	if !noLower {
-		name = strings.ToLower(name)
+	if lc {
+		lowercased := strings.ToLower(filepath.Base(name))
+		if dir := filepath.Dir(name); dir != "" && dir != "." {
+			lowercased = filepath.Join(dir, lowercased)
+		}
+		return lowercased
 	}
 
 	return name

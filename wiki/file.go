@@ -124,14 +124,26 @@ func (w *Wiki) allImageFiles() []string {
 	return files
 }
 
-// pathForPage returns the absolute path for a page. If necessary, it creates
-// diretories for the path components that do not exist.
+// pathForPage returns the absolute path for a page. If necessary and createOK is true,
+// it creates directories for the path components that do not exist.
 func (w *Wiki) pathForPage(pageName string, createOK bool) string {
-	pageName = wikifier.PageName(pageName)
+
+	// try lowercased version first (quiki style)
+	lcPageName := wikifier.PageName(pageName)
 	if createOK {
-		wikifier.MakeDir(w.Opt.Dir.Page, pageName)
+		wikifier.MakeDir(w.Opt.Dir.Page, lcPageName)
 	}
-	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, pageName))
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, lcPageName))
+
+	// it doesn't exist; try non-lowercased version (markdown/etc)
+	if _, err := os.Stat(path); err != nil {
+		normalPageName := wikifier.PageNameLC(pageName, false)
+		normalPath, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, normalPageName))
+		if _, err := os.Stat(normalPath); err == nil {
+			return normalPath
+		}
+	}
+
 	return path
 }
 
