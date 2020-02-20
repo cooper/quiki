@@ -29,9 +29,9 @@ func (toc *tocBlock) html(page *Page, el element) {
 func (toc *tocBlock) tocAdd(sec *secBlock, addTo element, page *Page) {
 	toc.secCount++
 
-	// create an item for this section
+	// create an item for this section if it has a title and isn't intro
 	var subList element
-	if !sec.isIntro {
+	if !sec.isIntro || sec.title == "" {
 		li := addTo.createChild("li", "")
 		a := li.createChild("a", "link-internal")
 		a.setAttr("href", "#"+sec.headingID)
