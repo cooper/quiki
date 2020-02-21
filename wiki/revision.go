@@ -7,11 +7,11 @@ import (
 
 	"github.com/cooper/quiki/wikifier"
 
+	"github.com/cooper/go-git/v4"
+	"github.com/cooper/go-git/v4/config"
+	"github.com/cooper/go-git/v4/plumbing"
+	"github.com/cooper/go-git/v4/plumbing/object"
 	"github.com/pkg/errors"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/config"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 // default options for commits made by quiki itself
