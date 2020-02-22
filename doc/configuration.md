@@ -20,7 +20,7 @@ file for the webserver. This tells it where to listen and where to find the
 wikis you have configured on the server. This is typically called `quiki.conf`,
 and is required as the first argument to the `quiki` executable.
 
-**Every wiki** also requires its own configuration file, called
+**Every wiki** also requires its own configuration file called
 `wiki.conf` at the root level of the wiki directory.
 
 ## wikifier options

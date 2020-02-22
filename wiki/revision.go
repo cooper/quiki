@@ -188,8 +188,7 @@ func (w *Wiki) Branch(name string) (*Wiki, error) {
 	}
 
 	// create a new Wiki at this location
-	// FIXME: this is dumb
-	return NewWiki(filepath.Join(dir, "wiki.conf"))
+	return NewWiki(dir)
 }
 
 // NewBranch is like Branch, except it creates the branch at the
