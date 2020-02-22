@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/Songmu/go-httpdate v1.0.0
 	github.com/alexedwards/scs/v2 v2.3.0
-	github.com/cooper/go-git/v4 v4.13.2
+	github.com/cooper/go-git/v4 v4.14.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-stack/stack v1.8.0 // indirect

@@ -141,15 +141,15 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 		return targetDir, nil
 	}
 
-	// repo, err := w.repo()
-	// if err != nil {
-	// 	return "", err
-	// }
+	repo, err := w.repo()
+	if err != nil {
+		return "", err
+	}
 
-	// // create the linked repository
-	// if _, err = repo.PlainAddWorktree(); err != nil {
-	// 	return "", err
-	// }
+	// create the linked repository
+	if _, err = repo.PlainAddWorktree(name, targetDir, &git.AddWorktreeOptions{}); err != nil {
+		return "", err
+	}
 
 	return targetDir, nil
 }
@@ -172,5 +172,12 @@ func (w *Wiki) Branch(name string) (*Wiki, error) {
 
 	// check out the branch in cache/branch/<name>;
 	// if it already has been checked out, this does nothing
-	return nil, nil
+	dir, err := w.checkoutBranch(name)
+	if err != nil {
+		return nil, err
+	}
+
+	// create a new Wiki at this location
+	// FIXME: this is dumb
+	return NewWiki(filepath.Join(dir, "wiki.conf"), "")
 }
