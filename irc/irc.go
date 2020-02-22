@@ -71,7 +71,7 @@ func main() {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".confvars")
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
-			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf")
+			w, err := wiki.NewWikiConfig("../wikis/mywiki/wiki.conf")
 
 			var reply string
 			if err != nil {
@@ -118,7 +118,7 @@ func main() {
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
 			var reply string
-			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf")
+			w, err := wiki.NewWikiConfig("../wikis/mywiki/wiki.conf")
 
 			if err != nil {
 				reply = err.Error()
@@ -143,7 +143,7 @@ func main() {
 			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, ".displayimage"), " ,:")
 
 			var reply string
-			w, err := wiki.NewWiki("../wikis/mywiki/wiki.conf")
+			w, err := wiki.NewWikiConfig("../wikis/mywiki/wiki.conf")
 
 			if err != nil {
 				reply = err.Error()
@@ -166,7 +166,7 @@ func main() {
 		},
 		func(irc *hbot.Bot, mes *hbot.Message) bool {
 			pageName := strings.TrimPrefix(mes.Content, ".names ")
-			w, _ := wiki.NewWiki("../wikis/mywiki/wiki.conf")
+			w, _ := wiki.NewWikiConfig("../wikis/mywiki/wiki.conf")
 			page := w.FindPage(pageName)
 			reply := fmt.Sprintf("%+v", struct {
 				Name, NameNE, RelName, RelNameNE, Path, RelPath string

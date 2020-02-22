@@ -19,8 +19,16 @@ type Wiki struct {
 	_repo      *git.Repository
 }
 
-// NewWiki creates a Wiki given the configuration file path.
-func NewWiki(confPath string) (*Wiki, error) {
+// NewWiki creates a Wiki given its directory path.
+func NewWiki(path string) (*Wiki, error) {
+	return NewWikiConfig(filepath.Join(path, "wiki.conf"))
+}
+
+// NewWikiConfig creates a Wiki given the configuration file path.
+//
+// Deprecated: Use NewWiki instead.
+//
+func NewWikiConfig(confPath string) (*Wiki, error) {
 	confPath = filepath.FromSlash(confPath)
 	w := &Wiki{
 		ConfigFile: confPath,

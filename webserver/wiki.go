@@ -72,7 +72,7 @@ func initWikis() error {
 		}
 
 		// create wiki
-		w, err := wiki.NewWiki(wikiConfPath)
+		w, err := wiki.NewWikiConfig(wikiConfPath)
 		if err != nil {
 			return err
 		}
