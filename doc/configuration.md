@@ -33,17 +33,14 @@ Name of the wiki.
 
 __Default__: *Wiki*
 
-### host
-
-| Option        | Description   | Default          |
-| -----         | -----         | -----            |
-| `host.wiki`   | Wiki host     | None (all hosts) |
+### host.wiki
 
 Hostname for the wiki.
 
 It may be overridden in the server configuration by
-[`server.wiki.[name].host`](#serverwikinamehost). If specified in neither
-place, the wiki is accessible from all available hosts.
+[`server.wiki.[name].host`](#serverwikinamehost).
+
+If specified in neither place, the wiki is accessible from all available hosts.
 
 ### dir.wiki
 
