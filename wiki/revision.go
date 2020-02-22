@@ -108,8 +108,8 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 // 	return err
 // }
 
-// Branches returns the git branches available.
-func (w *Wiki) Branches() ([]string, error) {
+// BranchNames returns the revision branches available.
+func (w *Wiki) BranchNames() ([]string, error) {
 	repo, err := w.repo()
 	var names []string
 	if err != nil {
@@ -141,6 +141,36 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 		return targetDir, nil
 	}
 
-	// TODO: finish
+	// repo, err := w.repo()
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	// // create the linked repository
+	// if _, err = repo.PlainAddWorktree(); err != nil {
+	// 	return "", err
+	// }
+
 	return targetDir, nil
+}
+
+// Branch returns a Wiki instance for this wiki at another branch.
+func (w *Wiki) Branch(name string) (*Wiki, error) {
+	names, err := w.BranchNames()
+	if err != nil {
+		return nil, err
+	}
+
+	// ensure the branch exists in git
+	found := false
+	for _, branchName := range names {
+		found = branchName == name
+		if found {
+			break
+		}
+	}
+
+	// check out the branch in cache/branch/<name>;
+	// if it already has been checked out, this does nothing
+	return nil, nil
 }

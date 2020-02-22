@@ -89,7 +89,7 @@ func initWikis() error {
 		wi := &WikiInfo{Wiki: w, Host: wikiHost, Name: wikiName}
 
 		// initialize git repsitory
-		log.Println(w.Branches())
+		log.Println(w.BranchNames())
 
 		// pregenerate
 		w.Pregenerate()

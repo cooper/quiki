@@ -59,7 +59,7 @@ func (image *imageBlock) parse(page *Page) {
 		image.alt = image.file
 	}
 
-	// no dimensions. if it's an inbox we can guess it
+	// no dimensions. if it's an infobox we can guess it
 	if image.width == 0 && image.height == 0 && image.parentBlock().blockType() == "infobox" {
 		image.width = 270
 	}
