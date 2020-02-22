@@ -126,6 +126,20 @@ func (w *Wiki) BranchNames() ([]string, error) {
 	return names, nil
 }
 
+// ensure a branch exists in git
+func (w *Wiki) hasBranch(name string) (bool, error) {
+	names, err := w.BranchNames()
+	if err != nil {
+		return false, err
+	}
+	for _, branchName := range names {
+		if branchName == name {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // checks out a branch in another directory. returns the directory
 func (w *Wiki) checkoutBranch(name string) (string, error) {
 	// TODO: make sure name is a simple string with no path elements
@@ -155,19 +169,15 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 }
 
 // Branch returns a Wiki instance for this wiki at another branch.
+// If the branch does not exist, an error is returned.
 func (w *Wiki) Branch(name string) (*Wiki, error) {
-	names, err := w.BranchNames()
-	if err != nil {
-		return nil, err
-	}
 
-	// ensure the branch exists in git
-	found := false
-	for _, branchName := range names {
-		found = branchName == name
-		if found {
-			break
+	// find branch
+	if exist, err := w.hasBranch(name); !exist {
+		if err != nil {
+			return nil, err
 		}
+		return nil, git.ErrBranchNotFound
 	}
 
 	// check out the branch in cache/branch/<name>;
@@ -180,4 +190,32 @@ func (w *Wiki) Branch(name string) (*Wiki, error) {
 	// create a new Wiki at this location
 	// FIXME: this is dumb
 	return NewWiki(filepath.Join(dir, "wiki.conf"), "")
+}
+
+// NewBranch is like Branch, except it creates the branch at the
+// current master revision if it does not yet exist.
+func (w *Wiki) NewBranch(name string) (*Wiki, error) {
+	repo, err := w.repo()
+	if err != nil {
+		return nil, err
+	}
+
+	// find branch
+	if exist, err := w.hasBranch(name); !exist {
+		if err != nil {
+			return nil, err
+		}
+
+		// try to create it
+		err := repo.CreateBranch(&config.Branch{
+			Name:  name,
+			Merge: plumbing.Master,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// now that it exists, fetch it
+	return w.Branch(name)
 }
