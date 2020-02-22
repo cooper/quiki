@@ -18,14 +18,15 @@ import (
 var javascriptTemplates string
 
 var frameHandlers = map[string]func(*wikiRequest){
-	"dashboard":  handleDashboardFrame,
-	"pages":      handlePagesFrame,
-	"categories": handleCategoriesFrame,
-	"images":     handleImagesFrame,
-	"models":     handleModelsFrame,
-	"settings":   handleSettingsFrame,
-	"edit-page":  handleEditPageFrame,
-	"edit-model": handleEditModelFrame,
+	"dashboard":     handleDashboardFrame,
+	"pages":         handlePagesFrame,
+	"categories":    handleCategoriesFrame,
+	"images":        handleImagesFrame,
+	"models":        handleModelsFrame,
+	"settings":      handleSettingsFrame,
+	"edit-page":     handleEditPageFrame,
+	"edit-model":    handleEditModelFrame,
+	"switch-branch": handleSwitchBranchFrame,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -280,6 +281,21 @@ func handleEditor(wr *wikiRequest, path, file, title string, model, config bool)
 		Title:        title,
 		File:         file,
 		Content:      fileRes.Content,
+		wikiTemplate: getGenericTemplate(wr),
+	}
+}
+
+func handleSwitchBranchFrame(wr *wikiRequest) {
+	branches, err := wr.wi.BranchNames()
+	if err != nil {
+		wr.err = err
+		return
+	}
+	wr.dot = struct {
+		Branches []string
+		wikiTemplate
+	}{
+		Branches:     branches,
 		wikiTemplate: getGenericTemplate(wr),
 	}
 }
