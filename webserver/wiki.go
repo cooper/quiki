@@ -60,10 +60,8 @@ func initWikis() error {
 		// host to accept (optional)
 		wikiHost, _ := Conf.GetStr(configPfx + ".host")
 
-		// get wiki config path and password
+		// get wiki config path
 		wikiConfPath, _ := Conf.GetStr(configPfx + ".config")
-		privConfPath, _ := Conf.GetStr(configPfx + ".private")
-
 		if wikiConfPath == "" {
 			// config not specified, so use server.dir.wiki and wiki.conf
 			dirWiki, err := Conf.GetStr("server.dir.wiki")
@@ -74,7 +72,7 @@ func initWikis() error {
 		}
 
 		// create wiki
-		w, err := wiki.NewWiki(wikiConfPath, privConfPath)
+		w, err := wiki.NewWiki(wikiConfPath)
 		if err != nil {
 			return err
 		}

@@ -12,50 +12,39 @@ import (
 
 // A Wiki represents a quiki website.
 type Wiki struct {
-	ConfigFile        string
-	PrivateConfigFile string
-	Opt               wikifier.PageOpt
-	Auth              *authenticator.Authenticator
-	pageLocks         map[string]*sync.Mutex
-	_repo             *git.Repository
+	ConfigFile string
+	Opt        wikifier.PageOpt
+	Auth       *authenticator.Authenticator
+	pageLocks  map[string]*sync.Mutex
+	_repo      *git.Repository
 }
 
-// NewWiki creates a Wiki given the public and private configuration files.
-func NewWiki(conf, privateConf string) (*Wiki, error) {
-	conf, privateConf = filepath.FromSlash(conf), filepath.FromSlash(privateConf)
+// NewWiki creates a Wiki given the configuration file path.
+func NewWiki(confPath string) (*Wiki, error) {
+	confPath = filepath.FromSlash(confPath)
 	w := &Wiki{
-		ConfigFile:        conf,
-		PrivateConfigFile: privateConf,
-		Opt:               defaultWikiOpt,
-		pageLocks:         make(map[string]*sync.Mutex),
+		ConfigFile: confPath,
+		Opt:        defaultWikiOpt,
+		pageLocks:  make(map[string]*sync.Mutex),
 	}
 
 	// there's no config!
-	if conf == "" {
+	if confPath == "" {
 		return nil, errors.New("no config file specified")
 	}
 
 	// guess dir.wiki from config location
 	// (if the conf specifies an absolute path, this will be overwritten)
-	w.Opt.Dir.Wiki = filepath.Dir(conf)
+	w.Opt.Dir.Wiki = filepath.Dir(confPath)
 
 	// parse the config
-	err := w.readConfig(conf)
+	err := w.readConfig(confPath)
 	if err != nil {
 		return nil, err
 	}
 
-	// also parse private config
-	// these values override those in the public config
-	if privateConf != "" {
-		err := w.readConfig(privateConf)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// create authenticator
-	w.Auth, err = authenticator.Open(filepath.Join(filepath.Dir(conf), "auth.json"))
+	w.Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confPath), "auth.json"))
 	if err != nil {
 		return nil, errors.New("init authenticator")
 	}

@@ -20,18 +20,8 @@ file for the webserver. This tells it where to listen and where to find the
 wikis you have configured on the server. This is typically called `quiki.conf`,
 and is required as the first argument to the `quiki` executable.
 
-**Every wiki** also requires its own configuration file, usually called
+**Every wiki** also requires its own configuration file, called
 `wiki.conf` at the root level of the wiki directory.
-When using webserver, the path of each wiki's configuration file is defined in
-the server configuration (`quiki.conf`) by
-[`server.wiki.[name].config`](#serverwikinameconfig).
-
-Each wiki can optionally have a **private configuration** file. This is where
-the administrative credentials and any other sensitive data can be stored.
-This file is located elsewhere than the wiki directory so as to void any
-possibility of it being served to HTTP clients.
-When using webserver, this is defined by
-[`server.wiki.[name].private`](#serverwikinameprivate).
 
 ## wikifier options
 
@@ -360,45 +350,6 @@ are needed and display it where appropriate.
 @logo: logo.png;
 ```
 
-## Wiki private options
-
-Private wiki options may be in a separation configuration file.
-This is where administrator credentials are stored.
-
-### admin.[username].name
-
-Real name for the administrator `[username]`.
-
-This is used to for revision tracking to attribute page creation,
-image upload, etc. to the user. Depending on the frontend and/or template,
-it may be displayed to the public as the author or maintainer of a page or
-the owner of some file.
-
-### admin.[username].email
-
-Email address of the administrator `[username]`.
-
-Used for revision tracking.
-
-### admin.[username].crypt
-
-Ttype of encryption used for the password of administrator `[username]`.
-
-**Accepted values**
-* _none_ (plain text)
-* _sha1_
-* _sha256_
-* _sha512_
-
-__Default__: *sha1*
-
-### admin.[username].password
-
-Password of the administrator `[username]`.
-
-It must be encrypted in
-the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
-
 ## webserver options
 
 These options are respected by the quiki webserver.
@@ -488,11 +439,3 @@ This is required for each wiki unless [`server.dir.wiki`](#serverdirwiki) is
 set and the wiki is located there.
 
 __Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]/wiki.conf`
-
-### server.wiki.[name].private
-
-The path to the PRIVATE configuration file for the wiki by the name of
-`[name]`.
-
-This is where administrative credentials are stored. Be sure that the
-private configuration is not inside the HTTP server root.
