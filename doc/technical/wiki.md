@@ -113,6 +113,18 @@ type CategoryEntry struct {
 
 A CategoryEntry describes a page that belongs to a category.
 
+#### type CategoryInfo
+
+```go
+type CategoryInfo struct {
+	File     string     `json:"file"`               // filename
+	Created  *time.Time `json:"created,omitempty"`  // creation time
+	Modified *time.Time `json:"modified,omitempty"` // modify time
+}
+```
+
+CategoryInfo represents metadata associated with a category.
+
 #### type CategoryType
 
 ```go
@@ -172,6 +184,29 @@ type DisplayError struct {
 ```
 
 DisplayError represents an error result to display.
+
+#### type DisplayFile
+
+```go
+type DisplayFile struct {
+
+	// file name relative to wiki root.
+	// path delimiter '/' is always used, regardless of OS.
+	File string `json:"file,omitempty"`
+
+	// absolute file path of the file.
+	// OS-specific path delimiter is used.
+	Path string `json:"path,omitempty"`
+
+	// the plain text file content
+	Content string
+
+	// time when the file was last modified
+	Modified *time.Time `json:"modified,omitempty"`
+}
+```
+
+DisplayFile represents a plain text file to display.
 
 #### type DisplayImage
 
@@ -326,6 +361,19 @@ type ImageInfo struct {
 
 ImageInfo represents a full-size image on the wiki.
 
+#### type ModelInfo
+
+```go
+type ModelInfo struct {
+	File     string     `json:"file"` // filename
+	Path     string     `json:"path"`
+	Created  *time.Time `json:"created,omitempty"`  // creation time
+	Modified *time.Time `json:"modified,omitempty"` // modify time
+}
+```
+
+ModelInfo represents metadata associated with a model.
+
 #### type SizedImage
 
 ```go
@@ -395,9 +443,9 @@ consideration.
 
 ```go
 type Wiki struct {
-	ConfigFile        string
-	PrivateConfigFile string
-	Opt               wikifier.PageOpt
+	ConfigFile string
+	Opt        wikifier.PageOpt
+	Auth       *authenticator.Authenticator
 }
 ```
 
@@ -406,9 +454,55 @@ A Wiki represents a quiki website.
 #### func  NewWiki
 
 ```go
-func NewWiki(conf, privateConf string) (*Wiki, error)
+func NewWiki(path string) (*Wiki, error)
 ```
-NewWiki creates a Wiki given the public and private configuration files.
+NewWiki creates a Wiki given its directory path.
+
+#### func  NewWikiConfig
+
+```go
+func NewWikiConfig(confPath string) (*Wiki, error)
+```
+NewWikiConfig creates a Wiki given the configuration file path.
+
+Deprecated: Use NewWiki instead.
+
+#### func (*Wiki) Branch
+
+```go
+func (w *Wiki) Branch(name string) (*Wiki, error)
+```
+Branch returns a Wiki instance for this wiki at another branch. If the branch
+does not exist, an error is returned.
+
+#### func (*Wiki) BranchNames
+
+```go
+func (w *Wiki) BranchNames() ([]string, error)
+```
+BranchNames returns the revision branches available.
+
+#### func (*Wiki) Categories
+
+```go
+func (w *Wiki) Categories() []CategoryInfo
+```
+Categories returns info about all the models in the wiki.
+
+#### func (*Wiki) CategoryInfo
+
+```go
+func (w *Wiki) CategoryInfo(name string) (info CategoryInfo)
+```
+CategoryInfo is an inexpensive request for info on a category.
+
+#### func (*Wiki) CategoryMap
+
+```go
+func (w *Wiki) CategoryMap() map[string]CategoryInfo
+```
+CategoryMap returns a map of model name to CategoryInfo for all models in the
+wiki.
 
 #### func (*Wiki) DisplayCategoryPosts
 
@@ -416,6 +510,13 @@ NewWiki creates a Wiki given the public and private configuration files.
 func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{}
 ```
 DisplayCategoryPosts returns the display result for a category.
+
+#### func (*Wiki) DisplayFile
+
+```go
+func (w *Wiki) DisplayFile(path string) interface{}
+```
+DisplayFile returns the display result for a plain text file.
 
 #### func (*Wiki) DisplayImage
 
@@ -457,6 +558,18 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 DisplaySizedImageGenerate returns the display result for an image in specific
 dimensions and allows images to be generated in any dimension.
 
+#### func (*Wiki) FindPage
+
+```go
+func (w *Wiki) FindPage(name string) (p *wikifier.Page)
+```
+FindPage attempts to find a page on this wiki given its name, regardless of the
+file format or filename case.
+
+If a page by this name exists, the returned page represents it. Otherwise, a new
+page representing the lowercased, normalized .page file is returned in the
+standard quiki filename format.
+
 #### func (*Wiki) GetCategory
 
 ```go
@@ -478,19 +591,72 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo)
 ```
 ImageInfo returns info for an image given its full-size name.
 
+#### func (*Wiki) ImageMap
+
+```go
+func (w *Wiki) ImageMap() map[string]ImageInfo
+```
+ImageMap returns a map of image filename to ImageInfo for all images in the
+wiki.
+
 #### func (*Wiki) Images
 
 ```go
-func (w *Wiki) Images() map[string]ImageInfo
+func (w *Wiki) Images() []ImageInfo
 ```
 Images returns info about all the images in the wiki.
 
-#### func (*Wiki) NewPage
+#### func (*Wiki) ModelInfo
 
 ```go
-func (w *Wiki) NewPage(name string) *wikifier.Page
+func (w *Wiki) ModelInfo(name string) (info ModelInfo)
 ```
-NewPage creates a Page given its name and configures it for use with this Wiki.
+ModelInfo is an inexpensive request for info on a model. It uses cached metadata
+rather than generating the model and extracting variables.
+
+#### func (*Wiki) ModelMap
+
+```go
+func (w *Wiki) ModelMap() map[string]ModelInfo
+```
+ModelMap returns a map of model name to ModelInfo for all models in the wiki.
+
+#### func (*Wiki) Models
+
+```go
+func (w *Wiki) Models() []ModelInfo
+```
+Models returns info about all the models in the wiki.
+
+#### func (*Wiki) NewBranch
+
+```go
+func (w *Wiki) NewBranch(name string) (*Wiki, error)
+```
+NewBranch is like Branch, except it creates the branch at the current master
+revision if it does not yet exist.
+
+#### func (*Wiki) PageInfo
+
+```go
+func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo)
+```
+PageInfo is an inexpensive request for info on a page. It uses cached metadata
+rather than generating the page and extracting variables.
+
+#### func (*Wiki) PageMap
+
+```go
+func (w *Wiki) PageMap() map[string]wikifier.PageInfo
+```
+PageMap returns a map of page name to PageInfo for all pages in the wiki.
+
+#### func (*Wiki) Pages
+
+```go
+func (w *Wiki) Pages() []wikifier.PageInfo
+```
+Pages returns info about all the pages in the wiki.
 
 #### func (*Wiki) Pregenerate
 

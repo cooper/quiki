@@ -22,14 +22,14 @@ const (
 #### func  CategoryName
 
 ```go
-func CategoryName(name string, noLower bool) string
+func CategoryName(name string) string
 ```
 CategoryName returns a clean category name.
 
 #### func  CategoryNameNE
 
 ```go
-func CategoryNameNE(name string, noLower bool) string
+func CategoryNameNE(name string) string
 ```
 CategoryNameNE returns a clean category with No Extension.
 
@@ -72,7 +72,7 @@ PageNameExt returns a clean page name with the provided extension.
 #### func  PageNameLink
 
 ```go
-func PageNameLink(name string, noLower bool) string
+func PageNameLink(name string) string
 ```
 PageNameLink returns a clean page name without the extension.
 
@@ -461,10 +461,10 @@ Modified returns the page modification time.
 ```go
 func (p *Page) Name() string
 ```
-Name returns the resolved page name, with or without extension.
+Name returns the resolved page name with extension.
 
-This DOES take symbolic links into account and DOES include the page prefix if
-applicable.
+This DOES take symbolic links into account. and DOES include the page prefix if
+applicable. Any prefix will have forward slashes regardless of OS.
 
 #### func (*Page) NameNE
 
@@ -472,6 +472,22 @@ applicable.
 func (p *Page) NameNE() string
 ```
 NameNE returns the resolved page name with No Extension.
+
+#### func (*Page) OSName
+
+```go
+func (p *Page) OSName() string
+```
+OSName is like Name, except it uses the native path separator. It should be used
+for file operations only.
+
+#### func (*Page) OSNameNE
+
+```go
+func (p *Page) OSNameNE() string
+```
+OSNameNE is like NameNE, except it uses the native path separator. It should be
+used for file operations only.
 
 #### func (*Page) Parse
 
@@ -570,6 +586,8 @@ TitleOrName returns the result of Title if available, otherwise that of Name.
 
 ```go
 type PageInfo struct {
+	Path      string     `json:"omit"`                // absolute filepath
+	File      string     `json:"file,omitempty"`      // name with extension, always with forward slashes
 	Created   *time.Time `json:"created,omitempty"`   // creation time
 	Modified  *time.Time `json:"modified,omitempty"`  // modify time
 	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
@@ -594,6 +612,7 @@ type PageOpt struct {
 	Template     string // name of template
 	MainRedirect bool   // redirect on main page rather than serve root
 	Page         PageOptPage
+	Host         PageOptHost
 	Dir          PageOptDir
 	Root         PageOptRoot
 	Image        PageOptImage
@@ -652,6 +671,16 @@ type PageOptExternalType string
 ```
 
 PageOptExternalType describes
+
+#### type PageOptHost
+
+```go
+type PageOptHost struct {
+	Wiki string // HTTP host for the wiki
+}
+```
+
+PageOptHost describes HTTP hosts for a wiki.
 
 #### type PageOptImage
 
