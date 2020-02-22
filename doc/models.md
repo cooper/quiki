@@ -11,8 +11,7 @@ and eliminate repetitious page source code.
 ## Creating models
 
 For safety, you cannot include any old page file into another. Instead, models are
-stored in a dedicated directory within your wiki root, configured by
-[`@dir.model`](configuration.md#dir), which defaults to `models`.
+stored in a dedicated `models` directory within the wiki root.
 
 Model source files can contain any quiki code, but it is common to use them
 in conjunction with [`html{}`](blocks.md#html) or [`format{}`](blocks.md#format)

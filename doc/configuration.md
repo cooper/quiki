@@ -11,7 +11,6 @@ The primary method of configuration is to define options in a configuration
 file. All quiki configuration files are written in the quiki language:
 
     @name:      MyWiki;             /* assign a string option */
-    @dir.page:  [@dir.wiki]/pages;  /* string option with embeded variable */
     @page.enable.cache;             /* enable a boolean option */
     -@page.enable.title;            /* disable a boolean option */
 
@@ -46,6 +45,18 @@ It may be overridden in the server configuration by
 [`server.wiki.[name].host`](#serverwikinamehost). If specified in neither
 place, the wiki is accessible from all available hosts.
 
+### dir.wiki
+
+Path to the wiki.
+
+With webserver, this can be omitted if either:
+
+1. [`server.dir.wiki`](#serverdirwiki) is configured, and the wiki is located
+   in that directory.
+2. [`server.wiki.[name].dir`](#serverwikinamedir) is configured.
+
+__Default__ (webserver): [`server.dir.wiki`](#serverdirwiki)`/[name]`
+
 ### root
 
 | Option        | Description   | Default        |
@@ -66,31 +77,8 @@ It may be useful to use `root.wiki` within the definitions of the rest:
     @root.image:    [@root.wiki]/images;
 
 If you specify `root.file`, the entire wiki directory (as specified by
-[`dir.wiki`](#dir)) will be indexed by the web server at this path. Note
+[`dir.wiki`](#dirwiki)) will be indexed by the web server at this path. Note
 that this will likely expose your wiki configuration.
-
-### dir
-
-| Option            | Description                                           |
-| -----             | -----                                                 |
-| `dir.wiki`        | Wiki root directory (usually inferred)                |
-| `dir.page`        | Page files stored here                                |
-| `dir.image`       | Image originals stored here                           |
-| `dir.model`       | Model files stored here                               |
-| `dir.cache`       | Generated content and metadata stored here            |
-
-Directories on the filesystem. It is strongly recommended that they are
-absolute paths; otherwise they will be dictated by whichever directory the
-program is started from. 
-
-Best practice to achieve this is to reference `dir.wiki` within each. With
-webserver, `dir.wiki` is predefined as long as your wiki exists within
-[`server.dir.wiki`](#serverdirwiki).
-
-    @dir.page:      [@dir.wiki]/pages;
-    @dir.image:     [@dir.wiki]/images;
-    @dir.model:     [@dir.wiki]/models;
-    @dir.cache:     [@dir.wiki]/cache;
 
 ### external
 
@@ -270,9 +258,8 @@ here so that there is consistency amongst various frontends such as webserver.
 
 Name of the main page.
 
-This should not be the page's title but rather a
-filename, relative to [`dir.page`](#dir). The `.page` extension is not
-necessary.
+This should not be the page's title but rather a filename, relative to the
+wiki page directory. The extension is not necessary.
 
 ```
 @main_page: Welcome Page; /* normalized to welcome_page.page */
@@ -291,9 +278,8 @@ rendering it at the root location.
 
 Name of the error page.
 
-This should not be the page's title but rather a
-filename, relative to [`dir.page`](#dir). The `.page` extension is not
-necessary.
+This should not be the page's title but rather a filename, relative to the
+wiki page directory. The extension is not necessary.
 
 ```
 @error_page: Error; /* normalized to error.page */
@@ -341,7 +327,7 @@ __Default__ (webserver): *default*
 
 ### logo
 
-Filename for the wiki logo, relative to [`dir.image`](#dir).
+Filename for the wiki logo, relative to the wiki image directory.
 
 Frontends like webserver automatically generate the logo in whatever dimensions
 are needed and display it where appropriate.
@@ -359,7 +345,7 @@ These options are respected by the quiki webserver.
 Path to some directory where wikis are stored.
 
 Your wikis do not all have to be in the same directory, so this is optional.
-However, if you make use of this, quiki can infer [`dir.wiki`](#dir) for each
+However, if you make use of this, quiki can infer [`dir.wiki`](#dirwiki) for each
 wiki, allowing you to omit the [`server.wiki.[name].dir`](#serverwikinamedir)
 options.
 

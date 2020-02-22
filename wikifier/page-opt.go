@@ -50,12 +50,12 @@ type PageOptHost struct {
 // PageOptDir describes actual filepaths to wiki resources.
 type PageOptDir struct {
 	Wiki     string // path to wiki root directory
-	Image    string // path to image directory
-	Category string // path to category directory
-	Page     string // path to page directory
-	Model    string // path to model directory
-	Markdown string // path to markdown directory
-	Cache    string // path to cache directory
+	Image    string // Deprecated: path to image directory
+	Category string // Deprecated: path to category directory
+	Page     string // Deprecated: path to page directory
+	Model    string // Deprecated: path to model directory
+	Markdown string // Deprecated: path to markdown directory
+	Cache    string // Deprecated: path to cache directory
 }
 
 // PageOptRoot describes HTTP paths to wiki resources.
@@ -174,17 +174,13 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy string options
 	pageOptString := map[string]*string{
-		"name":       &opt.Name,      // wiki name
-		"logo":       &opt.Logo,      // logo filename, relative to image dir
-		"main_page":  &opt.MainPage,  // main page name
-		"error_page": &opt.ErrorPage, // error page name
-		"template":   &opt.Template,  // template name
-		"host.wiki":  &opt.Host.Wiki, // wiki host
-		// "dir.wiki":      &opt.Dir.Wiki,      // wiki root directory
-		"dir.image":     &opt.Dir.Image,     // image directory
-		"dir.page":      &opt.Dir.Page,      // page directory
-		"dir.model":     &opt.Dir.Model,     // model directory
-		"dir.cache":     &opt.Dir.Cache,     // cache directory
+		"name":          &opt.Name,          // wiki name
+		"logo":          &opt.Logo,          // logo filename, relative to image dir
+		"main_page":     &opt.MainPage,      // main page name
+		"error_page":    &opt.ErrorPage,     // error page name
+		"template":      &opt.Template,      // template name
+		"host.wiki":     &opt.Host.Wiki,     // wiki host
+		"dir.wiki":      &opt.Dir.Wiki,      // wiki directory
 		"root.wiki":     &opt.Root.Wiki,     // http path to wiki
 		"root.image":    &opt.Root.Image,    // http path to images
 		"root.category": &opt.Root.Category, // http path to categories
@@ -201,12 +197,12 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		}
 	}
 
-	// convert all directories to native path separator
-	opt.Dir.Image = filepath.FromSlash(opt.Dir.Image)
-	opt.Dir.Page = filepath.FromSlash(opt.Dir.Page)
-	opt.Dir.Model = filepath.FromSlash(opt.Dir.Model)
-	opt.Dir.Cache = filepath.FromSlash(opt.Dir.Cache)
-	opt.Dir.Category = filepath.FromSlash(opt.Dir.Cache + "/category")
+	// all of these deprecated options are now overridden
+	opt.Dir.Page = filepath.Join(opt.Dir.Wiki, "pages")
+	opt.Dir.Image = filepath.Join(opt.Dir.Wiki, "images")
+	opt.Dir.Model = filepath.Join(opt.Dir.Wiki, "models")
+	opt.Dir.Cache = filepath.Join(opt.Dir.Wiki, "cache")
+	opt.Dir.Category = filepath.Join(opt.Dir.Wiki, "cache", "category")
 
 	// convert all HTTP roots to /
 	opt.Root.Wiki = filepath.ToSlash(opt.Root.Wiki)

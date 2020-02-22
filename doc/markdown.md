@@ -4,9 +4,8 @@ In addition to pages written in the [quiki source language](language.md),
 quiki can serve content rendered from
 [Markdown](https://en.wikipedia.org/wiki/Markdown).
 
-Markdown files are stored alongside `.page` files within the page directory as
-defined by the [`dir.page`](configuration.md#dir) directive. They are identified
-by the `.md` file extension.
+Markdown files are stored alongside `.page` files within the wiki page directory.
+They are identified by the `.md` file extension.
 
 Rather than simply injecting the Markdown content as HTML, quiki translates
 Markdown files to the quiki source language on the fly. Although this
