@@ -359,8 +359,9 @@ These options are respected by the quiki webserver.
 Path to some directory where wikis are stored.
 
 Your wikis do not all have to be in the same directory, so this is optional.
-However, if you make use of this, quiki can infer [`dir.wiki`](#dir) and
-[`server.wiki.[name].config`](#serverwikinameconfig) for each wiki.
+However, if you make use of this, quiki can infer [`dir.wiki`](#dir) for each
+wiki, allowing you to omit the [`server.wiki.[name].dir`](#serverwikinamedir)
+options.
 
 
 ### server.dir.adminifier
@@ -426,16 +427,17 @@ template in the [template](#template) directive.
 
 ### server.wiki.[name].enable
 
-Enable the wiki by the name of `[name]`.
+Enable the wiki with shortname `[name]`.
 
 Any wikis configured that do not have this option present are skipped.
 Any number of wikis can be configured on a single server using this.
 
-### server.wiki.[name].config
+### server.wiki.[name].dir
 
-Ppath to the configuration file for the wiki by the name of `[name]`.
+Path to the wiki with shortname `[name]`.
 
-This is required for each wiki unless [`server.dir.wiki`](#serverdirwiki) is
-set and the wiki is located there.
+This can be omitted if [`server.dir.wiki`](#serverdirwiki) is set and
+the wiki is located within that container. The shortname becomes the name of
+its directory inside `server.dir.wiki`.
 
-__Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]/wiki.conf`
+__Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]`

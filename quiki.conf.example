@@ -36,25 +36,9 @@
 
 
 /* WEBSITE CONFIGURATIONS --
+   
+   you can configure any number of websites to be served by this quiki.
+   enable them with server.wiki.[shortname].enable, where [shortname] is the name of
+   the wiki's directory in server.dir.wiki */
 
-   you can configure any number of wiki sites to be served by this quiki.
-   below is the working configuration for the included example site.
-   the shortcode (in this case, 'mywiki') will only appear in logs/debug info */
-
-@server.wiki.mywiki: {
-
-    /* each wiki requires its own configuration file, specified here. see
-       wikis/mywiki/wiki.conf for an example wiki configuration.
-       note: this can be omitted and inferred if the config is at
-       @server.dir.wiki/<shortcode>/wiki.conf
-    config: [@repo]/wikis/mywiki/wiki.conf; */
-    
-    /* optionally set this to the host to serve this wiki on, according to the HTTP
-       Host header. this overrides the @host.wiki setting in the wiki config file.
-       if neither specified, the wiki is accessible from all hosts.
-    host: mywiki.com; */
-
-};
-
-/* tells the server to enable mywiki. */
 @server.wiki.mywiki.enable;

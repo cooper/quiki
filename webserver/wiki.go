@@ -60,21 +60,42 @@ func initWikis() error {
 		// host to accept (optional)
 		wikiHost, _ := Conf.GetStr(configPfx + ".host")
 
-		// get wiki config path
-		wikiConfPath, _ := Conf.GetStr(configPfx + ".config")
-		if wikiConfPath == "" {
-			// config not specified, so use server.dir.wiki and wiki.conf
-			dirWiki, err := Conf.GetStr("server.dir.wiki")
+		// ceate the wiki instance
+		var w *wiki.Wiki
+
+		// first, prefer server.wiki.[name].dir
+		dirWiki, _ := Conf.GetStr(configPfx + ".dir")
+		if dirWiki != "" {
+			w, err = wiki.NewWiki(dirWiki)
 			if err != nil {
 				return err
 			}
-			wikiConfPath = filepath.Join(dirWiki, wikiName, "wiki.conf")
 		}
 
-		// create wiki
-		w, err := wiki.NewWikiConfig(wikiConfPath)
-		if err != nil {
-			return err
+		// that didn't work. try server.wiki.[name].config (deprecated)
+		if w == nil {
+			wikiConfPath, _ := Conf.GetStr(configPfx + ".config")
+			if wikiConfPath != "" {
+				w, err = wiki.NewWikiConfig(wikiConfPath)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// still no??? use server.dir.wiki/[name]
+		if w == nil {
+
+			// if not set, give up because this is last resort
+			serverDirWiki, err := Conf.GetStr("server.dir.wiki")
+			if err != nil {
+				return err
+			}
+
+			w, err = wiki.NewWiki(filepath.Join(serverDirWiki, wikiName))
+			if err != nil {
+				return err
+			}
 		}
 
 		// if wiki host was found in wiki config, use it ONLY when
