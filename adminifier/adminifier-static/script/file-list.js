@@ -188,7 +188,8 @@ var FileList = exports.FileList = new Class({
                 // anchor or span
                 var textContainer;
                 if (entry.link && isTitle)
-                    textContainer = a.addFrameClickHandler(new Element('a', { href: entry.link }));
+                    textContainer = a.addFrameClickHandler(new Element('a', {
+                        href: entry.link, 'class': 'frame-click' }));
                 else
                     textContainer = new Element('span');
                 td.appendChild(textContainer);

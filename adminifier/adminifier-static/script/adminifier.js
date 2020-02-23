@@ -204,7 +204,7 @@ function frameLoad (page) {
             $('content').innerHTML = html;
 
             // apply click handlers
-            addFrameClickHandler($('content').getElements('a'));
+            addFrameClickHandler($('content').getElements('a.frame-click'));
 
             // find HTML metadata
             var meta = $('content').getElement('meta');
