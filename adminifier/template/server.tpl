@@ -6,3 +6,4 @@ Available sites:
     <li><a href="{{$shortcode}}/dashboard">{{$wi.Title}}</a></li>
 {{end}}
 </ul>
+<a href="logout">Logout</a>

@@ -35,13 +35,14 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 
 // wikiTemplate members are available to all wiki templates
 type wikiTemplate struct {
-	User      *authenticator.User // user
-	Shortcode string              // wiki shortcode
-	WikiTitle string              // wiki title
-	Branch    string              // selected branch
-	Static    string              // adminifier-static root
-	AdminRoot string              // adminifier root
-	Root      string              // wiki root
+	User              *authenticator.User // user
+	ServerPanelAccess bool                // whether user can access main panel
+	Shortcode         string              // wiki shortcode
+	WikiTitle         string              // wiki title
+	Branch            string              // selected branch
+	Static            string              // adminifier-static root
+	AdminRoot         string              // adminifier root
+	Root              string              // wiki root
 }
 
 type wikiRequest struct {
@@ -420,12 +421,13 @@ func switchUserWiki(wr *wikiRequest, wi *webserver.WikiInfo) {
 
 func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 	return wikiTemplate{
-		User:      sessMgr.Get(wr.r.Context(), "user").(*authenticator.User),
-		Branch:    sessMgr.GetString(wr.r.Context(), "branch"),
-		Shortcode: wr.shortcode,
-		WikiTitle: wr.wi.Title,
-		AdminRoot: strings.TrimRight(root, "/"),
-		Static:    root + "adminifier-static",
-		Root:      root + wr.shortcode,
+		User:              sessMgr.Get(wr.r.Context(), "user").(*authenticator.User),
+		ServerPanelAccess: true, // TODO
+		Branch:            sessMgr.GetString(wr.r.Context(), "branch"),
+		Shortcode:         wr.shortcode,
+		WikiTitle:         wr.wi.Title,
+		AdminRoot:         strings.TrimRight(root, "/"),
+		Static:            root + "adminifier-static",
+		Root:              root + wr.shortcode,
 	}
 }
