@@ -29,8 +29,8 @@ var frameHandlers = map[string]func(*wikiRequest){
 }
 
 var wikiFuncHandlers = map[string]func(*wikiRequest){
-	"switch-branch": nil,
-	"create-branch": handleCreateBranch,
+	"switch-branch/": handleSwitchBranch,
+	"create-branch":  handleCreateBranch,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -360,6 +360,29 @@ func handleSwitchBranchFrame(wr *wikiRequest) {
 		Branches:     branches,
 		wikiTemplate: getGenericTemplate(wr),
 	}
+}
+
+func handleSwitchBranch(wr *wikiRequest) {
+	relPath := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/switch-branch/")
+	if relPath == "" {
+		wr.err = errors.New("no branch selected")
+		return
+	}
+
+	// fetch the branch
+	_, wr.err = wr.wi.Branch((relPath))
+	if wr.err != nil {
+		return
+	}
+
+	// set branch
+	sessMgr.Put(wr.r.Context(), "branch", relPath)
+
+	// TODO: when this request is submitted by JS, the UI can just reload
+	// the current frame so the user stays on the same page, just in new branch
+
+	// redirect back to dashboard
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
 }
 
 func handleCreateBranch(wr *wikiRequest) {
