@@ -4,6 +4,7 @@
     data-icon-b="yes"
 />
 
+Switch Branch:
 <ul>
 {{$root := .Root}}
 {{range .Branches}}

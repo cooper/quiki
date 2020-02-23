@@ -87,27 +87,20 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		var dot interface{} = nil
 		if handler, exist := frameHandlers[frameName]; exist {
 
-			// possibly switch wiki branches
-			userWiki := wi
-			branchName := sessMgr.GetString(r.Context(), "branch")
-			if branchName != "" {
-				branchWiki, err := wi.Branch(branchName)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				userWiki = wi.Copy(branchWiki)
-			}
-
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
 				wikiRoot:  root + shortcode,
-				wi:        userWiki,
 				w:         w,
 				r:         r,
 			}
 			dot = wr
+
+			// possibly switch wikis
+			switchUserWiki(wr, wi)
+			if wr.err != nil {
+				panic(wr.err)
+			}
 
 			// call handler
 			handler(wr)
@@ -158,25 +151,18 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 				return
 			}
 
-			// possibly switch wiki branches
-			userWiki := wi
-			branchName := sessMgr.GetString(r.Context(), "branch")
-			if branchName != "" {
-				branchWiki, err := wi.Branch(branchName)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				userWiki = wi.Copy(branchWiki)
-			}
-
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
 				wikiRoot:  root + shortcode,
-				wi:        userWiki,
 				w:         w,
 				r:         r,
+			}
+
+			// possibly switch wikis
+			switchUserWiki(wr, wi)
+			if wr.err != nil {
+				panic(wr.err)
 			}
 
 			// call handler
@@ -404,6 +390,21 @@ func handleCreateBranch(wr *wikiRequest) {
 
 	// redirect back to dashboard
 	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
+}
+
+// possibly switch wiki branches
+func switchUserWiki(wr *wikiRequest, wi *webserver.WikiInfo) {
+	userWiki := wi
+	branchName := sessMgr.GetString(wr.r.Context(), "branch")
+	if branchName != "" {
+		branchWiki, err := wi.Branch(branchName)
+		if err != nil {
+			wr.err = err
+			return
+		}
+		userWiki = wi.Copy(branchWiki)
+	}
+	wr.wi = userWiki
 }
 
 func getGenericTemplate(wr *wikiRequest) wikiTemplate {
