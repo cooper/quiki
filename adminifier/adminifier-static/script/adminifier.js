@@ -147,6 +147,7 @@ a.fakeAdopt = function (child) {
     parent.appendChild(child);
 };
 
+window.addEvent('popstate',     loadURL);
 document.addEvent('domready', 	loadURL);
 document.addEvent('domready',	searchHandler);
 document.addEvent('domready',   addDocumentFrameClickHandler);
