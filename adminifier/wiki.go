@@ -355,6 +355,13 @@ func handleSwitchBranch(wr *wikiRequest) {
 		return
 	}
 
+	// bad branch name
+	branchName := wr.r.Form.Get("branch")
+	if !wiki.ValidBranchName(branchName) {
+		wr.err = errors.New("invalid branch name")
+		return
+	}
+
 	// fetch the branch
 	_, wr.err = wr.wi.Branch((relPath))
 	if wr.err != nil {
@@ -373,14 +380,19 @@ func handleSwitchBranch(wr *wikiRequest) {
 
 func handleCreateBranch(wr *wikiRequest) {
 
-	// missing parameters or malformed request
 	// TODO: need a different version of parsePost that returns JSON errors
 	if !parsePost(wr.w, wr.r, "branch") {
 		return
 	}
 
-	// switch branches
+	// bad branch name
 	branchName := wr.r.Form.Get("branch")
+	if !wiki.ValidBranchName(branchName) {
+		wr.err = errors.New("invalid branch name")
+		return
+	}
+
+	// create or switch branches
 	_, err := wr.wi.NewBranch(branchName)
 	if err != nil {
 		wr.err = err

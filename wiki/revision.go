@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/cooper/quiki/wikifier"
@@ -254,4 +255,15 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 
 	// now that it exists, fetch it
 	return w.Branch(name)
+}
+
+var branchNameRgx = regexp.MustCompile(`^[\w]+[\w/]*[\w]+$`)
+
+// ValidBranchName returns whether a branch name is valid.
+//
+// quiki branch names may contain word-like characters `\w` and
+// forward slash (`/`) but may not start or end with a slash.
+//
+func ValidBranchName(name string) bool {
+	return branchNameRgx.MatchString(name)
 }
