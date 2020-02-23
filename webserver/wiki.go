@@ -253,3 +253,16 @@ func setupWiki(wi *WikiInfo) error {
 	wi.Title = wi.Opt.Name
 	return nil
 }
+
+// Copy creates a WikiInfo with all the same options, minus Wiki.
+// It is used for working with multiple branches within a wiki.
+func (wi *WikiInfo) Copy(w *wiki.Wiki) *WikiInfo {
+	return &WikiInfo{
+		Name:     wi.Name,
+		Title:    wi.Title,
+		Logo:     wi.Logo,
+		Host:     wi.Host,
+		template: wi.template,
+		Wiki:     w,
+	}
+}

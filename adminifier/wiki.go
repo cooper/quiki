@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -29,6 +28,11 @@ var frameHandlers = map[string]func(*wikiRequest){
 	"switch-branch": handleSwitchBranchFrame,
 }
 
+var wikiFuncHandlers = map[string]func(*wikiRequest){
+	"switch-branch": nil,
+	"create-branch": handleCreateBranch,
+}
+
 // wikiTemplate members are available to all wiki templates
 type wikiTemplate struct {
 	User      authenticator.User // user
@@ -42,6 +46,7 @@ type wikiTemplate struct {
 
 type wikiRequest struct {
 	shortcode string
+	wikiRoot  string
 	wi        *webserver.WikiInfo
 	w         http.ResponseWriter
 	r         *http.Request
@@ -67,7 +72,6 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 	// frames to load via ajax
 	frameRoot := root + shortcode + "/frame/"
-	log.Println(frameRoot)
 	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
@@ -83,17 +87,27 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		var dot interface{} = nil
 		if handler, exist := frameHandlers[frameName]; exist {
 
+			// possibly switch wiki branches
+			userWiki := wi
+			branchName := sessMgr.GetString(r.Context(), "branch")
+			if branchName != "" {
+				branchWiki, err := wi.Branch(branchName)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				userWiki = wi.Copy(branchWiki)
+			}
+
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
-				wi:        wi,
+				wikiRoot:  root + shortcode,
+				wi:        userWiki,
 				w:         w,
 				r:         r,
 			}
 			dot = wr
-
-			// TODO: if working in another branch, override wr.wi to
-			// the wiki instance for that branch
 
 			// call handler
 			handler(wr)
@@ -126,6 +140,54 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			panic(err)
 		}
 	})
+
+	// functions
+	funcRoot := root + shortcode + "/func/"
+	for funcName, thisHandler := range wikiFuncHandlers {
+		handler := thisHandler
+		mux.HandleFunc(host+funcRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
+
+			// check logged in
+			//
+			// TODO: everything in func/ will be JSON,
+			// so return a "not logged in" error to present login popup
+			// rather than redirecting
+			//
+			if !sessMgr.GetBool(r.Context(), "loggedIn") {
+				http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+				return
+			}
+
+			// possibly switch wiki branches
+			userWiki := wi
+			branchName := sessMgr.GetString(r.Context(), "branch")
+			if branchName != "" {
+				branchWiki, err := wi.Branch(branchName)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				userWiki = wi.Copy(branchWiki)
+			}
+
+			// create wiki request
+			wr := &wikiRequest{
+				shortcode: shortcode,
+				wikiRoot:  root + shortcode,
+				wi:        userWiki,
+				w:         w,
+				r:         r,
+			}
+
+			// call handler
+			handler(wr)
+
+			// handler returned an error
+			if wr.err != nil {
+				panic(wr.err)
+			}
+		})
+	}
 }
 
 func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
@@ -300,10 +362,31 @@ func handleSwitchBranchFrame(wr *wikiRequest) {
 	}
 }
 
+func handleCreateBranch(wr *wikiRequest) {
+
+	// missing parameters or malformed request
+	// TODO: need a different version of parsePost that returns JSON errors
+	if !parsePost(wr.w, wr.r, "branch") {
+		return
+	}
+
+	// switch branches
+	branchName := wr.r.Form.Get("branch")
+	_, err := wr.wi.NewBranch(branchName)
+	if err != nil {
+		wr.err = err
+		return
+	}
+	sessMgr.Put(wr.r.Context(), "branch", branchName)
+
+	// redirect back to dashboard
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
+}
+
 func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 	return wikiTemplate{
 		User:      sessMgr.Get(wr.r.Context(), "user").(authenticator.User),
-		Branch:    "master", // TODO
+		Branch:    sessMgr.GetString(wr.r.Context(), "branch"),
 		Shortcode: wr.shortcode,
 		WikiTitle: wr.wi.Title,
 		AdminRoot: strings.TrimRight(root, "/"),

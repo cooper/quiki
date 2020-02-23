@@ -59,6 +59,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	// start session and remember user info
 	sessMgr.Put(r.Context(), "user", &user)
 	sessMgr.Put(r.Context(), "loggedIn", true)
+	sessMgr.Put(r.Context(), "branch", "master")
 
 	// redirect to dashboard, which is now located at adminifier root
 	http.Redirect(w, r, "../", http.StatusTemporaryRedirect)

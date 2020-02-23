@@ -1,11 +1,14 @@
 package wiki
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/cooper/quiki/wikifier"
+	"gopkg.in/src-d/go-billy.v4"
 
 	"github.com/cooper/go-git/v4"
 	"github.com/cooper/go-git/v4/config"
@@ -120,7 +123,7 @@ func (w *Wiki) BranchNames() ([]string, error) {
 		return nil, err
 	}
 	branches.ForEach(func(ref *plumbing.Reference) error {
-		names = append(names, string(ref.Name()))
+		names = append(names, ref.Name().Short())
 		return nil
 	})
 	return names, nil
@@ -142,6 +145,12 @@ func (w *Wiki) hasBranch(name string) (bool, error) {
 
 // checks out a branch in another directory. returns the directory
 func (w *Wiki) checkoutBranch(name string) (string, error) {
+
+	// never checkout master in a linked repo
+	if name == "master" {
+		return "", errors.New("cannot check out master in a linked repo")
+	}
+
 	// TODO: make sure name is a simple string with no path elements
 
 	// make cache/branch/ if needed
@@ -171,6 +180,11 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 // Branch returns a Wiki instance for this wiki at another branch.
 // If the branch does not exist, an error is returned.
 func (w *Wiki) Branch(name string) (*Wiki, error) {
+
+	// never checkout master in a linked repo
+	if name == "master" {
+		return w, nil
+	}
 
 	// find branch
 	if exist, err := w.hasBranch(name); !exist {
@@ -208,8 +222,31 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 		// try to create it
 		err := repo.CreateBranch(&config.Branch{
 			Name:  name,
-			Merge: plumbing.Master,
+			Merge: plumbing.ReferenceName("refs/heads/" + name),
 		})
+		if err != nil {
+			return nil, err
+		}
+
+		// determine where master is at
+		fs := repo.Storer.(interface{ Filesystem() billy.Filesystem }).Filesystem()
+		f1, err := fs.Open(fs.Join("refs", "heads", "master"))
+		if err != nil {
+			return nil, err
+		}
+		defer f1.Close()
+		masterRef, err := ioutil.ReadAll(f1)
+		if err != nil {
+			return nil, err
+		}
+
+		// set refs/heads/<name> to same as master
+		f2, err := fs.Create(fs.Join("refs", "heads", name))
+		if err != nil {
+			return nil, err
+		}
+		defer f2.Close()
+		_, err = fmt.Fprintf(f2, "%s\n", string(masterRef))
 		if err != nil {
 			return nil, err
 		}

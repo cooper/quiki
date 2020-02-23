@@ -21,4 +21,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200221170553-0f24fbd83dfb
 	gopkg.in/inconshreveable/log15.v2 v2.0.0-20200109203555-b30bc20e4fd1 // indirect
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
+	gopkg.in/src-d/go-billy.v4 v4.3.2
 )
