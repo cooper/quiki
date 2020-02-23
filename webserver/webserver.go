@@ -55,7 +55,7 @@ var SessMgr *scs.SessionManager
 func Configure(confFile string) {
 	var err error
 	Mux = http.NewServeMux()
-	gob.Register(authenticator.User{})
+	gob.Register(&authenticator.User{})
 
 	// parse configuration
 	Conf = wikifier.NewPage(confFile)

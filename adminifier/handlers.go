@@ -29,10 +29,10 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.ExecuteTemplate(w, "server.tpl", struct {
-		User  authenticator.User
+		User  *authenticator.User
 		Wikis map[string]*webserver.WikiInfo
 	}{
-		User:  sessMgr.Get(r.Context(), "user").(authenticator.User),
+		User:  sessMgr.Get(r.Context(), "user").(*authenticator.User),
 		Wikis: webserver.Wikis,
 	})
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
