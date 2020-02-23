@@ -349,27 +349,26 @@ func handleSwitchBranchFrame(wr *wikiRequest) {
 }
 
 func handleSwitchBranch(wr *wikiRequest) {
-	relPath := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/switch-branch/")
-	if relPath == "" {
+	branchName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/switch-branch/")
+	if branchName == "" {
 		wr.err = errors.New("no branch selected")
 		return
 	}
 
 	// bad branch name
-	branchName := wr.r.Form.Get("branch")
 	if !wiki.ValidBranchName(branchName) {
-		wr.err = errors.New("invalid branch name")
+		wr.err = errors.New("invalid branch name: " + branchName)
 		return
 	}
 
 	// fetch the branch
-	_, wr.err = wr.wi.Branch((relPath))
+	_, wr.err = wr.wi.Branch(branchName)
 	if wr.err != nil {
 		return
 	}
 
 	// set branch
-	sessMgr.Put(wr.r.Context(), "branch", relPath)
+	sessMgr.Put(wr.r.Context(), "branch", branchName)
 
 	// TODO: when this request is submitted by JS, the UI can just reload
 	// the current frame so the user stays on the same page, just in new branch
@@ -388,7 +387,7 @@ func handleCreateBranch(wr *wikiRequest) {
 	// bad branch name
 	branchName := wr.r.Form.Get("branch")
 	if !wiki.ValidBranchName(branchName) {
-		wr.err = errors.New("invalid branch name")
+		wr.err = errors.New("invalid branch name: " + branchName)
 		return
 	}
 
