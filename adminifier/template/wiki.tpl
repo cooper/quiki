@@ -50,7 +50,7 @@ var adminifier = {
         <li data-nav="settings"><a class="frame-click" href="{{.Root}}/settings"><i class="fa fa-cog"></i> <span>Settings</a></li>
         <li data-nav="help"><a class="frame-click" href="{{.Root}}/help"><i class="fa fa-question-circle"></i> <span>Help</a></li>
         {{if .ServerPanelAccess}}
-            <li><a href="{{.AdminRoot}}"><i class="fa fa-globe-americas"></i> <span>Sites</span></a></li>
+            <li><a href="{{.AdminRoot}}/"><i class="fa fa-globe-americas"></i> <span>Sites</span></a></li>
         {{else}}
             <li><a href="{{.AdminRoot}}/logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
         {{end}}
