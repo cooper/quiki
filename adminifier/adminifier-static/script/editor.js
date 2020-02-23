@@ -30,7 +30,6 @@ window.addEvent('resize',                       adjustCurrentPopup);
 function pageScriptsLoadedHandler () {
     console.log('Editor script loaded');
     setupToolbar();
-    window.onbeforeunload = confirmOnPageExit;
     
     // load required ace resources
     Range  = ace.require('ace/range').Range;
@@ -65,7 +64,6 @@ function pageUnloadedHandler () {
     document.removeEvent('editorLoaded',        editorLoadedHandler);
     window.removeEvent('resize',                adjustCurrentPopup);
     document.body.removeEvent('click',          clickOutHandler);
-    delete window.onbeforeunload;
     delete a.editor;
 }
 
@@ -97,15 +95,6 @@ function clickOutHandler (e) {
         e.preventDefault();
         alert('You have unsaved changes.');
     }
-}
-
-// FIXME: issue #31
-function confirmOnPageExit (e) {
-    if (!ae.hasUnsavedChanges())
-        return;
-    var message = 'You have unsaved changes.';
-    if (e) e.returnValue = message;
-    return message;
 }
 
 // escape key pressed
