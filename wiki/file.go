@@ -167,3 +167,44 @@ func (w *Wiki) pathForModel(modelName string) string {
 	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Model, modelName))
 	return path
 }
+
+// Dir returns the absolute path to the resolved wiki directory.
+// If the wiki directory is a symlink, it is followed.
+//
+// Optional path components can be passed as arguments to be joined
+// with the wiki root by the path separator.
+func (w *Wiki) Dir(dirs ...string) string {
+	wikiAbs, _ := filepath.Abs(w.Opt.Dir.Wiki)
+	return filepath.Join(append([]string{wikiAbs}, dirs...)...)
+}
+
+// UnresolvedAbsFilePath takes a relative path to a file within the wiki
+// (e.g. `pages/mypage.page`) and joins it with the absolute path to the wiki
+// directory. The result is an absolute path which may or may not exist.
+//
+// Symlinks are not followed. If that is desired, use absoluteFilePath instead.
+//
+func (w *Wiki) UnresolvedAbsFilePath(relPath string) string {
+
+	// sanitize
+	relPath = filepath.FromSlash(relPath)
+
+	// join with wiki dir
+	path := w.Dir(relPath)
+
+	// resolve symlink
+	abs, _ := filepath.Abs(path)
+	return abs
+}
+
+// AbsFilePath takes a relative path to a file within the wiki
+// (e.g. `pages/mypage.page`), joins it with the wiki directory, and evaluates it
+// with `filepath.Abs()`. The result is an absolute path which may or may not exist.
+//
+// If the file is a symlink, it is followed. Thus, it is possible for the resulting
+// path to exist outside the wiki directory. If that is not desired, use
+// unresolvedAbsFilePath instead.
+func (w *Wiki) AbsFilePath(relPath string) string {
+	path, _ := filepath.Abs(w.Dir(w.UnresolvedAbsFilePath(relPath)))
+	return path
+}
