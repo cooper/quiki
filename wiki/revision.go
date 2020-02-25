@@ -21,6 +21,9 @@ import (
 // CommitOpts describes the options for a wiki revision.
 type CommitOpts struct {
 
+	// Comment is the commit description.
+	Comment string
+
 	// Name is the fullname of the user committing changes.
 	Name string
 
@@ -192,6 +195,48 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 	return targetDir, nil
 }
 
+// addAndCommit adds a file and then commits changes
+func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
+
+	// get repo
+	repo, err := w.repo()
+	if err != nil {
+		return err
+	}
+
+	// get worktree
+	wt, err := repo.Worktree()
+	if err != nil {
+		return errors.Wrap(err, "git:addAndCommit:Worktree")
+	}
+
+	// add the file
+	_, err = wt.Add(path)
+	if err != nil {
+		return err
+	}
+
+	// determine comment
+	comment := filepath.Base(path)
+	if commit.Comment != "" {
+		comment += ": " + commit.Comment
+	}
+
+	// commit
+	_, err = wt.Commit(comment, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  commit.Name,
+			Email: commit.Email,
+			When:  commit.Time,
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "git:addAndCommit:Commit")
+	}
+
+	return nil
+}
+
 // Branch returns a Wiki instance for this wiki at another branch.
 // If the branch does not exist, an error is returned.
 func (w *Wiki) Branch(name string) (*Wiki, error) {
@@ -317,7 +362,11 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 		return errors.New("symlink cannot be written with WriteFile")
 	}
 
-	// TODO: finish
+	// write file all at once
+	if err := ioutil.WriteFile(path, content, 0644); err != nil {
+		return err
+	}
 
-	return nil
+	// commit the change
+	return w.addAndCommit(path, commit)
 }
