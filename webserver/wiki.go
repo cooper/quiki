@@ -241,7 +241,7 @@ func setupWiki(wi *WikiInfo) error {
 
 	// file server
 	rootFile := wi.Opt.Root.File
-	dirWiki := wi.Opt.Dir.Wiki
+	dirWiki := wi.Dir()
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))

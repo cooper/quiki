@@ -18,6 +18,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+// CommitOpts describes the options for a wiki revision.
+type CommitOpts struct {
+
+	// Name is the fullname of the user committing changes.
+	Name string
+
+	// Email is the email address of the user committing changes.
+	Email string
+
+	// Time is the timestamp to associate with the revision.
+	// If unspecified, current time is used.
+	Time time.Time
+}
+
 // default options for commits made by quiki itself
 var quikiCommitOpts = &git.CommitOptions{
 	Author: &object.Signature{
@@ -37,7 +51,7 @@ func (w *Wiki) repo() (repo *git.Repository, err error) {
 	}
 
 	// open it
-	repo, err = git.PlainOpen(w.Opt.Dir.Wiki)
+	repo, err = git.PlainOpen(w.Dir())
 
 	// it doesn't exist- let's initialize it
 	if err == git.ErrRepositoryNotExists {
@@ -58,7 +72,7 @@ func (w *Wiki) repo() (repo *git.Repository, err error) {
 func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 
 	/// initialize new repo
-	repo, err = git.PlainInit(w.Opt.Dir.Wiki, false)
+	repo, err = git.PlainInit(w.Dir(), false)
 
 	// error in init
 	if err != nil {
@@ -98,7 +112,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 
 // // IsRepo returns true if the wiki directory is versioned by git.
 // func (w *Wiki) IsRepo() bool {
-// 	_, err := os.Stat(filepath.Join(w.Opt.Dir.Wiki, ".git"))
+// 	_, err := os.Stat(w.Dir(".git"))
 // 	return err == nil
 // }
 
@@ -108,7 +122,7 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 // 	if w.IsRepo() {
 // 		return nil
 // 	}
-// 	_, err := git.Init(ginit.Quiet, ginit.Directory(w.Opt.Dir.Wiki))
+// 	_, err := git.Init(ginit.Quiet, ginit.Directory(w.Dir())
 // 	return err
 // }
 
@@ -266,4 +280,44 @@ var branchNameRgx = regexp.MustCompile(`^[\w]+[\w\-/]*[\w]+$`)
 //
 func ValidBranchName(name string) bool {
 	return branchNameRgx.MatchString(name)
+}
+
+// WritePage writes a page file.
+
+// WriteFile writes a file in the wiki.
+//
+// The filename must be relative to the wiki directory.
+//
+// If the file does not exist and createOK is false, an error is returned.
+// If the file exists and is a symbolic link, an error is returned.
+//
+// This is a low-level API that allows writing any file within the wiki
+// directory, so it should not be utilized directly by frontends.
+// Use WritePage, WriteModel, WriteImage, or WriteConfig instead.
+//
+func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error {
+	path := w.UnresolvedAbsFilePath(name)
+	fi, err := os.Lstat(path)
+
+	if err != nil {
+		// some error occurred
+
+		if os.IsNotExist(err) {
+			// file doesn't exist-- only care if createOK is false
+			if !createOK {
+				return err
+			}
+		} else {
+			// all other errors are always bad
+			return err
+		}
+	} else if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+		// no errors occurred, so file exists
+		// check if it's a symlink
+		return errors.New("symlink cannot be written with WriteFile")
+	}
+
+	// TODO: finish
+
+	return nil
 }
