@@ -31,6 +31,7 @@ var frameHandlers = map[string]func(*wikiRequest){
 var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"switch-branch/": handleSwitchBranch,
 	"create-branch":  handleCreateBranch,
+	"write-page":     handleWritePage,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -404,6 +405,21 @@ func handleCreateBranch(wr *wikiRequest) {
 	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
 }
 
+func handleWritePage(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "page", "content") {
+		return
+	}
+
+	// TODO: double check the path is OK
+	pageName, content, message := wr.r.Form.Get("page"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
+
+	// write the file & commit
+	if err := wr.wi.WriteFile(filepath.Join("pages", pageName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
+		wr.err = err
+		return
+	}
+}
+
 // possibly switch wiki branches
 func switchUserWiki(wr *wikiRequest, wi *webserver.WikiInfo) {
 	userWiki := wi
@@ -429,5 +445,14 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		AdminRoot:         strings.TrimRight(root, "/"),
 		Static:            root + "adminifier-static",
 		Root:              root + wr.shortcode,
+	}
+}
+
+func getCommitOpts(wr *wikiRequest, comment string) wiki.CommitOpts {
+	user := sessMgr.Get(wr.r.Context(), "user").(*authenticator.User)
+	return wiki.CommitOpts{
+		Comment: comment,
+		Name:    user.DisplayName,
+		Email:   user.Email,
 	}
 }

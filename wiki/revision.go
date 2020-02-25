@@ -207,7 +207,7 @@ func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
 	// get worktree
 	wt, err := repo.Worktree()
 	if err != nil {
-		return errors.Wrap(err, "git:addAndCommit:Worktree")
+		return errors.Wrap(err, "git:repo:Worktree")
 	}
 
 	// add the file
@@ -231,7 +231,7 @@ func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "git:addAndCommit:Commit")
+		return errors.Wrap(err, "git:worktree:Commit")
 	}
 
 	return nil
