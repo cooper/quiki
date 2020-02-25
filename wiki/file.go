@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cooper/quiki/wikifier"
@@ -33,7 +34,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	path = filepath.FromSlash(path) // just in case
 
 	// ensure it can be made relative to dir.wiki
-	relPath := w.relPath(path)
+	relPath := w.RelPath(path)
 	if relPath == "" {
 		return DisplayError{
 			Error:         "Bad filepath",
@@ -74,10 +75,28 @@ func (w *Wiki) checkDirectories() {
 	panic("unimplemented")
 }
 
-// relPath returns a path relative to the wiki root
-// FIXME: check for ..???
-func (w *Wiki) relPath(absPath string) string {
-	wikiAbs, _ := filepath.Abs(w.Opt.Dir.Wiki)
+// RelPath takes an absolute file path and attempts to make it relative
+// to the wiki directory, regardless of whether the path exists.
+//
+// If the path can be made relative without following symlinks, this is
+// preferred. If that fails, symlinks in absPath are followed and a
+// second attempt is made.
+//
+// In any case the path cannot be made relative to the wiki directory,
+// an empty string is returned.
+func (w *Wiki) RelPath(absPath string) string {
+	rel := w._relPath(absPath)
+	if strings.Contains(rel, ".."+string(os.PathSeparator)) {
+		return ""
+	}
+	if strings.Contains(rel, string(os.PathSeparator)+"..") {
+		return ""
+	}
+	return rel
+}
+
+func (w *Wiki) _relPath(absPath string) string {
+	wikiAbs := w.Dir()
 
 	// can't resolve wiki path
 	if wikiAbs == "" {
