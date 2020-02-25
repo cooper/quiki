@@ -257,7 +257,7 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 	return w.Branch(name)
 }
 
-var branchNameRgx = regexp.MustCompile(`^[\w]+[\w/]*[\w]+$`)
+var branchNameRgx = regexp.MustCompile(`^[\w]+[\w\-/]*[\w]+$`)
 
 // ValidBranchName returns whether a branch name is valid.
 //
