@@ -85,7 +85,10 @@ func (w *Wiki) createRepo() (repo *git.Repository, err error) {
 	// initialized ok
 
 	// create master branch
-	err = repo.CreateBranch(&config.Branch{Name: "master"})
+	err = repo.CreateBranch(&config.Branch{
+		Name:  "master",
+		Merge: plumbing.Master,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "git:repo:CreateBranch")
 	}
@@ -287,7 +290,7 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 		// try to create it
 		err := repo.CreateBranch(&config.Branch{
 			Name:  name,
-			Merge: plumbing.ReferenceName("refs/heads/" + name),
+			Merge: plumbing.NewBranchReferenceName(name),
 		})
 		if err != nil {
 			return nil, err
