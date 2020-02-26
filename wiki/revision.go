@@ -217,9 +217,14 @@ func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
 	}
 
 	// determine comment
-	comment := filepath.Base(path)
+	comment := "Update " + filepath.Base(path)
 	if commit.Comment != "" {
 		comment += ": " + commit.Comment
+	}
+
+	// time defaults to now
+	if commit.Time.IsZero() {
+		commit.Time = time.Now()
 	}
 
 	// commit
@@ -368,5 +373,5 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 	}
 
 	// commit the change
-	return w.addAndCommit(path, commit)
+	return w.addAndCommit(name, commit)
 }
