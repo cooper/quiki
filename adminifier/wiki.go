@@ -11,6 +11,7 @@ import (
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
+	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
 
@@ -55,6 +56,11 @@ type wikiRequest struct {
 	tmplName  string
 	dot       interface{}
 	err       error
+}
+
+type editorOpts struct {
+	model, config bool
+	info          wikifier.PageInfo
 }
 
 // TODO: verify session on ALL wiki handlers
@@ -253,7 +259,7 @@ func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
 
 func handleSettingsFrame(wr *wikiRequest) {
 	// serve editor for the config file
-	handleEditor(wr, wr.wi.ConfigFile, "wiki.conf", "Configuration file", false, true)
+	handleEditor(wr, wr.wi.ConfigFile, "wiki.conf", "Configuration file", editorOpts{config: true})
 }
 
 func handleEditPageFrame(wr *wikiRequest) {
@@ -274,7 +280,7 @@ func handleEditPageFrame(wr *wikiRequest) {
 	}
 
 	// serve editor
-	handleEditor(wr, info.Path, info.File, info.Title, false, false)
+	handleEditor(wr, info.Path, info.File, info.Title, editorOpts{info: info})
 }
 
 func handleEditModelFrame(wr *wikiRequest) {
@@ -295,10 +301,10 @@ func handleEditModelFrame(wr *wikiRequest) {
 	}
 
 	// serve editor
-	handleEditor(wr, info.Path, info.File, info.File, true, false)
+	handleEditor(wr, info.Path, info.File, info.File, editorOpts{model: true})
 }
 
-func handleEditor(wr *wikiRequest, path, file, title string, model, config bool) {
+func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 	wr.tmplName = "frame-editor.tpl"
 
 	// call DisplayFile to get the content
@@ -314,6 +320,22 @@ func handleEditor(wr *wikiRequest, path, file, title string, model, config bool)
 		return
 	}
 
+	// json stuff
+	jsonData, err := json.Marshal(struct {
+		Model  bool              `json:"model"`
+		Config bool              `json:"config"`
+		Info   wikifier.PageInfo `json:"info,omitempty"`
+	}{
+		Model:  o.model,
+		Config: o.config,
+		Info:   o.info,
+	})
+	if err != nil {
+		wr.err = err
+		return
+	}
+
+	// template stuff
 	wr.dot = struct {
 		Found   bool
 		JSON    template.HTML
@@ -325,9 +347,9 @@ func handleEditor(wr *wikiRequest, path, file, title string, model, config bool)
 		wikiTemplate
 	}{
 		Found:        true,
-		JSON:         template.HTML("<!--JSON\n{}\n-->"), // TODO
-		Model:        model,
-		Config:       config,
+		JSON:         template.HTML("<!--JSON\n" + string(jsonData) + "\n-->"),
+		Model:        o.model,
+		Config:       o.config,
 		Title:        title,
 		File:         file,
 		Content:      fileRes.Content,

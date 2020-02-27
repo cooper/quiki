@@ -24,6 +24,7 @@ a.currentJSONMetadata.results.each(function (pageData) {
     });
     entry.setInfoState('Draft', pageData.draft);
     entry.setInfoState('Redirect', pageData.redirect);
+    entry.setInfoState('External', pageData.external);
     entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });

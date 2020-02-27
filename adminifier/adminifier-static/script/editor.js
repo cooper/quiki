@@ -39,6 +39,9 @@ function pageScriptsLoadedHandler () {
     editor = ace.edit('editor');
     ae.lastSavedData = editor.getValue();
 
+    // set read-only if page is external
+    editor.setReadOnly(!!a.currentJSONMetadata.info.external);
+
     // render editor
     var themeName = adminifier.themeName || 'twilight';
     editor.setTheme('ace/theme/' + themeName);
@@ -68,10 +71,18 @@ function pageUnloadedHandler () {
 }
 
 function editorLoadedHandler () {
+
+    // update page title in top bar
     ae.updatePageTitle();
+
+    // move cursor to start
     ae.resetSelectionAtTopLeft();
+
+    // update warnings/errors
     if (a.currentJSONMetadata && a.currentJSONMetadata.display_result)
-        ae.handlePageDisplayResult(a.currentJSONMetadata.display_result);
+        ae.handlePageDisplayResult(a.currentJSONMetadata.display_result);    
+
+    // load editor plugins
     plugins.each(function (plugin) {
         a.loadScript('editor-plugins/' + plugin);
     });
@@ -155,6 +166,9 @@ ae.addToolbarFunctions = function (funcs) {
 
     // on domready, make the associated toolbar buttons available
     document.addEvent('domready', function () { 
+        // ...unless editor is read-only
+        if (editor.getReadOnly())
+            return;
         Object.keys(funcs).each(function (funcName) {
             var li = $$('.editor-toolbar li.hidden[data-action=' + funcName + ']');
             if (!li || !li[0]) return;
