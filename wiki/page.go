@@ -214,6 +214,8 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	// this is for pages we just parsed with @page.redirect
 	if redir := page.Redirect(); redir != "" {
 		w.writeRedirectCache(page)
+		w.updatePageCategories(page)
+		// consider: set r.Categories? can redirects belong to categories?
 		return DisplayRedirect{Redirect: redir}
 	}
 
@@ -340,6 +342,7 @@ func (w *Wiki) writeRedirectCache(page *wikifier.Page) {
 	}
 
 	cacheFile.Write(j)
+	cacheFile.Write([]byte{'\n'})
 }
 
 func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
@@ -459,7 +462,7 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	if err := json.Unmarshal(jsonData, &info); err != nil {
 		return DisplayError{
 			Error:         "Could not read page cache file.",
-			DetailedError: "JSON encode error: " + err.Error(),
+			DetailedError: "JSON decode error: " + err.Error(),
 		}
 	}
 

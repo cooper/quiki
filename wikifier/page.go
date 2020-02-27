@@ -41,8 +41,9 @@ type Page struct {
 
 // PageInfo represents metadata associated with a page.
 type PageInfo struct {
-	Path      string     `json:"omit"`                // absolute filepath
+	Path      string     `json:"-"`                   // absolute filepath
 	File      string     `json:"file,omitempty"`      // name with extension, always with forward slashes
+	FileNE    string     `json:"file_ne,omitempty"`   // name without extension, always with forward slashes
 	Created   *time.Time `json:"created,omitempty"`   // creation time
 	Modified  *time.Time `json:"modified,omitempty"`  // modify time
 	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
@@ -401,6 +402,7 @@ func (p *Page) Categories() []string {
 func (p *Page) Info() PageInfo {
 	info := PageInfo{
 		File:      p.Name(),
+		FileNE:    p.NameNE(),
 		Draft:     p.Draft(),
 		Generated: p.Generated(),
 		Redirect:  p.Redirect(),
