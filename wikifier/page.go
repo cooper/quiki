@@ -48,6 +48,7 @@ type PageInfo struct {
 	Modified  *time.Time `json:"modified,omitempty"`  // modify time
 	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
 	Generated bool       `json:"generated,omitempty"` // true if page was generated from another source
+	External  bool       `json:"external,omitempty"`  // true if page is outside the page directory
 	Redirect  string     `json:"redirect,omitempty"`  // path page is to redirect to
 	FmtTitle  HTML       `json:"fmt_title,omitempty"` // title with formatting tags
 	Title     string     `json:"title,omitempty"`     // title without tags
@@ -360,6 +361,37 @@ func (p *Page) Generated() bool {
 	return b
 }
 
+// External returns true if the page is outside the page directory
+// as defined by the configuration, with symlinks considered.
+//
+// If `dir.wiki` isn't set, External is always true
+// (since the page is not associated with a wiki at all).
+func (p *Page) External() bool {
+
+	// not part of a wiki at all
+	dirPage := pageAbs(p.Opt.Dir.Page)
+	if dirPage == "" {
+		return true
+	}
+
+	// cannot be made relative
+	rel, err := filepath.Rel(dirPage, p.Path())
+	if err != nil {
+		return true
+	}
+
+	// contains ../ so it's not relative
+	if strings.Contains(rel, ".."+string(os.PathSeparator)) {
+		return true
+	}
+	if strings.Contains(rel, string(os.PathSeparator)+"..") {
+		return true
+	}
+
+	// otherwise it's in there
+	return false
+}
+
 // Author returns the page author's name, if any.
 func (p *Page) Author() string {
 	s, _ := p.GetStr("page.author")
@@ -405,6 +437,7 @@ func (p *Page) Info() PageInfo {
 		FileNE:    p.NameNE(),
 		Draft:     p.Draft(),
 		Generated: p.Generated(),
+		External:  p.External(),
 		Redirect:  p.Redirect(),
 		FmtTitle:  p.FmtTitle(),
 		Title:     p.Title(),
