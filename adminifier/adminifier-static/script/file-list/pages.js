@@ -17,13 +17,13 @@ var pageList = new FileList({
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (pageData) {
     var entry = new FileListEntry({
-        Title:      pageData.title || pageData.file_ne,
+        Title:      pageData.title || pageData.file_ne || pageData.file,
         Author:     pageData.author,
         Created:    pageData.created,
         Modified:   pageData.modified
     });
-    entry.setInfoState('Generated', pageData.generated);
     entry.setInfoState('Draft', pageData.draft);
+    entry.setInfoState('Redirect', pageData.redirect);
     entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });
