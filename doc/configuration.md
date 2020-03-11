@@ -424,3 +424,29 @@ the wiki is located within that container. The shortname becomes the name of
 its directory inside `server.dir.wiki`.
 
 __Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]`
+
+### adminifier.enable
+
+Enables the adminifier server administration panel.
+
+__Default__: Disabled (but enabled in the example configuration)
+
+### adminifier.host
+
+_Optional_. Specifies an HTTP host to bind to for the adminifier web panel.
+
+__Default__: None (i.e., adminifier is available on all hosts)
+
+### adminifier.root
+
+_Optional_ (required with [`adminifier.enable`](#adminifierenable)).
+Specifies the HTTP root for the adminifier web panel.
+
+If [`adminifier.host`](#adminifierhost) is specified and that hostname is
+dedicated to adminifier, you can set `adminifier.root` empty to occupy the
+entire host, for example:
+
+    @adminifier.host: admin.mywiki.example.com;
+    @adminifier.root: ;
+
+__Default__: None (`/admin` in the example configuration)
