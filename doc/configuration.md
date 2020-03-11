@@ -42,6 +42,8 @@ It may be overridden in the server configuration by
 
 If specified in neither place, the wiki is accessible from all available hosts.
 
+__Default__: None (all hosts)
+
 ### dir.wiki
 
 Path to the wiki.
@@ -51,6 +53,8 @@ With webserver, this can be omitted if either:
 1. [`server.dir.wiki`](#serverdirwiki) is configured, and the wiki is located
    in that directory.
 2. [`server.wiki.[name].dir`](#serverwikinamedir) is configured.
+
+In all other cases, it is __Required__.
 
 __Default__ (webserver): [`server.dir.wiki`](#serverdirwiki)`/[name]`
 
@@ -63,9 +67,9 @@ __Default__ (webserver): [`server.dir.wiki`](#serverdirwiki)`/[name]`
 | `root.image`  | Image root    | */images*      |
 | `root.file`   | File root     | None           |
 
-HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
-They are used for link targets and image URLs; they will never be used to
-locate content on the filesystem. Do not include trailing slashes.
+_Optional_. HTTP roots. These are relative to the server HTTP root, NOT the
+wiki root. They are used for link targets and image URLs; they will never be
+used to locate content on the filesystem. Do not include trailing slashes.
 
 It may be useful to use `root.wiki` within the definitions of the rest:
 
@@ -79,7 +83,7 @@ that this will likely expose your wiki configuration.
 
 ### external
 
-External wiki information.
+_Optional_. External wiki information.
 
 You can configure any number of external wikis, each referred to by a shorthand
 identifier `[wiki_id]` consisting of word-like characters.
@@ -110,7 +114,7 @@ From the page source, this looks like:
 
 ### page.enable.title
 
-If enabled, the first section's heading defaults to the title of the
+_Optional_. If enabled, the first section's heading defaults to the title of the
 page, and all other headings on the page are sized down one.
 
 You may want to disable this at the wiki level if your wiki content is
@@ -122,7 +126,7 @@ __Default__: Enabled
 
 ### image.size_method
 
-The method which quiki should use to scale images.
+_Optional_. The method which quiki should use to scale images.
 
 This is here for purposes of documentation only; there's probably no reason
 to ever stray away from the default for whichever quiki interface is used.
@@ -138,7 +142,7 @@ __Default__ (low-level): _javascript_
 
 ### image.calc
 
-A function reference that calculates a missing dimension of an image.
+_Optional_. A function reference that calculates a missing dimension of an image.
 This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
 This is here for purposes of documentation only and can only be configured
@@ -148,7 +152,7 @@ __Default__: (webserver) built-in function
 
 ### image.sizer
 
-A function reference that returns the URL to a sized version of an image. After
+_Optional_. A function reference that returns the URL to a sized version of an image. After
 using [`image.calc`](#imagecalc) to find the dimensions of an image,
 `image.sizer` is called to generate a URL for the image at those dimensions.
 
@@ -163,7 +167,7 @@ These options are available to the wiki website interface.
 
 ### image.type
 
-The desired file type for generated images.
+_Optional_. The desired file type for generated images.
 
 When configured, all resulting images will be in this format, regardless of
 their original format. Unless you have a specific reason to do this, omit
@@ -177,14 +181,14 @@ __Default__: none (preserve original format)
 
 ### image.quality
 
-The desired quality of generated images with lossy compression. This is only
+_Optional_. The desired quality of generated images with lossy compression. This is only
 utilized if [`image.type`](#imagetype) is set to *jpeg*.
 
 __Default__: *100*
 
 ### image.retina
 
-Image scales to enable for displays with a greater than 1:1 pixel ratio.
+_Optional_. Image scales to enable for displays with a greater than 1:1 pixel ratio.
 
 For instance, to support both @2x and @3x scaling:
 
@@ -194,7 +198,7 @@ __Default__: *2, 3*
 
 ### page.enable.cache
 
-Enable caching of generated pages.
+_Optional_. Enable caching of generated pages.
 
 For best performance, page caching is enabled by default, and quiki will
 only generate pages if the source file has been modified since the cache
@@ -204,13 +208,13 @@ __Default__: Enabled
 
 ### cat.per_page
 
-Maximum number of pages to display on a single category posts page.
+_Optional_. Maximum number of pages to display on a single category posts page.
 
 __Default__: _5_
 
 ### cat.[name].main
 
-Set the main page for the category by the name of `[name]`.
+_Optional_. Set the main page for the category by the name of `[name]`.
 This means that it will be displayed before all other categories, regardless
 of their creation dates. The value of this option is the page filename.
 
@@ -227,13 +231,13 @@ __Default__: none (show newest first)
 
 ### cat.[name].title
 
-Sets the human-readable title for the category by the name of `[name]`.
+_Optional_. Sets the human-readable title for the category by the name of `[name]`.
 
 __Default__: none
 
 ### var.*
 
-Global wiki variable space. Variables defined in this space will be
+_Optional_. Global wiki variable space. Variables defined in this space will be
 available throughout the wiki. However they may be overwritten on a
 particular page.
 
@@ -253,7 +257,7 @@ here so that there is consistency amongst various frontends such as webserver.
 
 ### main_page
 
-Name of the main page.
+_Optional_. Name of the main page.
 
 This should not be the page's title but rather a filename, relative to the
 wiki page directory. The extension is not necessary.
@@ -262,18 +266,22 @@ wiki page directory. The extension is not necessary.
 @main_page: Welcome Page; /* normalized to welcome_page.page */
 ```
 
+__Default__ (webserver): None
+
 ### main_redirect
 
-If enabled, the wiki root redirects to the main page rather than just
+_Optional_. If enabled, the wiki root redirects to the main page rather than just
 rendering it at the root location.
 
 ```
 @main_redirect;
 ```
 
+__Default__ (webserver): Disabled
+
 ### error_page
 
-Name of the error page.
+_Optional_. Name of the error page.
 
 This should not be the page's title but rather a filename, relative to the
 wiki page directory. The extension is not necessary.
@@ -282,9 +290,11 @@ wiki page directory. The extension is not necessary.
 @error_page: Error; /* normalized to error.page */
 ```
 
+__Default__ (webserver): None (show generic error text)
+
 ### navigation
 
-Navigation items.
+_Optional_. Navigation items.
 
 Keys are unformatted text to be displayed, with spaces permitted.
 Values are URLs, relative to the current page (NOT the wiki root).
@@ -312,9 +322,11 @@ supported depends on the frontend or template being used by the wiki.
 };
 ```
 
+__Default__ (webserver): None
+
 ### template
 
-Name or path of the template used by the wiki.
+_Optional_. Name or path of the template used by the wiki.
 
 ```
 @template: default;
@@ -324,7 +336,7 @@ __Default__ (webserver): *default*
 
 ### logo
 
-Filename for the wiki logo, relative to the wiki image directory.
+_Optional_. Filename for the wiki logo, relative to the wiki image directory.
 
 Frontends like webserver automatically generate the logo in whatever dimensions
 are needed and display it where appropriate.
@@ -339,7 +351,7 @@ These options are respected by the quiki webserver.
 
 ### server.dir.wiki
 
-Path to some directory where wikis are stored.
+_Optional_. Path to some directory where wikis are stored.
 
 Your wikis do not all have to be in the same directory, so this is optional.
 However, if you make use of this, quiki can infer [`dir.wiki`](#dirwiki) for each
@@ -349,11 +361,12 @@ options.
 
 ### server.dir.adminifier
 
+_Optional_ (Required with [`adminifier.enable`](#adminifierenable)).
 Path to adminifier resources.
 
 ### server.enable.pregeneration
 
-If enabled, webserver pre-generates all pages and images upon start.
+_Optional_. If enabled, webserver pre-generates all pages and images upon start.
 
 __Requires__: [`page.enable.cache`](#pageenablecache)
 
@@ -361,7 +374,7 @@ __Default__: Enabled
 
 ### server.enable.monitor
 
-If enabled, webserver uses operating system facilities to monitor wiki
+_Optional_. If enabled, webserver uses operating system facilities to monitor wiki
 directories and pre-generate content when the source files are changed.
 
 __Requires__: [`page.enable.cache`](#pageenablecache)
@@ -410,14 +423,14 @@ template in the [template](#template) directive.
 
 ### server.wiki.[name].enable
 
-Enable the wiki with shortname `[name]`.
+_Optional_. Enable the wiki with shortname `[name]`.
 
 Any wikis configured that do not have this option present are skipped.
 Any number of wikis can be configured on a single server using this.
 
 ### server.wiki.[name].dir
 
-Path to the wiki with shortname `[name]`.
+_Optional_. Path to the wiki with shortname `[name]`.
 
 This can be omitted if [`server.dir.wiki`](#serverdirwiki) is set and
 the wiki is located within that container. The shortname becomes the name of
@@ -427,8 +440,9 @@ __Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]`
 
 ### adminifier.enable
 
-Enables the adminifier server administration panel.
+_Optional_. Enables the adminifier server administration panel.
 
+__Requires__: [`server.dir.adminifier`](#serverdiradminifier)
 __Default__: Disabled (but enabled in the example configuration)
 
 ### adminifier.host
@@ -439,8 +453,7 @@ __Default__: None (i.e., adminifier is available on all hosts)
 
 ### adminifier.root
 
-_Optional_ (required with [`adminifier.enable`](#adminifierenable)).
-Specifies the HTTP root for the adminifier web panel.
+_Optional_. Specifies the HTTP root for the adminifier web panel.
 
 If [`adminifier.host`](#adminifierhost) is specified and that hostname is
 dedicated to adminifier, you can set `adminifier.root` empty to occupy the
@@ -449,4 +462,4 @@ entire host, for example:
     @adminifier.host: admin.mywiki.example.com;
     @adminifier.root: ;
 
-__Default__: None (`/admin` in the example configuration)
+__Default__: None (i.e., `/`)
