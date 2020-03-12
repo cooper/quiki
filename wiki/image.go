@@ -274,7 +274,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		for _, scale := range w.Opt.Image.Retina {
 			scaledImage := img        // copy
 			scaledImage.Scale = scale // set scale
-			w.DisplaySizedImageGenerate(scaledImage, true)
+			w.DisplaySizedImageGenerate(scaledImage, generateOK)
 		}
 	}
 
@@ -321,10 +321,11 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
 
-	if !generateOK {
-		dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-		return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	}
+	// FIXME: disabled for now
+	// if !generateOK {
+	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
+	// }
 
 	// generate the image
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
