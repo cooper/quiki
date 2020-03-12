@@ -147,12 +147,12 @@ func (w *Wiki) allImageFiles() []string {
 func (w *Wiki) pathForPage(pageName string) string {
 
 	// try lowercased version first (quiki style)
-	lcPageName := wikifier.PageName(pageName)
+	lcPageName := filepath.FromSlash(wikifier.PageName(pageName))
 	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, lcPageName))
 
 	// it doesn't exist; try non-lowercased version (markdown/etc)
 	if _, err := os.Stat(path); err != nil {
-		normalPageName := wikifier.PageName(pageName)
+		normalPageName := filepath.FromSlash(wikifier.PageName(pageName))
 		normalPath, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Page, normalPageName))
 		if _, err := os.Stat(normalPath); err == nil {
 			return normalPath
@@ -176,14 +176,14 @@ func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bo
 
 // pathForImage returns the absolute path for an image.
 func (w *Wiki) pathForImage(imageName string) string {
-	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Image, imageName))
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Image, filepath.FromSlash(imageName)))
 	return path
 }
 
 // pathForModel returns the absolute path for a model.
 func (w *Wiki) pathForModel(modelName string) string {
 	modelName = wikifier.PageNameExt(modelName, ".model")
-	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Model, modelName))
+	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Model, filepath.FromSlash(modelName)))
 	return path
 }
 

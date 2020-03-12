@@ -96,7 +96,7 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	si := SizedImageFromName(name)
 	si.Width = width
 	si.Height = height
-	return page.Opt.Root.Image + "/" + si.FullName()
+	return page.Opt.Root.Image + "/" + si.TrueName()
 }
 
 func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {

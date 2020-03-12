@@ -35,10 +35,11 @@ type ImageInfo struct {
 
 // SizedImage represents an image in specific dimensions.
 type SizedImage struct {
-	// for example 100x200-myimage@3x.png
+	// for example mydir/100x200-myimage@3x.png
 	Width, Height int    // 100, 200 (dimensions as requested)
 	Scale         int    // 3 (scale as requested)
-	Name          string // myimage (name without extension)
+	Prefix        string // mydir
+	RelNameNE     string // myimage (name without extension)
 	Ext           string // png (extension)
 	zeroByZero    bool   // true when created from 0x0-name
 }
@@ -47,6 +48,15 @@ type SizedImage struct {
 func SizedImageFromName(name string) SizedImage {
 	w, h := 0, 0
 	zeroByZero := false
+
+	// before all else, separate name and prefix
+	pfx := ""
+	name = filepath.ToSlash(name) // just in case
+	lastSlash := strings.LastIndexByte(name, '/')
+	if lastSlash != -1 {
+		pfx = name[:lastSlash]
+		name = name[lastSlash+1:]
+	}
 
 	// width and height were given, so it's a resized image
 	if matches := imageNameRegex.FindStringSubmatch(name); len(matches) != 0 {
@@ -78,7 +88,8 @@ func SizedImageFromName(name string) SizedImage {
 		Width:      w,
 		Height:     h,
 		Scale:      scale,
-		Name:       nameNE,
+		Prefix:     pfx,
+		RelNameNE:  nameNE,
 		Ext:        ext,
 		zeroByZero: zeroByZero,
 	}
@@ -96,36 +107,38 @@ func (img SizedImage) TrueHeight() int {
 
 // FullSizeName returns the name of the full-size image.
 func (img SizedImage) FullSizeName() string {
-	return img.Name + "." + img.Ext
+	return img.Prefix + img.RelNameNE + "." + img.Ext
 }
 
-// FullNameNE is like FullName but without the extension.
-func (img SizedImage) FullNameNE() string {
+// TrueNameNE is like TrueName but without the extension.
+func (img SizedImage) TrueNameNE() string {
 	if img.Width == 0 && img.Height == 0 {
-		return img.Name
+		return img.Prefix + img.RelNameNE
 	}
 	return fmt.Sprintf(
-		"%dx%d-%s",
+		"%s%dx%d-%s",
+		img.Prefix,
 		img.TrueWidth(),
 		img.TrueHeight(),
-		img.Name,
+		img.RelNameNE,
 	)
 }
 
-// FullName returns the image name with true dimensions.
-func (img SizedImage) FullName() string {
-	return img.FullNameNE() + "." + img.Ext
+// TrueName returns the image name with true dimensions.
+func (img SizedImage) TrueName() string {
+	return img.TrueNameNE() + "." + img.Ext
 }
 
 // ScaleName returns the image name with dimensions and scale.
 func (img SizedImage) ScaleName() string {
 	if img.Scale <= 1 {
-		return img.FullName()
+		return img.TrueName()
 	}
-	return fmt.Sprintf("%dx%d-%s@%dx.%s",
+	return fmt.Sprintf("%s%dx%d-%s@%dx.%s",
+		img.Prefix,
 		img.Width,
 		img.Height,
-		img.Name,
+		img.RelNameNE,
 		img.Scale,
 		img.Ext,
 	)
@@ -207,14 +220,14 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 
 	// find missing dimension
 	// note: we haven't checked if both are 0 yet, but this will return 0, 0 in that case
-	oldName := img.FullName()
+	oldName := img.TrueName()
 	img.Width, img.Height = calculateImageDimensions(bigW, bigH, img.Width, img.Height)
 
 	// check if the name has changed after this adjustment.
 	// if so, redirect
-	fullName := img.FullName()
-	if fullName != oldName || img.zeroByZero {
-		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + fullName}
+	trueName := img.TrueName()
+	if trueName != oldName || img.zeroByZero {
+		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + trueName}
 	}
 
 	// image name and full path
@@ -270,8 +283,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// #=========================#
 
 	// look for cached version
-	cachePath := w.Opt.Dir.Cache + "/image/" + fullName
-	wikifier.MakeDir(w.Opt.Dir.Cache+"/image/", fullName)
+	cachePath := w.Opt.Dir.Cache + "/image/" + trueName
+	wikifier.MakeDir(w.Opt.Dir.Cache+"/image/", trueName)
 	cacheFi, err := os.Lstat(cachePath)
 
 	// it exists
@@ -292,7 +305,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 			r.ModifiedHTTP = httpdate.Time2Str(mod)
 			r.Length = cacheFi.Size()
 
-			w.symlinkScaledImage(img, fullName)
+			w.symlinkScaledImage(img, trueName)
 			return r
 		}
 	}
@@ -319,7 +332,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		return dispErr
 	}
 
-	w.symlinkScaledImage(img, fullName)
+	w.symlinkScaledImage(img, trueName)
 	return r
 }
 
@@ -416,7 +429,7 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)
 
 	// generate the image in the source format and write
-	newImagePath := w.Opt.Dir.Cache + "/image/" + img.FullName()
+	newImagePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.TrueName())
 	err = imaging.Save(newImage, newImagePath)
 	if err != nil {
 		return DisplayError{
@@ -444,7 +457,7 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 	if img.Scale <= 1 {
 		return
 	}
-	scalePath := w.Opt.Dir.Cache + "/image/" + img.ScaleName()
+	scalePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.ScaleName())
 	os.Symlink(name, scalePath)
 }
 
