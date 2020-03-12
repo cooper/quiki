@@ -5,7 +5,6 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
-	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -205,7 +204,7 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) interface{} {
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{} {
 	var r DisplayImage
-	log.Printf("%+v\n", img)
+
 	// check if the file exists
 	bigPath := w.pathForImage(img.FullSizeName())
 	fi, err := os.Lstat(bigPath)
@@ -322,11 +321,10 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// request. because like, we would've served a cached image if it were
 	// actually used somewhere on the wiki
 
-	// FIXME: this is disabled for now
-	// if !generateOK {
-	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	// }
+	if !generateOK {
+		dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+		return DisplayError{Error: "Image does not exist at " + dimensions + "."}
+	}
 
 	// generate the image
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
@@ -454,10 +452,26 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 	return nil // success
 }
 
+// symlinks scaled cache file e.g. 100x200-asdf@2x.jpg -> 200x400-asdf.jpg
 func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
+
+	// dumb request
 	if img.Scale <= 1 {
 		return
 	}
+
+	// only symlink if this is a supported scale
+	ok := false
+	for _, scale := range w.Opt.Image.Retina {
+		if scale == img.Scale {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return
+	}
+
 	scalePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.ScaleName())
 	os.Symlink(filepath.Base(name), scalePath)
 }
