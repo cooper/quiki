@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -204,7 +205,7 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) interface{} {
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{} {
 	var r DisplayImage
-
+	log.Printf("%+v\n", img)
 	// check if the file exists
 	bigPath := w.pathForImage(img.FullSizeName())
 	fi, err := os.Lstat(bigPath)
