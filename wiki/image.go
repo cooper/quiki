@@ -54,7 +54,7 @@ func SizedImageFromName(name string) SizedImage {
 	name = filepath.ToSlash(name) // just in case
 	lastSlash := strings.LastIndexByte(name, '/')
 	if lastSlash != -1 {
-		pfx = name[:lastSlash]
+		pfx = name[:lastSlash+1]
 		name = name[lastSlash+1:]
 	}
 
