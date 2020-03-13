@@ -19,10 +19,10 @@ func main() {
 	}
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quiki")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			lines := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
 			page := wikifier.NewPageSource(strings.Replace(lines, "_NL_", "\n", -1))
 
@@ -49,10 +49,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".unique")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			// line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiku"), " ,:")
 
 			f, err := wikifier.UniqueFilesInDir("../standalone/", []string{"page"}, false)
@@ -67,10 +67,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".confvars")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			w, err := wiki.NewWiki("../wikis/mywiki")
 
 			var reply string
@@ -89,10 +89,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".pageinfo")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			var reply string
 			page := wikifier.NewPage("../wikis/mywiki/pages/wikifier.page")
 
@@ -113,10 +113,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".displaypage")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			var reply string
 			w, err := wiki.NewWiki("../wikis/mywiki")
 
@@ -136,10 +136,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".displayimage")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, ".displayimage"), " ,:")
 
 			var reply string
@@ -161,10 +161,10 @@ func main() {
 	})
 
 	mybot.AddTrigger(hbot.Trigger{
-		func(bot *hbot.Bot, mes *hbot.Message) bool {
+		Condition: func(bot *hbot.Bot, mes *hbot.Message) bool {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, ".names ")
 		},
-		func(irc *hbot.Bot, mes *hbot.Message) bool {
+		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			pageName := strings.TrimPrefix(mes.Content, ".names ")
 			w, _ := wiki.NewWiki("../wikis/mywiki")
 			page := w.FindPage(pageName)
