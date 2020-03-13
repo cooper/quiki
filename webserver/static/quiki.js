@@ -9,6 +9,7 @@ document.addEvent('domready', function () {
     // load image gallery if needed
     if ($$(".q-gallery")) {
         loadCSS("/static/ext/nanogallery2/css/nanogallery2.min.css");
+        loadJS("/static/ext/jquery-3.4.1.min.js");
         loadJS("/static/ext/nanogallery2/jquery.nanogallery2.min.js");
     }
 });
