@@ -89,6 +89,15 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 	img.path = page.Opt.Root.Image + "/" + img.file
 	entry := &galleryEntry{img.path, img}
 
+	// determine largest support retina scale
+	// this will be used as the multiplier
+	multi := 1
+	for _, scale := range page.Opt.Image.Retina {
+		if scale > multi {
+			multi = scale
+		}
+	}
+
 	// generate the thumbnail
 	if page.Opt.Image.SizeMethod == "server" {
 
@@ -103,7 +112,7 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 		width, height := page.Opt.Image.Calc(
 			img.file,
 			0,
-			g.thumbnailHeight,
+			g.thumbnailHeight*multi,
 			page,
 		)
 
