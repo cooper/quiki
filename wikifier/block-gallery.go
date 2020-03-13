@@ -99,6 +99,8 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 
 	// generate the thumbnail
 	img.height = g.thumbHeight * multi
+	img.width = 0
+	img.parsedDimensions = true
 	img.parse(page)
 
 	// fix paths

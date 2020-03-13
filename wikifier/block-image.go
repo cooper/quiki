@@ -15,6 +15,7 @@ type imageBlock struct {
 	align, float, author, license   string
 	width, height                   int
 	parseFailed, useJS              bool
+	parsedDimensions                bool
 	*Map
 }
 
@@ -46,8 +47,11 @@ func (image *imageBlock) parse(page *Page) {
 	image.license = image.getString("license")
 
 	// fetch dimensions
-	image.width = image.getPx("width")
-	image.height = image.getPx("height")
+	if !image.parsedDimensions {
+		image.width = image.getPx("width")
+		image.height = image.getPx("height")
+		image.parsedDimensions = true
+	}
 
 	// compatibility
 	if image.align == "" {
