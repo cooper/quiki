@@ -15,7 +15,7 @@ func (w *Wiki) Pregenerate() {
 	for _, image := range w.Images() {
 		for _, d := range image.Dimensions {
 			sized := SizedImageFromName(fmt.Sprintf("%dx%d-%s", d[0], d[1], image.File))
-			go w.DisplaySizedImageGenerate(sized, true)
+			w.DisplaySizedImageGenerate(sized, true)
 		}
 	}
 }

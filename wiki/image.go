@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -406,6 +407,8 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) interface{} {
 	width, height := img.TrueWidth(), img.TrueHeight()
+
+	log.Println("generate image:", img.TrueName())
 
 	// open the full-size image
 	bigImage, err := imaging.Open(bigPath)
