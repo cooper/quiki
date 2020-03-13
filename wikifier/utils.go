@@ -246,8 +246,17 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 				continue
 			}
 
+			// this is a symlink; follow it if it's a directory
+			isDir := file.IsDir()
+			if !isDir && file.Mode()&os.ModeSymlink != 0 {
+				stat, err := os.Stat(path)
+				if err == nil && stat.IsDir() {
+					isDir = true
+				}
+			}
+
 			// this is a directory
-			if file.IsDir() {
+			if isDir {
 				if !thisDirOnly {
 					doDir(pfx + file.Name() + string(filepath.Separator))
 				}
