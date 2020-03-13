@@ -98,7 +98,8 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 	}
 
 	// generate the thumbnail
-	img.height = g.thumbHeight * multi
+	// note: pregeneration will take care of the max scale
+	img.height = g.thumbHeight
 	img.width = 0
 	img.parsedDimensions = true
 	img.parse(page)
