@@ -82,7 +82,7 @@ func (m *Map) parse(page *Page) {
 	m.didParse = true
 
 	p := new(mapParser)
-	for _, pc := range m.posContent() {
+	for i, pc := range m.posContent() {
 		p.pos = pc.position
 
 		// infer start position to this one
@@ -121,7 +121,7 @@ func (m *Map) parse(page *Page) {
 			if item == "" {
 				continue
 			}
-			for i, c := range item {
+			for _, c := range item {
 				m.handleChar(page, i, p, c)
 			}
 		}

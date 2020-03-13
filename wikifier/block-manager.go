@@ -5,6 +5,8 @@ var blockAliases = map[string]string{
 	"paragraph": "p",
 	"hash":      "map",
 	"format":    "fmt",
+	"olist":     "numlist",
+	"ulist":     "list",
 }
 
 var blockInitializers = map[string]func(name string, b *parserBlock) block{
@@ -27,6 +29,7 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"image":     newImageBlock,
 	"model":     newModelBlock,
 	"toc":       newTocBlock,
+	"gallery":   newGalleryBlock,
 }
 
 func newBlock(blockType, blockName, headingID string, blockClasses []string, parentBlock block, parentCatch catch, pos position) block {

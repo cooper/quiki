@@ -180,7 +180,17 @@ ae.addToolbarFunctions = function (funcs) {
     Object.append(ae.toolbarFunctions, funcs);
 }
 
-// get current page filename
+// get current filename without extension
+ae.getFilenameNE = function () {
+    if (!a.currentJSONMetadata || !a.currentJSONMetadata.info)
+        return;
+    var ne = a.currentJSONMetadata.info.file_ne;
+    if (typeOf(ne) == 'string')
+        return ne;
+    return ae.getFilename();
+};
+
+// get current filename
 ae.getFilename = function () {
     return $('editor').getProperty('data-file');
 };
@@ -204,9 +214,7 @@ ae.getPageTitle = function (range) {
 // range is optional
 ae.updatePageTitle = function (range) {
     var title = ae.getPageTitle(range);
-    if (typeof title == 'undefined')
-        return;
-    a.updatePageTitle(title.length ? title : ae.getFilename());
+    a.updatePageTitle(typeOf(title) == 'string' && title.length ? title : ae.getFilenameNE());
 };
 
 // bind keyboard shortcuts to functions

@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -424,6 +425,10 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 		return nil // success
 	}
+
+	// safe point - we will resize the image
+
+	log.Println("generate image:", img.TrueName())
 
 	// create resized image
 	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)

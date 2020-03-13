@@ -1,7 +1,5 @@
 package wiki
 
-import "fmt"
-
 // Pregenerate simulates requests for all wiki resources
 // such that content caches can be pregenerated and stored.
 func (w *Wiki) Pregenerate() {
@@ -14,8 +12,10 @@ func (w *Wiki) Pregenerate() {
 	// generate images in all the sizes used
 	for _, image := range w.Images() {
 		for _, d := range image.Dimensions {
-			sized := SizedImageFromName(fmt.Sprintf("%dx%d-%s", d[0], d[1], image.File))
-			go w.DisplaySizedImageGenerate(sized, true)
+			sized := SizedImageFromName(image.File)
+			sized.Width = d[0]
+			sized.Height = d[1]
+			w.DisplaySizedImageGenerate(sized, true)
 		}
 	}
 }
