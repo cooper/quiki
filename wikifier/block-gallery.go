@@ -99,31 +99,8 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 	}
 
 	// generate the thumbnail
-	if page.Opt.Image.SizeMethod == "server" {
-
-		// Calc and Sizer must be present
-		if page.Opt.Image.Sizer == nil || page.Opt.Image.Calc == nil {
-			img.warn(img.openPos, "image.sizer and image.calc required with image.size_method 'server'")
-			img.parseFailed = true
-			return
-		}
-
-		// calculate missing dimension
-		width, height := page.Opt.Image.Calc(
-			img.file,
-			0,
-			g.thumbHeight*multi,
-			page,
-		)
-
-		// create thumbnail path
-		entry.thumbPath = page.Opt.Image.Sizer(
-			img.file,
-			width,
-			height,
-			page,
-		)
-	}
+	img.height = g.thumbHeight * multi
+	img.parse(page)
 
 	// add the image
 	g.images = append(g.images, entry)
