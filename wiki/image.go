@@ -408,8 +408,6 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) interface{} {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
-	log.Println("generate image:", img.TrueName())
-
 	// open the full-size image
 	bigImage, err := imaging.Open(bigPath)
 	if err != nil {
@@ -427,6 +425,10 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 		return nil // success
 	}
+
+	// safe point - we will resize the image
+
+	log.Println("generate image:", img.TrueName())
 
 	// create resized image
 	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)
