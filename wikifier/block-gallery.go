@@ -8,8 +8,8 @@ import (
 )
 
 type galleryBlock struct {
-	thumbnailHeight string
-	images          []galleryEntry
+	thumbnailHeight int
+	images          []*galleryEntry
 	*Map
 }
 
@@ -20,7 +20,7 @@ type galleryEntry struct {
 
 func newGalleryBlock(name string, b *parserBlock) block {
 	return &galleryBlock{
-		thumbnailHeight: "320",
+		thumbnailHeight: 320,
 		Map:             newMapBlock("", b).(*Map),
 	}
 }
@@ -34,45 +34,60 @@ func (g *galleryBlock) parse(page *Page) {
 
 		// thumbnail height
 		case "thumb_height":
-			var err error
-			g.thumbnailHeight, err = g.GetStr(imgKey)
+			thumbHeight, err := g.GetStr(imgKey)
+
+			// not a string
 			if err != nil {
 				g.warn(g.openPos, errors.Wrap(err, imgKey).Error()) // FIXME: use key position
+				break
 			}
 
-		// unknown key
-		default:
-			if strings.HasPrefix(imgKey, "anon_") {
-				// anonymous image is OK
-				blk, err := g.GetBlock(imgKey)
-				if err == nil {
-					// it is indeed a block
-					img, ok := blk.(*imageBlock)
-					if ok {
-						// it is indeed an image!
-						g.addImage(page, img)
-					} else {
-						// block other than image
-						g.warn(g.openPos, imgKey+": expected Block<image{}>") // FIXME: use key position
-					}
-				} else {
-					// non-block
-					g.warn(g.openPos, errors.Wrap(err, imgKey).Error()) // FIXME: use key position
-				}
-			} else {
-				// unknown key
-				g.warn(g.openPos, "Invalid key '"+imgKey+"'") // FIXME: use key position
+			// convert to int
+			height, err := strconv.Atoi(thumbHeight)
+			if err != nil {
+				g.warn(g.openPos, "thumb_height: expected integer")
+				break
 			}
+
+			// good
+			g.thumbnailHeight = height
+
+		default:
+
+			// unknown key
+			if !strings.HasPrefix(imgKey, "anon_") {
+				g.warn(g.openPos, "Invalid key '"+imgKey+"'") // FIXME: use key position
+				break
+			}
+
+			// anonymous image is OK
+			blk, err := g.GetBlock(imgKey)
+
+			// non-block
+			if err != nil {
+				g.warn(g.openPos, errors.Wrap(err, imgKey).Error()) // FIXME: use key position
+				break
+			}
+
+			// it is indeed a block, but is it an image?
+			img, ok := blk.(*imageBlock)
+			if !ok {
+				// block other than image
+				g.warn(g.openPos, imgKey+": expected Block<image{}>") // FIXME: use key position
+				break
+			}
+
+			// it is indeed an image!
+			g.addImage(page, img)
 		}
 	}
-
 }
 
 func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 
 	// get full-size path
 	img.path = page.Opt.Root.Image + "/" + img.file
-	entry := galleryEntry{img.path, img}
+	entry := &galleryEntry{img.path, img}
 
 	// generate the thumbnail
 	if page.Opt.Image.SizeMethod == "server" {
@@ -85,15 +100,10 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 		}
 
 		// calculate missing dimension
-		height, err := strconv.Atoi(g.thumbnailHeight)
-		if err != nil {
-			g.warn(g.openPos, "thumb_height: expected integer")
-			height = 320
-		}
 		width, height := page.Opt.Image.Calc(
 			img.file,
 			0,
-			height,
+			g.thumbnailHeight,
 			page,
 		)
 
@@ -115,7 +125,7 @@ func (g *galleryBlock) html(page *Page, el element) {
 
 	// create gallery options
 	options := `{
-		"thumbnailHeight": "` + g.thumbnailHeight + `",
+		"thumbnailHeight": "` + strconv.Itoa(g.thumbnailHeight) + `",
 		"thumbnailWidth": "auto",
 		"thumbnailBorderVertical": 0,
 		"thumbnailBorderHorizontal": 0,
