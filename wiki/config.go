@@ -75,7 +75,7 @@ func (w *Wiki) readConfig(file string) error {
 }
 
 func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int) {
-	path := filepath.Join(page.Opt.Dir.Image, name)
+	path := filepath.Join(page.Opt.Dir.Image, filepath.FromSlash(name))
 	bigW, bigH := getImageDimensions(path)
 
 	// original has no dimensions??
@@ -96,7 +96,7 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	si := SizedImageFromName(name)
 	si.Width = width
 	si.Height = height
-	return page.Opt.Root.Image + "/" + si.FullName()
+	return page.Opt.Root.Image + "/" + si.TrueName()
 }
 
 func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
