@@ -86,7 +86,6 @@ func (g *galleryBlock) parse(page *Page) {
 func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 
 	// get full-size path
-	img.path = page.Opt.Root.Image + "/" + img.file
 	entry := &galleryEntry{img.path, img}
 
 	// determine largest support retina scale
@@ -101,6 +100,10 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 	// generate the thumbnail
 	img.height = g.thumbHeight * multi
 	img.parse(page)
+
+	// fix paths
+	entry.thumbPath = img.path
+	img.path = page.Opt.Root.Image + "/" + img.file
 
 	// add the image
 	g.images = append(g.images, entry)
