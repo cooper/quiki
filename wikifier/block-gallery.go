@@ -8,20 +8,20 @@ import (
 )
 
 type galleryBlock struct {
-	thumbnailHeight int
-	images          []*galleryEntry
+	thumbHeight int
+	images      []*galleryEntry
 	*Map
 }
 
 type galleryEntry struct {
-	thumbnailPath string
-	img           *imageBlock
+	thumbPath string
+	img       *imageBlock
 }
 
 func newGalleryBlock(name string, b *parserBlock) block {
 	return &galleryBlock{
-		thumbnailHeight: 320,
-		Map:             newMapBlock("", b).(*Map),
+		thumbHeight: 220,
+		Map:         newMapBlock("", b).(*Map),
 	}
 }
 
@@ -50,7 +50,7 @@ func (g *galleryBlock) parse(page *Page) {
 			}
 
 			// good
-			g.thumbnailHeight = height
+			g.thumbHeight = height
 
 		default:
 
@@ -112,12 +112,12 @@ func (g *galleryBlock) addImage(page *Page, img *imageBlock) {
 		width, height := page.Opt.Image.Calc(
 			img.file,
 			0,
-			g.thumbnailHeight*multi,
+			g.thumbHeight*multi,
 			page,
 		)
 
 		// create thumbnail path
-		entry.thumbnailPath = page.Opt.Image.Sizer(
+		entry.thumbPath = page.Opt.Image.Sizer(
 			img.file,
 			width,
 			height,
@@ -134,7 +134,7 @@ func (g *galleryBlock) html(page *Page, el element) {
 
 	// create gallery options
 	options := `{
-		"thumbnailHeight": "` + strconv.Itoa(g.thumbnailHeight) + `",
+		"thumbHeight": "` + strconv.Itoa(g.thumbHeight) + `",
 		"thumbnailWidth": "auto",
 		"thumbnailBorderVertical": 0,
 		"thumbnailBorderHorizontal": 0,
@@ -173,7 +173,7 @@ func (g *galleryBlock) html(page *Page, el element) {
 		// create gallery item
 		a := el.createChild("a", "")
 		a.setAttr("href", entry.img.path)
-		a.setAttr("data-ngthumb", entry.thumbnailPath)
+		a.setAttr("data-ngthumb", entry.thumbPath)
 		a.setAttr("data-ngdesc", desc)
 	}
 }
