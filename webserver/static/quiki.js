@@ -9,8 +9,9 @@ document.addEvent('domready', function () {
     // load image gallery if needed
     if ($$(".q-gallery")) {
         loadCSS("/static/ext/nanogallery2/css/nanogallery2.min.css");
-        loadJS("/static/ext/jquery-3.4.1.min.js");
-        loadJS("/static/ext/nanogallery2/jquery.nanogallery2.min.js");
+        loadJS("/static/ext/jquery-3.4.1.min.js", function () {
+            loadJS("/static/ext/nanogallery2/jquery.nanogallery2.min.js");
+        });
     }
 });
 
@@ -29,11 +30,13 @@ function hashLoad() {
     }
 }
 
-function loadJS (src) {
+function loadJS (src, onLoad) {
     var script = new Element('script', {
         src:  src,
         type: 'text/javascript'
     });
+    if (onLoad)
+        script.addEvent('load', onLoad);
     document.head.appendChild(script);
 }
 
