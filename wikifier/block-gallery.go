@@ -148,7 +148,7 @@ func (g *galleryBlock) html(page *Page, el element) {
 
 	// set options
 	el.setAttr("data-nanogallery2", options)
-	el.setMeta("needID", true)
+	el.setAttr("id", "q-"+el.id())
 
 	// add images
 	for _, entry := range g.images {
