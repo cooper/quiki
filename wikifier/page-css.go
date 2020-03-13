@@ -5,7 +5,6 @@ import "strings"
 // CSS generates and returns the CSS code for the page's inline styles.
 func (p *Page) CSS() string {
 	generated := ""
-
 	for _, style := range p.styles {
 		applyTo := p.cssApplyString(style.applyTo)
 		generated += applyTo + " {\n"
@@ -14,26 +13,19 @@ func (p *Page) CSS() string {
 		}
 		generated += "}\n"
 	}
-
 	return generated
 }
 
 func (p *Page) cssApplyString(sets [][]string) string {
 	parts := make([]string, len(sets))
-
 	for i, set := range sets {
 		str := p.cssSetString(set)
-		var start string
-		if len(str) > 9 {
-			start = str[:9]
-		}
-		if start == "" || start != ".q-main" {
+		if !strings.HasPrefix(str, ".q-main") {
 			id := p.main.el().id()
 			str = ".q-" + id + " " + str
 		}
 		parts[i] = str
 	}
-
 	return strings.Join(parts, ",\n")
 }
 
