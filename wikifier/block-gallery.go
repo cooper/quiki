@@ -132,7 +132,7 @@ func (g *galleryBlock) html(page *Page, el element) {
 			"displayDescription": true,
 			"descriptionMultiLine": true
 		},
-		"thumbnailHoverEffect2": "descriptionSlideUp",
+		"thumbnailHoverEffect2": "descriptionSlideUp|scale120",
 		"thumbnailAlignment": "center",
 		"thumbnailGutterWidth": 10,
 		"thumbnailGutterHeight": 10
