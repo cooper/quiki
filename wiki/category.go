@@ -3,7 +3,6 @@ package wiki
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"math"
 	"os"
 	"sort"
@@ -148,7 +147,7 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	// if an error occurred in parsing, ditch the file
 	// note it may or may not exist anyway
 	if err != nil {
-		log.Printf("GetCategory(%s): %v", name, err)
+		w.Debugf("GetCategory(%s): %v", name, err)
 		os.Remove(path)
 	}
 
@@ -211,7 +210,7 @@ func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions
 	}
 
 	// write it
-	cat.write()
+	cat.write(w)
 }
 
 // Exists returns whether a category currently exists.
@@ -221,12 +220,12 @@ func (cat *Category) Exists() bool {
 }
 
 // write category to file
-func (cat *Category) write() {
+func (cat *Category) write(w *Wiki) {
 
 	// encode as JSON
 	jsonData, err := json.Marshal(cat)
 	if err != nil {
-		log.Printf("Category(%s).write(): %v", cat.Name, err)
+		w.Debugf("Category(%s).write(): %v", cat.Name, err)
 		return
 	}
 
@@ -328,7 +327,7 @@ func (cat *Category) update(w *Wiki) {
 	}
 
 	// write update
-	cat.write()
+	cat.write(w)
 }
 
 // checks if a category should be deleted

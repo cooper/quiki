@@ -1,14 +1,12 @@
 package wiki
 
-import "log"
-
 // Pregenerate simulates requests for all wiki resources
 // such that content caches can be pregenerated and stored.
 func (w *Wiki) Pregenerate() {
 
 	// cache page content
 	for _, pageName := range w.allPageFiles() {
-		log.Println("pregen page:", pageName)
+		w.Log("pregen page:", pageName)
 		w.DisplayPageDraft(pageName, true)
 	}
 
@@ -18,7 +16,7 @@ func (w *Wiki) Pregenerate() {
 			sized := SizedImageFromName(image.File)
 			sized.Width = d[0]
 			sized.Height = d[1]
-			log.Println("pregen image:", sized.ScaleName())
+			w.Log("pregen image:", sized.ScaleName())
 			w.DisplaySizedImageGenerate(sized, true)
 		}
 	}
