@@ -389,8 +389,10 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 	// it should exist at this point
 	if imageCat.Exists() {
-		info.Width = imageCat.ImageInfo.Width
-		info.Height = imageCat.ImageInfo.Height
+		if imageCat.ImageInfo != nil {
+			info.Width = imageCat.ImageInfo.Width
+			info.Height = imageCat.ImageInfo.Height
+		}
 		info.Created = imageCat.Created // category creation time, not image
 		for _, entry := range imageCat.Pages {
 			info.Dimensions = append(info.Dimensions, entry.Dimensions...)
