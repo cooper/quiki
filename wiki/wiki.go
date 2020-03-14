@@ -12,11 +12,12 @@ import (
 
 // A Wiki represents a quiki website.
 type Wiki struct {
-	ConfigFile string
-	Opt        wikifier.PageOpt
-	Auth       *authenticator.Authenticator
-	pageLocks  map[string]*sync.Mutex
-	_repo      *git.Repository
+	ConfigFile    string
+	Opt           wikifier.PageOpt
+	Auth          *authenticator.Authenticator
+	pageLocks     map[string]*sync.Mutex
+	pregenerating bool
+	_repo         *git.Repository
 }
 
 // NewWiki creates a Wiki given its directory path.

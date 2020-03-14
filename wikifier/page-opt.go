@@ -73,7 +73,6 @@ type PageOptImage struct {
 	SizeMethod string
 	Calc       func(file string, width, height int, page *Page) (w, h int)
 	Sizer      func(file string, width, height int, page *Page) (path string)
-	Pregen     func(file string, width, height int, page *Page) (w, h int, path string)
 }
 
 // PageOptCategory describes wiki category options.

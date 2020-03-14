@@ -3,6 +3,7 @@ package wiki
 // Pregenerate simulates requests for all wiki resources
 // such that content caches can be pregenerated and stored.
 func (w *Wiki) Pregenerate() {
+	w.pregenerating = true
 
 	// cache page content
 	for _, pageName := range w.allPageFiles() {
@@ -20,4 +21,6 @@ func (w *Wiki) Pregenerate() {
 	// 		w.DisplaySizedImageGenerate(sized, true)
 	// 	}
 	// }
+
+	w.pregenerating = false
 }

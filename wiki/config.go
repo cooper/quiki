@@ -32,7 +32,6 @@ var defaultWikiOpt = wikifier.PageOpt{
 		SizeMethod: "server",
 		Calc:       defaultImageCalc,
 		Sizer:      defaultImageSizer,
-		Pregen:     defaultImagePregenerator,
 	},
 	Category: wikifier.PageOptCategory{
 		PerPage: 5,
@@ -90,7 +89,19 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	}
 
 	// determine missing dimension
-	return calculateImageDimensions(bigW, bigH, width, height)
+	width, height = calculateImageDimensions(bigW, bigH, width, height)
+
+	// also pregenerate the image maybe
+	w, ok := page.Wiki.(*Wiki)
+	if ok && w.pregenerating {
+		sized := SizedImageFromName(name)
+		sized.Width = width
+		sized.Height = height
+		w.Debug("pregen image:", sized.ScaleName())
+		w.DisplaySizedImageGenerate(sized, true)
+	}
+
+	return width, height
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
@@ -98,20 +109,6 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	si.Width = width
 	si.Height = height
 	return page.Opt.Root.Image + "/" + si.TrueName()
-}
-
-func defaultImagePregenerator(name string, width, height int, page *wikifier.Page) (int, int, string) {
-	w, ok := page.Wiki.(*Wiki)
-	if !ok {
-		// fixme: can we hope with this somehow? I don't think it would ever happen though
-		return 0, 0, ""
-	}
-
-	sized := SizedImageFromName(name)
-	sized.Width = width
-	sized.Height = height
-	w.Debug("pregen image:", sized.ScaleName())
-	w.DisplaySizedImageGenerate(sized, true)
 }
 
 func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
