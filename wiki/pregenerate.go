@@ -6,7 +6,7 @@ func (w *Wiki) Pregenerate() {
 
 	// cache page content
 	for _, pageName := range w.allPageFiles() {
-		w.Log("pregen page:", pageName)
+		w.Debug("pregen page:", pageName)
 		w.DisplayPageDraft(pageName, true)
 	}
 
@@ -16,7 +16,7 @@ func (w *Wiki) Pregenerate() {
 			sized := SizedImageFromName(image.File)
 			sized.Width = d[0]
 			sized.Height = d[1]
-			w.Log("pregen image:", sized.ScaleName())
+			w.Debug("pregen image:", sized.ScaleName())
 			w.DisplaySizedImageGenerate(sized, true)
 		}
 	}

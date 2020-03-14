@@ -5,7 +5,6 @@ import (
 	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
-	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -205,6 +204,8 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) interface{} {
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{} {
 	var r DisplayImage
+	logName := img.ScaleName()
+	w.Debug("display image:", logName)
 
 	// check if the file exists
 	bigPath := w.pathForImage(img.FullSizeName())
@@ -220,6 +221,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	var bigW, bigH int
 	oldName := img.TrueName()
 	if (img.Width == 0 && img.Height != 0) || (img.Height == 0 && img.Width != 0) {
+		w.Debugf("display image: %s: missing a dimension; have to open", logName)
 
 		// get full size dimensions
 		bigW, bigH = getImageDimensions(bigPath)
@@ -233,6 +235,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// if so, redirect
 	trueName := img.TrueName()
 	if trueName != oldName || img.zeroByZero {
+		w.Debugf("display image: %s: redirect %s -> %s", logName, oldName, trueName)
 		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + trueName}
 	}
 
@@ -260,6 +263,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 
 	// if both dimensions are missing, display the full-size version of the image
 	if img.Width == 0 && img.Height == 0 {
+		w.Debugf("display image: %s: using full-size", logName)
 		mod := fi.ModTime()
 		r.Modified = &mod
 		r.ModifiedHTTP = httpdate.Time2Str(mod)
@@ -267,7 +271,8 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		return r
 	}
 
-	// at this point, at least one dimension is present
+	// at this point, at least one dimension was provided, and both
+	// dimensions have been determined
 
 	// #============================#
 	// #=== Retina scale support ===#
@@ -278,6 +283,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// so, commit a pregeneration request for each scaled version.
 	if img.Scale <= 1 && generateOK {
 		for _, scale := range w.Opt.Image.Retina {
+			w.Debugf("display image: %s: also generating retina @%dx", logName, scale)
 			scaledImage := img        // copy
 			scaledImage.Scale = scale // set scale
 			w.DisplaySizedImageGenerate(scaledImage, generateOK)
@@ -298,11 +304,13 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		if cacheFi.ModTime().Before(fi.ModTime()) {
 
 			// the original is newer, so forget the cached file
+			w.Debugf("display image: %s: purging outdated cache", logName)
 			os.Remove(cachePath)
 
 		} else {
 
 			// it exists and the cache file is newer
+			w.Debugf("display image: %s: using cached version", logName)
 			mod := cacheFi.ModTime()
 			r.Path = cachePath
 			r.File = filepath.Base(cachePath)
@@ -444,7 +452,7 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 	// safe point - we will resize the image
 
-	log.Println("generate image:", img.TrueName())
+	w.Debug("generate image: ", img.TrueName())
 
 	// create resized image
 	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)
@@ -494,6 +502,7 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 		return
 	}
 
+	w.Debugf("symlink image: %s -> %s", name, img.ScaleName())
 	scalePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.ScaleName())
 	os.Symlink(filepath.Base(name), scalePath)
 }
