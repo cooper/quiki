@@ -216,13 +216,18 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 		}
 	}
 
-	// get full size dimensions
-	bigW, bigH := getImageDimensions(bigPath)
-
-	// find missing dimension
-	// note: we haven't checked if both are 0 yet, but this will return 0, 0 in that case
+	// one dimension is missing
+	var bigW, bigH int
 	oldName := img.TrueName()
-	img.Width, img.Height = calculateImageDimensions(bigW, bigH, img.Width, img.Height)
+	if (img.Width == 0 && img.Height != 0) || (img.Height == 0 && img.Width != 0) {
+
+		// get full size dimensions
+		bigW, bigH = getImageDimensions(bigPath)
+
+		// find missing dimension
+		// note: we haven't checked if both are 0 yet, but this will return 0, 0 in that case
+		img.Width, img.Height = calculateImageDimensions(bigW, bigH, img.Width, img.Height)
+	}
 
 	// check if the name has changed after this adjustment.
 	// if so, redirect
@@ -329,6 +334,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	// }
 
 	// generate the image
+	// note: bigW and bigH might still be empty
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
 		return dispErr
 	}
@@ -417,6 +423,14 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 			Error:         "Image does not exist.",
 			DetailedError: "Decode image '" + bigPath + "' error: " + err.Error(),
 		}
+	}
+
+	// figure out full-size dimensions if we haven't already
+	// (imaging.Open calls Decode so the bounds are available by now)
+	if bigW == 0 || bigH == 0 {
+		b := bigImage.Bounds()
+		bigW = b.Max.X
+		bigH = b.Max.Y
 	}
 
 	// the request is to generate an image the same or larger than the original
