@@ -256,7 +256,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	}
 
 	// create or update image category
-	w.GetSpecialCategory(r.File, CategoryTypeImage).addImage(w, r.File, nil, nil)
+	//w.GetSpecialCategory(r.File, CategoryTypeImage).addImage(w, r.File, nil, nil)
 
 	// if both dimensions are missing, display the full-size version of the image
 	if img.Width == 0 && img.Height == 0 {
