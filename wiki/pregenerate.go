@@ -10,14 +10,14 @@ func (w *Wiki) Pregenerate() {
 		w.DisplayPageDraft(pageName, true)
 	}
 
-	// generate images in all the sizes used
-	for _, image := range w.Images() {
-		for _, d := range image.Dimensions {
-			sized := SizedImageFromName(image.File)
-			sized.Width = d[0]
-			sized.Height = d[1]
-			w.Debug("pregen image:", sized.ScaleName())
-			w.DisplaySizedImageGenerate(sized, true)
-		}
-	}
+	// // generate images in all the sizes used
+	// for _, image := range w.Images() {
+	// 	for _, d := range image.Dimensions {
+	// 		sized := SizedImageFromName(image.File)
+	// 		sized.Width = d[0]
+	// 		sized.Height = d[1]
+	// 		w.Debug("pregen image:", sized.ScaleName())
+	// 		w.DisplaySizedImageGenerate(sized, true)
+	// 	}
+	// }
 }
