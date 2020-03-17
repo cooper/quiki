@@ -4,7 +4,7 @@
     <meta charset="utf-8" data-wredirect="login" />
     <title>quiki login</title>
     <link rel="icon" type="image/png" href="/static/favicon.png" />
-    <style type="text/css">
+    <style>
         body {
             background-color: #333;
             font-family: sans-serif;

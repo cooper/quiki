@@ -31,10 +31,7 @@ function hashLoad() {
 }
 
 function loadJS (src, onLoad) {
-    var script = new Element('script', {
-        src:  src,
-        type: 'text/javascript'
-    });
+    var script = new Element('script', { src: src });
     if (onLoad)
         script.addEvent('load', onLoad);
     document.head.appendChild(script);

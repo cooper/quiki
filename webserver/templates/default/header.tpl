@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/style.css" />
     <link rel="stylesheet" type="text/css" href="/static/quiki.css" />
 {{with .PageCSS}}
-    <style type="text/css">
+    <style>
 {{.}}
     </style>
 {{end}}
