@@ -54,6 +54,7 @@ type PageInfo struct {
 	Title       string     `json:"title,omitempty"`     // title without tags
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
+	Keywords    []string   `json:"keywords,omitempty"`  // keywords
 }
 
 // NewPage creates a page given its filepath.
@@ -427,6 +428,12 @@ func (p *Page) Description() string {
 	return strip.StripTags(s)
 }
 
+// Keywords returns the list of page keywords.
+func (p *Page) Keywords() []string {
+	list, _ := p.GetStrList("page.keywords")
+	return list
+}
+
 // Categories returns a list of categories the page belongs to.
 func (p *Page) Categories() []string {
 	obj, err := p.GetObj("category")
@@ -453,6 +460,7 @@ func (p *Page) Info() PageInfo {
 		Title:       p.Title(),
 		Author:      p.Author(),
 		Description: p.Description(),
+		Keywords:    p.Keywords(),
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {
