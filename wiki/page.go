@@ -83,6 +83,12 @@ type DisplayPage struct {
 	// like FmtTitle except that all text formatting has been stripped.
 	// suitable for use in the <title> tag
 	Title string `json:"title,omitempty"`
+
+	// page description as extracted from the special @page.desc variable.
+	Description string `json:"desc,omitempty"`
+
+	// page keywords as extracted from the special @page.keywords variable
+	Keywords []string `json:"keywords,omitempty"`
 }
 
 type pageJSONManifest struct {
@@ -234,6 +240,8 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	r.Title = page.Title()
 	r.FmtTitle = page.FmtTitle()
 	r.Author = page.Author()
+	r.Description = page.Description()
+	r.Keywords = page.Keywords()
 	r.Draft = page.Draft()
 	r.Modified = &mod
 	r.ModifiedHTTP = httpdate.Time2Str(mod)
