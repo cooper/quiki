@@ -201,6 +201,60 @@ func (scope *variableScope) GetBlock(key string) (block, error) {
 	return nil, errors.New("not a block")
 }
 
+// GetStrList is like Get except it always returns a list of strings.
+//
+// If the value is a `list{}` block, the list's values are returned,
+// with non-strings quietly filtered out.
+//
+// If the value is a string, it is treated as a comma-separated list,
+// and each item is trimmed of prepending or suffixing whitespace.
+//
+func (scope *variableScope) GetStrList(key string) ([]string, error) {
+	val, err := scope.Get(key)
+	if err != nil {
+		return nil, err
+	}
+
+	switch v := val.(type) {
+
+	// list{} block
+	case *List:
+		var list []string
+		for _, entry := range v.list {
+
+			// not a string
+			if entry.typ != valueTypeString {
+				continue
+			}
+
+			// add it
+			list = append(list, entry.value.(string))
+		}
+		return list, nil
+
+	// comma-separated list
+	case string:
+		var list []string
+		for _, item := range strings.Split(v, ",") {
+
+			// trim whitespace
+			item = strings.TrimSpace(item)
+
+			// nothing left/blank entry
+			if item == "" {
+				continue
+			}
+
+			// add it
+			list = append(list, item)
+		}
+		return list, nil
+	}
+
+	// something else
+	return nil, errors.New("not a list{} or comma-separated list")
+}
+
 // INTERNAL
 
 // set own property
