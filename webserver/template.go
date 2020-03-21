@@ -233,3 +233,7 @@ func (p wikiPage) Logo() template.HTML {
 	h += ` />`
 	return template.HTML(h)
 }
+
+func (p wikiPage) KeywordString() string {
+	return strings.Join(p.Keywords, " ,")
+}
