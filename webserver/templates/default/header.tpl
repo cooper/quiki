@@ -2,6 +2,12 @@
 <html>
 <head>
     <meta charset="utf-8" />
+{{with .Description}}
+    <meta name="description" content="{{.}}" />
+{{end}}
+{{with .KeywordString}}
+    <meta name="keywords" content="{{.}}" />
+{{end}}
     <title>{{.VisibleTitle}}</title>
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/style.css" />
     <link rel="stylesheet" type="text/css" href="/static/quiki.css" />
