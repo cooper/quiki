@@ -41,18 +41,19 @@ type Page struct {
 
 // PageInfo represents metadata associated with a page.
 type PageInfo struct {
-	Path      string     `json:"-"`                   // absolute filepath
-	File      string     `json:"file,omitempty"`      // name with extension, always with forward slashes
-	FileNE    string     `json:"file_ne,omitempty"`   // name without extension, always with forward slashes
-	Created   *time.Time `json:"created,omitempty"`   // creation time
-	Modified  *time.Time `json:"modified,omitempty"`  // modify time
-	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
-	Generated bool       `json:"generated,omitempty"` // true if page was generated from another source
-	External  bool       `json:"external,omitempty"`  // true if page is outside the page directory
-	Redirect  string     `json:"redirect,omitempty"`  // path page is to redirect to
-	FmtTitle  HTML       `json:"fmt_title,omitempty"` // title with formatting tags
-	Title     string     `json:"title,omitempty"`     // title without tags
-	Author    string     `json:"author,omitempty"`    // author's name
+	Path        string     `json:"-"`                   // absolute filepath
+	File        string     `json:"file,omitempty"`      // name with extension, always with forward slashes
+	FileNE      string     `json:"file_ne,omitempty"`   // name without extension, always with forward slashes
+	Created     *time.Time `json:"created,omitempty"`   // creation time
+	Modified    *time.Time `json:"modified,omitempty"`  // modify time
+	Draft       bool       `json:"draft,omitempty"`     // true if page is marked as draft
+	Generated   bool       `json:"generated,omitempty"` // true if page was generated from another source
+	External    bool       `json:"external,omitempty"`  // true if page is outside the page directory
+	Redirect    string     `json:"redirect,omitempty"`  // path page is to redirect to
+	FmtTitle    HTML       `json:"fmt_title,omitempty"` // title with formatting tags
+	Title       string     `json:"title,omitempty"`     // title without tags
+	Author      string     `json:"author,omitempty"`    // author's name
+	Description string     `json:"desc,omitempty"`      // description
 }
 
 // NewPage creates a page given its filepath.
@@ -417,6 +418,15 @@ func (p *Page) TitleOrName() string {
 	return p.Name()
 }
 
+// Description returns the page description.
+func (p *Page) Description() string {
+	s, _ := p.GetStr("page.desc")
+	if s == "" {
+		s, _ = p.GetStr("page.description")
+	}
+	return strip.StripTags(s)
+}
+
 // Categories returns a list of categories the page belongs to.
 func (p *Page) Categories() []string {
 	obj, err := p.GetObj("category")
@@ -433,15 +443,16 @@ func (p *Page) Categories() []string {
 // Info returns the PageInfo for the page.
 func (p *Page) Info() PageInfo {
 	info := PageInfo{
-		File:      p.Name(),
-		FileNE:    p.NameNE(),
-		Draft:     p.Draft(),
-		Generated: p.Generated(),
-		External:  p.External(),
-		Redirect:  p.Redirect(),
-		FmtTitle:  p.FmtTitle(),
-		Title:     p.Title(),
-		Author:    p.Author(),
+		File:        p.Name(),
+		FileNE:      p.NameNE(),
+		Draft:       p.Draft(),
+		Generated:   p.Generated(),
+		External:    p.External(),
+		Redirect:    p.Redirect(),
+		FmtTitle:    p.FmtTitle(),
+		Title:       p.Title(),
+		Author:      p.Author(),
+		Description: p.Description(),
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {

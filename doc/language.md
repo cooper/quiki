@@ -422,6 +422,8 @@ at the very top of a page source file.
   time. Used for sorting the pages by creation date.
 * `@page.author` - Name of the page author. This is also optional but may be
   used by frontends to organize pages by author.
+* `@page.desc` - Page description. This is optional but can be used by frontends
+  for search results and search engine optimization. Max 160 characters.
 * `@page.draft` - [Boolean](#assignment) value which marks the page as a draft.
   This means that it will not be served to unauthenticated users.
 * `@page.redirect` - Page redirect target. All [link types](#links) are
