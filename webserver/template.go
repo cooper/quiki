@@ -171,6 +171,8 @@ type wikiPage struct {
 	Name        string                       // page name, without extension
 	WholeTitle  string                       // optional, shown in <title> as-is
 	Title       string                       // page title
+	Description string                       // page description
+	Keywords    []string                     // page keywords
 	WikiTitle   string                       // wiki titled
 	WikiLogo    string                       // path to wiki logo image (deprecated, use Logo)
 	WikiRoot    string                       // wiki HTTP root (deprecated, use Root.Wiki)

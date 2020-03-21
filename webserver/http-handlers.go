@@ -233,6 +233,8 @@ func wikiPageFromRes(wi *WikiInfo, res wiki.DisplayPage) wikiPage {
 	page.File = res.File
 	page.Name = res.Name
 	page.Title = res.Title
+	page.Description = res.Description
+	page.Keywords = res.Keywords
 	return page
 }
 
