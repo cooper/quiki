@@ -336,7 +336,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 			if err != nil {
 				// TODO: Produce warning wrapping error unless noWarnings
 				log.Printf("parseFormatType(%s): %v", formatType, err)
-				return HTML("(error)")
+				return HTML("(error: " + formatType + ": " + html.EscapeString(err.Error()) + ")")
 			}
 			if val == nil {
 				// TODO: Produce warning that var is undefined unless noWarnings
@@ -356,7 +356,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 				if !ok {
 					// TODO: Produce warning that attempted to interpolate non-string
 					log.Printf("parseFormatType(%s): tried to interpolate non-string: %v", formatType, val)
-					return HTML("(error)")
+					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
 				return page.formatTextOpts(strVal, fmtOpt{noVariables: true})
 			}

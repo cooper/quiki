@@ -1,8 +1,9 @@
 package wikifier
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // An AttributedObject is any object on which you can set and retrieve attributes.
@@ -98,7 +99,7 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 	for _, name := range parts {
 		newWhere, err := where.GetObj(name)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, name)
 		}
 
 		// no error, but there's nothing there
