@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"io/ioutil"
 	"os"
@@ -425,7 +426,7 @@ func (p *Page) Description() string {
 	if s == "" {
 		s, _ = p.GetStr("page.description")
 	}
-	return strip.StripTags(s)
+	return strip.StripTags(html.UnescapeString(s))
 }
 
 // Keywords returns the list of page keywords.
