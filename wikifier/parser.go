@@ -538,6 +538,9 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			case string:
 
+				// replace newlines with spaces
+				val = strings.ReplaceAll(val, "\n", " ")
+
 				// format it unless told not to
 				if !p.varNotInterpolated {
 					value = page.formatText(val)

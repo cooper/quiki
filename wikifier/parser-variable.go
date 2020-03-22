@@ -50,6 +50,9 @@ func (vv *variableValue) parentCatch() catch {
 }
 
 func (vv *variableValue) byteOK(b byte) bool {
+	if b == '\n' {
+		return true
+	}
 	ok, _ := regexp.Match(`.`, []byte{b})
 	return ok
 }
