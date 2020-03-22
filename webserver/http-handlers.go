@@ -235,6 +235,7 @@ func wikiPageFromRes(wi *WikiInfo, res wiki.DisplayPage) wikiPage {
 	page.Title = res.Title
 	page.Description = res.Description
 	page.Keywords = res.Keywords
+	page.Author = res.Author
 	return page
 }
 

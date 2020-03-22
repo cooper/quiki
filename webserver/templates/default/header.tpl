@@ -8,6 +8,9 @@
 {{with .KeywordString}}
     <meta name="keywords" content="{{.}}" />
 {{end}}
+{{with .Author}}
+    <meta name="author" content="{{.}}" />
+{{end}}
     <title>{{.VisibleTitle}}</title>
     <link rel="stylesheet" type="text/css" href="{{.StaticRoot}}/style.css" />
     <link rel="stylesheet" type="text/css" href="/static/quiki.css" />

@@ -173,6 +173,7 @@ type wikiPage struct {
 	Title       string                       // page title
 	Description string                       // page description
 	Keywords    []string                     // page keywords
+	Author      string                       // page author
 	WikiTitle   string                       // wiki titled
 	WikiLogo    string                       // path to wiki logo image (deprecated, use Logo)
 	WikiRoot    string                       // wiki HTTP root (deprecated, use Root.Wiki)
