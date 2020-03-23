@@ -117,7 +117,8 @@ func (m *Map) parse(page *Page) {
 			item.parse(page)
 
 		case string:
-			item = strings.TrimSpace(item)
+			item = strings.Trim(item, "\t ") // remove non-newline whitespace
+			// item = strings.Replace(item, "\n", " ", -1) // convert newlines
 			if item == "" {
 				continue
 			}
