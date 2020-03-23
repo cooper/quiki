@@ -345,32 +345,49 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 
 	// inner content
 	for _, textOrEl := range el.content {
+
+		// determine indent for this item
+		myIndent := indent + 1
+		if el.meta("noIndent") {
+			myIndent = 0
+		}
+
 		var addLines []indentedLine
 		switch v := textOrEl.(type) {
 
 		case element:
+
 			if v.meta("invisible") {
+				// this element is invisible - do not show it
 				break
 			}
+
 			if v.meta("noIndent") {
+				// this element says not to indent its content
 				addLines = v.generateIndented(0)
 			} else {
 				addLines = v.generateIndented(indent + 1)
 			}
 
 		case string:
-			myIndent := indent + 1
-			if el.meta("noIndent") {
-				myIndent = 0
+			stringLines := strings.Split(htmlfmt.EscapeString(v), "\n")
+			addLines = make([]indentedLine, len(stringLines))
+			for i, line := range stringLines {
+				if line == "" && i == len(stringLines)-1 {
+					continue
+				}
+				addLines[i] = indentedLine{line, myIndent}
 			}
-			addLines = []indentedLine{indentedLine{htmlfmt.EscapeString(v), myIndent}}
 
 		case HTML:
-			myIndent := indent + 1
-			if el.meta("noIndent") {
-				myIndent = 0
+			htmlLines := strings.Split(string(v), "\n")
+			addLines = make([]indentedLine, len(htmlLines))
+			for i, line := range htmlLines {
+				if line == "" && i == len(htmlLines)-1 {
+					continue
+				}
+				addLines[i] = indentedLine{line, myIndent}
 			}
-			addLines = []indentedLine{indentedLine{string(v), myIndent}}
 
 		}
 
