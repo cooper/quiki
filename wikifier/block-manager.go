@@ -32,7 +32,7 @@ var blockInitializers = map[string]func(name string, b *parserBlock) block{
 	"gallery":   newGalleryBlock,
 }
 
-func newBlock(blockType, blockName, headingID string, blockClasses []string, parentBlock block, parentCatch catch, pos position, page *Page) block {
+func newBlock(blockType, blockName, headingID string, blockClasses []string, parentBlock block, parentCatch catch, pos Position, page *Page) block {
 	if alias, exist := blockAliases[blockType]; exist {
 		blockType = alias
 	}

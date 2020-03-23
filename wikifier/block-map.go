@@ -27,7 +27,7 @@ type mapListEntry struct {
 	key      string          // actual underlying key
 	value    interface{}     // string, html, block, or mixed []interface{}
 	typ      valueType       // value type
-	pos      position        // position where the item started
+	pos      Position        // position where the item started
 	metas    map[string]bool // metadata
 }
 
@@ -49,8 +49,8 @@ type mapParser struct {
 
 	escape        bool
 	inValue       bool
-	startPos      position
-	pos           position
+	startPos      Position
+	pos           Position
 	overwroteKey  interface{}
 	overwroteWith interface{}
 	appendedKey   interface{}
@@ -59,7 +59,7 @@ type mapParser struct {
 // NewMap creates a new map, given the main block of the page it is to be associated with.
 func NewMap(mb block) *Map {
 	underlying := &parserBlock{
-		openPos:      position{0, 0}, // FIXME
+		openPos:      Position{0, 0}, // FIXME
 		parentB:      mb,
 		parentC:      mb,
 		typ:          "map",
@@ -320,7 +320,7 @@ func (m *Map) getEntry(key string) *mapListEntry {
 
 // getKeyPos returns the position where a key started.
 // If the key doesn't exist, it returns the position where the map started.
-func (m *Map) getKeyPos(key string) position {
+func (m *Map) getKeyPos(key string) Position {
 	if entry := m.getEntry(key); entry != nil {
 		return entry.pos
 	}

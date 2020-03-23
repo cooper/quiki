@@ -7,7 +7,7 @@ type variableName struct {
 	*genericCatch
 }
 
-func newVariableName(pfx string, pos position) *variableName {
+func newVariableName(pfx string, pos Position) *variableName {
 	pc := []posContent{{pfx, pos}}
 	return &variableName{genericCatch: &genericCatch{positionedPrefix: pc}}
 }

@@ -16,13 +16,13 @@ type block interface {
 	setParentBlock(p block)            // set parent block
 	blockType() string                 // block type
 	blockName() string                 // block name, if any
-	close(pos position)                // closes the block at the given position
+	close(pos Position)                // closes the block at the given position
 	closed() bool                      // true when closed
 	hierarchy() string                 // human-readable hierarchy
 	blockContent() []block             // block children
 	textContent() []string             // text children
-	openPosition() position            // position opened at
-	warn(pos position, warning string) // produce parser warning
+	openPosition() Position            // position opened at
+	warn(pos Position, warning string) // produce parser warning
 	catch                              // all blocks must conform to catch
 }
 
@@ -30,8 +30,8 @@ type block interface {
 type parserBlock struct {
 	typ, name string
 	classes   []string
-	openPos   position
-	closePos  position
+	openPos   Position
+	closePos  Position
 	parentB   block
 	parentC   catch
 	element   element
@@ -57,7 +57,7 @@ func (b *parserBlock) el() element {
 	return b.element
 }
 
-func (b *parserBlock) openPosition() position {
+func (b *parserBlock) openPosition() Position {
 	return b.openPos
 }
 
@@ -77,7 +77,7 @@ func (b *parserBlock) blockName() string {
 	return b.name
 }
 
-func (b *parserBlock) close(pos position) {
+func (b *parserBlock) close(pos Position) {
 	b.closePos = pos
 }
 
@@ -126,7 +126,7 @@ func (b *parserBlock) shouldSkipByte(byte) bool {
 	return false
 }
 
-func (b *parserBlock) warn(pos position, warning string) {
+func (b *parserBlock) warn(pos Position, warning string) {
 	log.Printf("WARNING: %s{} at %v: %s", b.blockType(), pos, warning)
 }
 

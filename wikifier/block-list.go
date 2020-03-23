@@ -18,7 +18,7 @@ type List struct {
 type listEntry struct {
 	value interface{}       // string, html, block, or mixed []interface{}
 	typ   valueType         // value type
-	pos   position          // position where the item started
+	pos   Position          // position where the item started
 	metas map[string]string // metadata
 }
 
@@ -33,14 +33,14 @@ func (entry *listEntry) meta(key string) string {
 type listParser struct {
 	values   []interface{}
 	escape   bool
-	startPos position
-	pos      position
+	startPos Position
+	pos      Position
 }
 
 // NewList creates a new list, given the main block of the page it is to be associated with.
 func NewList(mb block) *List {
 	underlying := &parserBlock{
-		openPos:      position{0, 0}, // FIXME
+		openPos:      Position{0, 0}, // FIXME
 		parentB:      mb,
 		parentC:      mb,
 		typ:          "list",

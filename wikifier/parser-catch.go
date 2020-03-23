@@ -21,7 +21,7 @@ type catch interface {
 	prefixContent() []interface{}
 	lastString() string
 	setLastContent(item interface{})
-	appendContent(item interface{}, pos position)
+	appendContent(item interface{}, pos Position)
 	appendContents(pc []posContent)
 	byteOK(b byte) bool
 	shouldSkipByte(b byte) bool
@@ -39,7 +39,7 @@ type genericCatch struct {
 
 type posContent struct {
 	content  interface{}
-	position position
+	position Position
 }
 
 func (c *genericCatch) setLastContent(content interface{}) {
@@ -65,7 +65,7 @@ func (c *genericCatch) lastString() string {
 }
 
 // append any combination of blocks and strings
-func (c *genericCatch) appendContent(content interface{}, pos position) {
+func (c *genericCatch) appendContent(content interface{}, pos Position) {
 	switch v := content.(type) {
 	case string:
 		c.appendString(v, pos)
@@ -87,7 +87,7 @@ func (c *genericCatch) appendContents(pc []posContent) {
 }
 
 // append an existing string if the last item is one
-func (c *genericCatch) appendString(s string, pos position) {
+func (c *genericCatch) appendString(s string, pos Position) {
 	c.line += s
 
 	// if it ends in a newline
@@ -152,7 +152,7 @@ func (c *genericCatch) finishLine() {
 	c.positioned[len(c.positioned)-1].content = newStr
 }
 
-func (c *genericCatch) pushContent(item interface{}, pos position) {
+func (c *genericCatch) pushContent(item interface{}, pos Position) {
 	c.positioned = append(c.positioned, posContent{item, pos})
 }
 

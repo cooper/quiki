@@ -17,7 +17,7 @@ func (mb *mainBlock) parse(page *Page) {
 	// convert text to sections with paragraphs
 	var newContent []posContent
 	var contentToAdd []posContent
-	var textStartPos position
+	var textStartPos Position
 	for _, pc := range mb.posContent() {
 		switch item := pc.content.(type) {
 		case block:

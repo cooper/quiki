@@ -11,7 +11,7 @@ import (
 )
 
 type parser struct {
-	pos position
+	pos Position
 
 	last       byte // last byte
 	this       byte // current byte
@@ -37,7 +37,7 @@ type parser struct {
 	lineHasStarted bool // true once the first non-space has occurred
 }
 
-type position struct {
+type Position struct {
 	line, column int
 }
 
@@ -49,15 +49,15 @@ var variableTokens = map[byte]bool{
 	'-': true,
 }
 
-func (pos position) none() bool {
+func (pos Position) none() bool {
 	return pos.line == 0 && pos.column == 0
 }
 
-func (pos position) MarshalJSON() ([]byte, error) {
+func (pos Position) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("[%d, %d]", pos.line, pos.column)), nil
 }
 
-func (pos position) UnmarshalJSON(data []byte) error {
+func (pos Position) UnmarshalJSON(data []byte) error {
 	var val interface{}
 	err := json.Unmarshal(data, &val)
 	if err != nil {
@@ -65,22 +65,22 @@ func (pos position) UnmarshalJSON(data []byte) error {
 	}
 	ary, ok := val.([]interface{})
 	if !ok || len(ary) != 2 {
-		return errors.New("(position).UnmarshalJSON: expected JSON array with len(2)")
+		return errors.New("(Position).UnmarshalJSON: expected JSON array with len(2)")
 	}
 	line, ok := ary[0].(float64)
 	if !ok {
-		return errors.New("(position).UnmarshalJSON: expected line number to be integer")
+		return errors.New("(Position).UnmarshalJSON: expected line number to be integer")
 	}
 	col, ok := ary[1].(float64)
 	if !ok {
-		return errors.New("(position).UnmarshalJSON: expected column number to be integer")
+		return errors.New("(Position).UnmarshalJSON: expected column number to be integer")
 	}
 	pos.line, pos.column = int(line), int(col)
 	return nil
 }
 
 func newParser(page *Page) *parser {
-	mb := newBlock("main", "", "", nil, nil, nil, position{}, page)
+	mb := newBlock("main", "", "", nil, nil, nil, Position{}, page)
 	return &parser{block: mb, catch: mb}
 }
 

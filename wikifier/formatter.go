@@ -208,8 +208,8 @@ type fmtOpt struct {
 	noEntities  bool     // disables html entity conversion
 	noVariables bool     // used internally to prevent recursive interpolation
 	noWarnings  bool     // silence warnings for undefined variables
-	pos         position // position used for warnings
-	startPos    position // set internally to position of '['
+	pos         Position // position used for warnings
+	startPos    Position // set internally to position of '['
 }
 
 func (page *Page) formatText(text string) HTML {
@@ -273,7 +273,7 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 			formatDepth--
 			if formatDepth == 0 {
 				items = append(items, page.parseFormatType(formatType, opts))
-				opts.startPos = position{}
+				opts.startPos = Position{}
 				continue
 			}
 		}

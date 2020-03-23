@@ -50,7 +50,7 @@ func getValueType(i interface{}) valueType {
 // Blocks are converted to elements.
 // Preformatted HTML is left as-is.
 //
-func prepareForHTML(value interface{}, page *Page, pos position) interface{} {
+func prepareForHTML(value interface{}, page *Page, pos Position) interface{} {
 	switch v := value.(type) {
 	case string:
 		value = page.formatTextOpts(v, fmtOpt{pos: pos})
