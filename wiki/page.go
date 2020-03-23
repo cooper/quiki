@@ -62,7 +62,7 @@ type DisplayPage struct {
 	Draft bool `json:"draft,omitempty"`
 
 	// warnings produced by the parser
-	Warnings []string `json:"warnings,omitempty"`
+	Warnings []wikifier.Warning `json:"warnings,omitempty"`
 
 	// time when the page was created, as extracted from
 	// the special @page.created variable
@@ -92,10 +92,10 @@ type DisplayPage struct {
 }
 
 type pageJSONManifest struct {
-	CSS        string   `json:"css,omitempty"`
-	Categories []string `json:"categories,omitempty"`
-	Warnings   []string `json:"warnings,omitempty"`
-	Error      string   `json:"error,omitempty"`
+	CSS        string             `json:"css,omitempty"`
+	Categories []string           `json:"categories,omitempty"`
+	Warnings   []wikifier.Warning `json:"warnings,omitempty"`
+	Error      string             `json:"error,omitempty"`
 	wikifier.PageInfo
 }
 
@@ -374,7 +374,7 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	info := pageJSONManifest{
 		CSS:        r.CSS,
 		Categories: r.Categories,
-		Warnings:   []string{}, // TODO
+		Warnings:   r.Warnings, // TODO
 		Error:      "",         // TODO
 		PageInfo:   page.Info(),
 	}
@@ -501,6 +501,7 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	r.FmtTitle = info.FmtTitle
 	r.Description = info.Description
 	r.Keywords = info.Keywords
+	r.Warnings = info.Warnings
 	r.FromCache = true
 	r.CSS = info.CSS
 	r.Content = wikifier.HTML(content)

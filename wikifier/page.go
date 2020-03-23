@@ -62,8 +62,8 @@ type PageInfo struct {
 
 // Warning represents a warning on a page.
 type Warning struct {
-	Message  string
-	Position Position
+	Message  string   `json:"message"`
+	Position Position `json:"position"`
 }
 
 // NewPage creates a page given its filepath.
