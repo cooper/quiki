@@ -287,7 +287,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		// this is part of the key
 
 		// starting a new key
-		if p.key == nil {
+		if p.key == nil && add != "\n" {
 			p.startPos = p.pos
 			p.key = add
 			return
