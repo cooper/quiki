@@ -499,6 +499,8 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	r.Author = info.Author
 	r.Title = info.Title
 	r.FmtTitle = info.FmtTitle
+	r.Description = info.Description
+	r.Keywords = info.Keywords
 	r.FromCache = true
 	r.CSS = info.CSS
 	r.Content = wikifier.HTML(content)
