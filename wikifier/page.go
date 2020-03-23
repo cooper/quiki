@@ -89,7 +89,7 @@ func NewPagePath(filePath, name string) *Page {
 
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
 func (p *Page) Parse() error {
-	p.parser = newParser()
+	p.parser = newParser(p)
 	p.main = p.parser.block
 	defer p.resetParseState()
 

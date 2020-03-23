@@ -52,8 +52,8 @@ func (pos position) none() bool {
 	return pos.line == 0 && pos.column == 0
 }
 
-func newParser() *parser {
-	mb := newBlock("main", "", "", nil, nil, nil, position{})
+func newParser(page *Page) *parser {
+	mb := newBlock("main", "", "", nil, nil, nil, position{}, page)
 	return &parser{block: mb, catch: mb}
 }
 
@@ -292,7 +292,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		}
 
 		// create the block
-		block := newBlock(blockType, blockName, headingID, blockClasses, p.block, p.catch, p.pos)
+		block := newBlock(blockType, blockName, headingID, blockClasses, p.block, p.catch, p.pos, page)
 
 		// TODO: produce a warning if the block has a name but the type does not support it
 

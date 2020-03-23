@@ -36,6 +36,7 @@ type parserBlock struct {
 	parentC   catch
 	element   element
 	headingID string
+	_page     *Page // used for warnings
 	*genericCatch
 }
 

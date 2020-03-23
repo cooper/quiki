@@ -162,7 +162,7 @@ func (sec *secBlock) createParagraph(page *Page, el element, pcs []posContent) {
 	}
 
 	// create a paragraph at first text node position
-	p := newBlock("p", "", "", nil, sec, sec, pcs[0].position)
+	p := newBlock("p", "", "", nil, sec, sec, pcs[0].position, page)
 	p.appendContent(pcs, pcs[0].position)
 
 	// parse and generate
