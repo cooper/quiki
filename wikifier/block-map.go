@@ -144,10 +144,11 @@ func (m *Map) parse(page *Page) {
 }
 
 func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
+	p.pos.column = i
 
 	if c == ':' && !p.inValue && !p.escape {
 		// first colon indicates we're entering a value
-
+		m.warnMaybe(p)
 		p.inValue = true
 
 	} else if c == '\\' && !p.escape {
@@ -177,7 +178,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 
 			// better to prefix text with : for less ambiguity
 			if isStrKey && strKey[0] != '-' {
-				m.warn(p.pos, "Standalone text should be prefixed with ':")
+				m.warn(p.pos, "Standalone text should be prefixed with ':'")
 			}
 
 			p.values = append(p.values, p.key)

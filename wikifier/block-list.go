@@ -113,6 +113,7 @@ func (l *List) parse(page *Page) {
 }
 
 func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine bool) {
+	p.pos.column = i
 
 	if c == '\\' && !p.escape {
 		// escapes the next character
