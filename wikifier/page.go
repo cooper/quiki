@@ -103,7 +103,6 @@ func (p *Page) Parse() error {
 			return err
 		}
 		d := markdown.Run(md)
-		fmt.Println(string(d))
 		reader = bytes.NewReader(d)
 	} else if p.FilePath != "" {
 		file, err := os.Open(p.FilePath)

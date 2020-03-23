@@ -3,7 +3,6 @@
 package monitor
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -60,7 +59,7 @@ func WatchWiki(w *wiki.Wiki) {
 		}
 		dirs[dir] = handler
 		if err := filepath.Walk(dir, walkDir); err != nil {
-			fmt.Println("ERROR", err)
+			log.Println("ERROR", err)
 		}
 	}
 
@@ -89,7 +88,7 @@ func WatchWiki(w *wiki.Wiki) {
 				// new directory created -- add to monitor
 				fi, err := os.Lstat(abs)
 				if err == nil && fi.IsDir() && event.Op&fsnotify.Create == fsnotify.Create {
-					fmt.Println("adding dir", abs)
+					log.Println("adding dir", abs)
 					mon.watching[abs] = true
 					watcher.Add(abs)
 					continue
@@ -98,7 +97,7 @@ func WatchWiki(w *wiki.Wiki) {
 				// a directory we were watching has been deleted
 				// note: this catches renames also
 				if mon.watching[abs] && event.Op&fsnotify.Remove == fsnotify.Remove {
-					fmt.Println("DELETE DIR", event)
+					log.Println("DELETE DIR", event)
 					delete(mon.watching, abs)
 					// watcher.Remove(abs) // nvm, it does this automatically
 					continue
@@ -114,7 +113,7 @@ func WatchWiki(w *wiki.Wiki) {
 
 				// watch for errors
 			case err := <-watcher.Errors:
-				fmt.Println("ERROR", err)
+				log.Println("ERROR", err)
 			}
 		}
 	}()
