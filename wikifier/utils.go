@@ -178,7 +178,7 @@ func fixSingleValue(value interface{}, pageMaybe *Page, fmtText bool) interface{
 	case HTML:
 		return v
 	case string:
-		v = strings.TrimSpace(v)
+		v = strings.Trim(v, "\t ") // remove non-newline spaces
 		if v == "" {
 			return nil
 		}
