@@ -38,14 +38,14 @@ func (g *galleryBlock) parse(page *Page) {
 
 			// not a string
 			if err != nil {
-				g.warn(g.openPos, errors.Wrap(err, imgKey).Error()) // FIXME: use key position
+				g.warn(g.getKeyPos(imgKey), errors.Wrap(err, imgKey).Error())
 				break
 			}
 
 			// convert to int
 			height, err := strconv.Atoi(thumbHeight)
 			if err != nil {
-				g.warn(g.openPos, "thumb_height: expected integer")
+				g.warn(g.getKeyPos(imgKey), "thumb_height: expected integer")
 				break
 			}
 
@@ -56,7 +56,7 @@ func (g *galleryBlock) parse(page *Page) {
 
 			// unknown key
 			if !strings.HasPrefix(imgKey, "anon_") {
-				g.warn(g.openPos, "Invalid key '"+imgKey+"'") // FIXME: use key position
+				g.warn(g.getKeyPos(imgKey), "Invalid key '"+imgKey+"'")
 				break
 			}
 
@@ -65,7 +65,7 @@ func (g *galleryBlock) parse(page *Page) {
 
 			// non-block
 			if err != nil {
-				g.warn(g.openPos, errors.Wrap(err, imgKey).Error()) // FIXME: use key position
+				g.warn(g.getKeyPos(imgKey), errors.Wrap(err, imgKey).Error())
 				break
 			}
 
@@ -73,7 +73,7 @@ func (g *galleryBlock) parse(page *Page) {
 			img, ok := blk.(*imageBlock)
 			if !ok {
 				// block other than image
-				g.warn(g.openPos, imgKey+": expected Block<image{}>") // FIXME: use key position
+				g.warn(g.getKeyPos(imgKey), imgKey+": expected Block<image{}>")
 				break
 			}
 
