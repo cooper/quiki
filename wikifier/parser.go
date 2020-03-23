@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -50,6 +51,32 @@ var variableTokens = map[byte]bool{
 
 func (pos position) none() bool {
 	return pos.line == 0 && pos.column == 0
+}
+
+func (pos position) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("[%d, %d]", pos.line, pos.column)), nil
+}
+
+func (pos position) UnmarshalJSON(data []byte) error {
+	var val interface{}
+	err := json.Unmarshal(data, &val)
+	if err != nil {
+		return err
+	}
+	ary, ok := val.([]interface{})
+	if !ok || len(ary) != 2 {
+		return errors.New("(position).UnmarshalJSON: expected JSON array with len(2)")
+	}
+	line, ok := ary[0].(float64)
+	if !ok {
+		return errors.New("(position).UnmarshalJSON: expected line number to be integer")
+	}
+	col, ok := ary[1].(float64)
+	if !ok {
+		return errors.New("(position).UnmarshalJSON: expected column number to be integer")
+	}
+	pos.line, pos.column = int(line), int(col)
+	return nil
 }
 
 func newParser(page *Page) *parser {
