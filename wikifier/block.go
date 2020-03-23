@@ -2,7 +2,6 @@ package wikifier
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -127,7 +126,8 @@ func (b *parserBlock) shouldSkipByte(byte) bool {
 }
 
 func (b *parserBlock) warn(pos Position, warning string) {
-	log.Printf("WARNING: %s{} at %v: %s", b.blockType(), pos, warning)
+	w := Warning{warning, pos}
+	b._page.Warnings = append(b._page.Warnings, w)
 }
 
 func (b *parserBlock) blockContent() []block {

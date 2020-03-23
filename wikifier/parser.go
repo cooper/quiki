@@ -53,10 +53,17 @@ func (pos Position) none() bool {
 	return pos.line == 0 && pos.column == 0
 }
 
+// String returns the position as `{line column}`.
+func (pos Position) String() string {
+	return fmt.Sprintf("{%d %d}", pos.line, pos.column)
+}
+
+// MarshalJSON encodes the position to `[line, column]`.
 func (pos Position) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("[%d, %d]", pos.line, pos.column)), nil
 }
 
+// UnmarshalJSON decodes the position from `[line, column]`.
 func (pos Position) UnmarshalJSON(data []byte) error {
 	var val interface{}
 	err := json.Unmarshal(data, &val)

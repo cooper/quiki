@@ -35,6 +35,11 @@ func main() {
 				reply = string(page.HTML())
 			}
 
+			// warnings
+			for _, warning := range page.Warnings {
+				reply += "\nWarning " + warning.Position.String() + ": " + warning.Message
+			}
+
 			// css
 			if css := page.CSS(); css != "" {
 				reply += "\n\nCSS:\n" + css

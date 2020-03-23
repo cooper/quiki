@@ -37,6 +37,7 @@ type Page struct {
 	headingIDs map[string]int
 	Wiki       interface{} // only available during Parse() and HTML()
 	markdown   bool        // true if FilePath points to a markdown source
+	Warnings   []Warning
 	*variableScope
 }
 
@@ -56,6 +57,13 @@ type PageInfo struct {
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
+	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
+}
+
+// Warning represents a warning on a page.
+type Warning struct {
+	Message  string
+	Position Position
 }
 
 // NewPage creates a page given its filepath.
