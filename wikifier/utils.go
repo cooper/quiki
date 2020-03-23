@@ -29,12 +29,12 @@ const (
 // If i is none of these, returns -1.
 func getValueType(i interface{}) valueType {
 	switch i.(type) {
+	case HTML:
+		return valueTypeHTML
 	case string:
 		return valueTypeString
 	case block:
 		return valueTypeBlock
-	case HTML:
-		return valueTypeHTML
 	case element:
 		return valueTypeElement
 	case []interface{}:

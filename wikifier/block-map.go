@@ -360,8 +360,10 @@ func (m *Map) html(page *Page, el element) {
 		return
 	}
 	for i, entry := range m.mapList {
-		m.mapList[i].value = prepareForHTML(entry.value, page, entry.pos)
-		m.setOwn(entry.key, m.mapList[i].value)
+		value := prepareForHTML(entry.value, page, entry.pos)
+		m.mapList[i].value = value
+		m.mapList[i].typ = getValueType(value)
+		m.setOwn(entry.key, value)
 	}
 }
 

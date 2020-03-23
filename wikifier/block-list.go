@@ -185,6 +185,7 @@ func (l *List) html(page *Page, el element) {
 		// prepare the value for inclusion in HTML element
 		value := prepareForHTML(entry.value, page, entry.pos)
 		l.list[i].value = value
+		l.list[i].typ = getValueType(value)
 
 		// create a list item
 		el.createChild("li", "list-item").add(value)
