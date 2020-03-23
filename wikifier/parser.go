@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 	"unicode"
@@ -37,6 +36,7 @@ type parser struct {
 	lineHasStarted bool // true once the first non-space has occurred
 }
 
+// Position represents a line and column position within a quiki source file.
 type Position struct {
 	line, column int
 }
@@ -377,7 +377,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		case "if":
 
 			p.conditionalExists = true
-			p.conditional = p.getConditional(page, p.block.blockName())
+			p.conditional = p.getConditional(p.block, page, p.block.blockName())
 			if p.conditional {
 				accepting.appendContents(p.block.posContent())
 			}
@@ -392,7 +392,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// only evaluate the conditional if the last one was false
 			if !p.conditional {
-				p.conditional = p.getConditional(page, p.block.blockName())
+				p.conditional = p.getConditional(p.block, page, p.block.blockName())
 				if p.conditional {
 					accepting.appendContents(p.block.posContent())
 				}
@@ -695,16 +695,17 @@ func (p *parser) nextByte(b byte) error {
 	return nil
 }
 
-func (p *parser) getConditional(page *Page, condition string) bool {
+func (p *parser) getConditional(blk block, page *Page, condition string) bool {
 
 	// no condition
 	if condition == "" {
-		p.warn("Conditional has no condition")
+		blk.warn(blk.openPosition(), "Conditional has no condition")
+		return false
 	}
 
 	// negated
 	if condition[0] == '!' {
-		return !p.getConditional(page, condition[1:])
+		return !p.getConditional(blk, page, condition[1:])
 	}
 
 	// looks like a variable
@@ -721,7 +722,7 @@ func (p *parser) getConditional(page *Page, condition string) bool {
 
 			// still error? this is something serious
 			if err2 != nil {
-				p.warn(err2.Error())
+				blk.warn(p.pos, err2.Error())
 				return false
 			}
 
@@ -733,7 +734,7 @@ func (p *parser) getConditional(page *Page, condition string) bool {
 	}
 
 	// something else
-	p.warn("Invalid condition; expected variable or attribute")
+	blk.warn(blk.openPosition(), "Invalid condition; expected variable or attribute")
 	return false
 }
 
@@ -741,8 +742,4 @@ func (p *parser) clearVariableState() {
 	p.varName = ""
 	p.varNotInterpolated = false
 	p.varNegated = false
-}
-
-func (p *parser) warn(warning string) {
-	log.Printf("WARNING: at %v: %s", p.pos, warning)
 }
