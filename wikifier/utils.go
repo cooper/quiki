@@ -94,7 +94,7 @@ func humanReadableValue(i interface{}) string {
 
 	// string
 	case string:
-		return `'` + strings.TrimSpace(v) + `'`
+		return `'` + strings.TrimSpace(strings.ReplaceAll(v, "\n", "\u2424")) + `'`
 
 	// boolean
 	case bool:
