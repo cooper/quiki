@@ -40,6 +40,11 @@ func main() {
 				reply += "\n\nCSS:\n" + css
 			}
 
+			// keywords
+			if kw := page.Keywords(); len(kw) != 0 {
+				reply += "\n\nKeywords:\n" + strings.Join(kw, ", ")
+			}
+
 			for _, line := range strings.Split(reply, "\n") {
 				irc.Send("PRIVMSG " + mes.To + " :" + line)
 			}

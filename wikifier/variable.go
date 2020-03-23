@@ -222,21 +222,27 @@ func (scope *variableScope) GetStrList(key string) ([]string, error) {
 	case *List:
 		var list []string
 		for _, entry := range v.list {
-
-			// not a string
-			if entry.typ != valueTypeString {
-				continue
+			if entry.typ == valueTypeString {
+				list = append(list, entry.value.(string))
+			} else if entry.typ == valueTypeHTML {
+				list = append(list, string(entry.value.(HTML)))
 			}
-
-			// add it
-			list = append(list, entry.value.(string))
 		}
 		return list, nil
 
 	// comma-separated list
-	case string:
+	case string, HTML:
+
+		// get string
+		var str string
+		if html, ok := v.(HTML); ok {
+			str = string(html)
+		} else {
+			str = v.(string)
+		}
+
 		var list []string
-		for _, item := range strings.Split(v, ",") {
+		for _, item := range strings.Split(str, ",") {
 
 			// trim whitespace
 			item = strings.TrimSpace(item)

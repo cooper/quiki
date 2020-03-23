@@ -16,7 +16,7 @@ type List struct {
 }
 
 type listEntry struct {
-	value interface{}       // string, block, or mixed []interface{}
+	value interface{}       // string, html, block, or mixed []interface{}
 	typ   valueType         // value type
 	pos   position          // position where the item started
 	metas map[string]string // metadata

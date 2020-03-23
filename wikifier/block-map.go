@@ -25,7 +25,7 @@ type Map struct {
 type mapListEntry struct {
 	keyTitle string          // displayed key text
 	key      string          // actual underlying key
-	value    interface{}     // string, block, or mixed []interface{}
+	value    interface{}     // string, html, block, or mixed []interface{}
 	typ      valueType       // value type
 	pos      position        // position where the item started
 	metas    map[string]bool // metadata

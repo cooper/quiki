@@ -17,11 +17,11 @@ type valueType int
 
 // These are the value types in a quiki page model.
 const (
-	valueTypeString  valueType = 0 // String
-	valueTypeBlock                 // Block
-	valueTypeHTML                  // Raw HTML
-	valueTypeElement               // HTML element
-	valueTypeMixed                 // []interface{} with a mixture of these
+	valueTypeString  valueType = iota // String
+	valueTypeBlock                    // Block
+	valueTypeHTML                     // Raw HTML
+	valueTypeElement                  // HTML element
+	valueTypeMixed                    // []interface{} with a mixture of these
 )
 
 // Returns a quiki valueType, given a value. Accepted types are string,
