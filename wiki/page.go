@@ -247,6 +247,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	r.ModifiedHTTP = httpdate.Time2Str(mod)
 	r.Content = page.HTML()
 	r.CSS = page.CSS()
+	r.Warnings = page.Warnings
 
 	// TODO: should we include the page object?
 	// TODO: warnings
