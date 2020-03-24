@@ -42,7 +42,7 @@ type wikiTemplate struct {
 	Shortcode         string              // wiki shortcode
 	WikiTitle         string              // wiki title
 	Branch            string              // selected branch
-	Static            string              // adminifier-static root
+	Static            string              // static root
 	AdminRoot         string              // adminifier root
 	Root              string              // wiki root
 }
@@ -465,7 +465,7 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		Shortcode:         wr.shortcode,
 		WikiTitle:         wr.wi.Title,
 		AdminRoot:         strings.TrimRight(root, "/"),
-		Static:            root + "adminifier-static",
+		Static:            root + "static",
 		Root:              root + wr.shortcode,
 	}
 }

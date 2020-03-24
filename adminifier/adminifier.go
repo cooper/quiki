@@ -19,7 +19,7 @@ var tmpl *template.Template
 var mux *http.ServeMux
 var conf *wikifier.Page
 var sessMgr *scs.SessionManager
-var host, root, dirAdminifier string
+var host, root, dirResource, dirAdminifier string
 
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
 func Configure() {
@@ -33,9 +33,9 @@ func Configure() {
 
 	// extract strings
 	for key, ptr := range map[string]*string{
-		"server.dir.adminifier": &dirAdminifier,
-		"adminifier.host":       &host,
-		"adminifier.root":       &root,
+		"server.dir.resource": &dirResource,
+		"adminifier.host":     &host,
+		"adminifier.root":     &root,
 	} {
 		str, err := conf.GetStr(key)
 		if err != nil {
@@ -44,7 +44,8 @@ func Configure() {
 		*ptr = str
 	}
 
-	dirAdminifier = filepath.FromSlash(dirAdminifier)
+	dirResource = filepath.FromSlash(dirResource)
+	dirAdminifier = filepath.Join(dirResource, "adminifier")
 	root += "/"
 
 	// configure session manager
@@ -53,8 +54,8 @@ func Configure() {
 	sessMgr.Cookie.Path = root
 
 	// setup static files server
-	if err := setupStatic(filepath.Join(dirAdminifier, "adminifier-static")); err != nil {
-		log.Fatal(errors.Wrap(err, "setup adminifier-static"))
+	if err := setupStatic(filepath.Join(dirAdminifier, "static")); err != nil {
+		log.Fatal(errors.Wrap(err, "setup adminifier static"))
 	}
 
 	// create template
@@ -81,7 +82,7 @@ func Configure() {
 }
 
 func setupStatic(staticPath string) error {
-	staticRoot := root + "adminifier-static/"
+	staticRoot := root + "static/"
 	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")

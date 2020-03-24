@@ -65,12 +65,12 @@ func Configure(confFile string) {
 	}
 
 	// extract strings
-	var dirStatic string
+	var dirResource string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &Port,
 		"server.http.bind":    &Bind,
 		"server.dir.template": &templateDirs,
-		"server.dir.static":   &dirStatic,
+		"server.dir.resource": &dirResource,
 	} {
 		str, err := Conf.GetStr(key)
 		if err != nil {
@@ -81,7 +81,8 @@ func Configure(confFile string) {
 
 	// normalize paths
 	templateDirs = filepath.FromSlash(templateDirs)
-	dirStatic = filepath.FromSlash(dirStatic)
+	dirResource = filepath.FromSlash(dirResource)
+	dirStatic := filepath.Join(dirResource, "webserver", "static")
 
 	// set up wikis
 	if err = initWikis(); err != nil {

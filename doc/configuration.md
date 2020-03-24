@@ -349,6 +349,13 @@ are needed and display it where appropriate.
 
 These options are respected by the quiki webserver.
 
+### server.dir.resource
+
+Path to quiki's `resources` directory.
+
+    @repo: .;       /* where quiki is cloned */
+    @server.dir.resource:   [@repo]/resources;
+
 ### server.dir.wiki
 
 _Optional_. Path to some directory where wikis are stored.
@@ -357,12 +364,6 @@ Your wikis do not all have to be in the same directory, so this is optional.
 However, if you make use of this, quiki can infer [`dir.wiki`](#dirwiki) for each
 wiki, allowing you to omit the [`server.wiki.[name].dir`](#serverwikinamedir)
 options.
-
-
-### server.dir.adminifier
-
-_Optional_ (Required with [`adminifier.enable`](#adminifierenable)).
-Path to adminifier resources.
 
 ### server.enable.pregeneration
 
@@ -417,7 +418,7 @@ _Optional_. Template search paths.
 
 This is a comma-separated list of paths to look for templates when they are
 specified by name in the wiki configuration. If you're running multiple wikis
-that share a template, or if you are using the default template, this optional
+that share a template, or if you are using the default template, this
 is useful. Otherwise, you can just specify the absolute path to each wiki's
 template in the [template](#template) directive.
 
@@ -442,7 +443,6 @@ __Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]`
 
 _Optional_. Enables the adminifier server administration panel.
 
-__Requires__: [`server.dir.adminifier`](#serverdiradminifier)
 __Default__: Disabled (but enabled in the example configuration)
 
 ### adminifier.host

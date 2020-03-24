@@ -4,11 +4,9 @@
 /* directories-- */
 
 @repo: .;   /* set this variable to the absolute path of the quiki repository */
-@server.dir.static:     [@repo]/webserver/static;     /* static files that ship with quiki */
-@server.dir.template:   [@repo]/webserver/templates;  /* comma-separated template search paths */
-@server.dir.adminifier: [@repo]/adminifier;           /* static files for adminifier */
-@server.dir.wiki:       [@repo]/wikis;                /* where your site directories are located */
-
+@server.dir.resource:   [@repo]/resources;      /* resource files that ship with quiki */
+@server.dir.template:   [@repo]/resources/webserver/templates; /* comma-separated template search paths */
+@server.dir.wiki:       [@repo]/wikis;          /* where your site directories are located */
 
 /* HTTP server bindings-- */
 
