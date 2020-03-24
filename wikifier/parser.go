@@ -699,7 +699,7 @@ func (p *parser) getConditional(blk block, page *Page, condition string) bool {
 
 	// no condition
 	if condition == "" {
-		blk.warn(blk.openPosition(), "Conditional has no condition")
+		blk.warn(blk.openPosition(), "Conditional "+blk.blockType()+"{} has no condition")
 		return false
 	}
 
