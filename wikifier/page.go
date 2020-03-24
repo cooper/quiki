@@ -127,7 +127,15 @@ func (p *Page) Parse() error {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		if err := p.parser.parseLine(scanner.Bytes(), p); err != nil {
-			return err
+
+			// already a ParserError
+			var perr *ParserError
+			if errors.As(err, &perr) {
+				return err
+			}
+
+			// wrap to include current positional info
+			return &ParserError{Position: p.parser.pos, Err: err}
 		}
 	}
 	if err := scanner.Err(); err != nil {

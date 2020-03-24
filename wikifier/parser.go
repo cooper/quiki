@@ -143,6 +143,20 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 	return nil
 }
 
+// ParserError represents an error in parsing with positional info.
+type ParserError struct {
+	Position Position
+	Err      error
+}
+
+func (e *ParserError) Error() string {
+	return fmt.Sprintf("{%d %d} %s", e.Position.line, e.Position.column, e.Err.Error())
+}
+
+func (e *ParserError) Unwrap() error {
+	return e.Err
+}
+
 func (p *parser) parseByte(b byte, page *Page) error {
 
 	// // fix extra newline added to code{} blocks
@@ -403,12 +417,12 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// no conditional exists before this
 			if !p.conditionalExists {
-				return errors.New("Unexpected elsif{}")
+				return errors.New("Unexpected else{}")
 			}
 
 			// title provided
 			if p.block.blockName() != "" {
-				p.block.warn(p.pos, "Conditional on else{} ignored")
+				p.block.warn(p.pos, "Condition on else{} ignored")
 			}
 
 			// the condition was false. add the contents of the else.
