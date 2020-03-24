@@ -81,7 +81,7 @@ func (b *parserBlock) close(pos Position) {
 }
 
 func (b *parserBlock) closed() bool {
-	return b.closePos.line != 0 || b.closePos.column != 0
+	return b.closePos.Line != 0 || b.closePos.Column != 0
 }
 
 func (b *parserBlock) String() string {

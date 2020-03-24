@@ -38,7 +38,7 @@ type parser struct {
 
 // Position represents a line and column position within a quiki source file.
 type Position struct {
-	line, column int
+	Line, Column int
 }
 
 var variableTokens = map[byte]bool{
@@ -50,17 +50,17 @@ var variableTokens = map[byte]bool{
 }
 
 func (pos Position) none() bool {
-	return pos.line == 0 && pos.column == 0
+	return pos.Line == 0 && pos.Column == 0
 }
 
 // String returns the position as `{line column}`.
 func (pos Position) String() string {
-	return fmt.Sprintf("{%d %d}", pos.line, pos.column)
+	return fmt.Sprintf("{%d %d}", pos.Line, pos.Column)
 }
 
 // MarshalJSON encodes the position to `[line, column]`.
 func (pos Position) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("[%d, %d]", pos.line, pos.column)), nil
+	return []byte(fmt.Sprintf("[%d, %d]", pos.Line, pos.Column)), nil
 }
 
 // UnmarshalJSON decodes the position from `[line, column]`.
@@ -82,7 +82,7 @@ func (pos Position) UnmarshalJSON(data []byte) error {
 	if !ok {
 		return errors.New("(Position).UnmarshalJSON: expected column number to be integer")
 	}
-	pos.line, pos.column = int(line), int(col)
+	pos.Line, pos.Column = int(line), int(col)
 	return nil
 }
 
@@ -92,7 +92,7 @@ func newParser(page *Page) *parser {
 }
 
 func (p *parser) parseLine(line []byte, page *Page) error {
-	p.pos.line++
+	p.pos.Line++
 
 	// this is a hack to fix extra whitespace in blocks just before they close
 	if p.braceLevel == 0 && strings.TrimSpace(string(line)) == "}" {
@@ -115,7 +115,7 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 		}
 
 		// update column and bytes
-		p.pos.column = i + 1
+		p.pos.Column = i + 1
 		p.this = b
 
 		// next two bytes
@@ -150,7 +150,7 @@ type ParserError struct {
 }
 
 func (e *ParserError) Error() string {
-	return fmt.Sprintf("{%d %d} %s", e.Position.line, e.Position.column, e.Err.Error())
+	return fmt.Sprintf("{%d %d} %s", e.Position.Line, e.Position.Column, e.Err.Error())
 }
 
 func (e *ParserError) Unwrap() error {

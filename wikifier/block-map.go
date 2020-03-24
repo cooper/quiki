@@ -144,7 +144,7 @@ func (m *Map) parse(page *Page) {
 }
 
 func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
-	p.pos.column = i
+	p.pos.Column = i
 
 	if c == ':' && !p.inValue && !p.escape {
 		// first colon indicates we're entering a value

@@ -243,10 +243,10 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 
 		// update position
 		if char == '\n' {
-			opts.pos.line++
-			opts.pos.column = 0
+			opts.pos.Line++
+			opts.pos.Column = 0
 		} else {
-			opts.pos.column++
+			opts.pos.Column++
 		}
 
 		if char == '[' && !escaped {
