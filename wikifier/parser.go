@@ -157,6 +157,11 @@ func (e *ParserError) Unwrap() error {
 	return e.Err
 }
 
+// creates a ParserError with position and message
+func parserError(pos Position, msg string) *ParserError {
+	return &ParserError{Position: pos, Err: errors.New(msg)}
+}
+
 func (p *parser) parseByte(b byte, page *Page) error {
 
 	// // fix extra newline added to code{} blocks
@@ -370,6 +375,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 	}
 
 	if b == '}' {
+		openPos := p.block.openPosition()
+
 		// closes a block
 		p.parserChar = true
 		accepting := p.catch.parentCatch()
@@ -401,7 +408,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// no conditional exists before this
 			if !p.conditionalExists {
-				return errors.New("Unexpected elsif{}")
+				return parserError(openPos, "Unexpected elsif{}")
 			}
 
 			// only evaluate the conditional if the last one was false
@@ -417,12 +424,12 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// no conditional exists before this
 			if !p.conditionalExists {
-				return errors.New("Unexpected else{}")
+				return parserError(openPos, "Unexpected else{}")
 			}
 
 			// title provided
 			if p.block.blockName() != "" {
-				p.block.warn(p.pos, "Condition on else{} ignored")
+				p.block.warn(openPos, "Condition on else{} ignored")
 			}
 
 			// the condition was false. add the contents of the else.
@@ -446,14 +453,14 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			// find the value and make sure it's a block
 			obj, err := page.GetBlock(varName)
 			if err != nil {
-				return errors.New("Variable block @" + varName + " does not contain a block")
+				return parserError(openPos, "Variable block @"+varName+" does not contain a block")
 			}
 			if obj == nil {
-				return errors.New("Variable block @" + varName + " does not exist")
+				return parserError(openPos, "Variable block @"+varName+" does not exist")
 			}
 			blk, ok := obj.(block)
 			if !ok {
-				return errors.New("Variable block @" + varName + " does not contain a block")
+				return parserError(openPos, "Variable block @"+varName+" does not contain a block")
 			}
 
 			// overwrite the block's parent to the parent of the {@var}
