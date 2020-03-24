@@ -41,14 +41,6 @@ type Position struct {
 	Line, Column int
 }
 
-var variableTokens = map[byte]bool{
-	'@': true,
-	'%': true,
-	':': true,
-	';': true,
-	'-': true,
-}
-
 func (pos Position) none() bool {
 	return pos.Line == 0 && pos.Column == 0
 }
@@ -160,6 +152,14 @@ func (e *ParserError) Unwrap() error {
 // creates a ParserError with position and message
 func parserError(pos Position, msg string) *ParserError {
 	return &ParserError{Position: pos, Err: errors.New(msg)}
+}
+
+var variableTokens = map[byte]bool{
+	'@': true,
+	'%': true,
+	':': true,
+	';': true,
+	'-': true,
 }
 
 func (p *parser) parseByte(b byte, page *Page) error {
@@ -755,7 +755,7 @@ func (p *parser) getConditional(blk block, page *Page, condition string) bool {
 	}
 
 	// something else
-	blk.warn(blk.openPosition(), "Invalid condition; expected variable or attribute")
+	blk.warn(blk.openPosition(), "Invalid "+blk.blockType()+"{} condition; expected variable or attribute")
 	return false
 }
 
