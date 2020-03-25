@@ -16,6 +16,7 @@ type imageBlock struct {
 	width, height                   int
 	parseFailed, useJS              bool
 	parsedDimensions                bool
+	fullSize                        bool
 	*Map
 }
 
@@ -120,7 +121,8 @@ func (image *imageBlock) parse(page *Page) {
 		}
 
 		// determine dimensions
-		calcWidth, calcHeight := page.Opt.Image.Calc(
+		var calcWidth, calcHeight int
+		calcWidth, calcHeight, image.fullSize = page.Opt.Image.Calc(
 			image.file,
 			image.width,
 			image.height,
@@ -179,9 +181,8 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	isAbsolute := url != nil && url.IsAbs()
 
 	// retina
-	// FIXME: if true -> if the image is not full-size
 	srcset := ""
-	if true && !isAbsolute && len(page.Opt.Image.Retina) != 0 {
+	if !image.fullSize && !isAbsolute && len(page.Opt.Image.Retina) != 0 {
 		srcset = ScaleString(image.path, page.Opt.Image.Retina)
 	}
 

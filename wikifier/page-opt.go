@@ -71,7 +71,7 @@ type PageOptRoot struct {
 type PageOptImage struct {
 	Retina     []int
 	SizeMethod string
-	Calc       func(file string, width, height int, page *Page) (w, h int)
+	Calc       func(file string, width, height int, page *Page) (w, h int, fullSize bool)
 	Sizer      func(file string, width, height int, page *Page) (path string)
 }
 
@@ -150,6 +150,7 @@ var defaultPageOpt = PageOpt{
 	Image: PageOptImage{
 		Retina:     []int{2, 3},
 		SizeMethod: "javascript",
+		Calc:       nil,
 		Sizer:      nil,
 	},
 	Category: PageOptCategory{

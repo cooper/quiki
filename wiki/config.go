@@ -74,18 +74,23 @@ func (w *Wiki) readConfig(file string) error {
 	return nil
 }
 
-func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int) {
+func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int, bool) {
 	path := filepath.Join(page.Opt.Dir.Image, filepath.FromSlash(name))
 	bigW, bigH := getImageDimensions(path)
 
 	// original has no dimensions??
 	if bigW == 0 || bigH == 0 {
-		return 0, 0
+		return 0, 0, true
 	}
 
 	// requesting 0x0 is same as requesting full-size
 	if width == 0 && height == 0 {
-		return bigW, bigH
+		return bigW, bigH, true
+	}
+
+	// requesting single full-size dimension is same as requesting full-size
+	if (width == bigW && height == 0) || (height == bigH && width == 0) {
+		return bigW, bigH, true
 	}
 
 	// determine missing dimension
@@ -101,7 +106,7 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 		w.DisplaySizedImageGenerate(sized, true)
 	}
 
-	return width, height
+	return width, height, false
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
