@@ -534,7 +534,9 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// unfortunately we have to iterate over this 1 more time
 	css := ""
 	for _, page := range pages {
-		css += page.CSS + "\n"
+		if page.CSS != "" {
+			css += page.CSS + "\n"
+		}
 	}
 
 	return DisplayCategoryPosts{
