@@ -17,6 +17,7 @@ type imageBlock struct {
 	parseFailed, useJS              bool
 	parsedDimensions                bool
 	fullSize                        bool
+	scales                          []int
 	*Map
 }
 
@@ -138,7 +139,21 @@ func (image *imageBlock) parse(page *Page) {
 		)
 
 		// remember that the page uses this image in these dimensions
+		// consider: should we remember the retina scales? I guess it doesn't really DEPEND on them
 		page.Images[image.file] = append(page.Images[image.file], []int{calcWidth, calcHeight})
+
+		// for each retina scale, determine whether the scaled dimensions would exceed full-size
+		for _, scale := range page.Opt.Image.Retina {
+			_, _, tooBig := page.Opt.Image.Calc(
+				image.file,
+				scale*image.width,
+				scale*image.height,
+				page,
+			)
+			if !tooBig {
+				image.scales = append(image.scales, scale)
+			}
+		}
 
 	} else {
 		// note: this should never happen because the config parser validates it
@@ -180,10 +195,14 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	url, _ := url.Parse(image.path)
 	isAbsolute := url != nil && url.IsAbs()
 
-	// retina
+	// retina--
+	//
+	// skip is using full size image (since it can't be scaled any larger than that)
+	// skip if the image URL is absolute (not an image served by this wiki)
+	//
 	srcset := ""
-	if !image.fullSize && !isAbsolute && len(page.Opt.Image.Retina) != 0 {
-		srcset = ScaleString(image.path, page.Opt.Image.Retina)
+	if !image.fullSize && !isAbsolute && len(image.scales) != 0 {
+		srcset = ScaleString(image.path, image.scales)
 	}
 
 	// determine link
