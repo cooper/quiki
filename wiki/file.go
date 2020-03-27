@@ -29,6 +29,9 @@ type DisplayFile struct {
 
 	// for pages, DisplayPage result
 	DisplayPage *DisplayPage `json:"display_page,omitempty"`
+
+	// for pages/models/etc, this is the parser error
+	Error *wikifier.Warning `json:"parse_error,omitempty"`
 }
 
 // DisplayFile returns the display result for a plain text file.
@@ -74,7 +77,15 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	if rel := w._relPath(path, w.Dir("pages")); rel != "" {
 		res := w.DisplayPageDraft(wikifier.PageNameNE(rel), true)
 		if dispPage, ok := res.(DisplayPage); ok {
+			// extract warnings/etc from a DisplayPage
 			r.DisplayPage = &dispPage
+
+		} else if dispErr, ok := res.(DisplayError); ok && dispErr.ParseError != nil {
+			// extract parsing error from a DisplayError
+			r.Error = &wikifier.Warning{
+				Message:  dispErr.ParseError.Err.Error(),
+				Position: dispErr.ParseError.Position,
+			}
 		}
 	} else if rel := w._relPath(path, w.Dir("models")); rel != "" {
 		// TODO: model errors/ warnings

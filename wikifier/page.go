@@ -97,9 +97,31 @@ func NewPagePath(filePath, name string) *Page {
 
 // Parse opens the page file and attempts to parse it, returning any errors encountered.
 func (p *Page) Parse() error {
+
+	// create parser
 	p.parser = newParser(p)
 	p.main = p.parser.block
 	defer p.resetParseState()
+
+	// call underlying parse
+	err := p._parse()
+	if err == nil {
+		return err
+	}
+
+	// error occurred--
+
+	// already a ParserError
+	var perr *ParserError
+	if errors.As(err, &perr) {
+		return err
+	}
+
+	// wrap to include current positional info
+	return &ParserError{Position: p.parser.pos, Err: err}
+}
+
+func (p *Page) _parse() error {
 
 	// create reader from file path or source code provided
 	var reader io.Reader
@@ -127,15 +149,7 @@ func (p *Page) Parse() error {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		if err := p.parser.parseLine(scanner.Bytes(), p); err != nil {
-
-			// already a ParserError
-			var perr *ParserError
-			if errors.As(err, &perr) {
-				return err
-			}
-
-			// wrap to include current positional info
-			return &ParserError{Position: p.parser.pos, Err: err}
+			return err
 		}
 	}
 	if err := scanner.Err(); err != nil {

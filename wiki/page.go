@@ -3,6 +3,7 @@ package wiki
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -208,7 +209,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		page.Parse()
 		// TODO: add page to categories
 		// TODO: cache the error
-		return DisplayError{Error: err.Error(), ParseError: true}
+		var pErr *wikifier.ParserError
+		errors.As(err, &pErr)
+		return DisplayError{Error: err.Error(), ParseError: pErr}
 	}
 
 	// if this is a draft and we're not serving drafts, pretend

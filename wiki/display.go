@@ -1,5 +1,7 @@
 package wiki
 
+import "github.com/cooper/quiki/wikifier"
+
 // DisplayError represents an error result to display.
 type DisplayError struct {
 	// a human-readable error string. sensitive info is never
@@ -14,8 +16,8 @@ type DisplayError struct {
 	// HTTP status code. if zero, 404 should be used
 	Status int
 
-	// true if the error occurred during parsing
-	ParseError bool
+	// if the error occurred during parsing, this is the positioned error
+	ParseError *wikifier.ParserError
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
