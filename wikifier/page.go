@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"html"
 	"io"
 	"io/ioutil"
@@ -158,8 +157,9 @@ func (p *Page) _parse() error {
 
 	// TODO: check if p.parser.catch != main block
 	if p.parser.catch != p.main {
-		if p.parser.catch == p.parser.block {
-			return fmt.Errorf("%s{} not closed; started at %d", p.parser.block.blockType(), p.parser.block.openPosition())
+		blk := p.parser.block
+		if p.parser.catch == blk {
+			return parserError(blk.openPosition(), blk.blockType()+"{} not closed")
 		}
 		return errors.New(string(p.parser.catch.catchType()) + " not closed")
 	}
