@@ -325,10 +325,12 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 		Model  bool              `json:"model"`
 		Config bool              `json:"config"`
 		Info   wikifier.PageInfo `json:"info,omitempty"`
+		wiki.DisplayFile
 	}{
-		Model:  o.model,
-		Config: o.config,
-		Info:   o.info,
+		Model:       o.model,
+		Config:      o.config,
+		Info:        o.info,
+		DisplayFile: fileRes,
 	})
 	if err != nil {
 		wr.err = err

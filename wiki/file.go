@@ -22,10 +22,13 @@ type DisplayFile struct {
 	Path string `json:"path,omitempty"`
 
 	// the plain text file content
-	Content string
+	Content string `json:"-"`
 
 	// time when the file was last modified
 	Modified *time.Time `json:"modified,omitempty"`
+
+	// for pages, DisplayPage result
+	DisplayPage *DisplayPage `json:"display_page,omitempty"`
 }
 
 // DisplayFile returns the display result for a plain text file.
@@ -67,6 +70,18 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	r.Modified = &mod
 	r.Content = string(content)
 
+	// For pages/models only-- check for cached warnings and errors
+	if rel := w._relPath(path, w.Dir("pages")); rel != "" {
+		res := w.DisplayPageDraft(wikifier.PageNameNE(rel), true)
+		if dispPage, ok := res.(DisplayPage); ok {
+			r.DisplayPage = &dispPage
+		}
+	} else if rel := w._relPath(path, w.Dir("models")); rel != "" {
+		// TODO: model errors/ warnings
+	} else {
+		panic("cn't make relative: " + path + " to " + w.Dir("pages"))
+	}
+
 	return r
 }
 
@@ -85,7 +100,7 @@ func (w *Wiki) checkDirectories() {
 // In any case the path cannot be made relative to the wiki directory,
 // an empty string is returned.
 func (w *Wiki) RelPath(absPath string) string {
-	rel := w._relPath(absPath)
+	rel := w._relPath(absPath, w.Dir())
 	if strings.Contains(rel, ".."+string(os.PathSeparator)) {
 		return ""
 	}
@@ -95,23 +110,22 @@ func (w *Wiki) RelPath(absPath string) string {
 	return rel
 }
 
-func (w *Wiki) _relPath(absPath string) string {
-	wikiAbs := w.Dir()
+func (w *Wiki) _relPath(absPath, base string) string {
 
 	// can't resolve wiki path
-	if wikiAbs == "" {
+	if base == "" {
 		return ""
 	}
 
 	// made it relative as-is
-	if rel, err := filepath.Rel(wikiAbs, absPath); err == nil {
+	if rel, err := filepath.Rel(base, absPath); err == nil {
 		return rel
 	}
 
 	// try to make it relative by resolving absPath as absolute
 	absPath, _ = filepath.Abs(absPath)
 	if absPath != "" {
-		if rel, err := filepath.Rel(wikiAbs, absPath); err == nil {
+		if rel, err := filepath.Rel(base, absPath); err == nil {
 			return rel
 		}
 	}

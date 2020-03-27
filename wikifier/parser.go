@@ -51,12 +51,12 @@ func (pos Position) String() string {
 }
 
 // MarshalJSON encodes the position to `[line, column]`.
-func (pos Position) MarshalJSON() ([]byte, error) {
+func (pos *Position) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("[%d, %d]", pos.Line, pos.Column)), nil
 }
 
 // UnmarshalJSON decodes the position from `[line, column]`.
-func (pos Position) UnmarshalJSON(data []byte) error {
+func (pos *Position) UnmarshalJSON(data []byte) error {
 	var val interface{}
 	err := json.Unmarshal(data, &val)
 	if err != nil {

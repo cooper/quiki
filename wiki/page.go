@@ -29,7 +29,7 @@ type DisplayPage struct {
 	Path string `json:"path,omitempty"`
 
 	// the page content (HTML)
-	Content wikifier.HTML `json:"content,omitempty"`
+	Content wikifier.HTML `json:"-"`
 
 	// time when the page was last modified.
 	// if Generated is true, this is the current time.
@@ -61,8 +61,9 @@ type DisplayPage struct {
 	// since normally a draft page instead results in a DisplayError.
 	Draft bool `json:"draft,omitempty"`
 
-	// warnings produced by the parser
+	// warnings and errors produced by the parser
 	Warnings []wikifier.Warning `json:"warnings,omitempty"`
+	Errors   []wikifier.Warning `json:"errors,omitempty"`
 
 	// time when the page was created, as extracted from
 	// the special @page.created variable

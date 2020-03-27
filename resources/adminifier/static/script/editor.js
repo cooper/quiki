@@ -79,8 +79,8 @@ function editorLoadedHandler () {
     ae.resetSelectionAtTopLeft();
 
     // update warnings/errors
-    if (a.currentJSONMetadata && a.currentJSONMetadata.display_result)
-        ae.handlePageDisplayResult(a.currentJSONMetadata.display_result);    
+    if (a.currentJSONMetadata && a.currentJSONMetadata.display_page)
+        ae.handlePageDisplayResult(a.currentJSONMetadata.display_page);    
 
     // load editor plugins
     plugins.each(function (plugin) {
@@ -667,27 +667,18 @@ ae.handlePageDisplayResult = function (res) {
 
     // annotate errors and warnings
     var annotations = [];
-    var addAnnotation = function (str, type, isDraft) {
-        var match = str.match(/^Line (\d+):(\d+):([\s\S]+)/);
-        if (!match) {
-            if (!isDraft)
-                alert(str);
-            return;
-        };
-        var row = match[1] - 1,
-            col = match[2],
-            errorText = match[3].trim().replace(/\n/g, '\u2424');
+    var addAnnotation = function (w) {
         annotations.push({
-            row:    row,
-            column: col,
-            text:   errorText,
-            type:   type
+            row:    w.position[0] - 1,
+            column: w.position[1],
+            text:   w.message.replace(/\n/g, '\u2424'),
+            type:   w.type
         });
     };
 
     // warnings
     if (res.warnings != null)
-        res.warnings.each(function (msg) { addAnnotation(msg, "warning"); });
+        res.warnings.each(function (w) { w.type = "warning"; addAnnotation(w); });
 
     // error
     if (res.error != null)
