@@ -219,6 +219,19 @@ GetStr is like Get except it always returns a string.
 
 If the value is HTML, it is converted to a string.
 
+#### func (Map) GetStrList
+
+```go
+func (scope Map) GetStrList(key string) ([]string, error)
+```
+GetStrList is like Get except it always returns a list of strings.
+
+If the value is a `list{}` block, the list's values are returned, with
+non-strings quietly filtered out.
+
+If the value is a string, it is treated as a comma-separated list, and each item
+is trimmed of prepending or suffixing whitespace.
+
 #### func (*Map) Keys
 
 ```go
@@ -274,6 +287,8 @@ type Page struct {
 	PageLinks map[string][]int   // references to other pages
 
 	Wiki interface{} // only available during Parse() and HTML()
+
+	Warnings []Warning
 }
 ```
 
@@ -351,6 +366,13 @@ func (p *Page) Created() time.Time
 ```
 Created returns the page creation time.
 
+#### func (*Page) Description
+
+```go
+func (p *Page) Description() string
+```
+Description returns the page description.
+
 #### func (*Page) Draft
 
 ```go
@@ -364,6 +386,17 @@ Draft returns true if the page is marked as a draft.
 func (p *Page) Exists() bool
 ```
 Exists is true if the page exists.
+
+#### func (*Page) External
+
+```go
+func (p *Page) External() bool
+```
+External returns true if the page is outside the page directory as defined by
+the configuration, with symlinks considered.
+
+If `dir.wiki` isn't set, External is always true (since the page is not
+associated with a wiki at all).
 
 #### func (*Page) FmtTitle
 
@@ -425,6 +458,19 @@ GetStr is like Get except it always returns a string.
 
 If the value is HTML, it is converted to a string.
 
+#### func (Page) GetStrList
+
+```go
+func (scope Page) GetStrList(key string) ([]string, error)
+```
+GetStrList is like Get except it always returns a list of strings.
+
+If the value is a `list{}` block, the list's values are returned, with
+non-strings quietly filtered out.
+
+If the value is a string, it is treated as a comma-separated list, and each item
+is trimmed of prepending or suffixing whitespace.
+
 #### func (*Page) HTML
 
 ```go
@@ -448,6 +494,13 @@ func (p *Page) IsSymlink() bool
 IsSymlink returns true if the page is a symbolic link to another file within the
 page directory. If it is symlinked to somewhere outside the page directory, it
 is treated as a normal page rather than a redirect.
+
+#### func (*Page) Keywords
+
+```go
+func (p *Page) Keywords() []string
+```
+Keywords returns the list of page keywords.
 
 #### func (*Page) Modified
 
@@ -586,16 +639,21 @@ TitleOrName returns the result of Title if available, otherwise that of Name.
 
 ```go
 type PageInfo struct {
-	Path      string     `json:"omit"`                // absolute filepath
-	File      string     `json:"file,omitempty"`      // name with extension, always with forward slashes
-	Created   *time.Time `json:"created,omitempty"`   // creation time
-	Modified  *time.Time `json:"modified,omitempty"`  // modify time
-	Draft     bool       `json:"draft,omitempty"`     // true if page is marked as draft
-	Generated bool       `json:"generated,omitempty"` // true if page was generated from another source
-	Redirect  string     `json:"redirect,omitempty"`  // path page is to redirect to
-	FmtTitle  HTML       `json:"fmt_title,omitempty"` // title with formatting tags
-	Title     string     `json:"title,omitempty"`     // title without tags
-	Author    string     `json:"author,omitempty"`    // author's name
+	Path        string     `json:"-"`                   // absolute filepath
+	File        string     `json:"file,omitempty"`      // name with extension, always with forward slashes
+	FileNE      string     `json:"file_ne,omitempty"`   // name without extension, always with forward slashes
+	Created     *time.Time `json:"created,omitempty"`   // creation time
+	Modified    *time.Time `json:"modified,omitempty"`  // modify time
+	Draft       bool       `json:"draft,omitempty"`     // true if page is marked as draft
+	Generated   bool       `json:"generated,omitempty"` // true if page was generated from another source
+	External    bool       `json:"external,omitempty"`  // true if page is outside the page directory
+	Redirect    string     `json:"redirect,omitempty"`  // path page is to redirect to
+	FmtTitle    HTML       `json:"fmt_title,omitempty"` // title with formatting tags
+	Title       string     `json:"title,omitempty"`     // title without tags
+	Author      string     `json:"author,omitempty"`    // author's name
+	Description string     `json:"desc,omitempty"`      // description
+	Keywords    []string   `json:"keywords,omitempty"`  // keywords
+	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 }
 ```
 
@@ -688,7 +746,7 @@ PageOptHost describes HTTP hosts for a wiki.
 type PageOptImage struct {
 	Retina     []int
 	SizeMethod string
-	Calc       func(file string, width, height int, page *Page) (w, h int)
+	Calc       func(file string, width, height int, page *Page) (w, h int, fullSize bool)
 	Sizer      func(file string, width, height int, page *Page) (path string)
 }
 ```
@@ -760,3 +818,68 @@ type PageOptSearch struct {
 ```
 
 PageOptSearch describes wiki search options.
+
+#### type ParserError
+
+```go
+type ParserError struct {
+	Position Position
+	Err      error
+}
+```
+
+ParserError represents an error in parsing with positional info.
+
+#### func (*ParserError) Error
+
+```go
+func (e *ParserError) Error() string
+```
+
+#### func (*ParserError) Unwrap
+
+```go
+func (e *ParserError) Unwrap() error
+```
+
+#### type Position
+
+```go
+type Position struct {
+	Line, Column int
+}
+```
+
+Position represents a line and column position within a quiki source file.
+
+#### func (*Position) MarshalJSON
+
+```go
+func (pos *Position) MarshalJSON() ([]byte, error)
+```
+MarshalJSON encodes the position to `[line, column]`.
+
+#### func (Position) String
+
+```go
+func (pos Position) String() string
+```
+String returns the position as `{line column}`.
+
+#### func (*Position) UnmarshalJSON
+
+```go
+func (pos *Position) UnmarshalJSON(data []byte) error
+```
+UnmarshalJSON decodes the position from `[line, column]`.
+
+#### type Warning
+
+```go
+type Warning struct {
+	Message  string   `json:"message"`
+	Position Position `json:"position"`
+}
+```
+
+Warning represents a warning on a page.

@@ -18,6 +18,48 @@ const (
 )
 ```
 
+#### func  PageSortAuthor
+
+```go
+func PageSortAuthor(p1, p2 *wikifier.PageInfo) bool
+```
+PageSortAuthor is a PageSortFunc to pass to PagesSorted() for sorting pages
+alphabetically by author.
+
+#### func  PageSortCreated
+
+```go
+func PageSortCreated(p1, p2 *wikifier.PageInfo) bool
+```
+PageSortCreated is a PageSortFunc to pass to PagesSorted() for sorting pages by
+creation time.
+
+#### func  PageSortModified
+
+```go
+func PageSortModified(p1, p2 *wikifier.PageInfo) bool
+```
+PageSortModified is a PageSortFunc to pass to PagesSorted() for sorting pages by
+modification time.
+
+#### func  PageSortTitle
+
+```go
+func PageSortTitle(p1, p2 *wikifier.PageInfo) bool
+```
+PageSortTitle is a PageSortFunc to pass to PagesSorted() for sorting pages
+alphabetically by title.
+
+#### func  ValidBranchName
+
+```go
+func ValidBranchName(name string) bool
+```
+ValidBranchName returns whether a branch name is valid.
+
+quiki branch names may contain word-like characters `\w` and forward slash (`/`)
+but may not start or end with a slash.
+
 #### type Category
 
 ```go
@@ -133,6 +175,28 @@ type CategoryType string
 
 CategoryType describes the type of a Category.
 
+#### type CommitOpts
+
+```go
+type CommitOpts struct {
+
+	// Comment is the commit description.
+	Comment string
+
+	// Name is the fullname of the user committing changes.
+	Name string
+
+	// Email is the email address of the user committing changes.
+	Email string
+
+	// Time is the timestamp to associate with the revision.
+	// If unspecified, current time is used.
+	Time time.Time
+}
+```
+
+CommitOpts describes the options for a wiki revision.
+
 #### type DisplayCategoryPosts
 
 ```go
@@ -174,8 +238,8 @@ type DisplayError struct {
 	// HTTP status code. if zero, 404 should be used
 	Status int
 
-	// true if the error occurred during parsing
-	ParseError bool
+	// if the error occurred during parsing, this is the positioned error
+	ParseError *wikifier.ParserError
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
@@ -199,10 +263,14 @@ type DisplayFile struct {
 	Path string `json:"path,omitempty"`
 
 	// the plain text file content
-	Content string
+	Content string `json:"-"`
 
 	// time when the file was last modified
 	Modified *time.Time `json:"modified,omitempty"`
+
+	// for pages/models/etc, parser warnings and error
+	Warnings []wikifier.Warning `json:"parse_warnings,omitempty"`
+	Error    *wikifier.Warning  `json:"parse_error,omitempty"`
 }
 ```
 
@@ -274,7 +342,7 @@ type DisplayPage struct {
 	Path string `json:"path,omitempty"`
 
 	// the page content (HTML)
-	Content wikifier.HTML `json:"content,omitempty"`
+	Content wikifier.HTML `json:"-"`
 
 	// time when the page was last modified.
 	// if Generated is true, this is the current time.
@@ -306,8 +374,9 @@ type DisplayPage struct {
 	// since normally a draft page instead results in a DisplayError.
 	Draft bool `json:"draft,omitempty"`
 
-	// warnings produced by the parser
-	Warnings []string `json:"warnings,omitempty"`
+	// warnings and errors produced by the parser
+	Warnings []wikifier.Warning `json:"warnings,omitempty"`
+	Errors   []wikifier.Warning `json:"errors,omitempty"`
 
 	// time when the page was created, as extracted from
 	// the special @page.created variable
@@ -328,6 +397,12 @@ type DisplayPage struct {
 	// like FmtTitle except that all text formatting has been stripped.
 	// suitable for use in the <title> tag
 	Title string `json:"title,omitempty"`
+
+	// page description as extracted from the special @page.desc variable.
+	Description string `json:"desc,omitempty"`
+
+	// page keywords as extracted from the special @page.keywords variable
+	Keywords []string `json:"keywords,omitempty"`
 }
 ```
 
@@ -374,14 +449,23 @@ type ModelInfo struct {
 
 ModelInfo represents metadata associated with a model.
 
+#### type PageSortFunc
+
+```go
+type PageSortFunc func(p1, p2 *wikifier.PageInfo) bool
+```
+
+PageSortFunc is a type for functions that can sort pages for PagesSorted().
+
 #### type SizedImage
 
 ```go
 type SizedImage struct {
-	// for example 100x200-myimage@3x.png
+	// for example mydir/100x200-myimage@3x.png
 	Width, Height int    // 100, 200 (dimensions as requested)
 	Scale         int    // 3 (scale as requested)
-	Name          string // myimage (name without extension)
+	Prefix        string // mydir
+	RelNameNE     string // myimage (name without extension)
 	Ext           string // png (extension)
 }
 ```
@@ -394,20 +478,6 @@ SizedImage represents an image in specific dimensions.
 func SizedImageFromName(name string) SizedImage
 ```
 SizedImageFromName returns a SizedImage given an image name.
-
-#### func (SizedImage) FullName
-
-```go
-func (img SizedImage) FullName() string
-```
-FullName returns the image name with true dimensions.
-
-#### func (SizedImage) FullNameNE
-
-```go
-func (img SizedImage) FullNameNE() string
-```
-FullNameNE is like FullName but without the extension.
 
 #### func (SizedImage) FullSizeName
 
@@ -430,6 +500,20 @@ func (img SizedImage) TrueHeight() int
 ```
 TrueHeight returns the actual image height when the Scale is taken into
 consideration.
+
+#### func (SizedImage) TrueName
+
+```go
+func (img SizedImage) TrueName() string
+```
+TrueName returns the image name with true dimensions.
+
+#### func (SizedImage) TrueNameNE
+
+```go
+func (img SizedImage) TrueNameNE() string
+```
+TrueNameNE is like TrueName but without the extension.
 
 #### func (SizedImage) TrueWidth
 
@@ -467,6 +551,19 @@ NewWikiConfig creates a Wiki given the configuration file path.
 
 Deprecated: Use NewWiki instead.
 
+#### func (*Wiki) AbsFilePath
+
+```go
+func (w *Wiki) AbsFilePath(relPath string) string
+```
+AbsFilePath takes a relative path to a file within the wiki (e.g.
+`pages/mypage.page`), joins it with the wiki directory, and evaluates it with
+`filepath.Abs()`. The result is an absolute path which may or may not exist.
+
+If the file is a symlink, it is followed. Thus, it is possible for the resulting
+path to exist outside the wiki directory. If that is not desired, use
+unresolvedAbsFilePath instead.
+
 #### func (*Wiki) Branch
 
 ```go
@@ -503,6 +600,31 @@ func (w *Wiki) CategoryMap() map[string]CategoryInfo
 ```
 CategoryMap returns a map of model name to CategoryInfo for all models in the
 wiki.
+
+#### func (*Wiki) Debug
+
+```go
+func (w *Wiki) Debug(i ...interface{})
+```
+Debug logs debug info for a wiki.
+
+#### func (*Wiki) Debugf
+
+```go
+func (w *Wiki) Debugf(format string, i ...interface{})
+```
+Debugf logs debug info for a wiki.
+
+#### func (*Wiki) Dir
+
+```go
+func (w *Wiki) Dir(dirs ...string) string
+```
+Dir returns the absolute path to the resolved wiki directory. If the wiki
+directory is a symlink, it is followed.
+
+Optional path components can be passed as arguments to be joined with the wiki
+root by the path separator.
 
 #### func (*Wiki) DisplayCategoryPosts
 
@@ -606,6 +728,20 @@ func (w *Wiki) Images() []ImageInfo
 ```
 Images returns info about all the images in the wiki.
 
+#### func (*Wiki) Log
+
+```go
+func (w *Wiki) Log(i ...interface{})
+```
+Log logs info for a wiki.
+
+#### func (*Wiki) Logf
+
+```go
+func (w *Wiki) Logf(format string, i ...interface{})
+```
+Logf logs info for a wiki.
+
 #### func (*Wiki) ModelInfo
 
 ```go
@@ -658,6 +794,13 @@ func (w *Wiki) Pages() []wikifier.PageInfo
 ```
 Pages returns info about all the pages in the wiki.
 
+#### func (*Wiki) PagesSorted
+
+```go
+func (w *Wiki) PagesSorted(sorters ...PageSortFunc) []wikifier.PageInfo
+```
+PagesSorted returns info about all the pages in the wiki, sorted as specified.
+
 #### func (*Wiki) Pregenerate
 
 ```go
@@ -665,3 +808,44 @@ func (w *Wiki) Pregenerate()
 ```
 Pregenerate simulates requests for all wiki resources such that content caches
 can be pregenerated and stored.
+
+#### func (*Wiki) RelPath
+
+```go
+func (w *Wiki) RelPath(absPath string) string
+```
+RelPath takes an absolute file path and attempts to make it relative to the wiki
+directory, regardless of whether the path exists.
+
+If the path can be made relative without following symlinks, this is preferred.
+If that fails, symlinks in absPath are followed and a second attempt is made.
+
+In any case the path cannot be made relative to the wiki directory, an empty
+string is returned.
+
+#### func (*Wiki) UnresolvedAbsFilePath
+
+```go
+func (w *Wiki) UnresolvedAbsFilePath(relPath string) string
+```
+UnresolvedAbsFilePath takes a relative path to a file within the wiki (e.g.
+`pages/mypage.page`) and joins it with the absolute path to the wiki directory.
+The result is an absolute path which may or may not exist.
+
+Symlinks are not followed. If that is desired, use absoluteFilePath instead.
+
+#### func (*Wiki) WriteFile
+
+```go
+func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WriteFile writes a file in the wiki.
+
+The filename must be relative to the wiki directory.
+
+If the file does not exist and createOK is false, an error is returned. If the
+file exists and is a symbolic link, an error is returned.
+
+This is a low-level API that allows writing any file within the wiki directory,
+so it should not be utilized directly by frontends. Use WritePage, WriteModel,
+WriteImage, or WriteConfig instead.
