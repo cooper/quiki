@@ -221,40 +221,48 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 func handleDashboardFrame(wr *wikiRequest) {
 }
 
-var pageSorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{
+var sorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{
 	"t": wiki.SortTitle,
 	"a": wiki.SortAuthor,
 	"c": wiki.SortCreated,
 	"m": wiki.SortModified,
 }
 
-func handlePagesFrame(wr *wikiRequest) {
-
-	// find sort
+// find sort from query
+func getSortFunc(wr *wikiRequest) (bool, wiki.SortFunc) {
 	descending := true
 	sortFunc := wiki.SortModified
 	s := wr.r.URL.Query().Get("sort")
 	if len(s) != 0 {
-		sortFunc = pageSorters[string(s[0])]
+		sortFunc = sorters[string(s[0])]
 		descending = len(s) > 1 && s[1] == '-'
 	}
 
-	// sort
-	pages := wr.wi.PagesSorted(descending, sortFunc, wiki.SortTitle)
+	return descending, sortFunc
+}
 
+func handlePagesFrame(wr *wikiRequest) {
+	descending, sortFunc := getSortFunc(wr)
+	pages := wr.wi.PagesSorted(descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, pages)
 }
 
 func handleImagesFrame(wr *wikiRequest) {
-	handleFileFrames(wr, wr.wi.Images(), "d")
+	descending, sortFunc := getSortFunc(wr)
+	images := wr.wi.ImagesSorted(descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, images, "d")
 }
 
 func handleModelsFrame(wr *wikiRequest) {
-	handleFileFrames(wr, wr.wi.Models())
+	descending, sortFunc := getSortFunc(wr)
+	models := wr.wi.ModelsSorted(descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, models)
 }
 
 func handleCategoriesFrame(wr *wikiRequest) {
-	handleFileFrames(wr, wr.wi.Categories())
+	descending, sortFunc := getSortFunc(wr)
+	cats := wr.wi.CategoriesSorted(descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, cats)
 }
 
 func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
