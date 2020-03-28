@@ -81,7 +81,7 @@ function editorLoadedHandler () {
     // update warnings/errors
     var meta = a.currentJSONMetadata;
     if (meta)
-        ae.handlePageDisplayResult(meta.display_page, meta.parse_error);    
+        ae.handleWarningsAndError(meta.parse_warnings, meta.parse_error);    
 
     // load editor plugins
     plugins.each(function (plugin) {
@@ -662,8 +662,7 @@ ae.selectPageTitle = function () {
 };
 
 // updates warnings and errors on page save
-ae.handlePageDisplayResult = function (res, error) {
-    if (!res) res = {};
+ae.handleWarningsAndError = function (warnings, error) {
 
     // annotate errors and warnings
     var annotations = [];
@@ -677,15 +676,18 @@ ae.handlePageDisplayResult = function (res, error) {
     };
 
     // warnings
-    if (res.warnings != null)
-        res.warnings.each(function (w) { w.type = "warning"; addAnnotation(w); });
+    if (warnings) warnings.each(function (w) {
+        w.type = "warning";
+        addAnnotation(w);
+    });
 
     // error
-    if (error != null) {
+    if (error) {
         error.type = "error";
-        addAnnotation(error, res.draft);
+        addAnnotation(error);
     }
 
+    // update annotations
     if (annotations.length)
         editor.session.setAnnotations(annotations);
     else

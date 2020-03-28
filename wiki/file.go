@@ -27,11 +27,9 @@ type DisplayFile struct {
 	// time when the file was last modified
 	Modified *time.Time `json:"modified,omitempty"`
 
-	// for pages, DisplayPage result
-	DisplayPage *DisplayPage `json:"display_page,omitempty"`
-
-	// for pages/models/etc, this is the parser error
-	Error *wikifier.Warning `json:"parse_error,omitempty"`
+	// for pages/models/etc, parser warnings and error
+	Warnings []wikifier.Warning `json:"parse_warnings,omitempty"`
+	Error    *wikifier.Warning  `json:"parse_error,omitempty"`
 }
 
 // DisplayFile returns the display result for a plain text file.
@@ -78,7 +76,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 		res := w.DisplayPageDraft(wikifier.PageNameNE(rel), true)
 		if dispPage, ok := res.(DisplayPage); ok {
 			// extract warnings/etc from a DisplayPage
-			r.DisplayPage = &dispPage
+			r.Warnings = dispPage.Warnings
 
 		} else if dispErr, ok := res.(DisplayError); ok && dispErr.ParseError != nil {
 			// extract parsing error from a DisplayError
