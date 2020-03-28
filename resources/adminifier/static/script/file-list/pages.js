@@ -7,8 +7,8 @@ var pageList = new FileList({
     root: 'pages',
     columns: ['Title', 'Author', 'Created', 'Modified'],
     columnData: {
-        Title:      { sort: 'a', isTitle: true },
-        Author:     { sort: 'u' },
+        Title:      { sort: 't', isTitle: true },
+        Author:     { sort: 'a' },
         Created:    { sort: 'c', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' },
         Modified:   { sort: 'm', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' }
     }

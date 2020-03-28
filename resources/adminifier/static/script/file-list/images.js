@@ -7,8 +7,8 @@ var imageList = new FileList({
     root: 'images',
     columns: ['Filename', 'Author', 'Created', 'Modified'],
     columnData: {
-        Filename:   { sort: 'a', isTitle: true },
-        Author:     { sort: 'u' },
+        Filename:   { sort: 't', isTitle: true },
+        Author:     { sort: 'a' },
         Created:    { sort: 'c', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' },
         Modified:   { sort: 'm', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' }
     }

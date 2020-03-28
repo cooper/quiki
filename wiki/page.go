@@ -283,7 +283,14 @@ type PageSortFunc func(p1, p2 *wikifier.PageInfo) bool
 
 // PageSortTitle is a PageSortFunc to pass to PagesSorted() for sorting pages alphabetically by title.
 func PageSortTitle(p1, p2 *wikifier.PageInfo) bool {
-	return strings.ToLower(p1.Title) < strings.ToLower(p2.Title)
+	t1, t2 := p1.Title, p2.Title
+	if t1 == "" {
+		t1 = p1.FileNE
+	}
+	if t2 == "" {
+		t2 = p2.FileNE
+	}
+	return t1 < t2
 }
 
 // PageSortAuthor is a PageSortFunc to pass to PagesSorted() for sorting pages alphabetically by author.

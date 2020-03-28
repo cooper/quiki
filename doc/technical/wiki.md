@@ -109,7 +109,7 @@ type Category struct {
 
 A Category is a collection of pages pertaining to a topic.
 
-A page can belong to many categories. Category memberships and metadta are
+A page can belong to many categories. Category memberships and metadata are
 stored in JSON manifests.
 
 #### func (*Category) AddPage

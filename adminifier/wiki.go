@@ -221,8 +221,34 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 func handleDashboardFrame(wr *wikiRequest) {
 }
 
+var pageSorters map[string]wiki.PageSortFunc = map[string]wiki.PageSortFunc{
+	"t": wiki.PageSortTitle,
+	"a": wiki.PageSortAuthor,
+	"c": wiki.PageSortCreated,
+	"m": wiki.PageSortModified,
+}
+
 func handlePagesFrame(wr *wikiRequest) {
-	handleFileFrames(wr, wr.wi.Pages())
+
+	// find sort
+	descending := true
+	sortFunc := wiki.PageSortModified
+	s := wr.r.URL.Query().Get("sort")
+	if len(s) != 0 {
+		sortFunc = pageSorters[string(s[0])]
+		descending = len(s) > 1 && s[1] == '-'
+	}
+
+	// sort
+	pages := wr.wi.PagesSorted(sortFunc, wiki.PageSortTitle)
+	if descending {
+		for i := len(pages)/2 - 1; i >= 0; i-- {
+			opp := len(pages) - 1 - i
+			pages[i], pages[opp] = pages[opp], pages[i]
+		}
+	}
+
+	handleFileFrames(wr, pages)
 }
 
 func handleImagesFrame(wr *wikiRequest) {
@@ -238,21 +264,31 @@ func handleCategoriesFrame(wr *wikiRequest) {
 }
 
 func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
+
+	// json stuffs
 	res, err := json.Marshal(map[string]interface{}{
-		"sort_types": append([]string{"a", "c", "u", "m"}, extras...),
+		"sort_types": append([]string{"t", "a", "c", "m"}, extras...),
 		"results":    results,
 	})
 	if err != nil {
 		wr.err = err
 		return
 	}
+
+	// determine sort
+	// consider: should we validate sort here also
+	s := wr.r.URL.Query().Get("sort")
+	if s == "" {
+		s = "m-"
+	}
+
 	wr.dot = struct {
 		JSON  template.HTML
 		Order string
 		wikiTemplate
 	}{
 		JSON:         template.HTML("<!--JSON\n" + string(res) + "\n-->"),
-		Order:        "m-",
+		Order:        s,
 		wikiTemplate: getGenericTemplate(wr),
 	}
 }
