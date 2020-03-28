@@ -170,7 +170,7 @@ func setupWiki(wi *WikiInfo) error {
 		case wiki.DisplayImage:
 			wi.Logo = wi.Opt.Root.Image + "/" + disp.File
 		case wiki.DisplayRedirect:
-			wi.Logo = disp.Redirect
+			wi.Logo = wi.Opt.Root.Image + "/" + disp.Redirect
 		default:
 			log.Printf("[%s] generate logo failed: %+v", wi.Name, res)
 		}
