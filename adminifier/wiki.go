@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
@@ -489,11 +490,29 @@ func handleWritePage(wr *wikiRequest) {
 func handleImage(wr *wikiRequest) {
 	imageName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/image/")
 	si := wiki.SizedImageFromName(imageName)
+
+	// get dimensions from query params
+	w, _ := strconv.Atoi(wr.r.URL.Query().Get("width"))
+	h, _ := strconv.Atoi(wr.r.URL.Query().Get("height"))
+	if w != 0 {
+		si.Width = w
+	}
+	if h != 0 {
+		si.Height = 0
+	}
+
+	// display/generate image
 	switch res := wr.wi.DisplaySizedImageGenerate(si, true).(type) {
+
+	// image
 	case wiki.DisplayImage:
 		http.ServeFile(wr.w, wr.r, res.Path)
+
+	// redirect to true image name
 	case wiki.DisplayRedirect:
 		http.Redirect(wr.w, wr.r, res.Redirect, http.StatusMovedPermanently)
+
+	// error/other
 	default:
 		http.NotFound(wr.w, wr.r)
 	}

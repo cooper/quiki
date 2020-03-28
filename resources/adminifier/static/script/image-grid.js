@@ -9,7 +9,7 @@ $('content').appendChild(container);
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (imageData) {
     imageData.root = adminifier.wikiRoot;
-    
+
     // the larger dimension dictates the image size
     imageData.dimension = imageData.width < imageData.height ?
         'height' : 'width';
@@ -21,12 +21,6 @@ a.currentJSONMetadata.results.each(function (imageData) {
 
     // retina scaling
     imageData.dimValue *= retinaDensity();
-
-    // dimStr is image path with dimensions in front
-    if (imageData.dimension == 'width')
-        imageData.dimStr = imageData.dimValue + 'x0-' + imageData.file;
-    else
-        imageData.dimStr = '0x' + imageData.dimValue + '-' + imageData.file;
     
     var div = new Element('div', {
         class: 'image-grid-item',
