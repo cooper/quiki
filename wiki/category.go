@@ -580,7 +580,8 @@ func (ci sortableCategoryInfo) SortInfo() SortInfo {
 	}
 }
 
-// CategoriesSorted returns info about all the pages in the wiki, sorted as specified.
+// CategoriesSorted returns info about all the categories in the wiki, sorted as specified.
+// Accepted sort functions are SortTitle, SortCreated, and SortModified.
 func (w *Wiki) CategoriesSorted(descend bool, sorters ...SortFunc) []CategoryInfo {
 
 	// convert to []Sortable

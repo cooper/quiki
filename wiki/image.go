@@ -380,6 +380,7 @@ func (ii sortableImageInfo) SortInfo() SortInfo {
 }
 
 // ImagesSorted returns info about all the pages in the wiki, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, SortModified, and SortDimensions.
 func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo {
 
 	// convert to []Sortable

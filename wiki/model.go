@@ -41,6 +41,7 @@ func (mi sortableModelInfo) SortInfo() SortInfo {
 }
 
 // ModelsSorted returns info about all the models in the wiki, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
 func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []ModelInfo {
 
 	// convert to []Sortable

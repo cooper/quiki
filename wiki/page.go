@@ -305,6 +305,7 @@ func (pi sortablePageInfo) SortInfo() SortInfo {
 }
 
 // PagesSorted returns info about all the pages in the wiki, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
 func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInfo {
 
 	// convert to []Sortable
