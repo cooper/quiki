@@ -8,6 +8,7 @@ $('content').appendChild(container);
 
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (imageData) {
+    imageData.root = adminifier.wikiRoot;
     
     // the larger dimension dictates the image size
     imageData.dimension = imageData.width < imageData.height ?
