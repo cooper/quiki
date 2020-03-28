@@ -570,6 +570,41 @@ func (w *Wiki) Categories() []CategoryInfo {
 	return cats
 }
 
+type sortableCategoryInfo CategoryInfo
+
+func (ci sortableCategoryInfo) SortInfo() SortInfo {
+	return SortInfo{
+		Title:    ci.File,
+		Created:  *ci.Created,
+		Modified: *ci.Modified,
+	}
+}
+
+// CategoriesSorted returns info about all the pages in the wiki, sorted as specified.
+func (w *Wiki) CategoriesSorted(descend bool, sorters ...SortFunc) []CategoryInfo {
+
+	// convert to []Sortable
+	cats := w.Categories()
+	sorted := make([]Sortable, len(cats))
+	for i, ci := range w.Categories() {
+		sorted[i] = sortableCategoryInfo(ci)
+	}
+
+	// sort
+	var sorter sort.Interface = sorter(sorted, sorters...)
+	if descend {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+
+	// convert back to []CategoryInfo
+	for i, si := range sorted {
+		cats[i] = CategoryInfo(si.(sortableCategoryInfo))
+	}
+
+	return cats
+}
+
 // CategoryMap returns a map of model name to CategoryInfo for all models in the wiki.
 func (w *Wiki) CategoryMap() map[string]CategoryInfo {
 	catNames := w.allCategoryFiles("")
