@@ -221,18 +221,18 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 func handleDashboardFrame(wr *wikiRequest) {
 }
 
-var pageSorters map[string]wiki.PageSortFunc = map[string]wiki.PageSortFunc{
-	"t": wiki.PageSortTitle,
-	"a": wiki.PageSortAuthor,
-	"c": wiki.PageSortCreated,
-	"m": wiki.PageSortModified,
+var pageSorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{
+	"t": wiki.SortTitle,
+	"a": wiki.SortAuthor,
+	"c": wiki.SortCreated,
+	"m": wiki.SortModified,
 }
 
 func handlePagesFrame(wr *wikiRequest) {
 
 	// find sort
 	descending := true
-	sortFunc := wiki.PageSortModified
+	sortFunc := wiki.SortModified
 	s := wr.r.URL.Query().Get("sort")
 	if len(s) != 0 {
 		sortFunc = pageSorters[string(s[0])]
@@ -240,7 +240,7 @@ func handlePagesFrame(wr *wikiRequest) {
 	}
 
 	// sort
-	pages := wr.wi.PagesSorted(sortFunc, wiki.PageSortTitle)
+	pages := wr.wi.PagesSorted(sortFunc, wiki.SortTitle)
 	if descending {
 		for i := len(pages)/2 - 1; i >= 0; i-- {
 			opp := len(pages) - 1 - i
