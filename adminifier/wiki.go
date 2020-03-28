@@ -226,6 +226,7 @@ var sorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{
 	"a": wiki.SortAuthor,
 	"c": wiki.SortCreated,
 	"m": wiki.SortModified,
+	"d": wiki.SortDimensions,
 }
 
 // find sort from query

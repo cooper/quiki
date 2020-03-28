@@ -13,33 +13,44 @@ type Sortable interface {
 
 // SortInfo is the data returned from Sortable items for sorting wiki resources.
 type SortInfo struct {
-	Title    string
-	Author   string
-	Created  time.Time
-	Modified time.Time
+	Title      string
+	Author     string
+	Created    time.Time
+	Modified   time.Time
+	Dimensions []int
 }
 
 // SortFunc is a type for functions that can sort items.
 type SortFunc func(p, q Sortable) bool
 
-// SortTitle is a SortFunc to pass to ItemsSorted() for sorting items alphabetically by title.
+// SortTitle is a SortFunc for sorting items alphabetically by title.
 func SortTitle(p, q Sortable) bool {
 	return strings.ToLower(p.SortInfo().Title) < strings.ToLower(q.SortInfo().Title)
 }
 
-// SortAuthor is a SortFunc to pass to ItemsSorted() for sorting items alphabetically by author.
+// SortAuthor is a SortFunc for sorting items alphabetically by author.
 func SortAuthor(p, q Sortable) bool {
 	return strings.ToLower(p.SortInfo().Author) < strings.ToLower(q.SortInfo().Author)
 }
 
-// SortCreated is a SortFunc to pass to ItemsSorted() for sorting items by creation time.
+// SortCreated is a SortFunc for sorting items by creation time.
 func SortCreated(p, q Sortable) bool {
 	return p.SortInfo().Created.Before(q.SortInfo().Created)
 }
 
-// SortModified is a SortFunc to pass to ItemsSorted() for sorting items by modification time.
+// SortModified is a SortFunc for sorting items by modification time.
 func SortModified(p, q Sortable) bool {
 	return p.SortInfo().Modified.Before(q.SortInfo().Modified)
+}
+
+// SortDimensions is a SortFunc for sorting images by their dimensions.
+func SortDimensions(p, q Sortable) bool {
+	d1, d2 := p.SortInfo().Dimensions, q.SortInfo().Dimensions
+	if d1 == nil || d2 == nil {
+		return false
+	}
+	product1, product2 := d1[0]*d1[1], d2[0]*d2[1]
+	return product1 < product2
 }
 
 // itemSorter implements the Sort interface, sorting the changes within.

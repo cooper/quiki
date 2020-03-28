@@ -374,8 +374,9 @@ func (ii sortableImageInfo) SortInfo() SortInfo {
 	return SortInfo{
 		Title: ii.File,
 		// TODO: Author
-		Created:  *ii.Created,
-		Modified: *ii.Modified,
+		Created:    *ii.Created,
+		Modified:   *ii.Modified,
+		Dimensions: []int{ii.Width, ii.Height},
 	}
 }
 

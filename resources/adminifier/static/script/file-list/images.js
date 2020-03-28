@@ -5,10 +5,11 @@ if (!FileList || !a.currentJSONMetadata)
 
 var imageList = new FileList({
     root: 'images',
-    columns: ['Filename', 'Author', 'Created', 'Modified'],
+    columns: ['Filename', 'Author', 'Dimensions', 'Created', 'Modified'],
     columnData: {
         Filename:   { sort: 't', isTitle: true },
         Author:     { sort: 'a' },
+        Dimensions: { sort: 'd' },
         Created:    { sort: 'c', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' },
         Modified:   { sort: 'm', fixer: dateToHRTimeAgo, tooltipFixer: dateToPreciseHR, dataType: 'date' }
     }
@@ -19,6 +20,7 @@ a.currentJSONMetadata.results.each(function (imageData) {
     var entry = new FileListEntry({
         Filename:   imageData.file,
         Author:     imageData.author,
+        Dimensions: imageData.width + 'x' + imageData.height,
         Created:    imageData.created,
         Modified:   imageData.modified
     });
