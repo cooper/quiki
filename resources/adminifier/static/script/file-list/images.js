@@ -17,10 +17,13 @@ var imageList = new FileList({
 
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (imageData) {
+    var dim = null;
+    if (imageData.width && imageData.height)
+        dim = imageData.width + 'x' + imageData.height;
     var entry = new FileListEntry({
         Filename:   imageData.file,
         Author:     imageData.author,
-        Dimensions: imageData.width + 'x' + imageData.height,
+        Dimensions: dim,
         Created:    imageData.created,
         Modified:   imageData.modified
     });
