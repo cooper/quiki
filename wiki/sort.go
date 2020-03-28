@@ -54,10 +54,10 @@ func (ps *itemSorter) Sort(items []Sortable) {
 	sort.Sort(ps)
 }
 
-// itemsOrderedBy returns a Sorter that sorts using the less functions, in order.
+// sorter returns a Sorter that sorts using the less functions, in order.
 // Call its Sort method to sort the data.
-func itemsOrderedBy(less ...SortFunc) *itemSorter {
-	return &itemSorter{less: less}
+func sorter(items []Sortable, less ...SortFunc) *itemSorter {
+	return &itemSorter{items, less}
 }
 
 // Len is part of sort.Interface.

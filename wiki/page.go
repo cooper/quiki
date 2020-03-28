@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -304,7 +305,7 @@ func (pi sortablePageInfo) SortInfo() SortInfo {
 }
 
 // PagesSorted returns info about all the pages in the wiki, sorted as specified.
-func (w *Wiki) PagesSorted(sorters ...SortFunc) []wikifier.PageInfo {
+func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInfo {
 
 	// convert to []Sortable
 	pages := w.Pages()
@@ -314,7 +315,11 @@ func (w *Wiki) PagesSorted(sorters ...SortFunc) []wikifier.PageInfo {
 	}
 
 	// sort
-	itemsOrderedBy(sorters...).Sort(sorted)
+	var sorter sort.Interface = sorter(sorted, sorters...)
+	if descend {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
 
 	// convert back to []wikifier.PageInfo
 	for i, si := range sorted {

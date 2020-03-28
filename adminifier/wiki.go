@@ -240,13 +240,7 @@ func handlePagesFrame(wr *wikiRequest) {
 	}
 
 	// sort
-	pages := wr.wi.PagesSorted(sortFunc, wiki.SortTitle)
-	if descending {
-		for i := len(pages)/2 - 1; i >= 0; i-- {
-			opp := len(pages) - 1 - i
-			pages[i], pages[opp] = pages[opp], pages[i]
-		}
-	}
+	pages := wr.wi.PagesSorted(descending, sortFunc, wiki.SortTitle)
 
 	handleFileFrames(wr, pages)
 }
