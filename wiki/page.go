@@ -375,7 +375,7 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 	}
 
 	// fallback created to modified
-	if info.Created.IsZero() {
+	if info.Created == nil {
 		info.Created = &mod
 	}
 
