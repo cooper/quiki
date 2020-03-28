@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"os"
+	"sort"
 	"time"
 )
 
@@ -23,6 +24,42 @@ func (w *Wiki) Models() []ModelInfo {
 	for _, name := range modelNames {
 		models[i] = w.ModelInfo(name)
 		i++
+	}
+
+	return models
+}
+
+type sortableModelInfo ModelInfo
+
+func (mi sortableModelInfo) SortInfo() SortInfo {
+	return SortInfo{
+		Title: mi.File,
+		// TODO: Author
+		Created:  *mi.Created,
+		Modified: *mi.Modified,
+	}
+}
+
+// ModelsSorted returns info about all the models in the wiki, sorted as specified.
+func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []ModelInfo {
+
+	// convert to []Sortable
+	models := w.Models()
+	sorted := make([]Sortable, len(models))
+	for i, pi := range w.Models() {
+		sorted[i] = sortableModelInfo(pi)
+	}
+
+	// sort
+	var sorter sort.Interface = sorter(sorted, sorters...)
+	if descend {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+
+	// convert back to []ModelInfo
+	for i, si := range sorted {
+		models[i] = ModelInfo(si.(sortableModelInfo))
 	}
 
 	return models
