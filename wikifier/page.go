@@ -36,6 +36,7 @@ type Page struct {
 	headingIDs map[string]int
 	Wiki       interface{} // only available during Parse() and HTML()
 	markdown   bool        // true if FilePath points to a markdown source
+	model      bool        // true if this is a model being generated
 	Warnings   []Warning
 	*variableScope
 }
@@ -308,6 +309,24 @@ func (p *Page) RelPath() string {
 	return filepath.Join(p.Opt.Dir.Page, p.name)
 }
 
+// getPageStr is like GetStr except it adds the proper prefix
+// for @page and @model vars.
+func (p *Page) getPageStr(key string) (string, error) {
+	if p.model {
+		return p.GetStr("model." + key)
+	}
+	return p.GetStr("page." + key)
+}
+
+// getPageBool is like GetBool except it adds the proper prefix
+// for @page and @model vars.
+func (p *Page) getPageBool(key string) (bool, error) {
+	if p.model {
+		return p.GetBool("model." + key)
+	}
+	return p.GetBool("page." + key)
+}
+
 // Redirect returns the location to which the page redirects, if any.
 // This may be a relative or absolute URL, suitable for use in a Location header.
 func (p *Page) Redirect() string {
@@ -318,7 +337,7 @@ func (p *Page) Redirect() string {
 	}
 
 	// @page.redirect
-	if link, err := p.GetStr("page.redirect"); err != nil {
+	if link, err := p.getPageStr("redirect"); err != nil {
 		// FIXME: is there anyway to produce a warning for wrong variable type?
 	} else if ok, target, _, _, _ := p.parseLink(link); ok {
 		return target
@@ -343,7 +362,7 @@ func (p *Page) IsSymlink() bool {
 func (p *Page) Created() time.Time {
 	var t time.Time
 	// FIXME: maybe produce a warning if this is not in the right format
-	created, _ := p.GetStr("page.created")
+	created, _ := p.getPageStr("created")
 	if created == "" {
 		return t
 	}
@@ -382,14 +401,14 @@ func (p *Page) SearchPath() string {
 
 // Draft returns true if the page is marked as a draft.
 func (p *Page) Draft() bool {
-	b, _ := p.GetBool("page.draft")
+	b, _ := p.getPageBool("draft")
 	return b
 }
 
 // Generated returns true if the page was auto-generated
 // from some other source content.
 func (p *Page) Generated() bool {
-	b, _ := p.GetBool("page.generated")
+	b, _ := p.getPageBool("generated")
 	return b
 }
 
@@ -426,13 +445,13 @@ func (p *Page) External() bool {
 
 // Author returns the page author's name, if any.
 func (p *Page) Author() string {
-	s, _ := p.GetStr("page.author")
+	s, _ := p.getPageStr("author")
 	return s
 }
 
 // FmtTitle returns the page title, preserving any possible text formatting.
 func (p *Page) FmtTitle() HTML {
-	s, _ := p.GetStr("page.title")
+	s, _ := p.getPageStr("title")
 	return HTML(s)
 }
 
@@ -451,9 +470,9 @@ func (p *Page) TitleOrName() string {
 
 // Description returns the page description.
 func (p *Page) Description() string {
-	s, _ := p.GetStr("page.desc")
+	s, _ := p.getPageStr("desc")
 	if s == "" {
-		s, _ = p.GetStr("page.description")
+		s, _ = p.getPageStr("description")
 	}
 	return strip.StripTags(html.UnescapeString(s))
 }

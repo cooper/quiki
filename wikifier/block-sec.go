@@ -24,9 +24,9 @@ func (sec *secBlock) parse(page *Page) {
 	enable := page.Opt.Page.EnableTitle
 
 	// overwrite with local var if present
-	val, _ := page.Get("page.enable.title")
-	if boolVal, ok := val.(bool); ok {
-		enable = boolVal
+	val, err := page.getPageBool("enable.title")
+	if err == nil {
+		enable = val
 	}
 
 	// @page.enable.title causes the first header to be larger than the
