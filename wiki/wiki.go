@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"errors"
+	"log"
 	"path/filepath"
 	"sync"
 
@@ -18,6 +19,7 @@ type Wiki struct {
 	pageLocks     map[string]*sync.Mutex
 	pregenerating bool
 	_repo         *git.Repository
+	_logger       *log.Logger
 }
 
 // NewWiki creates a Wiki given its directory path.

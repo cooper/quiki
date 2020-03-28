@@ -221,6 +221,12 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 }
 
 func handleDashboardFrame(wr *wikiRequest) {
+	logs, _ := ioutil.ReadFile(wr.wi.Dir("cache", "wiki.log"))
+	wr.dot = struct {
+		Logs string
+	}{
+		Logs: string(logs),
+	}
 }
 
 var sorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{

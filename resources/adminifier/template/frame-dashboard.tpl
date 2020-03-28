@@ -8,8 +8,8 @@
     data-button-date-selection="{'title': 'Last 30 days', 'icon': 'calendar', 'func': 'displayDateSelector'}"
 />
 
-<h2>Server logs</h2>
+<h2>Logs</h2>
 
 <pre id="server-logs">
-Server logs go here
+{{.Logs}}
 </pre>
