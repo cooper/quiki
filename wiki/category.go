@@ -286,7 +286,7 @@ func (cat *Category) update(w *Wiki) {
 
 			// for models, check if the page still uses the model
 			case CategoryTypeModel:
-				// TODO
+				_, stillMember = page.Models[wikifier.CategoryNameNE(cat.Name)]
 
 			// for normal categories, check @category
 			default:
