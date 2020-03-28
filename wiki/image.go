@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -365,6 +366,42 @@ func (w *Wiki) Images() []ImageInfo {
 	}
 
 	return images
+}
+
+type sortableImageInfo ImageInfo
+
+func (ii sortableImageInfo) SortInfo() SortInfo {
+	return SortInfo{
+		Title: ii.File,
+		// TODO: Author
+		Created:  *ii.Created,
+		Modified: *ii.Modified,
+	}
+}
+
+// ImagesSorted returns info about all the pages in the wiki, sorted as specified.
+func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo {
+
+	// convert to []Sortable
+	pages := w.Images()
+	sorted := make([]Sortable, len(pages))
+	for i, ii := range w.Images() {
+		sorted[i] = sortableImageInfo(ii)
+	}
+
+	// sort
+	var sorter sort.Interface = sorter(sorted, sorters...)
+	if descend {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+
+	// convert back to []ImageInfo
+	for i, si := range sorted {
+		pages[i] = ImageInfo(si.(sortableImageInfo))
+	}
+
+	return pages
 }
 
 // ImageMap returns a map of image filename to ImageInfo for all images in the wiki.
