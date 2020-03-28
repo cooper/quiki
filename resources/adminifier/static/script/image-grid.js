@@ -13,13 +13,19 @@ a.currentJSONMetadata.results.each(function (imageData) {
     imageData.dimension = imageData.width < imageData.height ?
         'height' : 'width';
     
-    // max is 250
+    // max is 250 for either
     imageData.dimValue = imageData[imageData.dimension];
     if (imageData.dimValue > 250)
         imageData.dimValue = 250;
-        
+
     // retina scaling
     imageData.dimValue *= retinaDensity();
+
+    // dimStr is image path with dimensions in front
+    if (imageData.dimension == 'width')
+        imageData.dimStr = imageData.dimValue + 'x0-' + imageData.file;
+    else
+        imageData.dimStr = '0x' + imageData.dimValue + '-' + imageData.file;
     
     var div = new Element('div', {
         class: 'image-grid-item',

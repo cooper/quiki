@@ -33,6 +33,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"switch-branch/": handleSwitchBranch,
 	"create-branch":  handleCreateBranch,
 	"write-page":     handleWritePage,
+	"image/":         handleImage,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -287,11 +288,13 @@ func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
 
 	wr.dot = struct {
 		JSON  template.HTML
-		Order string
+		Order string // sort
+		List  bool   // for images, show file list rather than grid
 		wikiTemplate
 	}{
 		JSON:         template.HTML("<!--JSON\n" + string(res) + "\n-->"),
 		Order:        s,
+		List:         wr.r.URL.Query().Get("mode") == "list",
 		wikiTemplate: getGenericTemplate(wr),
 	}
 }
@@ -480,6 +483,19 @@ func handleWritePage(wr *wikiRequest) {
 	if err := wr.wi.WriteFile(filepath.Join("pages", pageName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
 		wr.err = err
 		return
+	}
+}
+
+func handleImage(wr *wikiRequest) {
+	imageName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/image/")
+	si := wiki.SizedImageFromName(imageName)
+	switch res := wr.wi.DisplaySizedImageGenerate(si, true).(type) {
+	case wiki.DisplayImage:
+		http.ServeFile(wr.w, wr.r, res.Path)
+	case wiki.DisplayRedirect:
+		http.Redirect(wr.w, wr.r, res.Redirect, http.StatusMovedPermanently)
+	default:
+		http.NotFound(wr.w, wr.r)
 	}
 }
 

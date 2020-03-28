@@ -13,7 +13,7 @@
     max-width: 250px;
     max-height: 250px;
     margin-bottom: 5px;
-    background: url(../images/image-alpha-grid.png) center repeat;
+    background: url(../image/image-alpha-grid.png) center repeat;
     display: block;
 }
 
@@ -22,7 +22,7 @@
  all and (min--moz-device-pixel-ratio: 1.5),
  all and (min-device-pixel-ratio: 1.5) {
     .image-grid-item img {
-        background: url(../images/image-alpha-grid@2x.png) center repeat;
+        background: url(../image/image-alpha-grid@2x.png) center repeat;
         background-size: 250px 250px;
     }
 }
