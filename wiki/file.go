@@ -73,7 +73,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 
 	// For pages/models only-- check for cached warnings and errors
 	if rel := w._relPath(path, w.Dir("pages")); rel != "" {
-		res := w.DisplayPageDraft(wikifier.PageNameNE(rel), true)
+		res := w.DisplayPageDraft(rel, true)
 		if dispPage, ok := res.(DisplayPage); ok {
 			// extract warnings/etc from a DisplayPage
 			r.Warnings = dispPage.Warnings
@@ -87,8 +87,6 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 		}
 	} else if rel := w._relPath(path, w.Dir("models")); rel != "" {
 		// TODO: model errors/ warnings
-	} else {
-		panic("cn't make relative: " + path + " to " + w.Dir("pages"))
 	}
 
 	return r
