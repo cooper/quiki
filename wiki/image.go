@@ -237,7 +237,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interf
 	trueName := img.TrueName()
 	if trueName != oldName || img.zeroByZero {
 		w.Debugf("display image: %s: redirect %s -> %s", logName, oldName, trueName)
-		return DisplayRedirect{Redirect: w.Opt.Root.Image + "/" + trueName}
+		return DisplayRedirect{filepath.Base(trueName)}
 	}
 
 	// image name and full path
