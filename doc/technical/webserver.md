@@ -89,3 +89,11 @@ type WikiInfo struct {
 ```
 
 WikiInfo represents a wiki hosted on this webserver.
+
+#### func (*WikiInfo) Copy
+
+```go
+func (wi *WikiInfo) Copy(w *wiki.Wiki) *WikiInfo
+```
+Copy creates a WikiInfo with all the same options, minus Wiki. It is used for
+working with multiple branches within a wiki.

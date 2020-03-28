@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -277,6 +278,84 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	return r
 }
 
+// PageSortFunc is a type for functions that can sort pages for PagesSorted().
+type PageSortFunc func(p1, p2 *wikifier.PageInfo) bool
+
+// PageSortTitle is a PageSortFunc to pass to PagesSorted() for sorting pages alphabetically by title.
+func PageSortTitle(p1, p2 *wikifier.PageInfo) bool {
+	return strings.ToLower(p1.Title) < strings.ToLower(p2.Title)
+}
+
+// PageSortAuthor is a PageSortFunc to pass to PagesSorted() for sorting pages alphabetically by author.
+func PageSortAuthor(p1, p2 *wikifier.PageInfo) bool {
+	return strings.ToLower(p1.Author) < strings.ToLower(p2.Author)
+}
+
+// PageSortCreated is a PageSortFunc to pass to PagesSorted() for sorting pages by creation time.
+func PageSortCreated(p1, p2 *wikifier.PageInfo) bool {
+	return p1.Created.Before(*p2.Created)
+}
+
+// PageSortModified is a PageSortFunc to pass to PagesSorted() for sorting pages by modification time.
+func PageSortModified(p1, p2 *wikifier.PageInfo) bool {
+	return p1.Modified.Before(*p2.Modified)
+}
+
+// pageSorter implements the Sort interface, sorting the changes within.
+type pageSorter struct {
+	pages []wikifier.PageInfo
+	less  []PageSortFunc
+}
+
+// Sort sorts the argument slice according to the less functions passed to pagesOrderedBy.
+func (ps *pageSorter) Sort(pages []wikifier.PageInfo) {
+	ps.pages = pages
+	sort.Sort(ps)
+}
+
+// pagesOrderedBy returns a Sorter that sorts using the less functions, in order.
+// Call its Sort method to sort the data.
+func pagesOrderedBy(less ...PageSortFunc) *pageSorter {
+	return &pageSorter{less: less}
+}
+
+// Len is part of sort.Interface.
+func (ps *pageSorter) Len() int {
+	return len(ps.pages)
+}
+
+// Swap is part of sort.Interface.
+func (ps *pageSorter) Swap(i, j int) {
+	ps.pages[i], ps.pages[j] = ps.pages[j], ps.pages[i]
+}
+
+// Less is part of sort.Interface. It is implemented by looping along the
+// less functions until it finds a comparison that discriminates between
+// the two items (one is less than the other). Note that it can call the
+// less functions twice per call. We could change the functions to return
+// -1, 0, 1 and reduce the number of calls for greater efficiency: an
+// exercise for the reader.
+func (ps *pageSorter) Less(i, j int) bool {
+	p, q := &ps.pages[i], &ps.pages[j]
+	// Try all but the last comparison.
+	var k int
+	for k = 0; k < len(ps.less)-1; k++ {
+		less := ps.less[k]
+		switch {
+		case less(p, q):
+			// p < q, so we have a decision.
+			return true
+		case less(q, p):
+			// p > q, so we have a decision.
+			return false
+		}
+		// p == q; try the next comparison.
+	}
+	// All comparisons to here said "equal", so just return whatever
+	// the final comparison reports.
+	return ps.less[k](p, q)
+}
+
 // Pages returns info about all the pages in the wiki.
 func (w *Wiki) Pages() []wikifier.PageInfo {
 	pageNames := w.allPageFiles()
@@ -289,6 +368,13 @@ func (w *Wiki) Pages() []wikifier.PageInfo {
 		i++
 	}
 
+	return pages
+}
+
+// PagesSorted returns info about all the pages in the wiki, sorted as specified.
+func (w *Wiki) PagesSorted(sorters ...PageSortFunc) []wikifier.PageInfo {
+	pages := w.Pages()
+	pagesOrderedBy(sorters...).Sort(pages)
 	return pages
 }
 
