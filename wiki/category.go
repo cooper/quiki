@@ -424,9 +424,10 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	}
 
 	// model tracking categories
-	for modelName := range page.Models {
+	for modelName, modelInfo := range page.Models {
 		modelCat := w.GetSpecialCategory(modelName, CategoryTypeModel)
 		modelCat.Preserve = true // keep until there are no more references
+		modelCat.PageInfo = &modelInfo
 		modelCat.AddPage(w, page)
 	}
 }

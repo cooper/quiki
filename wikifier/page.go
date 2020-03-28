@@ -26,11 +26,11 @@ type Page struct {
 	VarsOnly   bool     // True if Parse() should only extract variables
 	Opt        *PageOpt // page options
 	styles     []styleEntry
-	parser     *parser            // wikifier parser instance
-	main       block              // main block
-	Images     map[string][][]int // references to images
-	Models     map[string]bool    // references to models
-	PageLinks  map[string][]int   // references to other pages
+	parser     *parser             // wikifier parser instance
+	main       block               // main block
+	Images     map[string][][]int  // references to images
+	Models     map[string]PageInfo // references to models
+	PageLinks  map[string][]int    // references to other pages
 	sectionN   int
 	name       string
 	headingIDs map[string]int
@@ -74,7 +74,7 @@ func NewPage(filePath string) *Page {
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
 		Images:        make(map[string][][]int),
-		Models:        make(map[string]bool),
+		Models:        make(map[string]PageInfo),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
 		markdown:      strings.HasSuffix(filePath, ".md"),

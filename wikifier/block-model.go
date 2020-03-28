@@ -21,7 +21,6 @@ func (mb *modelBlock) parse(page *Page) {
 	name := mb.blockName()
 	file := ModelName(name)
 	path := pageAbs(filepath.Join(page.Opt.Dir.Model, file))
-	page.Models[file] = true
 
 	// create page
 	model := NewPage(path)
@@ -51,6 +50,9 @@ func (mb *modelBlock) parse(page *Page) {
 
 	mb.modelName = name
 	mb.model = model
+
+	// remember the page uses this
+	page.Models[file] = model.Info()
 }
 
 func (mb *modelBlock) html(page *Page, mbEl element) {
