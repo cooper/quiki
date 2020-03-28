@@ -29,7 +29,7 @@ const (
 
 // A Category is a collection of pages pertaining to a topic.
 //
-// A page can belong to many categories. Category memberships and metadta
+// A page can belong to many categories. Category memberships and metadata
 // are stored in JSON manifests.
 //
 type Category struct {
