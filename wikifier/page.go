@@ -37,7 +37,8 @@ type Page struct {
 	Wiki       interface{} // only available during Parse() and HTML()
 	markdown   bool        // true if FilePath points to a markdown source
 	model      bool        // true if this is a model being generated
-	Warnings   []Warning
+	Warnings   []Warning   // parser warnings
+	Error      *Warning    // parser error, as an encodable Warning
 	*variableScope
 }
 
@@ -58,6 +59,7 @@ type PageInfo struct {
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
+	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
 
 // ModelInfo represents metadata associated with a model.
@@ -123,14 +125,20 @@ func (p *Page) Parse() error {
 
 	// error occurred--
 
-	// already a ParserError
+	// if not already a ParserError
 	var perr *ParserError
-	if errors.As(err, &perr) {
-		return err
+	if !errors.As(err, &perr) {
+		// wrap to include current positional info
+		perr = &ParserError{Position: p.parser.pos, Err: err}
 	}
 
-	// wrap to include current positional info
-	return &ParserError{Position: p.parser.pos, Err: err}
+	// convert to Warning for p.Error
+	p.Error = &Warning{
+		Message:  perr.Err.Error(),
+		Position: perr.Position,
+	}
+
+	return perr
 }
 
 func (p *Page) _parse() error {
@@ -523,6 +531,7 @@ func (p *Page) Info() PageInfo {
 		Description: p.Description(),
 		Keywords:    p.Keywords(),
 		Warnings:    p.Warnings,
+		Error:       p.Error,
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {

@@ -205,25 +205,39 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	//
 	err := page.Parse()
 	if err != nil {
+
+		// copy original error because we will reparse
+		oldErr := page.Error
+
+		// re-parse in variable-only mode to extract page data
 		page.VarsOnly = true
 		page.Parse()
-		// TODO: add page to categories
-		// TODO: cache the error
+
+		// write original error to cache
+		page.Error = oldErr
+		w.writeVarsCache(page)
+
+		// add page to categories-
+		// should be possible if VarsOnly mode was successful
+		w.updatePageCategories(page)
+
+		// extract the ParserError
 		var pErr *wikifier.ParserError
 		errors.As(err, &pErr)
+
 		return DisplayError{Error: err.Error(), ParseError: pErr}
 	}
 
 	// if this is a draft and we're not serving drafts, pretend
 	// that the page does not exist
 	if !draftOK && page.Draft() {
-		return DisplayError{Error: "Page has not yet been publised.", Draft: true}
+		return DisplayError{Error: "Page has not yet been published.", Draft: true}
 	}
 
 	// THIRD redirect check -
 	// this is for pages we just parsed with @page.redirect
 	if redir := page.Redirect(); redir != "" {
-		w.writeRedirectCache(page)
+		w.writeVarsCache(page)
 		w.updatePageCategories(page)
 		// consider: set r.Categories? can redirects belong to categories?
 		return DisplayRedirect{Redirect: redir}
@@ -381,7 +395,9 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 	return
 }
 
-func (w *Wiki) writeRedirectCache(page *wikifier.Page) {
+// like writePageCache except it only includes PageInfo.
+// used for redirects and parser errors where vars could still be extracted.
+func (w *Wiki) writeVarsCache(page *wikifier.Page) {
 
 	// caching isn't enabled
 	if !page.Opt.Page.EnableCache || page.CachePath() == "" {
@@ -395,7 +411,7 @@ func (w *Wiki) writeRedirectCache(page *wikifier.Page) {
 		return
 	}
 
-	// create manifest with just page info (includes redirect)
+	// create manifest with just page info (includes redirect/error)
 	j, err := json.Marshal(pageJSONManifest{PageInfo: page.Info()})
 	if err != nil {
 		return

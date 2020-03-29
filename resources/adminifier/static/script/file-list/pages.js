@@ -26,7 +26,7 @@ a.currentJSONMetadata.results.each(function (pageData) {
     entry.setInfoState('Redirect',  pageData.redirect);
     entry.setInfoState('External',  pageData.external);
     entry.setInfoState('Warnings',  pageData.warnings && pageData.warnings.length);
-    entry.setInfoState('Errors',    !!pageData.error);
+    entry.setInfoState('Error',     !!pageData.error);
     entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });
