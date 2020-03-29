@@ -273,6 +273,23 @@ properties, such as a string, Set returns an error.
 func (b Map) String() string
 ```
 
+#### type ModelInfo
+
+```go
+type ModelInfo struct {
+	Title       string     `json:"title"`            // @model.title
+	Author      string     `json:"author,omitempty"` // @model.author
+	Description string     `json:"desc,omitempty"`   // @model.desc
+	File        string     `json:"file"`             // filename
+	FileNE      string     `json:"file_ne"`          // filename with no extension
+	Path        string     `json:"path"`
+	Created     *time.Time `json:"created,omitempty"`  // creation time
+	Modified    *time.Time `json:"modified,omitempty"` // modify time
+}
+```
+
+ModelInfo represents metadata associated with a model.
+
 #### type Page
 
 ```go
@@ -282,13 +299,14 @@ type Page struct {
 	VarsOnly bool     // True if Parse() should only extract variables
 	Opt      *PageOpt // page options
 
-	Images    map[string][][]int // references to images
-	Models    map[string]bool    // references to models
-	PageLinks map[string][]int   // references to other pages
+	Images    map[string][][]int   // references to images
+	Models    map[string]ModelInfo // references to models
+	PageLinks map[string][]int     // references to other pages
 
 	Wiki interface{} // only available during Parse() and HTML()
 
-	Warnings []Warning
+	Warnings []Warning // parser warnings
+	Error    *Warning  // parser error, as an encodable Warning
 }
 ```
 
@@ -654,6 +672,7 @@ type PageInfo struct {
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
+	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
 ```
 
@@ -768,10 +787,23 @@ PageOptLink describes functions to assist with link targets.
 #### type PageOptLinkFunction
 
 ```go
-type PageOptLinkFunction func(page *Page, ok *bool, target, tooltip, displayDefault *string)
+type PageOptLinkFunction func(page *Page, opts *PageOptLinkOpts)
 ```
 
 A PageOptLinkFunction sanitizes a link target.
+
+#### type PageOptLinkOpts
+
+```go
+type PageOptLinkOpts struct {
+	Ok             *bool   // func sets to true if the link is valid
+	Target         *string // func sets to overwrite the link target
+	Tooltip        *string // func sets tooltip to display
+	DisplayDefault *string // func sets default text to display (if no pipe)
+}
+```
+
+PageOptLinkOpts contains options passed to a PageOptLinkFunction.
 
 #### type PageOptNavigation
 

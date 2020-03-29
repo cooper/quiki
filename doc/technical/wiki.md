@@ -10,45 +10,48 @@ const (
 	// CategoryTypeImage is a type of category that tracks which pages use an image.
 	CategoryTypeImage CategoryType = "image"
 
-	// CategoryTypeModel is a type of category that tracks which pages use a model.
+	// CategoryTypeModel is a metacategory that tracks which pages use a model.
 	CategoryTypeModel = "model"
 
-	// CategoryTypePage is a type of category that tracks which pages reference another page.
+	// CategoryTypePage is a metacategory that tracks which pages reference another page.
 	CategoryTypePage = "page"
 )
 ```
 
-#### func  PageSortAuthor
+#### func  SortAuthor
 
 ```go
-func PageSortAuthor(p1, p2 *wikifier.PageInfo) bool
+func SortAuthor(p, q Sortable) bool
 ```
-PageSortAuthor is a PageSortFunc to pass to PagesSorted() for sorting pages
-alphabetically by author.
+SortAuthor is a SortFunc for sorting items alphabetically by author.
 
-#### func  PageSortCreated
+#### func  SortCreated
 
 ```go
-func PageSortCreated(p1, p2 *wikifier.PageInfo) bool
+func SortCreated(p, q Sortable) bool
 ```
-PageSortCreated is a PageSortFunc to pass to PagesSorted() for sorting pages by
-creation time.
+SortCreated is a SortFunc for sorting items by creation time.
 
-#### func  PageSortModified
+#### func  SortDimensions
 
 ```go
-func PageSortModified(p1, p2 *wikifier.PageInfo) bool
+func SortDimensions(p, q Sortable) bool
 ```
-PageSortModified is a PageSortFunc to pass to PagesSorted() for sorting pages by
-modification time.
+SortDimensions is a SortFunc for sorting images by their dimensions.
 
-#### func  PageSortTitle
+#### func  SortModified
 
 ```go
-func PageSortTitle(p1, p2 *wikifier.PageInfo) bool
+func SortModified(p, q Sortable) bool
 ```
-PageSortTitle is a PageSortFunc to pass to PagesSorted() for sorting pages
-alphabetically by title.
+SortModified is a SortFunc for sorting items by modification time.
+
+#### func  SortTitle
+
+```go
+func SortTitle(p, q Sortable) bool
+```
+SortTitle is a SortFunc for sorting items alphabetically by title.
 
 #### func  ValidBranchName
 
@@ -69,10 +72,11 @@ type Category struct {
 	Path string `json:"-"`
 
 	// category filename, including the .cat extension
-	File string `json:"-"`
+	File string `json:"file"`
 
 	// category name without extension
-	Name string `json:"name,omitempty"`
+	Name   string `json:"name,omitempty"`
+	FileNE string `json:"file_ne,omitempty"` // alias for consistency
 
 	// human-readable category title
 	Title string `json:"title,omitempty"`
@@ -86,6 +90,9 @@ type Category struct {
 	Modified     *time.Time `json:"modified,omitempty"`
 	ModifiedHTTP string     `json:"modified_http,omitempty"` // HTTP formatted
 
+	// time when the category metafile was last read.
+	Asof *time.Time `json:"asof,omitempty"`
+
 	// pages in the category. keys are filenames
 	Pages map[string]CategoryEntry `json:"pages,omitempty"`
 
@@ -98,6 +105,9 @@ type Category struct {
 
 	// for CategoryTypePage, this is the info for the tracked page
 	PageInfo *wikifier.PageInfo `json:"page_info,omitempty"`
+
+	// for CategoryTypeModel, this is the info for the tracked model
+	ModelInfo *wikifier.ModelInfo `json:"model_info,omitempty"`
 
 	// for CategoryTypeImage, this is the info for the tracked image
 	ImageInfo *struct {
@@ -159,9 +169,7 @@ A CategoryEntry describes a page that belongs to a category.
 
 ```go
 type CategoryInfo struct {
-	File     string     `json:"file"`               // filename
-	Created  *time.Time `json:"created,omitempty"`  // creation time
-	Modified *time.Time `json:"modified,omitempty"` // modify time
+	*Category
 }
 ```
 
@@ -238,8 +246,9 @@ type DisplayError struct {
 	// HTTP status code. if zero, 404 should be used
 	Status int
 
-	// if the error occurred during parsing, this is the positioned error
-	ParseError *wikifier.ParserError
+	// if the error occurred during parsing, this is the position.
+	// for all non-parsing errors, this is 0:0
+	Position wikifier.Position
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
@@ -376,7 +385,6 @@ type DisplayPage struct {
 
 	// warnings and errors produced by the parser
 	Warnings []wikifier.Warning `json:"warnings,omitempty"`
-	Errors   []wikifier.Warning `json:"errors,omitempty"`
 
 	// time when the page was created, as extracted from
 	// the special @page.created variable
@@ -435,27 +443,6 @@ type ImageInfo struct {
 ```
 
 ImageInfo represents a full-size image on the wiki.
-
-#### type ModelInfo
-
-```go
-type ModelInfo struct {
-	File     string     `json:"file"` // filename
-	Path     string     `json:"path"`
-	Created  *time.Time `json:"created,omitempty"`  // creation time
-	Modified *time.Time `json:"modified,omitempty"` // modify time
-}
-```
-
-ModelInfo represents metadata associated with a model.
-
-#### type PageSortFunc
-
-```go
-type PageSortFunc func(p1, p2 *wikifier.PageInfo) bool
-```
-
-PageSortFunc is a type for functions that can sort pages for PagesSorted().
 
 #### type SizedImage
 
@@ -523,6 +510,38 @@ func (img SizedImage) TrueWidth() int
 TrueWidth returns the actual image width when the Scale is taken into
 consideration.
 
+#### type SortFunc
+
+```go
+type SortFunc func(p, q Sortable) bool
+```
+
+SortFunc is a type for functions that can sort items.
+
+#### type SortInfo
+
+```go
+type SortInfo struct {
+	Title      string
+	Author     string
+	Created    time.Time
+	Modified   time.Time
+	Dimensions []int
+}
+```
+
+SortInfo is the data returned from Sortable items for sorting wiki resources.
+
+#### type Sortable
+
+```go
+type Sortable interface {
+	SortInfo() SortInfo
+}
+```
+
+Sortable is the interface that allows quiki to sort wiki resources.
+
 #### type Wiki
 
 ```go
@@ -585,6 +604,14 @@ BranchNames returns the revision branches available.
 func (w *Wiki) Categories() []CategoryInfo
 ```
 Categories returns info about all the models in the wiki.
+
+#### func (*Wiki) CategoriesSorted
+
+```go
+func (w *Wiki) CategoriesSorted(descend bool, sorters ...SortFunc) []CategoryInfo
+```
+CategoriesSorted returns info about all the categories in the wiki, sorted as
+specified. Accepted sort functions are SortTitle, SortCreated, and SortModified.
 
 #### func (*Wiki) CategoryInfo
 
@@ -728,6 +755,15 @@ func (w *Wiki) Images() []ImageInfo
 ```
 Images returns info about all the images in the wiki.
 
+#### func (*Wiki) ImagesSorted
+
+```go
+func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo
+```
+ImagesSorted returns info about all the pages in the wiki, sorted as specified.
+Accepted sort functions are SortTitle, SortAuthor, SortCreated, SortModified,
+and SortDimensions.
+
 #### func (*Wiki) Log
 
 ```go
@@ -745,7 +781,7 @@ Logf logs info for a wiki.
 #### func (*Wiki) ModelInfo
 
 ```go
-func (w *Wiki) ModelInfo(name string) (info ModelInfo)
+func (w *Wiki) ModelInfo(name string) (info wikifier.ModelInfo)
 ```
 ModelInfo is an inexpensive request for info on a model. It uses cached metadata
 rather than generating the model and extracting variables.
@@ -753,16 +789,26 @@ rather than generating the model and extracting variables.
 #### func (*Wiki) ModelMap
 
 ```go
-func (w *Wiki) ModelMap() map[string]ModelInfo
+func (w *Wiki) ModelMap() map[string]wikifier.ModelInfo
 ```
-ModelMap returns a map of model name to ModelInfo for all models in the wiki.
+ModelMap returns a map of model name to wikifier.ModelInfo for all models in the
+wiki.
 
 #### func (*Wiki) Models
 
 ```go
-func (w *Wiki) Models() []ModelInfo
+func (w *Wiki) Models() []wikifier.ModelInfo
 ```
 Models returns info about all the models in the wiki.
+
+#### func (*Wiki) ModelsSorted
+
+```go
+func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []wikifier.ModelInfo
+```
+ModelsSorted returns info about all the models in the wiki, sorted as specified.
+Accepted sort functions are SortTitle, SortAuthor, SortCreated, and
+SortModified.
 
 #### func (*Wiki) NewBranch
 
@@ -797,9 +843,11 @@ Pages returns info about all the pages in the wiki.
 #### func (*Wiki) PagesSorted
 
 ```go
-func (w *Wiki) PagesSorted(sorters ...PageSortFunc) []wikifier.PageInfo
+func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInfo
 ```
 PagesSorted returns info about all the pages in the wiki, sorted as specified.
+Accepted sort functions are SortTitle, SortAuthor, SortCreated, and
+SortModified.
 
 #### func (*Wiki) Pregenerate
 
