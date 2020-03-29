@@ -150,7 +150,9 @@ func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	if catType != "" {
 		dir = filepath.Join(dir, string(catType))
 	}
-	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, false)
+	// consider: once we supported prefixed categories (issue #79),
+	// will need to rethink the below...
+	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, true)
 	return files
 }
 
