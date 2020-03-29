@@ -150,9 +150,7 @@ func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	if catType != "" {
 		dir = filepath.Join(dir, string(catType))
 	}
-	// consider: once we supported prefixed categories (issue #79),
-	// will need to rethink the below...
-	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, true)
+	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, false)
 	return files
 }
 
@@ -189,11 +187,21 @@ func (w *Wiki) pathForPage(pageName string) string {
 // creates directories for the path components that do not exist.
 func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bool) string {
 	catName = wikifier.CategoryName(catName)
-	dir := filepath.Join(w.Opt.Dir.Cache, "category")
+
+	// determine base dir
+	var dir string
+	if catType != "" {
+		dir = filepath.Join(w.Opt.Dir.Cache, "meta", string(catType))
+	} else {
+		dir = filepath.Join(w.Opt.Dir.Cache, "category")
+	}
+
+	// make subdirs
 	if createOK {
 		wikifier.MakeDir(dir, filepath.Join(string(catType), catName))
 	}
-	path, _ := filepath.Abs(filepath.Join(dir, string(catType), catName))
+
+	path, _ := filepath.Abs(filepath.Join(dir, catName))
 	return path
 }
 
