@@ -235,7 +235,7 @@ function frameLoad (page) {
 
 	a.updateIcon('circle-notch fa-spin');
     var request = new Request({
-        url: 'frame/' + page,
+        url: adminifier.wikiRoot + '/frame/' + page,
         onSuccess: handleResponse,
         onFailure: function (e) {
             handleResponse(e.response

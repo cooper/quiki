@@ -73,12 +73,7 @@ type editorOpts struct {
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 	// each of these URLs generates wiki.tpl
-	for _, which := range []string{
-		"dashboard", "pages", "categories",
-		"images", "models", "settings", "help",
-		"edit-page", "edit-model", "switch-branch",
-		"edit-category",
-	} {
+	for which := range frameHandlers {
 		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
@@ -94,13 +89,18 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			return
 		}
 
-		frameName := strings.TrimPrefix(r.URL.Path, frameRoot)
+		frameNameFull := strings.TrimPrefix(r.URL.Path, frameRoot)
+		frameName := frameNameFull
+		if i := strings.IndexByte(frameNameFull, '/'); i != -1 {
+			frameNameFull = frameName[:i+1]
+			frameName = frameNameFull[:i]
+		}
 		tmplName := "frame-" + frameName + ".tpl"
 
 		// call func to create template params
 		var dot interface{} = nil
-		if handler, exist := frameHandlers[frameName]; exist {
 
+		if handler, exist := frameHandlers[frameNameFull]; exist {
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
