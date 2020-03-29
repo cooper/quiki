@@ -422,7 +422,14 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 		return false
 	}
 
+	// the category meta file still exists, so let's keep it (issue #74)
 	nameNE := wikifier.CategoryNameNE(cat.Name)
+	metaPath := w.Dir("topics", nameNE+".cat")
+	_, metaErr := os.Lstat(metaPath)
+	if metaErr == nil {
+		return false
+	}
+
 	preserve := false
 	switch cat.Type {
 
