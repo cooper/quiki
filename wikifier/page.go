@@ -62,18 +62,6 @@ type PageInfo struct {
 	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
 
-// ModelInfo represents metadata associated with a model.
-type ModelInfo struct {
-	Title       string     `json:"title"`            // @model.title
-	Author      string     `json:"author,omitempty"` // @model.author
-	Description string     `json:"desc,omitempty"`   // @model.desc
-	File        string     `json:"file"`             // filename
-	FileNE      string     `json:"file_ne"`          // filename with no extension
-	Path        string     `json:"path"`
-	Created     *time.Time `json:"created,omitempty"`  // creation time
-	Modified    *time.Time `json:"modified,omitempty"` // modify time
-}
-
 // Warning represents a warning on a page.
 type Warning struct {
 	Message  string   `json:"message"`
@@ -530,27 +518,6 @@ func (p *Page) Info() PageInfo {
 		Keywords:    p.Keywords(),
 		Warnings:    p.Warnings,
 		Error:       p.Error,
-	}
-	mod, create := p.Modified(), p.Created()
-	if !mod.IsZero() {
-		info.Modified = &mod
-		info.Created = &mod // fallback
-	}
-	if !create.IsZero() {
-		info.Created = &create
-	}
-	return info
-}
-
-// modelInfo is like (wikifier.Page).Info() but used internally
-// to instead return a ModelInfo
-func (p *Page) modelInfo() ModelInfo {
-	info := ModelInfo{
-		File:        p.Name(),
-		FileNE:      p.NameNE(),
-		Title:       p.Title(),
-		Author:      p.Author(),
-		Description: p.Description(),
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {
