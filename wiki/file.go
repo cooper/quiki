@@ -148,7 +148,7 @@ func (w *Wiki) allPageFiles() []string {
 func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	dir := w.Opt.Dir.Category
 	if catType != "" {
-		dir = filepath.Join(dir, string(catType))
+		dir = w.Dir("cache", "meta", string(catType))
 	}
 	files, _ := wikifier.UniqueFilesInDir(dir, []string{"cat"}, false)
 	return files
@@ -198,7 +198,7 @@ func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bo
 
 	// make subdirs
 	if createOK {
-		wikifier.MakeDir(dir, filepath.Join(string(catType), catName))
+		wikifier.MakeDir(dir, catName)
 	}
 
 	path, _ := filepath.Abs(filepath.Join(dir, catName))
