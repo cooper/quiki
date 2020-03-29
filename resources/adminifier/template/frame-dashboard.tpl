@@ -11,7 +11,7 @@
 
 {{if .Errors}}
 <h2>Pages with Errors</h2>
-These pages are not being served on the wiki due to errors.
+{{len .Errors}} page{{if gt (len .Errors) 1}}s are{{else}} is{{end}} not being served due to errors.
 
 <pre class="info">
 {{- range .Errors -}}
@@ -23,7 +23,7 @@ These pages are not being served on the wiki due to errors.
 
 {{if .Warnings}}
 <h2>Pages with Warnings</h2>
-These pages have warnings.
+{{len .Warnings}} page{{if gt (len .Warnings) 1}}s have{{else}} has{{end}} warnings.
 
 <pre class="info">
 {{- range .Warnings -}}

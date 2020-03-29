@@ -3,3 +3,5 @@
 @category.mytopic;
 
 This page has some content and references a [[ capital page | test-cap/Capital ]].
+
+image{}
