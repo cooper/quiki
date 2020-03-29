@@ -60,7 +60,6 @@ var adminifier = {
 <div id="content">
 </div>
 
-{{/* TODO: ALL OF THE JS TEMPLATES */}}
 {{.JSTemplates}}
 
 </body>

@@ -176,7 +176,7 @@ func (p *Page) _parse() error {
 		return err
 	}
 
-	// TODO: check if p.parser.catch != main block
+	// check if p.parser.catch != main block
 	if p.parser.catch != p.main {
 		blk := p.parser.block
 		if p.parser.catch == blk {
@@ -192,7 +192,6 @@ func (p *Page) _parse() error {
 
 	// inject variables set in the page to page opts
 	if err := InjectPageOpt(p, p.Opt); err != nil {
-		// TODO: position
 		return err
 	}
 
@@ -202,7 +201,6 @@ func (p *Page) _parse() error {
 // HTML generates and returns the HTML code for the page.
 // The page must be parsed with Parse before attempting this method.
 func (p *Page) HTML() HTML {
-	// TODO: cache and then recursively destroy elements
 	return generateBlock(p.main, p)
 }
 
@@ -571,7 +569,6 @@ func (p *Page) mainBlock() block {
 
 // resets the parser
 func (p *Page) resetParseState() {
-	// TODO: recursively destroy blocks
 	p.parser = nil
 }
 

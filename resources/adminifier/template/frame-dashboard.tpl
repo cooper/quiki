@@ -8,8 +8,36 @@
     data-button-date-selection="{'title': 'Last 30 days', 'icon': 'calendar', 'func': 'displayDateSelector'}"
 />
 
-<h2>Logs</h2>
 
-<pre id="server-logs">
+{{if .Errors}}
+<h2>Pages with Errors</h2>
+These pages are not being served on the wiki due to errors.
+
+<pre class="info">
+{{- range .Errors -}}
+<a href="edit-page?page={{.File}}">{{.File}}</a>:
+{{- .Error.Position.Line}}:{{.Error.Position.Column}}: {{.Error.Message}}
+{{end -}}
+</pre>
+{{end}}
+
+{{if .Warnings}}
+<h2>Pages with Warnings</h2>
+These pages have warnings.
+
+<pre class="info">
+{{- range .Warnings -}}
+{{- $file := .File -}}
+{{- range .Warnings -}}
+<a href="edit-page?page={{$file}}">{{$file}}</a>:
+{{- .Position.Line}}:{{.Position.Column}}: {{.Message}}
+{{end -}}
+{{end -}}
+</pre>
+{{end}}
+
+
+<h2>Logs</h2>
+<pre class="info">
 {{.Logs}}
 </pre>

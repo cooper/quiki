@@ -12,6 +12,7 @@ import (
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
+	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
 
@@ -221,11 +222,30 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 }
 
 func handleDashboardFrame(wr *wikiRequest) {
+
+	// wiki logs
 	logs, _ := ioutil.ReadFile(wr.wi.Dir("cache", "wiki.log"))
+
+	// pages with errors and warnings
+	var errors []wikifier.PageInfo
+	var warnings []wikifier.PageInfo
+	for _, info := range wr.wi.PagesSorted(false, wiki.SortModified, wiki.SortTitle) {
+		if info.Error != nil {
+			errors = append(errors, info)
+		}
+		if info.Warnings != nil {
+			warnings = append(warnings, info)
+		}
+	}
+
 	wr.dot = struct {
-		Logs string
+		Logs     string
+		Errors   []wikifier.PageInfo
+		Warnings []wikifier.PageInfo
 	}{
-		Logs: string(logs),
+		Logs:     string(logs),
+		Errors:   errors,
+		Warnings: warnings,
 	}
 }
 

@@ -3,3 +3,5 @@
 @category.mytopic;
 
 Page two. It references a [[ subpage | subpages/my ]].
+
+if {}

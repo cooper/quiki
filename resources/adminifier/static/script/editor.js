@@ -40,7 +40,8 @@ function pageScriptsLoadedHandler () {
     ae.lastSavedData = editor.getValue();
 
     // set read-only if page is external
-    editor.setReadOnly(!!a.currentJSONMetadata.info.external);
+    if (a.currentJSONMetadata.info)
+        editor.setReadOnly(!!a.currentJSONMetadata.info.external);
 
     // render editor
     var themeName = adminifier.themeName || 'twilight';

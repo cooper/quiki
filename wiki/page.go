@@ -265,9 +265,6 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 	r.CSS = page.CSS()
 	r.Warnings = page.Warnings
 
-	// TODO: should we include the page object?
-	// TODO: warnings
-
 	// update categories
 	w.updatePageCategories(page)
 	r.Categories = page.Categories()
