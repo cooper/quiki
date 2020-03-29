@@ -17,7 +17,7 @@ var modelList = new FileList({
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (modelData) {
     var entry = new FileListEntry({
-        Title:      modelData.title || modelData.file,
+        Title:      modelData.title || modelData.file_ne || modelData.file,
         Author:     modelData.author,
         Created:    modelData.created,
         Modified:   modelData.modified

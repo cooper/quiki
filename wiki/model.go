@@ -4,11 +4,14 @@ import (
 	"os"
 	"sort"
 	"time"
+
+	"github.com/cooper/quiki/wikifier"
 )
 
 // ModelInfo represents metadata associated with a model.
 type ModelInfo struct {
-	File     string     `json:"file"` // filename
+	Title    string     `json:"title"` // @model.title
+	File     string     `json:"file"`  // filename
 	Path     string     `json:"path"`
 	Created  *time.Time `json:"created,omitempty"`  // creation time
 	Modified *time.Time `json:"modified,omitempty"` // modify time
@@ -95,7 +98,8 @@ func (w *Wiki) ModelInfo(name string) (info ModelInfo) {
 
 	// if model category exists use that info
 	if modelCat.Exists() {
-		// TODO: store/retrieve some metadata in the model category
+		info.Title = modelCat.PageInfo.Title
+		info.Created = modelCat.PageInfo.Created
 	}
 
 	// this stuff is available to all
@@ -103,7 +107,16 @@ func (w *Wiki) ModelInfo(name string) (info ModelInfo) {
 	info.File = name
 	info.Path = path
 	info.Modified = &mod // actual model mod time
-	info.Created = &mod
+
+	// fallback title to name
+	if info.Title == "" {
+		info.Title = wikifier.PageNameNE(name)
+	}
+
+	// fallback created to modified
+	if info.Created == nil {
+		info.Created = &mod
+	}
 
 	return
 }
