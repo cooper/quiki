@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"math"
 	"os"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
+	"github.com/pkg/errors"
 )
 
 // CategoryType describes the type of a Category.
@@ -55,6 +55,9 @@ type Category struct {
 	// this is updated when pages are added and deleted
 	Modified     *time.Time `json:"modified,omitempty"`
 	ModifiedHTTP string     `json:"modified_http,omitempty"` // HTTP formatted
+
+	// time when the category metafile was last read.
+	Asof *time.Time `json:"asof,omitempty"`
 
 	// pages in the category. keys are filenames
 	Pages map[string]CategoryEntry `json:"pages,omitempty"`
@@ -133,6 +136,7 @@ func (w *Wiki) GetCategory(name string) *Category {
 func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	name = wikifier.CategoryNameNE(name)
 	path := w.pathForCategory(name, typ, true)
+	metaPath := w.Dir("topics", name+".cat")
 
 	// load the category if it exists
 	var cat Category
@@ -143,7 +147,8 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	}
 
 	// error occurred in ReadFile or Unmarshal
-	if err != nil {
+	bogus := err != nil
+	if bogus {
 
 		// if the error occurred in Unmarshal or is some filesystem
 		// error OTHER than that it does not exist, purge the cache file
@@ -160,13 +165,81 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 		cat.ModifiedHTTP = cat.CreatedHTTP
 	}
 
-	// update these
+	// update these in any case
 	cat.Path = path
 	cat.Name = name
 	cat.File = name + ".cat"
 	cat.Type = typ
 
+	// load category metadata if available--
+	// but only in these cases:
+	//
+	// 1. cache does not exist
+	// 2. cache exists, but meta has changed since the last time we looked
+	// 3. cache was just purged due to an error above
+	//
+	if typ == "" {
+		metaFi, metaErr := os.Lstat(metaPath)
+		neverChecked := cat.Asof == nil // no Asof; we've never ever read the meta file
+		if metaErr == nil && (bogus || neverChecked || metaFi.ModTime().After(*cat.Asof)) {
+			w.readCategoryMeta(metaPath, &cat)
+		}
+	}
+
 	return &cat
+}
+
+// extract info from a category metadata file
+func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
+	w.Debugf("readCategoryMeta(%s): parsing category metadata", cat.Name)
+
+	// create page
+	p := wikifier.NewPage(metaPath)
+
+	if err := p.Parse(); err != nil {
+		// TODO: do something with this error
+		w.Logf("readCategoryMeta(%s): parse error: %v", cat.Name, err)
+	}
+
+	// extract string options
+	optString := map[string]*string{
+		"title": &cat.Title,
+		// TODO: "main_page":
+		// TODO: "display_as":
+		// TODO: "sort": (e.g. date descending)
+	}
+	for name, ptr := range optString {
+		str, err := p.GetStr("category." + name)
+		if err != nil {
+			err = errors.Wrap(err, name)
+			// TODO: do something with this error
+			w.Logf("readCategoryMeta(%s): vars error: %v", name, err)
+		}
+		if str != "" {
+			*ptr = str
+		}
+	}
+
+	// extract boolean options
+	optBool := map[string]*bool{
+		// TODO: "display_author":
+		// TODO: "display_date":
+	}
+	for name, ptr := range optBool {
+		val, err := p.Get("category." + name)
+		if err != nil {
+			// TODO: do something with this error
+			w.Logf("readCategoryMeta(%s): vars error: %v", name, err)
+		}
+		if enable, ok := val.(bool); ok {
+			*ptr = enable
+		}
+	}
+
+	// update the category
+	now := time.Now()
+	cat.Asof = &now
+	cat.write(w)
 }
 
 // AddPage adds a page to a category.
