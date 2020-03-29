@@ -75,14 +75,14 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	if rel := w._relPath(path, w.Dir("pages")); rel != "" {
 		res := w.DisplayPageDraft(rel, true)
 		if dispPage, ok := res.(DisplayPage); ok {
-			// extract warnings/etc from a DisplayPage
+			// extract warnings/error from a DisplayPage
 			r.Warnings = dispPage.Warnings
 
-		} else if dispErr, ok := res.(DisplayError); ok && dispErr.ParseError != nil {
+		} else if dispErr, ok := res.(DisplayError); ok {
 			// extract parsing error from a DisplayError
 			r.Error = &wikifier.Warning{
-				Message:  dispErr.ParseError.Err.Error(),
-				Position: dispErr.ParseError.Position,
+				Message:  dispErr.Error,
+				Position: dispErr.Position,
 			}
 		}
 	} else if rel := w._relPath(path, w.Dir("models")); rel != "" {

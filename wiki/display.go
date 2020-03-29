@@ -16,8 +16,9 @@ type DisplayError struct {
 	// HTTP status code. if zero, 404 should be used
 	Status int
 
-	// if the error occurred during parsing, this is the positioned error
-	ParseError *wikifier.ParserError
+	// if the error occurred during parsing, this is the position.
+	// for all non-parsing errors, this is 0:0
+	Position wikifier.Position
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access

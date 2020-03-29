@@ -65,7 +65,6 @@ type DisplayPage struct {
 
 	// warnings and errors produced by the parser
 	Warnings []wikifier.Warning `json:"warnings,omitempty"`
-	Errors   []wikifier.Warning `json:"errors,omitempty"`
 
 	// time when the page was created, as extracted from
 	// the special @page.created variable
@@ -97,7 +96,6 @@ type DisplayPage struct {
 type pageJSONManifest struct {
 	CSS        string   `json:"css,omitempty"`
 	Categories []string `json:"categories,omitempty"`
-	Error      string   `json:"error,omitempty"`
 	wikifier.PageInfo
 }
 
@@ -225,7 +223,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		var pErr *wikifier.ParserError
 		errors.As(err, &pErr)
 
-		return DisplayError{Error: err.Error(), ParseError: pErr}
+		return DisplayError{Error: err.Error(), Position: pErr.Position}
 	}
 
 	// if this is a draft and we're not serving drafts, pretend
@@ -442,7 +440,6 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	info := pageJSONManifest{
 		CSS:        r.CSS,
 		Categories: r.Categories,
-		Error:      "", // TODO
 		PageInfo:   page.Info(),
 	}
 
@@ -544,12 +541,18 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	// if this is a draft and we're not serving drafts, pretend
 	// that the page does not exist
 	if !draftOK && info.Draft {
-		return DisplayError{Error: "Page has not yet been publised.", Draft: true}
+		return DisplayError{
+			Error: "Page has not yet been publised.",
+			Draft: true,
+		}
 	}
 
 	// cached error
-	if info.Error != "" {
-		return DisplayError{Error: info.Error}
+	if info.Error != nil {
+		return DisplayError{
+			Error:    info.Error.Message,
+			Position: info.Error.Position,
+		}
 	}
 
 	// cached redirect
