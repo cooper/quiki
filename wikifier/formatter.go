@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	variableRegex = regexp.MustCompile(`^([@%])([\w\.]+)$`)
+	variableRegex = regexp.MustCompile(`^([@%])([\w\.\/]+)$`)
 	linkRegex     = regexp.MustCompile(`^((\w+)://|\$)\s*`)
 	mailRegex     = regexp.MustCompile(`^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$`)
 	colorRegex    = regexp.MustCompile(`(?i)^#[\da-f]+$`)

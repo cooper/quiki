@@ -22,7 +22,7 @@ func (vn *variableName) parentCatch() catch {
 
 // word-like chars and periods are OK in var names
 func (vn *variableName) byteOK(b byte) bool {
-	ok, _ := regexp.Match(`[\w\.]`, []byte{b})
+	ok, _ := regexp.Match(`[\w\.\/]`, []byte{b})
 	return ok
 }
 
