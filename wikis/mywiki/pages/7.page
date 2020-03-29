@@ -3,3 +3,6 @@
 @category.mytopic;
 
 This page has some content.
+
+if [] {
+}

@@ -95,10 +95,9 @@ type DisplayPage struct {
 }
 
 type pageJSONManifest struct {
-	CSS        string             `json:"css,omitempty"`
-	Categories []string           `json:"categories,omitempty"`
-	Warnings   []wikifier.Warning `json:"warnings,omitempty"`
-	Error      string             `json:"error,omitempty"`
+	CSS        string   `json:"css,omitempty"`
+	Categories []string `json:"categories,omitempty"`
+	Error      string   `json:"error,omitempty"`
 	wikifier.PageInfo
 }
 
@@ -427,7 +426,6 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	info := pageJSONManifest{
 		CSS:        r.CSS,
 		Categories: r.Categories,
-		Warnings:   r.Warnings,
 		Error:      "", // TODO
 		PageInfo:   page.Info(),
 	}

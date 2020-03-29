@@ -522,6 +522,7 @@ func (p *Page) Info() PageInfo {
 		Author:      p.Author(),
 		Description: p.Description(),
 		Keywords:    p.Keywords(),
+		Warnings:    p.Warnings,
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {

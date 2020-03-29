@@ -22,9 +22,11 @@ a.currentJSONMetadata.results.each(function (pageData) {
         Created:    pageData.created,
         Modified:   pageData.modified
     });
-    entry.setInfoState('Draft', pageData.draft);
-    entry.setInfoState('Redirect', pageData.redirect);
-    entry.setInfoState('External', pageData.external);
+    entry.setInfoState('Draft',     pageData.draft);
+    entry.setInfoState('Redirect',  pageData.redirect);
+    entry.setInfoState('External',  pageData.external);
+    entry.setInfoState('Warnings',  pageData.warnings && pageData.warnings.length);
+    entry.setInfoState('Errors',    !!pageData.error);
     entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });
