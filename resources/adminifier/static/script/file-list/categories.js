@@ -17,7 +17,7 @@ var catList = new FileList({
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (catData) {
     var entry = new FileListEntry({
-        Title:      catData.title || catData.file,
+        Title:      catData.title || catData.file_ne || catData.file,
         Author:     catData.author,
         Created:    catData.created,
         Modified:   catData.modified

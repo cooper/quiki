@@ -39,10 +39,11 @@ type Category struct {
 	Path string `json:"-"`
 
 	// category filename, including the .cat extension
-	File string `json:"-"`
+	File string `json:"file"`
 
 	// category name without extension
-	Name string `json:"name,omitempty"`
+	Name   string `json:"name,omitempty"`
+	FileNE string `json:"file_ne,omitempty"` // alias for consistency
 
 	// human-readable category title
 	Title string `json:"title,omitempty"`
@@ -170,6 +171,7 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	cat.Name = name
 	cat.File = name + ".cat"
 	cat.Type = typ
+	cat.FileNE = name // alias
 
 	// load category metadata if available--
 	// but only in these cases:
@@ -633,9 +635,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 
 // CategoryInfo represents metadata associated with a category.
 type CategoryInfo struct {
-	File     string     `json:"file"`               // filename
-	Created  *time.Time `json:"created,omitempty"`  // creation time
-	Modified *time.Time `json:"modified,omitempty"` // modify time
+	*Category
 }
 
 // Categories returns info about all the models in the wiki.
@@ -704,14 +704,7 @@ func (w *Wiki) CategoryMap() map[string]CategoryInfo {
 
 // CategoryInfo is an inexpensive request for info on a category.
 func (w *Wiki) CategoryInfo(name string) (info CategoryInfo) {
-	cat := w.GetCategory(name)
-
-	// this stuff is available to all
-	info.File = cat.File
-	info.Modified = cat.Modified
-	info.Created = cat.Created
-
-	return
+	return CategoryInfo{w.GetCategory(name)}
 }
 
 // logic for sorting pages by time
