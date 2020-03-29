@@ -7,6 +7,9 @@
 {{else if .Config}}
       data-nav="settings"
       data-icon="cog"
+{{else if .Category}}
+    data-nav="categories"
+    data-icon="list"
 {{else}}
       data-nav="pages"
       data-icon="edit"

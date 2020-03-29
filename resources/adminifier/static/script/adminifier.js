@@ -190,52 +190,60 @@ function frameLoad (page) {
     a.currentPage = page;
     console.log("Loading " + page);
 
+    var handleResponse = function (html) {
+
+        // the page may start with JSON metadata...
+        if (!html.indexOf('<!--JSON')) {
+            var json = JSON.parse(html.split('\n', 3)[1]);
+            a.currentJSONMetadata = json;
+        }
+
+        // set the content
+        $('content').innerHTML = html;
+
+        // apply click handlers
+        addFrameClickHandler($('content').getElements('a.frame-click'));
+
+        // find HTML metadata
+        var meta = $('content').getElement('meta');
+        if (meta) {
+            var attrs = meta.attributes;
+            [].forEach.call(meta.attributes, function(attr) {
+                if (/^data-/.test(attr.name))
+                    attrs[attr.name] = attr.value;
+            });
+
+            // // Tools for all pages
+            // 'data-redirect',    // javascript frame redirect
+            // 'data-wredirect',   // window redirect
+            // 'data-nav',         // navigation item identifier to highlight
+            // 'data-title',       // page title for top bar
+            // 'data-icon',        // page icon name for top bar
+            // 'data-scripts',     // SSV script names w/o extensions
+            // 'data-styles',      // SSV css names w/o extensions
+            // 'data-flags',       // SSV page flags
+            // 'data-search', 		// name of function to call on search
+            // 'data-buttons', 	// buttons to display in top bar
+            //
+            // // Used by specific pages
+            //
+            // 'data-sort'         // sort option, used by file lists
+
+            handlePageData(attrs);
+        }
+    };
+
 	a.updateIcon('circle-notch fa-spin');
     var request = new Request({
         url: 'frame/' + page,
-        onSuccess: function (html) {
-
-            // the page may start with JSON metadata...
-            if (!html.indexOf('<!--JSON')) {
-                var json = JSON.parse(html.split('\n', 3)[1]);
-                a.currentJSONMetadata = json;
-            }
-
-            // set the content
-            $('content').innerHTML = html;
-
-            // apply click handlers
-            addFrameClickHandler($('content').getElements('a.frame-click'));
-
-            // find HTML metadata
-            var meta = $('content').getElement('meta');
-            if (meta) {
-                var attrs = meta.attributes;
-				[].forEach.call(meta.attributes, function(attr) {
-				    if (/^data-/.test(attr.name))
-				        attrs[attr.name] = attr.value;
-				});
-
-                // // Tools for all pages
-                // 'data-redirect',    // javascript frame redirect
-                // 'data-wredirect',   // window redirect
-                // 'data-nav',         // navigation item identifier to highlight
-                // 'data-title',       // page title for top bar
-                // 'data-icon',        // page icon name for top bar
-                // 'data-scripts',     // SSV script names w/o extensions
-                // 'data-styles',      // SSV css names w/o extensions
-                // 'data-flags',       // SSV page flags
-				// 'data-search', 		// name of function to call on search
-				// 'data-buttons', 	// buttons to display in top bar
-				//
-                // // Used by specific pages
-				//
-                // 'data-sort'         // sort option, used by file lists
-
-                handlePageData(attrs);
-            }
-        },
-        onFail: function (html) {
+        onSuccess: handleResponse,
+        onFailure: function (e) {
+            handleResponse(e.response
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+            );
         }
     });
     request.get();

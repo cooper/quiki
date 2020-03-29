@@ -24,7 +24,7 @@ a.currentJSONMetadata.results.each(function (catData) {
     });
     entry.setInfoState('Generated', catData.generated);
     entry.setInfoState('Draft', catData.draft);
-    // entry.link = adminifier.wikiRoot + '/edit-cat?cat=' + encodeURIComponent(catData.file); TODO
+    entry.link = adminifier.wikiRoot + '/edit-category?cat=' + encodeURIComponent(catData.file);
     catList.addEntry(entry);
 });
 

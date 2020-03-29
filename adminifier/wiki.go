@@ -26,6 +26,7 @@ var frameHandlers = map[string]func(*wikiRequest){
 	"models":        handleModelsFrame,
 	"settings":      handleSettingsFrame,
 	"edit-page":     handleEditPageFrame,
+	"edit-category": handleEditCategoryFrame,
 	"edit-model":    handleEditModelFrame,
 	"switch-branch": handleSwitchBranchFrame,
 }
@@ -63,6 +64,7 @@ type wikiRequest struct {
 type editorOpts struct {
 	model  bool        // true if editing a model
 	config bool        // true if editing the config
+	cat    bool        // true if editing a category
 	info   interface{} // PageInfo or ModelInfo
 }
 
@@ -75,6 +77,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		"dashboard", "pages", "categories",
 		"images", "models", "settings", "help",
 		"edit-page", "edit-model", "switch-branch",
+		"edit-category",
 	} {
 		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
@@ -118,7 +121,8 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 			// handler returned an error
 			if wr.err != nil {
-				panic(wr.err)
+				http.Error(w, wr.err.Error(), http.StatusInternalServerError)
+				return
 			}
 
 			// handler was successful
@@ -141,7 +145,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 		// error occurred in template execution
 		if err != nil {
-			panic(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 
@@ -217,7 +221,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 		}),
 	})
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -371,7 +375,28 @@ func handleEditModelFrame(wr *wikiRequest) {
 
 	// serve editor
 	handleEditor(wr, info.Path, info.File, info.Title, editorOpts{model: true, info: info})
+}
 
+func handleEditCategoryFrame(wr *wikiRequest) {
+	q := wr.r.URL.Query()
+
+	// no page filename provided
+	name := q.Get("cat")
+	if name == "" {
+		wr.err = errors.New("no page filename provided")
+		return
+	}
+
+	// find the category
+	metaPath := wr.wi.Dir("topics", name)
+	info := wr.wi.CategoryInfo(name)
+	if !info.Exists() {
+		wr.err = errors.New("category does not exist")
+		return
+	}
+
+	// serve editor
+	handleEditor(wr, metaPath, info.File, info.Title, editorOpts{cat: true, info: info})
 }
 
 func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
@@ -392,13 +417,15 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 
 	// json stuff
 	jsonData, err := json.Marshal(struct {
-		Model  bool        `json:"model"`
-		Config bool        `json:"config"`
-		Info   interface{} `json:"info,omitempty"` // PageInfo or ModelInfo
+		Model    bool        `json:"model"`
+		Config   bool        `json:"config"`
+		Category bool        `json:"category"`
+		Info     interface{} `json:"info,omitempty"` // PageInfo or ModelInfo
 		wiki.DisplayFile
 	}{
 		Model:       o.model,
 		Config:      o.config,
+		Category:    o.cat,
 		Info:        o.info,
 		DisplayFile: fileRes,
 	})
@@ -409,19 +436,21 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 
 	// template stuff
 	wr.dot = struct {
-		Found   bool
-		JSON    template.HTML
-		Model   bool   // true if editing a model
-		Config  bool   // true if editing config
-		Title   string // page title or filename
-		File    string // filename
-		Content string // file content
+		Found    bool
+		JSON     template.HTML
+		Model    bool // true if editing a model
+		Config   bool // true if editing config
+		Category bool
+		Title    string // page title or filename
+		File     string // filename
+		Content  string // file content
 		wikiTemplate
 	}{
 		Found:        true,
 		JSON:         template.HTML("<!--JSON\n" + string(jsonData) + "\n-->"),
 		Model:        o.model,
 		Config:       o.config,
+		Category:     o.cat,
 		Title:        title,
 		File:         file,
 		Content:      fileRes.Content,
