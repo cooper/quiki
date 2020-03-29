@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"math"
 	"os"
@@ -20,10 +21,10 @@ const (
 	// CategoryTypeImage is a type of category that tracks which pages use an image.
 	CategoryTypeImage CategoryType = "image"
 
-	// CategoryTypeModel is a type of category that tracks which pages use a model.
+	// CategoryTypeModel is a metacategory that tracks which pages use a model.
 	CategoryTypeModel = "model"
 
-	// CategoryTypePage is a type of category that tracks which pages reference another page.
+	// CategoryTypePage is a metacategory that tracks which pages reference another page.
 	CategoryTypePage = "page"
 )
 
@@ -137,21 +138,26 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	var cat Category
 	jsonData, err := ioutil.ReadFile(path)
 	if err == nil {
+		// file exists
 		err = json.Unmarshal(jsonData, &cat)
-	} else {
+	}
+
+	// error occurred in ReadFile or Unmarshal
+	if err != nil {
+
+		// if the error occurred in Unmarshal or is some filesystem
+		// error OTHER than that it does not exist, purge the cache file
+		if !errors.Is(err, os.ErrNotExist) {
+			w.Debugf("GetCategory(%s): purging bad cache file: %v", name, err)
+			os.Remove(path)
+		}
+
+		// with any error, we need to create the category new
 		now := time.Now()
 		cat.Created = &now
 		cat.Modified = &now
 		cat.CreatedHTTP = httpdate.Time2Str(now)
 		cat.ModifiedHTTP = cat.CreatedHTTP
-		err = nil
-	}
-
-	// if an error occurred in parsing, ditch the file
-	// note it may or may not exist anyway
-	if err != nil {
-		w.Debugf("GetCategory(%s): %v", name, err)
-		os.Remove(path)
 	}
 
 	// update these
