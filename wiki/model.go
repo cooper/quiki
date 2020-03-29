@@ -3,24 +3,14 @@ package wiki
 import (
 	"os"
 	"sort"
-	"time"
 
 	"github.com/cooper/quiki/wikifier"
 )
 
-// ModelInfo represents metadata associated with a model.
-type ModelInfo struct {
-	Title    string     `json:"title"` // @model.title
-	File     string     `json:"file"`  // filename
-	Path     string     `json:"path"`
-	Created  *time.Time `json:"created,omitempty"`  // creation time
-	Modified *time.Time `json:"modified,omitempty"` // modify time
-}
-
 // Models returns info about all the models in the wiki.
-func (w *Wiki) Models() []ModelInfo {
+func (w *Wiki) Models() []wikifier.ModelInfo {
 	modelNames := w.allModelFiles()
-	models := make([]ModelInfo, len(modelNames))
+	models := make([]wikifier.ModelInfo, len(modelNames))
 
 	// models individually
 	i := 0
@@ -32,7 +22,7 @@ func (w *Wiki) Models() []ModelInfo {
 	return models
 }
 
-type sortableModelInfo ModelInfo
+type sortableModelInfo wikifier.ModelInfo
 
 func (mi sortableModelInfo) SortInfo() SortInfo {
 	return SortInfo{
@@ -45,7 +35,7 @@ func (mi sortableModelInfo) SortInfo() SortInfo {
 
 // ModelsSorted returns info about all the models in the wiki, sorted as specified.
 // Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
-func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []ModelInfo {
+func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []wikifier.ModelInfo {
 
 	// convert to []Sortable
 	models := w.Models()
@@ -61,18 +51,18 @@ func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []ModelInfo {
 	}
 	sort.Sort(sorter)
 
-	// convert back to []ModelInfo
+	// convert back to []wikifier.ModelInfo
 	for i, si := range sorted {
-		models[i] = ModelInfo(si.(sortableModelInfo))
+		models[i] = wikifier.ModelInfo(si.(sortableModelInfo))
 	}
 
 	return models
 }
 
-// ModelMap returns a map of model name to ModelInfo for all models in the wiki.
-func (w *Wiki) ModelMap() map[string]ModelInfo {
+// ModelMap returns a map of model name to wikifier.ModelInfo for all models in the wiki.
+func (w *Wiki) ModelMap() map[string]wikifier.ModelInfo {
 	modelNames := w.allModelFiles()
-	models := make(map[string]ModelInfo, len(modelNames))
+	models := make(map[string]wikifier.ModelInfo, len(modelNames))
 
 	// models individually
 	for _, name := range modelNames {
@@ -84,7 +74,7 @@ func (w *Wiki) ModelMap() map[string]ModelInfo {
 
 // ModelInfo is an inexpensive request for info on a model. It uses cached
 // metadata rather than generating the model and extracting variables.
-func (w *Wiki) ModelInfo(name string) (info ModelInfo) {
+func (w *Wiki) ModelInfo(name string) (info wikifier.ModelInfo) {
 
 	// the model does not exist
 	path := w.pathForModel(name)
@@ -97,9 +87,8 @@ func (w *Wiki) ModelInfo(name string) (info ModelInfo) {
 	modelCat := w.GetSpecialCategory(name, CategoryTypeModel)
 
 	// if model category exists use that info
-	if modelCat.Exists() {
-		info.Title = modelCat.PageInfo.Title
-		info.Created = modelCat.PageInfo.Created
+	if modelCat.Exists() && modelCat.ModelInfo != nil {
+		info = *modelCat.ModelInfo
 	}
 
 	// this stuff is available to all

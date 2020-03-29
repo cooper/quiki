@@ -26,11 +26,11 @@ type Page struct {
 	VarsOnly   bool     // True if Parse() should only extract variables
 	Opt        *PageOpt // page options
 	styles     []styleEntry
-	parser     *parser             // wikifier parser instance
-	main       block               // main block
-	Images     map[string][][]int  // references to images
-	Models     map[string]PageInfo // references to models
-	PageLinks  map[string][]int    // references to other pages
+	parser     *parser              // wikifier parser instance
+	main       block                // main block
+	Images     map[string][][]int   // references to images
+	Models     map[string]ModelInfo // references to models
+	PageLinks  map[string][]int     // references to other pages
 	sectionN   int
 	name       string
 	headingIDs map[string]int
@@ -60,6 +60,18 @@ type PageInfo struct {
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 }
 
+// ModelInfo represents metadata associated with a model.
+type ModelInfo struct {
+	Title       string     `json:"title"`            // @model.title
+	Author      string     `json:"author,omitempty"` // @model.author
+	Description string     `json:"desc,omitempty"`   // @model.desc
+	File        string     `json:"file"`             // filename
+	FileNE      string     `json:"file_ne"`          // filename with no extension
+	Path        string     `json:"path"`
+	Created     *time.Time `json:"created,omitempty"`  // creation time
+	Modified    *time.Time `json:"modified,omitempty"` // modify time
+}
+
 // Warning represents a warning on a page.
 type Warning struct {
 	Message  string   `json:"message"`
@@ -74,7 +86,7 @@ func NewPage(filePath string) *Page {
 		Opt:           &myOpt,
 		variableScope: newVariableScope(),
 		Images:        make(map[string][][]int),
-		Models:        make(map[string]PageInfo),
+		Models:        make(map[string]ModelInfo),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
 		markdown:      strings.HasSuffix(filePath, ".md"),
@@ -510,6 +522,27 @@ func (p *Page) Info() PageInfo {
 		Author:      p.Author(),
 		Description: p.Description(),
 		Keywords:    p.Keywords(),
+	}
+	mod, create := p.Modified(), p.Created()
+	if !mod.IsZero() {
+		info.Modified = &mod
+		info.Created = &mod // fallback
+	}
+	if !create.IsZero() {
+		info.Created = &create
+	}
+	return info
+}
+
+// modelInfo is like (wikifier.Page).Info() but used internally
+// to instead return a ModelInfo
+func (p *Page) modelInfo() ModelInfo {
+	info := ModelInfo{
+		File:        p.Name(),
+		FileNE:      p.NameNE(),
+		Title:       p.Title(),
+		Author:      p.Author(),
+		Description: p.Description(),
 	}
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {

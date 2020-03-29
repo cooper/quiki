@@ -52,7 +52,7 @@ func (mb *modelBlock) parse(page *Page) {
 	mb.model = model
 
 	// remember the page uses this
-	page.Models[file] = model.Info()
+	page.Models[file] = model.modelInfo()
 }
 
 func (mb *modelBlock) html(page *Page, mbEl element) {

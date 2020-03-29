@@ -359,7 +359,7 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 	pageCat := w.GetSpecialCategory(nameNE, CategoryTypePage)
 
 	// if page category exists use that info
-	if pageCat.Exists() {
+	if pageCat.Exists() && pageCat.PageInfo != nil {
 		info = *pageCat.PageInfo
 	}
 

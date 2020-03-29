@@ -70,6 +70,9 @@ type Category struct {
 	// for CategoryTypePage, this is the info for the tracked page
 	PageInfo *wikifier.PageInfo `json:"page_info,omitempty"`
 
+	// for CategoryTypeModel, this is the info for the tracked model
+	ModelInfo *wikifier.ModelInfo `json:"model_info,omitempty"`
+
 	// for CategoryTypeImage, this is the info for the tracked image
 	ImageInfo *struct {
 		Width  int `json:"width,omitempty"`
@@ -427,7 +430,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	for modelName, modelInfo := range page.Models {
 		modelCat := w.GetSpecialCategory(modelName, CategoryTypeModel)
 		modelCat.Preserve = true // keep until there are no more references
-		modelCat.PageInfo = &modelInfo
+		modelCat.ModelInfo = &modelInfo
 		modelCat.AddPage(w, page)
 	}
 }
