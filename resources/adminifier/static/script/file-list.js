@@ -344,7 +344,9 @@ function quickSearch (entry) {
 exports.dateToPreciseHR = dateToPreciseHR;
 function dateToPreciseHR (d) {
     if (typeof d == 'string')
-        d = Date.parse(d);//new Date(parseInt(d) * 1000);
+        d = Date.parse(d);
+    else if (typeof d == 'number')
+        d = new Date(parseInt(d));
     if (!d)
         d = new Date(); 
     return d.toString();
