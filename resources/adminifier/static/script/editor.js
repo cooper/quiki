@@ -214,6 +214,7 @@ ae.getPageTitle = function (range) {
 // update the page title to whatever @page.title says
 // range is optional
 ae.updatePageTitle = function (range) {
+    return; // FIXME: this is disabled for now
     var title = ae.getPageTitle(range);
     a.updatePageTitle(typeOf(title) == 'string' && title.length ? title : ae.getFilenameNE());
 };

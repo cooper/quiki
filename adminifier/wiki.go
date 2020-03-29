@@ -12,7 +12,6 @@ import (
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
-	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
 
@@ -61,8 +60,9 @@ type wikiRequest struct {
 }
 
 type editorOpts struct {
-	model, config bool
-	info          wikifier.PageInfo
+	model  bool        // true if editing a model
+	config bool        // true if editing the config
+	info   interface{} // PageInfo or ModelInfo
 }
 
 // TODO: verify session on ALL wiki handlers
@@ -350,7 +350,8 @@ func handleEditModelFrame(wr *wikiRequest) {
 	}
 
 	// serve editor
-	handleEditor(wr, info.Path, info.File, info.File, editorOpts{model: true})
+	handleEditor(wr, info.Path, info.File, info.Title, editorOpts{model: true, info: info})
+
 }
 
 func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
@@ -371,9 +372,9 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 
 	// json stuff
 	jsonData, err := json.Marshal(struct {
-		Model  bool              `json:"model"`
-		Config bool              `json:"config"`
-		Info   wikifier.PageInfo `json:"info,omitempty"`
+		Model  bool        `json:"model"`
+		Config bool        `json:"config"`
+		Info   interface{} `json:"info,omitempty"` // PageInfo or ModelInfo
 		wiki.DisplayFile
 	}{
 		Model:       o.model,
