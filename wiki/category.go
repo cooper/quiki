@@ -48,6 +48,10 @@ type Category struct {
 	// human-readable category title
 	Title string `json:"title,omitempty"`
 
+	// number of posts per page when displaying as posts
+	// (@category.per_page)
+	PerPage int `json:"per_page,omitempty"`
+
 	// time when the category was created
 	Created     *time.Time `json:"created,omitempty"`
 	CreatedHTTP string     `json:"created_http,omitempty"` // HTTP formatted
@@ -204,8 +208,10 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 	}
 
 	// extract string options
+	var perPage string
 	optString := map[string]*string{
-		"title": &cat.Title,
+		"title":    &cat.Title,
+		"per_page": &perPage,
 		// TODO: "main_page":
 		// TODO: "display_as":
 		// TODO: "sort": (e.g. date descending)
@@ -215,7 +221,7 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 		if err != nil {
 			err = errors.Wrap(err, name)
 			// TODO: do something with this error
-			w.Logf("readCategoryMeta(%s): vars error: %v", name, err)
+			w.Logf("readCategoryMeta(%s): vars error: %v", cat.Name, err)
 		}
 		if str != "" {
 			*ptr = str
@@ -231,10 +237,20 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 		val, err := p.Get("category." + name)
 		if err != nil {
 			// TODO: do something with this error
-			w.Logf("readCategoryMeta(%s): vars error: %v", name, err)
+			w.Logf("readCategoryMeta(%s): vars error: %v", cat.Name, err)
 		}
 		if enable, ok := val.(bool); ok {
 			*ptr = enable
+		}
+	}
+
+	// special case- per_page to int
+	if perPage != "" {
+		var err error
+		cat.PerPage, err = strconv.Atoi(perPage)
+		if err != nil {
+			// TODO: do something with this error
+			w.Logf("readCategoryMeta(%s): vars error: per_page: %v", cat.Name, err)
 		}
 	}
 
@@ -567,8 +583,13 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
 	// order with newest first
 	sort.Sort(pages)
 
+	// decide on the limit of cats per page
+	limit := cat.PerPage // try local option
+	if limit == 0 {
+		limit = w.Opt.Category.PerPage // fall back to wiki option
+	}
+
 	// determine how many pages of pages we're gonna need
-	limit := w.Opt.Category.PerPage
 	numPages := 0
 	if limit > 0 {
 		numPages = int(math.Ceil(float64(len(pages)) / float64(limit)))
