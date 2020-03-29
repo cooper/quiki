@@ -357,7 +357,7 @@ func (p *Page) Redirect() string {
 	// @page.redirect
 	if link, err := p.getPageStr("redirect"); err != nil {
 		// FIXME: is there anyway to produce a warning for wrong variable type?
-	} else if ok, target, _, _, _ := p.parseLink(link); ok {
+	} else if ok, target, _, _, _ := p.parseLink(link, &fmtOpt{}); ok {
 		return target
 	}
 
@@ -561,6 +561,12 @@ func (p *Page) modelInfo() ModelInfo {
 		info.Created = &create
 	}
 	return info
+}
+
+// create a page warning
+func (p *Page) warn(pos Position, warning string) {
+	w := Warning{warning, pos}
+	p.Warnings = append(p.Warnings, w)
 }
 
 func (p *Page) mainBlock() block {

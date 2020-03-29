@@ -117,18 +117,18 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	return page.Opt.Root.Image + "/" + si.TrueName()
 }
 
-func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
+func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	w, good := page.Wiki.(*Wiki)
 	if !good {
 		return
 	}
-	targetNameNE := strings.TrimPrefix(*target, page.Opt.Root.Page+"/") // I don't like this
+	targetNameNE := strings.TrimPrefix(*o.Target, page.Opt.Root.Page+"/") // I don't like this
 	if hashIdx := strings.IndexByte(targetNameNE, '#'); hashIdx != -1 {
 		// remove section when checking if page exists
 		// note: whitespace like My Page # Section has been trimmed already
 		targetNameNE = targetNameNE[:hashIdx]
 		if targetNameNE == "" {
-			*ok = true
+			*o.Ok = true
 			return
 		}
 	}
@@ -138,21 +138,21 @@ func linkPageExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefau
 	targetPage := w.FindPage(targetNameNE)
 	if targetPage.Exists() {
 		targetNameNE = targetPage.NameNE()
-		*ok = true
+		*o.Ok = true
 	} else {
 		// default behavior is lowercase, normalize
 		targetNameNE = wikifier.PageNameLink(targetNameNE)
 	}
 
-	*target = page.Opt.Root.Page + "/" + targetNameNE
+	*o.Target = page.Opt.Root.Page + "/" + targetNameNE
 	page.PageLinks[targetNameNE] = append(page.PageLinks[targetNameNE], 1) // FIXME: line number
 }
 
-func linkCategoryExists(page *wikifier.Page, ok *bool, target, tooltip, displayDefault *string) {
+func linkCategoryExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	w, good := page.Wiki.(*Wiki)
 	if !good {
 		return
 	}
-	catName := wikifier.CategoryName(*displayDefault)
-	*ok = w.GetCategory(catName).Exists()
+	catName := wikifier.CategoryName(*o.DisplayDefault)
+	*o.Ok = w.GetCategory(catName).Exists()
 }

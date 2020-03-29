@@ -492,7 +492,7 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 	// safe point - we will resize the image
 
-	w.Debug("generate image: ", img.TrueName())
+	w.Debug("generate image:", img.TrueName())
 
 	// create resized image
 	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)

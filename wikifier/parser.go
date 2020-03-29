@@ -584,7 +584,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// fetch content and clear catch
-			value := fixValuesForStorage(p.catch.content(), page, true)
+			value := fixValuesForStorage(p.catch.content(), page, p.pos, true)
 			p.catch = p.catch.parentCatch()
 
 			switch val := value.(type) {
@@ -598,7 +598,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 				// format it unless told not to
 				if !p.varNotInterpolated {
-					value = page.formatText(val)
+					value = page.formatText(val, p.pos)
 				}
 
 			case HTML:

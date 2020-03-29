@@ -205,22 +205,22 @@ var staticFormats = map[string]string{
 }
 
 type fmtOpt struct {
+	pos         Position // (required) position used for warnings
 	noEntities  bool     // disables html entity conversion
 	noVariables bool     // used internally to prevent recursive interpolation
 	noWarnings  bool     // silence warnings for undefined variables
-	pos         Position // position used for warnings
 	startPos    Position // set internally to position of '['
 }
 
-func (page *Page) formatText(text string) HTML {
-	return page._formatTextOpts(text, &fmtOpt{})
+func (page *Page) formatText(text string, pos Position) HTML {
+	return page._formatTextOpts(text, &fmtOpt{pos: pos})
 }
 
-func (page *Page) formatTextOpts(text string, opts fmtOpt) HTML {
-	return page._formatTextOpts(text, &opts)
+func (page *Page) formatTextOpts(text string, o fmtOpt) HTML {
+	return page._formatTextOpts(text, &o)
 }
 
-func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
+func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -228,8 +228,8 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 	}
 
 	// find and copy the position
-	if opts.pos.none() {
-		// TODO: use the current page position
+	if o.pos.none() && page.parser != nil {
+		o.pos = page.parser.pos
 	}
 
 	// my @items;
@@ -243,22 +243,22 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 
 		// update position
 		if char == '\n' {
-			opts.pos.Line++
-			opts.pos.Column = 0
+			o.pos.Line++
+			o.pos.Column = 0
 		} else {
-			opts.pos.Column++
+			o.pos.Column++
 		}
 
 		if char == '[' && !escaped {
 			// marks the beginning of a formatting element
 			formatDepth++
 			if formatDepth == 1 {
-				opts.startPos = opts.pos
+				o.startPos = o.pos
 				formatType = ""
 
 				// store the string we have so far
 				if str != "" {
-					if opts.noEntities {
+					if o.noEntities {
 						items = append(items, HTML(str))
 					} else {
 						items = append(items, str)
@@ -272,8 +272,8 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 			// marks the end of a formatting element
 			formatDepth--
 			if formatDepth == 0 {
-				items = append(items, page.parseFormatType(formatType, opts))
-				opts.startPos = Position{}
+				items = append(items, page.parseFormatType(formatType, o))
+				o.startPos = Position{}
 				continue
 			}
 		}
@@ -295,7 +295,7 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 
 	// add the final string
 	if str != "" {
-		if opts.noEntities {
+		if o.noEntities {
 			items = append(items, HTML(str))
 		} else {
 			items = append(items, str)
@@ -320,7 +320,7 @@ func (page *Page) _formatTextOpts(text string, opts *fmtOpt) HTML {
 	return HTML(final)
 }
 
-func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
+func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 
 	// static format
 	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
@@ -328,18 +328,21 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 	}
 
 	// variable
-	if !opts.noVariables {
+	if !o.noVariables {
 		if variableRegex.MatchString(formatType) {
 
 			// fetch the value
 			val, err := page.Get(formatType[1:])
 			if err != nil {
-				// TODO: Produce warning wrapping error unless noWarnings
-				log.Printf("parseFormatType(%s): %v", formatType, err)
+				if !o.noWarnings {
+					page.warn(o.pos, err.Error())
+				}
 				return HTML("(error: " + formatType + ": " + html.EscapeString(err.Error()) + ")")
 			}
 			if val == nil {
-				// TODO: Produce warning that var is undefined unless noWarnings
+				if !o.noWarnings {
+					page.warn(o.pos, "Variable "+formatType+" is undefined")
+				}
 				return HTML("(null)")
 			}
 
@@ -420,7 +423,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
-		ok, target, linkType, tooltip, display := page.parseLink(formatType[1 : len(formatType)-1])
+		ok, target, linkType, tooltip, display := page.parseLink(formatType[1:len(formatType)-1], o)
 		invalid := ""
 		if !ok {
 			invalid = " invalid"
@@ -468,7 +471,7 @@ func (page *Page) parseFormatType(formatType string, opts *fmtOpt) HTML {
 	return HTML("")
 }
 
-func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip string, display HTML) {
+func (page *Page) parseLink(link string, o *fmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
 
 	// nothing in, nothing out
@@ -480,7 +483,7 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	split := strings.SplitN(link, "|", 2)
 	displayDefault := ""
 	if len(split) == 2 {
-		display = page.formatText(strings.TrimSpace(split[0]))
+		display = page.formatText(strings.TrimSpace(split[0]), o.pos)
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
@@ -580,7 +583,13 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 
 	// call link handler
 	if handler != nil {
-		handler(page, &ok, &target, &tooltip, &displayDefault)
+		handler(page, &PageOptLinkOpts{
+			Ok:             &ok,
+			Target:         &target,
+			Tooltip:        &tooltip,
+			DisplayDefault: &displayDefault,
+			fmtOpt:         o,
+		})
 	}
 
 	// pipe was not present
@@ -595,27 +604,27 @@ func (page *Page) parseLink(link string) (ok bool, target, linkType, tooltip str
 	return
 }
 
-func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *string) {
+func defaultExternalLink(page *Page, o *PageOptLinkOpts) {
 	// note: the wiki shortcode is in tooltip for now
 	// the target is in displayDefault
-	ext, exists := page.Opt.External[*tooltip]
+	ext, exists := page.Opt.External[*o.Tooltip]
 	if !exists {
-		// TODO: proper warning
-		log.Println(page.Name() + ": external wiki '" + *tooltip + "' does not exist")
-		*ok = false
+
+		page.warn(o.pos, "External wiki '"+*o.Tooltip+"' does not exist")
+		*o.Ok = false
 		return
 	}
 
 	// default tooltip for no section
-	*tooltip = ext.Name + ": " + *target // e.g. Wikipedia: Some Page
+	*o.Tooltip = ext.Name + ": " + *o.Target // e.g. Wikipedia: Some Page
 
 	// split by # to get section
 	section := ""
-	split := strings.SplitN(*target, "#", 2)
+	split := strings.SplitN(*o.Target, "#", 2)
 	if len(split) == 2 {
-		*target = strings.TrimSpace(split[0])
+		*o.Target = strings.TrimSpace(split[0])
 		section = strings.TrimSpace(split[1])
-		*tooltip = *target + " # " + section
+		*o.Tooltip = *o.Target + " # " + section
 	}
 
 	// normalize based on type
@@ -623,25 +632,25 @@ func defaultExternalLink(page *Page, ok *bool, target, tooltip, displayDefault *
 
 	// convert all non-alphanumerics to underscore
 	case PageOptExternalTypeQuiki:
-		*target = PageNameLink(*target)
+		*o.Target = PageNameLink(*o.Target)
 		section = PageNameLink(section)
 
 	// convert space to underscore, URI escape the rest
 	case PageOptExternalTypeMediaWiki:
-		*target = html.EscapeString(strings.Replace(*target, " ", "_", -1))
+		*o.Target = html.EscapeString(strings.Replace(*o.Target, " ", "_", -1))
 		section = html.EscapeString(strings.Replace(section, " ", "_", -1))
 
 	// no special normalization, just URI escapes
 	default: // (PageOptExternalTypeNone)
-		*target = html.EscapeString(*target)
-		section = html.EscapeString(*target)
+		*o.Target = html.EscapeString(*o.Target)
+		section = html.EscapeString(*o.Target)
 	}
 
 	// add the wiki page root
-	*target = ext.Root + "/" + *target
+	*o.Target = ext.Root + "/" + *o.Target
 
 	// add the section back
 	if section != "" {
-		*target += "#" + section
+		*o.Target += "#" + section
 	}
 }

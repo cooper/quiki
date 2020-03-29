@@ -126,8 +126,7 @@ func (b *parserBlock) shouldSkipByte(byte) bool {
 }
 
 func (b *parserBlock) warn(pos Position, warning string) {
-	w := Warning{warning, pos}
-	b._page.Warnings = append(b._page.Warnings, w)
+	b._page.warn(pos, warning)
 }
 
 func (b *parserBlock) blockContent() []block {

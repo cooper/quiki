@@ -86,7 +86,16 @@ type PageOptSearch struct {
 }
 
 // A PageOptLinkFunction sanitizes a link target.
-type PageOptLinkFunction func(page *Page, ok *bool, target, tooltip, displayDefault *string)
+type PageOptLinkFunction func(page *Page, opts *PageOptLinkOpts)
+
+// PageOptLinkOpts contains options passed to a PageOptLinkFunction.
+type PageOptLinkOpts struct {
+	Ok             *bool   // func sets to true if the link is valid
+	Target         *string // func sets to overwrite the link target
+	Tooltip        *string // func sets tooltip to display
+	DisplayDefault *string // func sets default text to display (if no pipe)
+	*fmtOpt                // formatter options available to func
+}
 
 // PageOptLink describes functions to assist with link targets.
 type PageOptLink struct {

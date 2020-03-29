@@ -35,7 +35,7 @@ func (toc *tocBlock) tocAdd(sec *secBlock, addTo element, page *Page) {
 		li := addTo.createChild("li", "")
 		a := li.createChild("a", "link-internal")
 		a.setAttr("href", "#"+sec.headingID)
-		a.addHTML(page.formatTextOpts(sec.title, fmtOpt{pos: sec.openPos}))
+		a.addHTML(page.formatText(sec.title, sec.openPos))
 		addTo = li
 	} else {
 		subList = addTo

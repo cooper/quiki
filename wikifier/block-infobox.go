@@ -28,7 +28,7 @@ func (ib *infobox) html(page *Page, el element) {
 	if ib.name != "" {
 		th := el.createChild("tr", "infobox-title").createChild("th", "")
 		th.setAttr("colspan", "2")
-		th.addHTML(page.formatTextOpts(ib.name, fmtOpt{pos: ib.openPos}))
+		th.addHTML(page.formatText(ib.name, ib.openPos))
 	}
 
 	// add the rows
@@ -75,7 +75,7 @@ func (is *infosec) html(page *Page, els element) {
 		is.mapList = append([]*mapListEntry{&mapListEntry{
 			key:   "_infosec_title_",
 			metas: map[string]bool{"isTitle": true},
-			value: page.formatTextOpts(is.blockName(), fmtOpt{pos: is.openPosition()}),
+			value: page.formatText(is.blockName(), is.openPosition()),
 		}}, is.mapList...)
 	}
 

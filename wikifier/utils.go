@@ -53,7 +53,7 @@ func getValueType(i interface{}) valueType {
 func prepareForHTML(value interface{}, page *Page, pos Position) interface{} {
 	switch v := value.(type) {
 	case string:
-		value = page.formatTextOpts(v, fmtOpt{pos: pos})
+		value = page.formatText(v, pos)
 	case block:
 		v.html(page, v.el())
 		value = v.el()
@@ -120,7 +120,7 @@ func humanReadableValue(i interface{}) string {
 // fix a value before storing it in a list or map
 // this returns either a string, block, or []interface{} of both
 // strings next to each other are merged; empty strings are removed
-func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) interface{} {
+func fixValuesForStorage(values []interface{}, pageMaybe *Page, pos Position, fmtText bool) interface{} {
 
 	// no items
 	if len(values) == 0 {
@@ -129,7 +129,7 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) in
 
 	// one value in; one value out!
 	if len(values) == 1 {
-		return fixSingleValue(values[0], pageMaybe, fmtText)
+		return fixSingleValue(values[0], pageMaybe, pos, fmtText)
 	}
 
 	// multiple values
@@ -138,7 +138,7 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) in
 	for _, value := range values {
 
 		// fix this value; then skip it if it's nothin
-		value = fixSingleValue(value, pageMaybe, fmtText)
+		value = fixSingleValue(value, pageMaybe, pos, fmtText)
 		if value == nil {
 			continue
 		}
@@ -173,7 +173,7 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, fmtText bool) in
 	return valuesToStore
 }
 
-func fixSingleValue(value interface{}, pageMaybe *Page, fmtText bool) interface{} {
+func fixSingleValue(value interface{}, pageMaybe *Page, pos Position, fmtText bool) interface{} {
 	switch v := value.(type) {
 	case HTML:
 		return v
@@ -183,7 +183,7 @@ func fixSingleValue(value interface{}, pageMaybe *Page, fmtText bool) interface{
 			return nil
 		}
 		if fmtText && pageMaybe != nil {
-			return pageMaybe.formatText(v)
+			return pageMaybe.formatText(v, pos)
 		}
 		return v
 	case block:

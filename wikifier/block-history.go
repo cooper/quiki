@@ -18,10 +18,7 @@ func (b *historyBlock) html(page *Page, el element) {
 		tr := table.createChild("tr", "history-pair")
 
 		// key
-		tr.createChild("td", "history-key").add(page.formatTextOpts(
-			pair.keyTitle, fmtOpt{
-				pos: pair.pos,
-			}))
+		tr.createChild("td", "history-key").add(page.formatText(pair.keyTitle, pair.pos))
 
 		// value
 		tr.createChild("td", "history-value").add(pair.value)

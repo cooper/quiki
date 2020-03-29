@@ -207,7 +207,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		// fix the value
 		// this returns either a string, block, HTML, or []interface{} combination
 		// strings next to each other are merged; empty strings are removed
-		valueToStore := fixValuesForStorage(p.values, page, !m.noFormatValues)
+		valueToStore := fixValuesForStorage(p.values, page, p.pos, !m.noFormatValues)
 
 		// if this key exists, rename it to the next available <key>_key_<n>
 		for exist, err := m.Get(strKey); exist != nil && err != nil; {
