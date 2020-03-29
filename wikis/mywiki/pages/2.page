@@ -4,4 +4,8 @@
 
 Page two. It references a [[ subpage | subpages/my ]].
 
-[@badvar]   
+if [@goodvar] {
+    [@goodvar] - this one shouldn't be an issue
+} else {
+    [@badvar] - this one produces a warning
+}
