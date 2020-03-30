@@ -1,0 +1,21 @@
+@page.title:    Help;
+@page.author:   quiki authors;
+@page.created:  Sun, 29 Mar 2020 22:23:32 GMT;
+
+[Documentation] {
+    list {
+        [[ Language spec | doc/language ]];
+        [[ Configuration spec | doc/configuration ]];
+        [[ Block reference | doc/blocks ]];
+        [[ Models (Templating) | doc/models ]];
+        [[ Styling (CSS) | doc/styling ]];
+    }
+}
+
+[Additional help] {
+    list {
+        [[ quiki website | https://quiki.app ]];
+        [[ Report a bug or issue | https://github.com/cooper/quiki/issues ]];
+        [[ Contact quiki support | https://quiki.app/support ]];
+    }
+}

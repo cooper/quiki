@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -535,7 +534,9 @@ func handleCreateBranch(wr *wikiRequest) {
 
 func handleHelpFrame(wr *wikiRequest) {
 	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
-	log.Println("HELP PAGE:", helpPage)
+	if helpPage == "" {
+		helpPage = "main"
+	}
 
 	var dot struct {
 		Title   string
