@@ -72,7 +72,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	r.Content = string(content)
 
 	// For pages/models only-- check for cached warnings and errors
-	if rel := w._relPath(path, w.Dir("pages")); rel != "" {
+	if rel := makeRelPath(path, w.Dir("pages")); rel != "" && relPathLocal(rel) {
 		res := w.DisplayPageDraft(rel, true)
 		if dispPage, ok := res.(DisplayPage); ok {
 			// extract warnings/error from a DisplayPage
@@ -85,7 +85,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 				Position: dispErr.Position,
 			}
 		}
-	} else if rel := w._relPath(path, w.Dir("models")); rel != "" {
+	} else if rel := makeRelPath(path, w.Dir("models")); rel != "" {
 		// TODO: model errors/ warnings
 	}
 
@@ -107,17 +107,24 @@ func (w *Wiki) checkDirectories() {
 // In any case the path cannot be made relative to the wiki directory,
 // an empty string is returned.
 func (w *Wiki) RelPath(absPath string) string {
-	rel := w._relPath(absPath, w.Dir())
-	if strings.Contains(rel, ".."+string(os.PathSeparator)) {
-		return ""
-	}
-	if strings.Contains(rel, string(os.PathSeparator)+"..") {
+	rel := makeRelPath(absPath, w.Dir())
+	if !relPathLocal(rel) {
 		return ""
 	}
 	return rel
 }
 
-func (w *Wiki) _relPath(absPath, base string) string {
+func relPathLocal(relPath string) bool {
+	if strings.Contains(relPath, ".."+string(os.PathSeparator)) {
+		return false
+	}
+	if strings.Contains(relPath, string(os.PathSeparator)+"..") {
+		return false
+	}
+	return true
+}
+
+func makeRelPath(absPath, base string) string {
 
 	// can't resolve wiki path
 	if base == "" {
