@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 )
 
 var javascriptTemplates string
+var helpWiki *wiki.Wiki
 
 var frameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
@@ -29,6 +31,8 @@ var frameHandlers = map[string]func(*wikiRequest){
 	"edit-category": handleEditCategoryFrame,
 	"edit-model":    handleEditModelFrame,
 	"switch-branch": handleSwitchBranchFrame,
+	"help":          handleHelpFrame,
+	"help/":         handleHelpFrame,
 }
 
 var wikiFuncHandlers = map[string]func(*wikiRequest){
@@ -45,7 +49,8 @@ type wikiTemplate struct {
 	Shortcode         string              // wiki shortcode
 	WikiTitle         string              // wiki title
 	Branch            string              // selected branch
-	Static            string              // static root
+	Static            string              // adminifier static root
+	QStatic           string              // webserver static root
 	AdminRoot         string              // adminifier root
 	Root              string              // wiki root
 }
@@ -528,6 +533,45 @@ func handleCreateBranch(wr *wikiRequest) {
 	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
 }
 
+func handleHelpFrame(wr *wikiRequest) {
+	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
+	log.Println("HELP PAGE:", helpPage)
+
+	var dot struct {
+		Title   string
+		Content template.HTML
+	}
+	wr.dot = &dot
+
+	// create the help wiki if not already loaded
+	if helpWiki == nil {
+		var err error
+		helpWiki, err = wiki.NewWiki(filepath.Join(dirAdminifier, "help"))
+		if err != nil {
+			wr.err = err
+			return
+		}
+	}
+
+	// display the page
+	res := helpWiki.DisplayPage(helpPage)
+	switch res := res.(type) {
+
+	// page content
+	case wiki.DisplayPage:
+		dot.Title = res.Title
+		dot.Content = template.HTML(res.Content)
+
+	// error
+	case wiki.DisplayError:
+		wr.err = errors.New(res.Error)
+
+	// something else
+	default:
+		wr.err = errors.New("unknown response")
+	}
+}
+
 func handleWritePage(wr *wikiRequest) {
 	if !parsePost(wr.w, wr.r, "page", "content") {
 		return
@@ -598,6 +642,7 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		WikiTitle:         wr.wi.Title,
 		AdminRoot:         strings.TrimRight(root, "/"),
 		Static:            root + "static",
+		QStatic:           root + "qstatic",
 		Root:              root + wr.shortcode,
 	}
 }

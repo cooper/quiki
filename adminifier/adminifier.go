@@ -53,9 +53,14 @@ func Configure() {
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
 	sessMgr.Cookie.Path = root
 
-	// setup static files server
-	if err := setupStatic(filepath.Join(dirAdminifier, "static")); err != nil {
+	// setup adminifier static files server
+	if err := setupStatic(filepath.Join(dirAdminifier, "static"), root+"static/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier static"))
+	}
+
+	// setup webserver static files server
+	if err := setupStatic(filepath.Join(dirResource, "webserver", "static"), root+"qstatic/"); err != nil {
+		log.Fatal(errors.Wrap(err, "setup adminifier qstatic"))
 	}
 
 	// create template
@@ -81,8 +86,7 @@ func Configure() {
 	}
 }
 
-func setupStatic(staticPath string) error {
-	staticRoot := root + "static/"
+func setupStatic(staticPath, staticRoot string) error {
 	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")

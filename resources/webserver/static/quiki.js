@@ -7,7 +7,7 @@ document.addEvent('domready', function () {
     hashLoad();
 
     // load image gallery if needed
-    if ($$(".q-gallery")) {
+    if ($$(".q-gallery").length) {
         loadCSS("/static/ext/nanogallery2/css/nanogallery2.min.css");
         loadJS("/static/ext/jquery-3.4.1.min.js", function () {
             loadJS("/static/ext/nanogallery2/jquery.nanogallery2.min.js");
@@ -26,6 +26,8 @@ function hashLoad() {
     var el = $(anchor);
     if (el) {
         pos = el.getPosition();
+        if ($('top-bar'))
+            pos.y -= $('top-bar').offsetHeight;
         scrollTo(pos.x, pos.y);
     }
 }
