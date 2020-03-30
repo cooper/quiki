@@ -560,7 +560,9 @@ func handleHelpFrame(wr *wikiRequest) {
 	// page content
 	case wiki.DisplayPage:
 		dot.Title = res.Title
-		dot.Content = template.HTML(res.Content)
+		content := string(res.Content)
+		content = strings.ReplaceAll(content, `"/pagereplace/`, `"`+wr.wikiRoot+"/help/")
+		dot.Content = template.HTML(content)
 
 	// error
 	case wiki.DisplayError:
