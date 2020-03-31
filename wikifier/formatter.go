@@ -3,7 +3,6 @@ package wikifier
 import (
 	"fmt"
 	"html"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -216,7 +215,8 @@ func (page *Page) formatText(text string, pos Position) HTML {
 	return page._formatTextOpts(text, &fmtOpt{pos: pos})
 }
 
-func (page *Page) formatTextOpts(text string, o fmtOpt) HTML {
+func (page *Page) formatTextOpts(text string, pos Position, o fmtOpt) HTML {
+	o.pos = pos
 	return page._formatTextOpts(text, &o)
 }
 
@@ -357,11 +357,10 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 			}
 			if formatType[0] == '%' {
 				if !ok {
-					// TODO: Produce warning that attempted to interpolate non-string
-					log.Printf("parseFormatType(%s): tried to interpolate non-string: %v", formatType, val)
+					page.warn(o.pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
-				return page.formatTextOpts(strVal, fmtOpt{noVariables: true})
+				return page.formatTextOpts(strVal, o.pos, fmtOpt{noVariables: true})
 			}
 
 			// it was a string but just @var
@@ -403,7 +402,7 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 
 			// external wiki link
 			// technically this used to observe @external.name and @external.root,
-			// but in practice it was also set to wikipedia
+			// but in practice it was always set to wikipedia
 			case '!':
 				formatType = text + "|wp:" + target
 

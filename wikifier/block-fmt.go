@@ -14,10 +14,7 @@ func (b *fmtBlock) html(page *Page, el element) {
 	for _, item := range b.posContent() {
 		// if it's a string, format it
 		if str, ok := item.content.(string); ok {
-			el.add(page.formatTextOpts(str, fmtOpt{
-				noEntities: true,
-				pos:        item.position,
-			}))
+			el.add(page.formatTextOpts(str, item.position, fmtOpt{noEntities: true}))
 			continue
 		}
 		el.add(item.content)

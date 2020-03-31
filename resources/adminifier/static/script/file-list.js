@@ -604,8 +604,6 @@ function displayFilter () {
                 firstDate = orderedDates[0];
             if (orderedDates.getLast())
                 lastDate = orderedDates.getLast();
-
-            console.log('OrderedDates', orderedDates);
             
             // create date picker
             var picker = new Pikaday({
