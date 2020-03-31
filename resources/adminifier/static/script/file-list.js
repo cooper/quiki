@@ -164,7 +164,7 @@ var FileList = exports.FileList = new Class({
         }
 
         // on change, check/uncheck all
-        selectAllInput.addEvent('change', function () {
+        if (self.options.selection) selectAllInput.addEvent('change', function () {
             var checked = selectAllInput.checked;
             tbody.getElements('input[type=checkbox]').each(function (box) {
                 box.checked = checked;
@@ -298,6 +298,11 @@ var FileList = exports.FileList = new Class({
 
     // update "select all" state
     updateSelectAll: function () {
+    
+        // selection is disabled
+        if (!this.options.selection)
+            return;
+
         var tbody = this.table.getElement('tbody'),
             thead = this.table.getElement('thead');
         var selectAllInput = thead.getElement('input[type=checkbox]');
@@ -309,8 +314,6 @@ var FileList = exports.FileList = new Class({
             selectAllInput.checked = true;
             return;
         }
-
-
 
         // otherwise, if any are unchecked, uncheck "select all"
         if (tbody.getElements('input[type=checkbox]').some(function (c) {
