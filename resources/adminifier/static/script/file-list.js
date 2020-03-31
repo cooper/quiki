@@ -131,6 +131,14 @@ var FileList = exports.FileList = new Class({
         checkTh.appendChild(input);
         if (self.options.selection)
             theadTr.appendChild(checkTh);
+
+        // on change, check/uncheck all
+        input.addEvent('change', function () {
+            var checked = input.checked;
+            tbody.getElements('input[type=checkbox]').each(function (box) {
+                box.checked = checked;
+            });
+        });
         
         // other columns
         self.getVisibleColumns().each(function (col) {

@@ -85,7 +85,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 				Position: dispErr.Position,
 			}
 		}
-	} else if rel := makeRelPath(path, w.Dir("models")); rel != "" {
+	} else if rel := makeRelPath(path, w.Dir("models")); rel != "" && relPathLocal(rel) {
 		// TODO: model errors/ warnings
 	}
 
