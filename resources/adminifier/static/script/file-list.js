@@ -40,7 +40,7 @@ var FileList = exports.FileList = new Class({
             // convert date to object
             switch (self.getColumnData(col, 'dataType')) {
                 case 'date':
-                    val = Date.parse(val);//new Date(parseInt(val) * 1000);
+                    val = new Date(val);
                     break;
             }
             
@@ -411,10 +411,8 @@ function quickSearch (entry) {
 
 exports.dateToPreciseHR = dateToPreciseHR;
 function dateToPreciseHR (d) {
-    if (typeof d == 'string')
-        d = Date.parse(d);
-    else if (typeof d == 'number')
-        d = new Date(parseInt(d));
+    if (typeof d == 'string' || typeof d == 'number')
+        d = new Date(d);
     if (!d)
         d = new Date(); 
     return d.toString();
@@ -426,7 +424,7 @@ function dateToHRTimeAgo (time) {
         case 'number':
             break;
         case 'string':
-            time = +Date.parse(time);//+new Date(time);
+            time = +new Date(time);
             break;
         case 'object':
             if (time.constructor === Date)
@@ -597,9 +595,8 @@ function displayFilter () {
             textInput.set('placeholder', 'Pick a date...');
             
             // determine date range
-            var orderedDates = list.getValuesForColumn(col)
-            .sort(function(a, b) {
-                return a > b;
+            var orderedDates = list.getValuesForColumn(col).sort(function(a, b) {
+                return a - b;
             });
             var firstDate = new Date(),
                 lastDate  = new Date();
@@ -607,6 +604,8 @@ function displayFilter () {
                 firstDate = orderedDates[0];
             if (orderedDates.getLast())
                 lastDate = orderedDates.getLast();
+
+            console.log('OrderedDates', orderedDates);
             
             // create date picker
             var picker = new Pikaday({
@@ -705,8 +704,9 @@ function filterFilter (entry) {
                 
                 // date
                 if (typeOf(right) == 'date') {
-                    var left = Date.parse(rule[1]);//new Date(rule[1]);
-                     left.setHours(0, 0, 0, 0);  // lose precision
+                    var left = rule[1];
+                    if (typeOf(left) != 'date') left = new Date(left);
+                    left.setHours(0, 0, 0, 0);  // lose precision
                     right.setHours(0, 0, 0, 0);
                     return left.getTime() == right.getTime();
                 }
@@ -718,14 +718,16 @@ function filterFilter (entry) {
             // date less than
             else if (rule[0] == 'Before' && typeOf(right) == 'date')
             someFuncsMustPass.push(function (entry) {
-                var left = Date.parse(rule[1]); //new Date(rule[1]);
+                var left = rule[1];
+                if (typeOf(left) != 'date') left = new Date(left);
                 return left > right;
             });
         
             // date greater than
             else if (rule[0] == 'After' && typeOf(right) == 'date')
             someFuncsMustPass.push(function (entry) {
-                var left = Date.parse(rule[1]); //new Date(rule[1]);
+                var left = rule[1];
+                if (typeOf(left) != 'date') left = new Date(left);
                 return left < right;
             });
             
