@@ -523,9 +523,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		if potentiallyVar {
 
 			// disable interpolation if it's %var
-			if b == '%' {
-				p.varNotInterpolated = true
-			}
+			p.varNotInterpolated = b == '%'
 
 			// catch the var name
 			catch := newVariableName(string(b), p.pos)
