@@ -68,11 +68,11 @@ func (l *List) parse(page *Page) {
 
 	p := new(listParser)
 	for _, pc := range l.posContent() {
-		p.pos = pc.position
+		p.pos = pc.pos
 
 		// infer start position to this one
 		if p.startPos.none() {
-			p.startPos = pc.position
+			p.startPos = pc.pos
 		}
 
 		switch item := pc.content.(type) {

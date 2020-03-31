@@ -38,8 +38,8 @@ type genericCatch struct {
 }
 
 type posContent struct {
-	content  interface{}
-	position Position
+	content interface{}
+	pos     Position
 }
 
 func (c *genericCatch) setLastContent(content interface{}) {
@@ -76,7 +76,7 @@ func (c *genericCatch) appendContent(content interface{}, pos Position) {
 			c.appendContent(item, pos)
 		}
 	case posContent:
-		c.appendContent(v.content, v.position)
+		c.appendContent(v.content, v.pos)
 	default:
 		c.pushContent(v, pos)
 	}

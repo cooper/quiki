@@ -83,11 +83,11 @@ func (m *Map) parse(page *Page) {
 
 	p := new(mapParser)
 	for i, pc := range m.posContent() {
-		p.pos = pc.position
+		p.pos = pc.pos
 
 		// infer start position to this one
 		if p.startPos.none() {
-			p.startPos = pc.position
+			p.startPos = pc.pos
 		}
 
 		switch item := pc.content.(type) {

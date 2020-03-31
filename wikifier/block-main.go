@@ -33,14 +33,14 @@ func (mb *mainBlock) parse(page *Page) {
 
 			// now parse and add this block also
 			item.parse(page)
-			newContent = append(newContent, posContent{item, pc.position})
+			newContent = append(newContent, posContent{item, pc.pos})
 
 		case string:
 			if strings.TrimSpace(item) == "" && len(contentToAdd) == 0 {
 				continue
 			}
 			if contentToAdd == nil {
-				textStartPos = pc.position
+				textStartPos = pc.pos
 			}
 			contentToAdd = append(contentToAdd, pc)
 
@@ -80,8 +80,8 @@ func (mb *mainBlock) createSection(page *Page, pcs []posContent) block {
 	}
 
 	// create a section at first text node position
-	sec := newBlock("sec", "", "", nil, mb, mb, pcs[0].position, page)
-	sec.appendContent(pcs, pcs[0].position)
+	sec := newBlock("sec", "", "", nil, mb, mb, pcs[0].pos, page)
+	sec.appendContent(pcs, pcs[0].pos)
 
 	// parse
 	sec.parse(page)
