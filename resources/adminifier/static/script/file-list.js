@@ -119,8 +119,10 @@ var FileList = exports.FileList = new Class({
 
         // may be cached
         var thead = self.thead;
+        var selectAllInput;
         if (thead) {
             table.appendChild(thead);
+            selectAllInput = thead.getElement('input[type=checkbox]');
         }
 
         // create heading
@@ -133,18 +135,10 @@ var FileList = exports.FileList = new Class({
             
             // checkbox column for table head
             var checkTh = new Element('th', { 'class': 'checkbox' });
-            var input = new Element('input', { type: 'checkbox' });
-            checkTh.appendChild(input);
+            selectAllInput = new Element('input', { type: 'checkbox' });
+            checkTh.appendChild(selectAllInput);
             if (self.options.selection)
                 theadTr.appendChild(checkTh);
-
-            // on change, check/uncheck all
-            input.addEvent('change', function () {
-                var checked = input.checked;
-                tbody.getElements('input[type=checkbox]').each(function (box) {
-                    box.checked = checked;
-                });
-            });
             
             // other columns
             self.getVisibleColumns().each(function (col) {
@@ -168,6 +162,14 @@ var FileList = exports.FileList = new Class({
                 }
             });
         }
+
+        // on change, check/uncheck all
+        selectAllInput.addEvent('change', function () {
+            var checked = selectAllInput.checked;
+            tbody.getElements('input[type=checkbox]').each(function (box) {
+                box.checked = checked;
+            });
+        });
 
         // TABLE BODY
 
@@ -244,7 +246,30 @@ var FileList = exports.FileList = new Class({
             tbody.appendChild(tr);
         });
 
+        // handle checkbox click for each row
+        tbody.getElements('input[type=checkbox]').each(function (cb) {
+            cb.addEvent('change', function () {
+
+                // if all are checked, check the "select all" box
+                if (cb.checked && tbody.getElements('input[type=checkbox]').every(function (c) {
+                    return c.checked;
+                })) {
+                    selectAllInput.checked = true;
+                }
+
+                // if unchecking, uncheck the "select all" box
+                if (!cb.checked)
+                    selectAllInput.checked = false;
+
+            });
+        });
+
+        // update sort
         self.updateSortMethod(a.currentData['data-sort']);
+
+        // update "select all" state
+        self.updateSelectAll();
+
         container.appendChild(table);
     },
 
@@ -269,6 +294,28 @@ var FileList = exports.FileList = new Class({
         if (th) th.innerHTML +=
             ' <i class="sort-icon fa fa-' + char +
             '" style="padding-left: 3px; width: 1em;"></i>';
+    },
+
+    // update "select all" state
+    updateSelectAll: function () {
+        var tbody = this.table.getElement('tbody'),
+            thead = this.table.getElement('thead');
+        var selectAllInput = thead.getElement('input[type=checkbox]');
+
+        // if all are checked, check the "select all" box
+        if (tbody.getElements('input[type=checkbox]').every(function (c) {
+            return c.checked;
+        })) {
+            selectAllInput.checked = true;
+            return;
+        }
+
+
+
+        // otherwise, if any are unchecked, uncheck "select all"
+        if (tbody.getElements('input[type=checkbox]').some(function (c) {
+            return !c.checked;
+        })) selectAllInput.checked = false;
     }
 });
 
