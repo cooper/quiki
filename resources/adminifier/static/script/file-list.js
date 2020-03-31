@@ -116,57 +116,67 @@ var FileList = exports.FileList = new Class({
         table.store('file-list', self);
         
         // TABLE HEADING
-        
-        var thead   = new Element('thead'),
-            theadTr = new Element('tr'),
-            tbody   = new Element('tbody');
-        thead.appendChild(theadTr);
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        
-        // checkbox column for table head
-        //<th class="checkbox"><input type="checkbox" value="0" /></th>
-        var checkTh = new Element('th', { 'class': 'checkbox' });
-        var input = new Element('input', { type: 'checkbox', value: '0' });
-        checkTh.appendChild(input);
-        if (self.options.selection)
-            theadTr.appendChild(checkTh);
 
-        // on change, check/uncheck all
-        input.addEvent('change', function () {
-            var checked = input.checked;
-            tbody.getElements('input[type=checkbox]').each(function (box) {
-                box.checked = checked;
+        // may be cached
+        var thead = self.thead;
+        if (thead) {
+            table.appendChild(thead);
+        }
+
+        // create heading
+        else {
+
+            thead = self.thead = new Element('thead');
+            var theadTr = new Element('tr');
+            thead.appendChild(theadTr);
+            table.appendChild(thead);
+            
+            // checkbox column for table head
+            var checkTh = new Element('th', { 'class': 'checkbox' });
+            var input = new Element('input', { type: 'checkbox' });
+            checkTh.appendChild(input);
+            if (self.options.selection)
+                theadTr.appendChild(checkTh);
+
+            // on change, check/uncheck all
+            input.addEvent('change', function () {
+                var checked = input.checked;
+                tbody.getElements('input[type=checkbox]').each(function (box) {
+                    box.checked = checked;
+                });
             });
-        });
-        
-        // other columns
-        self.getVisibleColumns().each(function (col) {
             
-            // column is title?
-            var className = self.getColumnData(col, 'isTitle') ?
-                'title' : 'info';
-            var th = new Element('th', { 'class': className });
-            var anchor = a.addFrameClickHandler(new Element('a', { text: col, 'class': 'frame-click' }));
-            th.appendChild(anchor);
-            theadTr.appendChild(th);
-            
-            // sort method
-            var sort = self.getColumnData(col, 'sort');
-            if (sort) {
-                th.set('data-sort', sort);
-                var setSort = sort + '-';
-                if (a.currentData['data-sort'] == setSort)
-                    setSort = sort + encodeURIComponent('+');
-                anchor.set('href', updateURLParameter(window.location.href, 'sort', setSort));
-            }
-        });
-        
+            // other columns
+            self.getVisibleColumns().each(function (col) {
+                
+                // column is title?
+                var className = self.getColumnData(col, 'isTitle') ?
+                    'title' : 'info';
+                var th = new Element('th', { 'class': className });
+                var anchor = a.addFrameClickHandler(new Element('a', { text: col, 'class': 'frame-click' }));
+                th.appendChild(anchor);
+                theadTr.appendChild(th);
+                
+                // sort method
+                var sort = self.getColumnData(col, 'sort');
+                if (sort) {
+                    th.set('data-sort', sort);
+                    var setSort = sort + '-';
+                    if (a.currentData['data-sort'] == setSort)
+                        setSort = sort + encodeURIComponent('+');
+                    anchor.set('href', updateURLParameter(window.location.href, 'sort', setSort));
+                }
+            });
+        }
+
         // TABLE BODY
+
+        var tbody = new Element('tbody');
+        table.appendChild(tbody);
         
         // checkbox column for table body
         var checkTd = new Element('td', { 'class': 'checkbox' });
-        checkTd.appendChild(input.clone());
+        checkTd.appendChild(new Element('input', { type: 'checkbox' }));
         
         // add each entry as a table row
         visibleEntries.each(function (entry) {
@@ -419,6 +429,7 @@ function filterResize () {
        $('navigation-sidebar').offsetWidth - 250 + 'px');
 }
 
+// filter button toggle
 exports.displayFilter = displayFilter;
 function displayFilter () {
     var list = getList();
