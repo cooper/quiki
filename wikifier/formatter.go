@@ -205,11 +205,10 @@ var staticFormats = map[string]string{
 
 // FmtOpt describes options for page.FmtOpts.
 type FmtOpt struct {
-	Pos         Position // (required) position used for warnings
+	Pos         Position // position used for warnings (set internally)
 	NoEntities  bool     // disables html entity conversion
-	NoVariables bool     // used internally to prevent recursive interpolation
 	NoWarnings  bool     // silence warnings for undefined variables
-	StartPos    Position // set internally to position of '['
+	noVariables bool     // set internally to prevent recursive interpolation
 }
 
 // Fmt generates HTML from a quiki-encoded formatted string.
@@ -256,7 +255,6 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 			// marks the beginning of a formatting element
 			formatDepth++
 			if formatDepth == 1 {
-				o.StartPos = o.Pos
 				formatType = ""
 
 				// store the string we have so far
@@ -276,7 +274,6 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 			formatDepth--
 			if formatDepth == 0 {
 				items = append(items, p.parseFormatType(formatType, o))
-				o.StartPos = Position{}
 				continue
 			}
 		}
@@ -331,7 +328,7 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 	}
 
 	// variable
-	if !o.NoVariables {
+	if !o.noVariables {
 		if variableRegex.MatchString(formatType) {
 
 			// fetch the value
@@ -363,7 +360,7 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 					p.warn(o.Pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
-				return p.FmtOpts(strVal, o.Pos, FmtOpt{NoVariables: true})
+				return p.FmtOpts(strVal, o.Pos, FmtOpt{noVariables: true})
 			}
 
 			// @var with a string (was set with %var but should not be interpolated)
