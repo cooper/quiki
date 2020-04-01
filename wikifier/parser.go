@@ -582,25 +582,17 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// fetch content and clear catch
-			value := fixValuesForStorage(p.catch.content(), page, p.pos, true)
+			value := fixValuesForStorage(p.catch.content(), page, p.pos, !p.varNotInterpolated)
 			p.catch = p.catch.parentCatch()
 
 			switch val := value.(type) {
 			case []interface{}:
 				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
 
-			case string:
-
-				// replace newlines with spaces
-				val = strings.ReplaceAll(val, "\n", " ")
-
-				// format it unless told not to
-				if !p.varNotInterpolated {
-					value = page.formatText(val, p.pos)
-				}
-
-			case HTML:
-				value = val
+			case string, HTML:
+				// do nothing
+				// (if varNotInterpolated is true, keep string as-is)
+				// (if varNotInterpolated is false, would have returned HTML)
 
 			case block:
 

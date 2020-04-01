@@ -400,14 +400,6 @@ accessing it as `[@my_text]` would display the raw formatting code. Instead,
 we use `[%my_text]` to display it which tells the parser to format the
 contents of the variable as we retrieve its value.
 
-Whether you defined the variable with `@` or `%` sigil does not concern the
-parser. Therefore if you do something like:
-```
-@my_text: This string variable has [b]bold text[/b];
-```
-and then try to display it with `[%my_text]`, the variable is
-double-formatted, resulting in ugly escaped HTML tags visible to clients.
-
 ### Special variables
 
 `@page` contains information about the current page. Its attributes are set

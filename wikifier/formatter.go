@@ -346,30 +346,30 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 				return HTML("(null)")
 			}
 
-			// format text if this is %var
-			strVal, ok := val.(string)
-			if !ok {
-				var htmlVal HTML
-				htmlVal, ok = val.(HTML)
-				if ok {
-					strVal = string(htmlVal)
-				}
-			}
+			strVal, isStr := val.(string)
+			htmlVal, isHTML := val.(HTML)
+
+			// %var is for unformatted strings only
 			if formatType[0] == '%' {
-				if !ok {
+				if isHTML {
+					// warn that HTML is being double-encoded
+					page.warn(o.pos, "Variable "+formatType+" already formatted; use @"+formatType[1:])
+					return htmlVal
+				} else if !isStr {
+					// other non-string value, probably a block
 					page.warn(o.pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
 				return page.formatTextOpts(strVal, o.pos, fmtOpt{noVariables: true})
 			}
 
-			// it was a string but just @var
-			if ok {
+			// @var with a string (was set with %var but should not be interpolated)
+			if isStr {
 				return HTML(html.EscapeString(strVal))
 			}
 
-			// otherwise this is probably HTML
-			if htmlVal, ok := val.(HTML); ok {
+			// @var with HTML (normal set with @ and retrieved with @)
+			if isHTML {
 				return htmlVal
 			}
 
