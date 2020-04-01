@@ -16,7 +16,7 @@
 <pre class="info">
 {{- range .Errors -}}
 <a href="edit-page?page={{.File}}">{{.File}}</a>:
-{{- .Error.Position.Line}}:{{.Error.Position.Column}}: {{.Error.Message}}
+{{- .Error.Pos.Line}}:{{.Error.Pos.Column}}: {{.Error.Message}}
 {{end -}}
 </pre>
 {{end}}
@@ -30,7 +30,7 @@
 {{- $file := .File -}}
 {{- range .Warnings -}}
 <a href="edit-page?page={{$file}}">{{$file}}</a>:
-{{- .Position.Line}}:{{.Position.Column}}: {{.Message}}
+{{- .Pos.Line}}:{{.Pos.Column}}: {{.Message}}
 {{end -}}
 {{end -}}
 </pre>
