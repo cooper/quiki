@@ -64,8 +64,8 @@ type PageInfo struct {
 
 // Warning represents a warning on a page.
 type Warning struct {
-	Message  string   `json:"message"`
-	Position Position `json:"position"`
+	Message string   `json:"message"`
+	Pos     Position `json:"position"`
 }
 
 // NewPage creates a page given its filepath.
@@ -117,13 +117,13 @@ func (p *Page) Parse() error {
 	var perr *ParserError
 	if !errors.As(err, &perr) {
 		// wrap to include current positional info
-		perr = &ParserError{Position: p.parser.pos, Err: err}
+		perr = &ParserError{Pos: p.parser.pos, Err: err}
 	}
 
 	// convert to Warning for p.Error
 	p.Error = &Warning{
-		Message:  perr.Err.Error(),
-		Position: perr.Position,
+		Message: perr.Err.Error(),
+		Pos:     perr.Pos,
 	}
 
 	return perr

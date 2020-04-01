@@ -81,8 +81,8 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 		} else if dispErr, ok := res.(DisplayError); ok {
 			// extract parsing error from a DisplayError
 			r.Error = &wikifier.Warning{
-				Message:  dispErr.Error,
-				Position: dispErr.Position,
+				Message: dispErr.Error,
+				Pos:     dispErr.Pos,
 			}
 		}
 	} else if rel := makeRelPath(path, w.Dir("models")); rel != "" && relPathLocal(rel) {

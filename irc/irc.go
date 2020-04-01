@@ -34,7 +34,7 @@ func main() {
 
 			// warnings
 			for _, warning := range page.Warnings {
-				reply += "\nWarning " + warning.Position.String() + " " + warning.Message
+				reply += "\nWarning " + warning.Pos.String() + " " + warning.Message
 			}
 
 			// css

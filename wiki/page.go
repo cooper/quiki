@@ -223,7 +223,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
 		var pErr *wikifier.ParserError
 		errors.As(err, &pErr)
 
-		return DisplayError{Error: err.Error(), Position: pErr.Position}
+		return DisplayError{Error: err.Error(), Pos: pErr.Pos}
 	}
 
 	// if this is a draft and we're not serving drafts, pretend
@@ -547,8 +547,8 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	// cached error
 	if info.Error != nil {
 		return DisplayError{
-			Error:    info.Error.Message,
-			Position: info.Error.Position,
+			Error: info.Error.Message,
+			Pos:   info.Error.Pos,
 		}
 	}
 
@@ -580,6 +580,6 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 
 // like page.warn
 func pageWarn(p *wikifier.Page, warning string, pos wikifier.Position) {
-	w := wikifier.Warning{Message: warning, Position: pos}
+	w := wikifier.Warning{Message: warning, Pos: pos}
 	p.Warnings = append(p.Warnings, w)
 }

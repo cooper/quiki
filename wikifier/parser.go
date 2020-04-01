@@ -137,12 +137,12 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 
 // ParserError represents an error in parsing with positional info.
 type ParserError struct {
-	Position Position
-	Err      error
+	Pos Position
+	Err error
 }
 
 func (e *ParserError) Error() string {
-	return fmt.Sprintf("{%d %d} %s", e.Position.Line, e.Position.Column, e.Err.Error())
+	return fmt.Sprintf("{%d %d} %s", e.Pos.Line, e.Pos.Column, e.Err.Error())
 }
 
 func (e *ParserError) Unwrap() error {
@@ -151,7 +151,7 @@ func (e *ParserError) Unwrap() error {
 
 // creates a ParserError with position and message
 func parserError(pos Position, msg string) *ParserError {
-	return &ParserError{Position: pos, Err: errors.New(msg)}
+	return &ParserError{Pos: pos, Err: errors.New(msg)}
 }
 
 var variableTokens = map[byte]bool{

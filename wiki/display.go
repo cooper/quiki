@@ -18,7 +18,7 @@ type DisplayError struct {
 
 	// if the error occurred during parsing, this is the position.
 	// for all non-parsing errors, this is 0:0
-	Position wikifier.Position
+	Pos wikifier.Position
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
