@@ -147,6 +147,8 @@ func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	} else {
 		// default behavior is lowercase, normalize
 		targetName = wikifier.PageNameLink(targetName)
+		*o.Ok = false
+		pageWarn(page, "Page target '"+targetName+"' does not exist", o.Pos)
 	}
 
 	*o.Target = page.Opt.Root.Page + "/" + targetName + sec
@@ -160,4 +162,7 @@ func linkCategoryExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	}
 	catName := wikifier.CategoryName(*o.DisplayDefault)
 	*o.Ok = w.GetCategory(catName).Exists()
+	if !*o.Ok {
+		pageWarn(page, "Category target '"+wikifier.CategoryNameNE(catName)+"' does not exist", o.Pos)
+	}
 }

@@ -577,3 +577,9 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 
 	return nil // success
 }
+
+// like page.warn
+func pageWarn(p *wikifier.Page, warning string, pos wikifier.Position) {
+	w := wikifier.Warning{Message: warning, Position: pos}
+	p.Warnings = append(p.Warnings, w)
+}
