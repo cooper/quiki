@@ -569,7 +569,7 @@ func (page *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, 
 		if hashIdx := strings.IndexByte(target, '#'); hashIdx != -1 && len(target) >= hashIdx {
 			sec = PageNameNE(strings.TrimSpace(target[hashIdx+1:]))
 			target = strings.TrimSpace(target[:hashIdx])
-			tooltip = target + " # " + sec
+			tooltip = target + " § " + sec
 			sec = "#" + sec
 		}
 
@@ -628,7 +628,7 @@ func defaultExternalLink(page *Page, o *PageOptLinkOpts) {
 	if len(split) == 2 {
 		*o.Target = strings.TrimSpace(split[0])
 		section = strings.TrimSpace(split[1])
-		*o.Tooltip = *o.Target + " # " + section
+		*o.Tooltip = *o.Target + " § " + section
 	}
 
 	// normalize based on type

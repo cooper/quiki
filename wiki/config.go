@@ -129,7 +129,7 @@ func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 
 	// remove section when checking if page exists
 	if hashIdx := strings.IndexByte(targetName, '#'); hashIdx != -1 && len(targetName) >= hashIdx {
-		// note: whitespace like My Page # Section has been trimmed already
+		// note: page/section has been normalized and trimmed already
 		sec = "#" + targetName[hashIdx+1:]
 		targetName = targetName[:hashIdx]
 		if targetName == "" {
@@ -150,7 +150,7 @@ func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	}
 
 	*o.Target = page.Opt.Root.Page + "/" + targetName + sec
-	page.PageLinks[targetName] = append(page.PageLinks[targetName], 1) // FIXME: line number
+	page.PageLinks[targetName] = append(page.PageLinks[targetName], o.Pos.Line)
 }
 
 func linkCategoryExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
