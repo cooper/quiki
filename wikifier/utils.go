@@ -53,7 +53,7 @@ func getValueType(i interface{}) valueType {
 func prepareForHTML(value interface{}, page *Page, pos Position) interface{} {
 	switch v := value.(type) {
 	case string:
-		value = page.formatText(v, pos)
+		value = page.Fmt(v, pos)
 	case block:
 		v.html(page, v.el())
 		value = v.el()
@@ -183,7 +183,7 @@ func fixSingleValue(value interface{}, pageMaybe *Page, pos Position, fmtText bo
 			return nil
 		}
 		if fmtText && pageMaybe != nil {
-			return pageMaybe.formatText(v, pos)
+			return pageMaybe.Fmt(v, pos)
 		}
 		return v
 	case block:

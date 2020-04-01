@@ -94,7 +94,7 @@ type PageOptLinkOpts struct {
 	Target         *string // func sets to overwrite the link target
 	Tooltip        *string // func sets tooltip to display
 	DisplayDefault *string // func sets default text to display (if no pipe)
-	*fmtOpt                // formatter options available to func
+	*FmtOpt                // formatter options available to func
 }
 
 // PageOptLink describes functions to assist with link targets.

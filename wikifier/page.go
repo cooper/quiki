@@ -345,7 +345,7 @@ func (p *Page) Redirect() string {
 	// @page.redirect
 	if link, err := p.getPageStr("redirect"); err != nil {
 		// FIXME: is there anyway to produce a warning for wrong variable type?
-	} else if ok, target, _, _, _ := p.parseLink(link, &fmtOpt{}); ok {
+	} else if ok, target, _, _, _ := p.parseLink(link, &FmtOpt{}); ok {
 		return target
 	}
 

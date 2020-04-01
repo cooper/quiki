@@ -203,24 +203,27 @@ var staticFormats = map[string]string{
 	"---": `&mdash;`, // em dash
 }
 
-type fmtOpt struct {
-	pos         Position // (required) position used for warnings
-	noEntities  bool     // disables html entity conversion
-	noVariables bool     // used internally to prevent recursive interpolation
-	noWarnings  bool     // silence warnings for undefined variables
-	startPos    Position // set internally to position of '['
+// FmtOpt describes options for Fmt or FmtOpts.
+type FmtOpt struct {
+	Pos         Position // (required) position used for warnings
+	NoEntities  bool     // disables html entity conversion
+	NoVariables bool     // used internally to prevent recursive interpolation
+	NoWarnings  bool     // silence warnings for undefined variables
+	StartPos    Position // set internally to position of '['
 }
 
-func (page *Page) formatText(text string, pos Position) HTML {
-	return page._formatTextOpts(text, &fmtOpt{pos: pos})
+// Fmt generates HTML from a quiki-encoded formatted string.
+func (page *Page) Fmt(text string, pos Position) HTML {
+	return page._parseFormattedText(text, &FmtOpt{Pos: pos})
 }
 
-func (page *Page) formatTextOpts(text string, pos Position, o fmtOpt) HTML {
-	o.pos = pos
-	return page._formatTextOpts(text, &o)
+// FmtOpts is like Fmt except you can specify additional options with the FmtOpt argument.
+func (page *Page) FmtOpts(text string, pos Position, o FmtOpt) HTML {
+	o.Pos = pos
+	return page._parseFormattedText(text, &o)
 }
 
-func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
+func (page *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -228,8 +231,8 @@ func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 	}
 
 	// find and copy the position
-	if o.pos.none() && page.parser != nil {
-		o.pos = page.parser.pos
+	if o.Pos.none() && page.parser != nil {
+		o.Pos = page.parser.pos
 	}
 
 	// my @items;
@@ -243,22 +246,22 @@ func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 
 		// update position
 		if char == '\n' {
-			o.pos.Line++
-			o.pos.Column = 0
+			o.Pos.Line++
+			o.Pos.Column = 0
 		} else {
-			o.pos.Column++
+			o.Pos.Column++
 		}
 
 		if char == '[' && !escaped {
 			// marks the beginning of a formatting element
 			formatDepth++
 			if formatDepth == 1 {
-				o.startPos = o.pos
+				o.StartPos = o.Pos
 				formatType = ""
 
 				// store the string we have so far
 				if str != "" {
-					if o.noEntities {
+					if o.NoEntities {
 						items = append(items, HTML(str))
 					} else {
 						items = append(items, str)
@@ -273,7 +276,7 @@ func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 			formatDepth--
 			if formatDepth == 0 {
 				items = append(items, page.parseFormatType(formatType, o))
-				o.startPos = Position{}
+				o.StartPos = Position{}
 				continue
 			}
 		}
@@ -295,7 +298,7 @@ func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 
 	// add the final string
 	if str != "" {
-		if o.noEntities {
+		if o.NoEntities {
 			items = append(items, HTML(str))
 		} else {
 			items = append(items, str)
@@ -320,7 +323,7 @@ func (page *Page) _formatTextOpts(text string, o *fmtOpt) HTML {
 	return HTML(final)
 }
 
-func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
+func (page *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 
 	// static format
 	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
@@ -328,20 +331,20 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 	}
 
 	// variable
-	if !o.noVariables {
+	if !o.NoVariables {
 		if variableRegex.MatchString(formatType) {
 
 			// fetch the value
 			val, err := page.Get(formatType[1:])
 			if err != nil {
-				if !o.noWarnings {
-					page.warn(o.pos, err.Error())
+				if !o.NoWarnings {
+					page.warn(o.Pos, err.Error())
 				}
 				return HTML("(error: " + formatType + ": " + html.EscapeString(err.Error()) + ")")
 			}
 			if val == nil {
-				if !o.noWarnings {
-					page.warn(o.pos, "Variable "+formatType+" is undefined")
+				if !o.NoWarnings {
+					page.warn(o.Pos, "Variable "+formatType+" is undefined")
 				}
 				return HTML("(null)")
 			}
@@ -353,14 +356,14 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 			if formatType[0] == '%' {
 				if isHTML {
 					// warn that HTML is being double-encoded
-					page.warn(o.pos, "Variable "+formatType+" already formatted; use @"+formatType[1:])
+					page.warn(o.Pos, "Variable "+formatType+" already formatted; use @"+formatType[1:])
 					return htmlVal
 				} else if !isStr {
 					// other non-string value, probably a block
-					page.warn(o.pos, "Can't interpolate non-string variable "+formatType)
+					page.warn(o.Pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
-				return page.formatTextOpts(strVal, o.pos, fmtOpt{noVariables: true})
+				return page.FmtOpts(strVal, o.Pos, FmtOpt{NoVariables: true})
 			}
 
 			// @var with a string (was set with %var but should not be interpolated)
@@ -470,7 +473,7 @@ func (page *Page) parseFormatType(formatType string, o *fmtOpt) HTML {
 	return HTML("")
 }
 
-func (page *Page) parseLink(link string, o *fmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
+func (page *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
 
 	// nothing in, nothing out
@@ -482,7 +485,7 @@ func (page *Page) parseLink(link string, o *fmtOpt) (ok bool, target, linkType, 
 	split := strings.SplitN(link, "|", 2)
 	displayDefault := ""
 	if len(split) == 2 {
-		display = page.formatText(strings.TrimSpace(split[0]), o.pos)
+		display = page.Fmt(strings.TrimSpace(split[0]), o.Pos)
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
@@ -589,7 +592,7 @@ func (page *Page) parseLink(link string, o *fmtOpt) (ok bool, target, linkType, 
 			Target:         &target,
 			Tooltip:        &tooltip,
 			DisplayDefault: &displayDefault,
-			fmtOpt:         o,
+			FmtOpt:         o,
 		})
 	}
 
@@ -611,7 +614,7 @@ func defaultExternalLink(page *Page, o *PageOptLinkOpts) {
 	ext, exists := page.Opt.External[*o.Tooltip]
 	if !exists {
 
-		page.warn(o.pos, "External wiki '"+*o.Tooltip+"' does not exist")
+		page.warn(o.Pos, "External wiki '"+*o.Tooltip+"' does not exist")
 		*o.Ok = false
 		return
 	}
