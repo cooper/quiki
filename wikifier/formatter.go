@@ -564,12 +564,14 @@ func (page *Page) parseLink(link string, o *fmtOpt) (ok bool, target, linkType, 
 		// section
 		sec := ""
 		if hashIdx := strings.IndexByte(target, '#'); hashIdx != -1 && len(target) >= hashIdx {
-			sec = "#" + PageNameNE(strings.TrimSpace(target[hashIdx+1:]))
+			sec = PageNameNE(strings.TrimSpace(target[hashIdx+1:]))
 			target = strings.TrimSpace(target[:hashIdx])
+			tooltip = target + " # " + sec
+			sec = "#" + sec
 		}
 
 		// determine actual target
-		if target == "" && sec != "" && sec[0] == '#' {
+		if target == "" && sec != "" {
 			// section on same page
 			target = sec
 		} else {

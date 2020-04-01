@@ -122,12 +122,17 @@ func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 	if !good {
 		return
 	}
-	targetNameNE := strings.TrimPrefix(*o.Target, page.Opt.Root.Page+"/") // I don't like this
-	if hashIdx := strings.IndexByte(targetNameNE, '#'); hashIdx != -1 {
-		// remove section when checking if page exists
+
+	// I don't like this
+	targetName := strings.TrimPrefix(*o.Target, page.Opt.Root.Page+"/")
+	sec := ""
+
+	// remove section when checking if page exists
+	if hashIdx := strings.IndexByte(targetName, '#'); hashIdx != -1 && len(targetName) >= hashIdx {
 		// note: whitespace like My Page # Section has been trimmed already
-		targetNameNE = targetNameNE[:hashIdx]
-		if targetNameNE == "" {
+		sec = "#" + targetName[hashIdx+1:]
+		targetName = targetName[:hashIdx]
+		if targetName == "" {
 			*o.Ok = true
 			return
 		}
@@ -135,17 +140,17 @@ func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
 
 	// try to find the page regardless of format/case.
 	// if it exists, override name so case is correct
-	targetPage := w.FindPage(targetNameNE)
+	targetPage := w.FindPage(targetName)
 	if targetPage.Exists() {
-		targetNameNE = targetPage.NameNE()
+		targetName = targetPage.NameNE()
 		*o.Ok = true
 	} else {
 		// default behavior is lowercase, normalize
-		targetNameNE = wikifier.PageNameLink(targetNameNE)
+		targetName = wikifier.PageNameLink(targetName)
 	}
 
-	*o.Target = page.Opt.Root.Page + "/" + targetNameNE
-	page.PageLinks[targetNameNE] = append(page.PageLinks[targetNameNE], 1) // FIXME: line number
+	*o.Target = page.Opt.Root.Page + "/" + targetName + sec
+	page.PageLinks[targetName] = append(page.PageLinks[targetName], 1) // FIXME: line number
 }
 
 func linkCategoryExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
