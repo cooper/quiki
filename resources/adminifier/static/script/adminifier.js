@@ -315,67 +315,18 @@ var flagOptions = {
     // top bar buttons
 	buttons: {
 		init: function () {
-			if (!a.currentData || !a.currentData['data-buttons'])
-				return;
-			SSV(a.currentData['data-buttons']).each(function (buttonID) {
-				
-				// find opts
-				var buttonStuff = a.currentData['data-button-' + buttonID];
-				if (!buttonStuff) {
-					console.warn('Button ' + buttonID + ' is not configured');
-					return;
-				}
-				
-				// parse psuedo-JSON
-				buttonStuff = JSON.decode(buttonStuff.replace(/'/g, '"'));
-				if (!buttonStuff) {
-					console.warn('Failed to parse JSON for button ' + buttonID);
-					return;
-                }
-                
-				// create button
-				var but = new Element('span', {
-					id:		'top-button-' + buttonID,
-					class: 	'top-title top-button injected'
-				});
-				
-				// hide if default state is to hide
-				if (buttonStuff.hide)
-					but.setStyle('display', 'none');
-				
-				// title
-				var anchor = new Element('a', {
-					href: buttonStuff.href || '#'
-				});
-				anchor.set('text', buttonStuff.title);
-				but.appendChild(anchor);
-				
-				// icon
-				if (buttonStuff.icon) {
-					anchor.set('text', ' ' + anchor.get('text'));
-					var i = new Element('i', {
-						'class': 'fa fa-' + buttonStuff.icon
-					});
-					i.inject(anchor, 'top');
-				}
-				
-				// click click event if callback func is provided
-				if (buttonStuff.func) anchor.addEvent('click', function (e) {
-					e.preventDefault();
-					var func = window[buttonStuff.func];
-					if (!func) {
-						console.warn(
-							'Button ' + buttonID + ' function ' +
-							buttonStuff.func + ' does not exist'
-						);
-						return;
-					}
-					func();
-				});
-            
-                // inject the button
-				but.inject($$('.top-button').getLast(), 'after');
-			});
+            if (!a.currentData)
+                return;            
+            if (a.currentData['data-buttons'])
+                SSV(a.currentData['data-buttons']).each(function (btn) {
+                var but = makeButton(btn);
+                but.inject($$('.top-button').getLast(), 'after');
+            });
+            if (a.currentData['data-selection-buttons'])
+                SSV(a.currentData['data-selection-buttons']).each(function (btn) {
+                var but = makeButton(btn);
+                but.inject($('top-search'), 'after');
+            });
 		},
 		destroy: function () {
 			$$('.top-button.injected').each(function (but) {
@@ -384,6 +335,65 @@ var flagOptions = {
 		}
 	}
 };
+
+function makeButton (buttonID, where) {
+				
+    // find opts
+    var buttonStuff = a.currentData['data-button-' + buttonID];
+    if (!buttonStuff) {
+        console.warn('Button ' + buttonID + ' is not configured');
+        return;
+    }
+    
+    // parse psuedo-JSON
+    buttonStuff = JSON.decode(buttonStuff.replace(/'/g, '"'));
+    if (!buttonStuff) {
+        console.warn('Failed to parse JSON for button ' + buttonID);
+        return;
+    }
+    
+    // create button
+    var but = new Element('span', {
+        id:		'top-button-' + buttonID,
+        class: 	'top-title top-button injected'
+    });
+    
+    // hide if default state is to hide
+    if (buttonStuff.hide)
+        but.setStyle('display', 'none');
+    
+    // title
+    var anchor = new Element('a', {
+        href: buttonStuff.href || '#'
+    });
+    anchor.set('text', buttonStuff.title);
+    but.appendChild(anchor);
+    
+    // icon
+    if (buttonStuff.icon) {
+        anchor.set('text', ' ' + anchor.get('text'));
+        var i = new Element('i', {
+            'class': 'fa fa-' + buttonStuff.icon
+        });
+        i.inject(anchor, 'top');
+    }
+    
+    // click click event if callback func is provided
+    if (buttonStuff.func) anchor.addEvent('click', function (e) {
+        e.preventDefault();
+        var func = window[buttonStuff.func];
+        if (!func) {
+            console.warn(
+                'Button ' + buttonID + ' function ' +
+                buttonStuff.func + ' does not exist'
+            );
+            return;
+        }
+        func();
+    });
+
+    return but;
+}
 
 // handle page data on request completion
 function handlePageData (data) {

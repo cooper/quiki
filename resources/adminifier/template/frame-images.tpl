@@ -3,13 +3,19 @@
     data-nav="images"
     data-title="Images"
     data-icon="images"
-    data-buttons="upload image-mode filter actions"
     data-flags="no-margin search buttons"
     data-search="fileSearch"
     data-sort="{{.Order}}"
+
+    data-buttons="upload image-mode filter"
     data-button-upload="{'title': 'Upload images', 'icon': 'upload', 'href': '{{.Root}}/upload-images'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
-    data-button-actions="{'title': 'With selected...', 'icon': 'magic', 'func': 'displayActionMenu', 'hide': true}"
+
+    data-selection-buttons="move rename delete"
+    data-button-move="{'title': 'Move', 'icon': 'folder', 'func': 'moveSelected', 'hide': true}"
+    data-button-rename="{'title': 'Rename', 'icon': 'file-signature', 'func': 'renameSelected', 'hide': true}"
+    data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
+
 {{if .List}}
     data-button-image-mode="{'title': 'Grid view', 'icon': 'th', 'href': '{{.Root}}/images'}"
     data-scripts="file-list file-list/images pikaday"
