@@ -169,6 +169,7 @@ var FileList = exports.FileList = new Class({
             tbody.getElements('input[type=checkbox]').each(function (box) {
                 box.checked = checked;
             });
+            self.updateActions();
         });
 
         // TABLE BODY
@@ -258,17 +259,19 @@ var FileList = exports.FileList = new Class({
                 }
 
                 // if unchecking, uncheck the "select all" box
-                if (!cb.checked)
+                else if (!cb.checked)
                     selectAllInput.checked = false;
 
+                self.updateActions();
             });
         });
 
         // update sort
         self.updateSortMethod(a.currentData['data-sort']);
 
-        // update "select all" state
+        // update "select all" state and action buttons
         self.updateSelectAll();
+        self.updateActions();
 
         container.appendChild(table);
     },
@@ -308,17 +311,29 @@ var FileList = exports.FileList = new Class({
         var selectAllInput = thead.getElement('input[type=checkbox]');
 
         // if all are checked, check the "select all" box
+        var someSelected = false;
         if (tbody.getElements('input[type=checkbox]').every(function (c) {
+            if (c.checked) someSelected = true;
             return c.checked;
-        })) {
+        }))
             selectAllInput.checked = true;
-            return;
-        }
 
         // otherwise, if any are unchecked, uncheck "select all"
-        if (tbody.getElements('input[type=checkbox]').some(function (c) {
+        else if (tbody.getElements('input[type=checkbox]').some(function (c) {
             return !c.checked;
-        })) selectAllInput.checked = false;
+        }))
+            selectAllInput.checked = false;
+
+    },
+    updateActions: function () {
+        var someSelected = this.table.getElement('tbody').
+        getElements('input[type=checkbox]').some(function (c) {
+            return c.checked;
+        });
+        var display = someSelected ? 'inline-block' : 'none';
+        $$('.top-button.action').each(function (btn) {
+            btn.setStyle('display', display);
+        });
     }
 });
 

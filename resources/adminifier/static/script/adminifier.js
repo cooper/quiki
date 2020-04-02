@@ -223,7 +223,8 @@ function frameLoad (page) {
             // 'data-styles',      // SSV css names w/o extensions
             // 'data-flags',       // SSV page flags
             // 'data-search', 		// name of function to call on search
-            // 'data-buttons', 	// buttons to display in top bar
+            // 'data-buttons', 	    // buttons to display in top bar
+            // 'data-selection-buttons',    // same but for bulk actions
             //
             // // Used by specific pages
             //
@@ -325,6 +326,7 @@ var flagOptions = {
             if (a.currentData['data-selection-buttons'])
                 SSV(a.currentData['data-selection-buttons']).each(function (btn) {
                 var but = makeButton(btn);
+                but.addClass('action');
                 but.inject($('top-search'), 'after');
             });
 		},
