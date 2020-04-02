@@ -641,9 +641,11 @@ function displayFilter () {
             // create date picker
             var picker = new Pikaday({
                 field:       textInput,
-                firstDay:    1,
+                firstDay:    0,
                 minDate:     firstDate,
-                maxDate:     lastDate
+                maxDate:     lastDate,
+                defaultDate: lastDate,
+                yearRange:   [firstDate.getFullYear(), lastDate.getFullYear()]
             });
             
             // date select, add to list of accepted values
