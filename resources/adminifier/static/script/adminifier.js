@@ -343,14 +343,14 @@ function makeButton (buttonID, where) {
     // find opts
     var buttonStuff = a.currentData['data-button-' + buttonID];
     if (!buttonStuff) {
-        console.warn('Button ' + buttonID + ' is not configured');
+        console.warn('Button "' + buttonID + '" is not configured');
         return;
     }
     
     // parse psuedo-JSON
     buttonStuff = JSON.decode(buttonStuff.replace(/'/g, '"'));
     if (!buttonStuff) {
-        console.warn('Failed to parse JSON for button ' + buttonID);
+        console.warn('Failed to parse JSON for button "' + buttonID + '"');
         return;
     }
     
@@ -386,7 +386,7 @@ function makeButton (buttonID, where) {
         var func = window[buttonStuff.func];
         if (!func) {
             console.warn(
-                'Button ' + buttonID + ' function ' +
+                'Button "' + buttonID + '" function ' +
                 buttonStuff.func + ' does not exist'
             );
             return;
