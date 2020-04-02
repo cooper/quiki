@@ -309,17 +309,22 @@ var FileList = exports.FileList = new Class({
         var tbody = this.table.getElement('tbody'),
             thead = this.table.getElement('thead');
         var selectAllInput = thead.getElement('input[type=checkbox]');
+        var checkboxes = tbody.getElements('input[type=checkbox]');
+
+        // no checkboxes are there, so unselect
+        if (!checkboxes.length) {
+            selectAllInput.checked = false;
+            return;
+        }
 
         // if all are checked, check the "select all" box
-        var someSelected = false;
-        if (tbody.getElements('input[type=checkbox]').every(function (c) {
-            if (c.checked) someSelected = true;
+        if (checkboxes.every(function (c) {
             return c.checked;
         }))
             selectAllInput.checked = true;
 
         // otherwise, if any are unchecked, uncheck "select all"
-        else if (tbody.getElements('input[type=checkbox]').some(function (c) {
+        else if (checkboxes.some(function (c) {
             return !c.checked;
         }))
             selectAllInput.checked = false;
