@@ -547,9 +547,16 @@ function displayFilter () {
         check.addEvent('change', function () {
             var d = check.checked ? 'block' : 'none';
             inner.setStyle('display', d);
-            if (dataType != 'date') input.focus();
+            input.focus();
             row.set('data-enabled', check.checked ? true : '');
             list.redraw();
+        });
+
+        // on radio button change, focus the text input
+        inner.getElements('input[type=radio]').each(function (radio) {
+            radio.addEvent('change', function () {
+                input.focus();
+            });
         });
         
         var textInput = row.getElement('input[type=text]');
@@ -616,6 +623,7 @@ function displayFilter () {
         a.fakeAdopt(filterEditor);
         
         // if this is a date, enable pikaday
+        textInput.set('placeholder', 'Enter text...');
         if (dataType == 'date') {
             textInput.set('placeholder', 'Pick a date...');
             
