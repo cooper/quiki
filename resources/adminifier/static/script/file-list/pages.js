@@ -33,4 +33,17 @@ a.currentJSONMetadata.results.each(function (pageData) {
 
 pageList.draw($('content'));
 
+exports.createPage = function () {
+    var createWindow = new ModalWindow({
+        icon:           'plus-circle',
+        title:          'Create page',
+        html:           'Coming soon',
+        padded:         true,
+        id:             'create-page-window',
+        autoDestroy:    true,
+        onDone:         null
+    });
+    createWindow.show();
+}
+
 })(adminifier, window);

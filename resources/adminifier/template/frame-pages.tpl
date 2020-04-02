@@ -11,7 +11,7 @@
     data-sort="{{.Order}}"
 
     data-buttons="create filter"
-    data-button-create="{'title': 'New page', 'icon': 'plus-circle', 'href': '{{.Root}}/create-page'}"
+    data-button-create="{'title': 'New page', 'icon': 'plus-circle', 'func': 'createPage'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"
