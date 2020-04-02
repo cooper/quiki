@@ -1,5 +1,8 @@
 <script type="text/x-tmpl" id="tmpl-filter-editor">
-    <div class="filter-editor-title"></div>
+    <div class="filter-editor-title">
+        <i class="fa fa-filter"></i> Filter
+        <a href="#"><i class="fa fa-times"></i></a>
+    </div>
 </script>
 
 <script type="text/x-tmpl" id="tmpl-filter-text">

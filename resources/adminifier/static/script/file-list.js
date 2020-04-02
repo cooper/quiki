@@ -520,6 +520,9 @@ function displayFilter () {
         class:  'filter-editor',
         html:   tmpl('tmpl-filter-editor', {})
     });
+
+    // filter editor close button
+    filterEditor.getElement('.filter-editor-title a').addEvent('click', closeFilter);
     
     // add each column
     list.options.columns.each(function (col) {

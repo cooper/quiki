@@ -125,6 +125,13 @@ ul.file-list-toolbar li.disabled {
 
 .filter-editor-title {
     padding: 9px;
+    background-color: #333;
+}
+
+.filter-editor-title a {
+    color: inherit;
+    float: right;
+    line-height: 22px;
 }
 
 .filter-row {
