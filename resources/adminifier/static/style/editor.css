@@ -69,6 +69,11 @@ ul.editor-toolbar li.hidden {
     display: none;
 }
 
+ul.editor-toolbar li.readonly {
+    width: auto;
+    cursor: default;
+}
+
 /* shared in editor helpers */
 
 .editor-tool-large-button {

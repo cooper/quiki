@@ -445,6 +445,7 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 		Model    bool // true if editing a model
 		Config   bool // true if editing config
 		Category bool
+		Info     interface{}
 		Title    string // page title or filename
 		File     string // filename
 		Content  string // file content
@@ -455,6 +456,7 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 		Model:        o.model,
 		Config:       o.config,
 		Category:     o.cat,
+		Info:         o.info,
 		Title:        title,
 		File:         file,
 		Content:      fileRes.Content,

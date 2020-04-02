@@ -883,7 +883,9 @@ function setupToolbar () {
 
     // switch between buttons
     $$('ul.editor-toolbar li').each(function (li) {
-
+        if (li.hasClass('readonly'))
+            return;
+            
         // hover animation
         li.set('morph', { duration: 150 });
         li.addEvent('mouseenter', function () {
