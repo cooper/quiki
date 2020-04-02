@@ -543,9 +543,11 @@ function displayFilter () {
         // on click, show the inner part
         var inner = row.getElement('.filter-row-inner');
         var check = row.getElement('input[type=checkbox]');
+        var input = row.getElement('input[type=text]');
         check.addEvent('change', function () {
             var d = check.checked ? 'block' : 'none';
             inner.setStyle('display', d);
+            if (dataType != 'date') input.focus();
             row.set('data-enabled', check.checked ? true : '');
             list.redraw();
         });
