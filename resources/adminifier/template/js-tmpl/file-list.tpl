@@ -10,6 +10,7 @@
     <div class="filter-row-inner">
         <form>
             <input type="radio" name="mode" data-mode="Contains" checked /> Contains
+            <input type="radio" name="mode" data-mode="Matches" /> Matches
             <input type="radio" name="mode" data-mode="Is" /> Is<br />
         </form>
         <i class="fa fa-plus-circle fa-lg" style="color: chartreuse;"></i>
@@ -21,9 +22,9 @@
     <span><input type="checkbox" /> {%= o.column %}</span>
     <div class="filter-row-inner">
         <form>
-            <input type="radio" name="mode" data-mode="Is" checked /> Is
-            <input type="radio" name="mode" data-mode="Before" /> Before
-            <input type="radio" name="mode" data-mode="After" /> After<br />
+            <input type="radio" name="mode" data-mode="Before" checked /> Before
+            <input type="radio" name="mode" data-mode="After" /> After
+            <input type="radio" name="mode" data-mode="Is" /> Is<br />
         </form>
         <i class="fa fa-plus-circle fa-lg" style="color: chartreuse;"></i>
         <input type="text" />

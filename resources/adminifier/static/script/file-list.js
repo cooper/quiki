@@ -718,6 +718,24 @@ function filterFilter (entry) {
                 return right.toString().toLowerCase()
                     .contains(rule[1].toLowerCase());
             });
+
+            // matches regex
+            else if (rule[0] == 'Matches')
+            someFuncsMustPass.push(function (entry) {
+                if (typeof right != 'string') {
+                    if (right.toString)
+                        right = right.toString();
+                    else
+                        return;
+                }
+                try {
+                    if (right.match(new RegExp(rule[1], 'i')))
+                        return true;
+                }
+                catch (e) {
+                    // TODO: somehow tell user regex is invalid but just once
+                }
+            });
             
             // equals
             else if (rule[0] == 'Is')
