@@ -8,7 +8,7 @@
     data-sort="{{.Order}}"
 
     data-buttons="upload image-mode filter"
-    data-button-upload="{'title': 'Upload images', 'icon': 'upload', 'href': '{{.Root}}/upload-images'}"
+    data-button-upload="{'title': 'Upload', 'icon': 'upload', 'href': '{{.Root}}/upload-images'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"
