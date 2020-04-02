@@ -107,6 +107,10 @@ div.navigation-popover {
     float: right;
 }
 
+#top-bar span.top-button.action {
+    background-color: #333;
+}
+
 #top-bar span.top-title a {
     height: 100%;
     display: inline-block;
