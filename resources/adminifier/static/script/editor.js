@@ -197,6 +197,7 @@ ae.getFilename = function () {
 };
 
 // true if the file being edited is a model
+// TODO: rather than isModel we need all the different modes to be distinguished
 ae.isModel = function () {
     return $('editor').getProperty('data-model') != null;
 };

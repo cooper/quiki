@@ -31,6 +31,10 @@ function displayPageOptionsWindow () {
         return value.value;
     });
 
+    // TODO: check explicitly for whether it's a quiki markup page or model.
+    // maybe add support for markdown stuff too. if none of these, the options
+    // button should never have been displayed on the toolbar or been disabled.
+
     // create the options window
     var optionsWindow = new ModalWindow({
         icon:           'cog',
@@ -115,6 +119,10 @@ function displayPageOptionsWindow () {
 }
 
 function updatePageOptions () {
+
+    // editor is read-only
+    if (ae.isReadOnly())
+        return;
 
     // replace old option values with new ones
     var container = this.container;
