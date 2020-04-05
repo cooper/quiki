@@ -40,8 +40,7 @@ function pageScriptsLoadedHandler () {
     ae.lastSavedData = editor.getValue();
 
     // set read-only if page is external
-    if (a.currentJSONMetadata.info)
-        editor.setReadOnly(!!a.currentJSONMetadata.info.external);
+    editor.setReadOnly(ae.isReadOnly());
 
     // render editor
     var themeName = adminifier.themeName || 'twilight';
@@ -200,6 +199,13 @@ ae.getFilename = function () {
 // true if the file being edited is a model
 ae.isModel = function () {
     return $('editor').getProperty('data-model') != null;
+};
+
+// true if the file is read-only
+ae.isReadOnly = function () {
+    if (a.currentJSONMetadata.info)
+        return !!a.currentJSONMetadata.info.external;
+    return false;
 };
 
 // returns the page title text, with any escapes accounted for.
@@ -885,7 +891,7 @@ function setupToolbar () {
     $$('ul.editor-toolbar li').each(function (li) {
         if (li.hasClass('readonly'))
             return;
-            
+
         // hover animation
         li.set('morph', { duration: 150 });
         li.addEvent('mouseenter', function () {
