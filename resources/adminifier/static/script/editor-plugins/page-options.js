@@ -31,16 +31,20 @@ function displayPageOptionsWindow () {
         return value.value;
     });
 
-    // TODO: check explicitly for whether it's a quiki markup page or model.
-    // maybe add support for markdown stuff too. if none of these, the options
+    // TODO: add support for markdown stuff too. if none of these, the options
     // button should never have been displayed on the toolbar or been disabled.
+
+    // make sure it is an acceptable file type
+    if (!ae.isPage() && !ae.isModel())
+        return;
+    var title    = ae.isModel() ? 'Modal options' : 'Page options';
+    var template = ae.isModel() ? 'tmpl-model-options' : 'tmpl-page-options';
 
     // create the options window
     var optionsWindow = new ModalWindow({
         icon:           'cog',
-        title:          ae.isModel() ? 'Model options' : 'Page options',
-        html:           tmpl(ae.isModel() ?
-            'tmpl-model-options' : 'tmpl-page-options', foundOptsValues),
+        title:          title,
+        html:           tmpl(template, foundOptsValues),
         padded:         true,
         id:             'editor-options-window',
         autoDestroy:    true,
@@ -280,7 +284,7 @@ function generatePageOptions (opts) {
         if (typeOf(value) == 'boolean' && !value)
             return;
 
-        string += '@page.' + optName;
+        string += (ae.isModel() ? '@model.' : '@page.') + optName;
 
         // non-boolean value
         if (value !== true) {
