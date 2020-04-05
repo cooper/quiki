@@ -66,6 +66,7 @@ type wikiRequest struct {
 }
 
 type editorOpts struct {
+	page   bool        // true if editing a page
 	model  bool        // true if editing a model
 	config bool        // true if editing the config
 	cat    bool        // true if editing a category
@@ -357,7 +358,7 @@ func handleEditPageFrame(wr *wikiRequest) {
 	}
 
 	// serve editor
-	handleEditor(wr, info.Path, info.File, info.Title, editorOpts{info: info})
+	handleEditor(wr, info.Path, info.File, info.Title, editorOpts{page: true, info: info})
 }
 
 func handleEditModelFrame(wr *wikiRequest) {
@@ -442,6 +443,7 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 	wr.dot = struct {
 		Found    bool
 		JSON     template.HTML
+		Page     bool // true if editing a page
 		Model    bool // true if editing a model
 		Config   bool // true if editing config
 		Category bool
@@ -453,6 +455,7 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 	}{
 		Found:        true,
 		JSON:         template.HTML("<!--JSON\n" + string(jsonData) + "\n-->"),
+		Page:         o.page,
 		Model:        o.model,
 		Config:       o.config,
 		Category:     o.cat,

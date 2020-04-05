@@ -25,7 +25,7 @@
 {{else}}
 <div class="editor-toolbar-wrapper">
     <ul class="editor-toolbar">
-        {{if .Info}}{{if .Info.External}}
+        {{if and .Page .Info}}{{if .Info.External}}
             <li class="readonly">READ ONLY</li>
         {{end}}{{end}}
         <li data-action="save" class="right"><i class="fa right fa-save"></i> <span>Save</span></li>
