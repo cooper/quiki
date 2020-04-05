@@ -7,10 +7,12 @@ var ae;
 function loadedHandler () {
     ae = a.editor;
 
+    // this function is only available for quiki pages and models
+    if (!ae.isPage() && !ae.isModel() && !ae.isReadOnly())
+        return;
+
     // add toolbar function
-    ae.addToolbarFunctions({
-        options:    displayPageOptionsWindow
-    });
+    ae.addToolbarFunctions({ options: displayPageOptionsWindow });
 }
 
 function unloadedHandler () {
@@ -34,9 +36,6 @@ function displayPageOptionsWindow () {
     // TODO: add support for markdown stuff too. if none of these, the options
     // button should never have been displayed on the toolbar or been disabled.
 
-    // make sure it is an acceptable file type
-    if (!ae.isPage() && !ae.isModel())
-        return;
     var title    = ae.isModel() ? 'Modal options' : 'Page options';
     var template = ae.isModel() ? 'tmpl-model-options' : 'tmpl-page-options';
 

@@ -32,7 +32,7 @@
         <li data-action="delete" class="right"><i class="fa right fa-trash"></i> Delete</li>
         <li data-action="revisions" class="right"><i class="fa right fa-history"></i> Revisions</li>
         <li data-action="view" class="right"><i class="fa right fa-binoculars"></i> View</li>
-        <li data-action="options" class="right"><i class="fa right fa-wrench"></i> Options</li>
+        <li class="hidden right" data-action="options"><i class="fa right fa-wrench"></i> Options</li>
         <li id="toolbar-redo" data-action="redo" class="right disabled"><i class="fa right fa-redo"></i> Redo</li>
         <li id="toolbar-undo" data-action="undo" class="right disabled"><i class="fa right fa-undo"></i> Undo</li>
 
