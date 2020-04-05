@@ -538,10 +538,6 @@ func handleCreateBranch(wr *wikiRequest) {
 }
 
 func handleHelpFrame(wr *wikiRequest) {
-	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
-	if helpPage == "" {
-		helpPage = "main"
-	}
 
 	var dot struct {
 		Title   string
@@ -557,6 +553,12 @@ func handleHelpFrame(wr *wikiRequest) {
 			wr.err = err
 			return
 		}
+	}
+
+	// determine page
+	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
+	if helpPage == "" {
+		helpPage = helpWiki.Opt.MainPage
 	}
 
 	// display the page
