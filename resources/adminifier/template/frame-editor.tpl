@@ -60,7 +60,7 @@
 
     </ul>
 </div>
-<div id="editor" data-file="{{.File}}"{{if .Model}} data-model{{end}}>
+<div id="editor" data-file="{{.File}}">
 {{- .Content -}}
 </div>
 {{end}}

@@ -196,11 +196,11 @@ ae.getFilename = function () {
     return $('editor').getProperty('data-file');
 };
 
-// true if the file being edited is a model
-// TODO: rather than isModel we need all the different modes to be distinguished
-ae.isModel = function () {
-    return $('editor').getProperty('data-model') != null;
-};
+// file types
+ae.isPage       = function () { return a.currentJSONMetadata && a.currentJSONMetadata.page;     };
+ae.isModel      = function () { return a.currentJSONMetadata && a.currentJSONMetadata.model;    };
+ae.isCategory   = function () { return a.currentJSONMetadata && a.currentJSONMetadata.category; };
+ae.isConfig     = function () { return a.currentJSONMetadata && a.currentJSONMetadata.config;   };
 
 // true if the file is read-only
 ae.isReadOnly = function () {
