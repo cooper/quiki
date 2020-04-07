@@ -2,6 +2,7 @@ table.file-list {
     /*table-layout: fixed;*/
     border-collapse: collapse;
     width: 100%;
+    position: relative;
 }
 
 /* all cells */
@@ -38,7 +39,8 @@ table.file-list td.title {
 
 /* head cells */
 
-table.file-list thead {
+table.file-list thead tr:first-child {
+    position: fixed;
 }
 
 table.file-list thead th {

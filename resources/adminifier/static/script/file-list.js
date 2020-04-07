@@ -1,6 +1,5 @@
 (function (a, exports) {
 
-// a.loadScript('pikaday');
 document.addEvent('pageUnloaded', pageUnloaded)
 
 function pageUnloaded () {
@@ -167,6 +166,9 @@ var FileList = exports.FileList = new Class({
                     anchor.set('href', updateURLParameter(window.location.href, 'sort', setSort));
                 }
             });
+
+            // duplicate that will be covered
+            thead.appendChild(theadTr.clone()); 
         }
 
         // on change, check/uncheck all
