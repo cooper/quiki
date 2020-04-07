@@ -1,10 +1,15 @@
 (function (a, exports) {
 
+window.addEvent('resize', resize);
 document.addEvent('pageUnloaded', pageUnloaded)
 
 function pageUnloaded () {
+    window.removeEvent('resize', resize);
     document.removeEvent('pageUnloaded', pageUnloaded);
     closeFilter();
+
+    // undo our content size adjustments
+    $('content').setStyle('width', 'auto');
 }
 
 var FileList = exports.FileList = new Class({
@@ -516,9 +521,16 @@ function dateToHRTimeAgo (time) {
     return time;
 }
 
-function filterResize () {
-   $('content').setStyle('width', window.innerWidth -
-       $('navigation-sidebar').offsetWidth - 250 + 'px');
+function resize () {
+    var filterEditor = document.getElement('.filter-editor');
+    var width = window.innerWidth - $('navigation-sidebar').offsetWidth;
+    if (filterEditor)
+        width -= filterEditor.offsetWidth;
+    width += 'px';
+    $('content').setStyle('width', width);
+    $$('table.file-list thead tr:first-child').each(function (tr) {
+        tr.setStyle('width', width);
+    });
 }
 
 // filter button toggle
@@ -699,11 +711,8 @@ function displayFilter () {
         filterEditor.appendChild(row);
     });
     
-    // resize content
-    window.addEvent('resize', filterResize);
-    filterResize();
-    
     document.body.adopt(filterEditor);
+    resize();    
 }
 
 function getFilterRules (row) {
@@ -840,9 +849,7 @@ function closeFilter () {
     // destroy the editor
     document.getElement('.filter-editor').destroy();
     
-    // undo our content size adjustments
-    window.removeEvent('resize', filterResize);
-    $('content').setStyle('width', 'auto');
+    resize();
 }
 
 function updateURLParameter(url, param, paramVal){
