@@ -69,7 +69,7 @@ function scriptLoaded () {
 	}
 	
 	// this was the last one
-	$('content').setStyle('user-select', 'all');
+	$('content').setStyle('user-select', 'auto');
 	a.updateIcon(a.currentData['data-icon'], a.currentData['data-icon-b']);
 	pageScriptsDone = true;
 	if (firedPageScriptsLoaded) return;
