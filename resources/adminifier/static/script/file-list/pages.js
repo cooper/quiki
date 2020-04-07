@@ -17,6 +17,7 @@ var pageList = new FileList({
 if (a.currentJSONMetadata.results)
 a.currentJSONMetadata.results.each(function (pageData) {
     var entry = new FileListEntry({
+        data:       pageData,
         Title:      pageData.title || pageData.file_ne || pageData.file,
         Author:     pageData.author,
         Created:    pageData.created,

@@ -76,6 +76,12 @@ var FileList = exports.FileList = new Class({
             return entry.columns[col];
         });
     },
+
+    getSelection: function () {
+        return this.entries.filter(function (entry) {
+            return entry.checkbox && entry.checkbox.checked;
+        });
+    },
     
     redraw: function () {
         var container = this.container;
@@ -195,8 +201,10 @@ var FileList = exports.FileList = new Class({
             tr = entry.tr = new Element('tr');
             
             // checkbox
-            if (self.options.selection)
+            if (self.options.selection) {
                 tr.appendChild(checkTd.clone());
+                entry.checkbox = tr.getElement('input');
+            }
             
             // visible data columns
             self.getVisibleColumns().each(function (col) {
@@ -330,6 +338,8 @@ var FileList = exports.FileList = new Class({
             selectAllInput.checked = false;
 
     },
+
+    // update action buttons
     updateActions: function () {
         var someSelected = this.table.getElement('tbody').
         getElements('input[type=checkbox]').some(function (c) {
@@ -343,12 +353,23 @@ var FileList = exports.FileList = new Class({
 });
 
 var FileListEntry = exports.FileListEntry = new Class({
-    
+    Implements: [Options],
+
+    options: { values: {} },
+
     initialize: function (values) {
         this.columns    = {};
         this.tooltips   = {};
         this.infoState  = [];
-        if (values) this.setValues(values);
+
+        // data for entry
+        if (values.data) {
+            this.data = values.data;
+            delete values.data;
+        }
+
+        // add values
+        this.setValues(values);
     },
     
     setValue: function (key, value) {
@@ -360,6 +381,7 @@ var FileListEntry = exports.FileListEntry = new Class({
     },
     
     setValues: function (obj) {
+        if (!obj) return;
         var self = this;
         Object.each(obj, function(value, key) {
             self.setValue(key, value);
@@ -852,6 +874,9 @@ exports.deleteSelected = function (but) {
         text:       'Are you sure?'
     });
 
+    var list = getList();
+    var selection = list.getSelection();
+
     // button text events
     var shouldChange = function () {
         return !deleteBut.hasClass('progress') &&
@@ -859,13 +884,20 @@ exports.deleteSelected = function (but) {
             !deleteBut.hasClass('failure');
     };
     deleteBut.addEvent('mouseenter', function () {
-        if (shouldChange()) deleteBut.innerHTML = 'Delete';
+        if (shouldChange()) deleteBut.innerHTML = 'Delete ' + selection.length + ' items';
     });
     deleteBut.addEvent('mouseleave', function () {
         if (shouldChange()) deleteBut.innerHTML = 'Are you sure?';
     });
     
-
+    // button click
+    deleteBut.addEvent('click', function () {
+        var fileNames = selection.map(function (entry) {
+            return entry.data.file;
+        });
+        console.log("Deleting: ", fileNames);
+    });
+    
     box.adopt(deleteBut);
     a.displayPopupBox(box, 40, but);
 }
