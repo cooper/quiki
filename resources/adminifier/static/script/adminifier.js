@@ -35,6 +35,7 @@ function SSV (str) {
 
 // update page title
 a.updatePageTitle = function (title, titleTagOnly) {
+    console.log(title);
     if (!titleTagOnly)
         $('page-title').getElement('span').innerText = title;
     document.title = title + ' | ' + a.wikiName;
@@ -70,7 +71,7 @@ function scriptLoaded () {
 	
 	// this was the last one
 	$('content').setStyle('user-select', 'auto');
-	a.updateIcon(a.currentData['data-icon'], a.currentData['data-icon-b']);
+	a.updateIcon(a.currentData['icon'], a.currentData['icon-b']);
 	pageScriptsDone = true;
 	if (firedPageScriptsLoaded) return;
 	document.fireEvent('pageScriptsLoaded');
@@ -211,8 +212,12 @@ function frameLoad (page) {
         if (meta) {
             var attrs = meta.attributes;
             [].forEach.call(meta.attributes, function(attr) {
-                if (/^data-/.test(attr.name))
-                    attrs[attr.name] = attr.value;
+                if (/^data-/.test(attr.name)) {
+                    var val = attr.value;
+                    if (val.textContent)
+                        val = val.textContent;
+                    attrs[attr.name.replace(/^data-/, '')] = val;
+                }
             });
 
             // // Tools for all pages
@@ -320,13 +325,13 @@ var flagOptions = {
 		init: function () {
             if (!a.currentData)
                 return;            
-            if (a.currentData['data-buttons'])
-                SSV(a.currentData['data-buttons']).each(function (btn) {
+            if (a.currentData['buttons'])
+                SSV(a.currentData['buttons']).each(function (btn) {
                 var but = makeButton(btn);
                 but.inject($$('.top-button').getLast(), 'after');
             });
-            if (a.currentData['data-selection-buttons'])
-                SSV(a.currentData['data-selection-buttons']).each(function (btn) {
+            if (a.currentData['selection-buttons'])
+                SSV(a.currentData['selection-buttons']).each(function (btn) {
                 var but = makeButton(btn);
                 but.addClass('action');
                 but.inject($('top-search'), 'after');
@@ -343,7 +348,7 @@ var flagOptions = {
 function makeButton (buttonID, where) {
 				
     // find opts
-    var buttonStuff = a.currentData['data-button-' + buttonID];
+    var buttonStuff = a.currentData['button-' + buttonID];
     if (!buttonStuff) {
         console.warn('Button "' + buttonID + '" is not configured');
         return;
@@ -417,7 +422,7 @@ function handlePageData (data) {
     $('content').setStyle('user-select', 'none');
 
     // window redirect
-    var target = data['data-wredirect'];
+    var target = data['wredirect'];
     if (target) {
         console.log('Redirecting to ' + target);
         window.location = target;
@@ -425,7 +430,7 @@ function handlePageData (data) {
     }
 
     // page redirect
-    target = data['data-redirect'];
+    target = data['redirect'];
     if (target) {
         console.log('Redirecting to ' + target);
         history.pushState(page, '', adminifier.wikiRoot + '/' + target);
@@ -434,12 +439,12 @@ function handlePageData (data) {
     }
 
     // page title and icon
-    a.updatePageTitle(data['data-title']);
+    a.updatePageTitle(data['title']);
     window.scrollTo(0, 0);
     // ^ not sure if scrolling necessary when setting display: none
 
     // highlight navigation item
-    var li = $$('li[data-nav="' + data['data-nav'] + '"]')[0];
+    var li = $$('li[data-nav="' + data['nav'] + '"]')[0];
     if (li) {
         $$('li.active').each(function (li) { li.removeClass('active'); });
         li.addClass('active');
@@ -450,14 +455,14 @@ function handlePageData (data) {
 
     // load new scripts
 	firedPageScriptsLoaded = false;
-    a.loadScripts(SSV(data['data-scripts']));
+    a.loadScripts(SSV(data['scripts']));
 
 
     // destroy old styles
     $$('link.dynamic').each(function (link) { link.destroy(); });
 
     // inject new styles
-    SSV(data['data-styles']).each(function (style) {
+    SSV(data['styles']).each(function (style) {
         if (!style.length) return;
 		var href;
 		if (style == 'colorpicker')
@@ -486,7 +491,7 @@ function handlePageData (data) {
 
     // initialize new page flags
     a.currentFlags = [];
-    SSV(data['data-flags']).each(function (flagName) {
+    SSV(data['flags']).each(function (flagName) {
         var flag = flagOptions[flagName];
         if (!flag) return;
         a.currentFlags.push(flag);
@@ -526,11 +531,11 @@ function searchUpdate () {
     var text = $('top-search').get('value');
     
     // the page with search function has since been destroyed
-	if (!a.currentData || !a.currentData['data-search'])
+	if (!a.currentData || !a.currentData['search'])
         return;
         
     // the page provides no search handler
-	var searchFunc = window[a.currentData['data-search']];
+	var searchFunc = window[a.currentData['search']];
 	if (!searchFunc)
         return;
         
