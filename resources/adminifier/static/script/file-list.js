@@ -166,7 +166,7 @@ var FileList = exports.FileList = new Class({
                 if (sort) {
                     th.set('data-sort', sort);
                     var setSort = sort + '-';
-                    if (a.currentData['sort'] == setSort)
+                    if (a.data.sort == setSort)
                         setSort = sort + encodeURIComponent('+');
                     anchor.set('href', updateURLParameter(window.location.href, 'sort', setSort));
                 }
@@ -282,7 +282,7 @@ var FileList = exports.FileList = new Class({
         });
 
         // update sort
-        self.updateSortMethod(a.currentData['sort']);
+        self.updateSortMethod(a.data.sort);
 
         // update "select all" state and action buttons
         self.updateSelectAll();

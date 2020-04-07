@@ -71,7 +71,7 @@ function scriptLoaded () {
 	
 	// this was the last one
 	$('content').setStyle('user-select', 'auto');
-	a.updateIcon(a.currentData['icon'], a.currentData['icon-b']);
+	a.updateIcon(a.data.icon, a.data.iconB);
 	pageScriptsDone = true;
 	if (firedPageScriptsLoaded) return;
 	document.fireEvent('pageScriptsLoaded');
@@ -210,32 +210,41 @@ function frameLoad (page) {
         // find HTML metadata
         var meta = $('content').getElement('meta');
         if (meta) {
-            var attrs = meta.attributes;
+            var attrs = {};
             [].forEach.call(meta.attributes, function(attr) {
                 if (/^data-/.test(attr.name)) {
                     var val = attr.value;
                     if (val.textContent)
                         val = val.textContent;
-                    attrs[attr.name.replace(/^data-/, '')] = val;
+                    var name = attr.name
+                        .replace(/^data-/, '')
+                        .replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+                    attrs[name] = val;
                 }
             });
 
-            // // Tools for all pages
-            // 'data-redirect',    // javascript frame redirect
-            // 'data-wredirect',   // window redirect
-            // 'data-nav',         // navigation item identifier to highlight
-            // 'data-title',       // page title for top bar
-            // 'data-icon',        // page icon name for top bar
-            // 'data-scripts',     // SSV script names w/o extensions
-            // 'data-styles',      // SSV css names w/o extensions
-            // 'data-flags',       // SSV page flags
-            // 'data-search', 		// name of function to call on search
-            // 'data-buttons', 	    // buttons to display in top bar
-            // 'data-selection-buttons',    // same but for bulk actions
+            //////////////////////////
+            // Tools for all pages ///
+            //////////////////////////
             //
-            // // Used by specific pages
+            // data-redirect                    javascript frame redirect
+            // data-wredirect                   window redirect
+            // data-nav                         navigation item identifier to highlight
+            // data-title                       page title for top bar
+            // data-icon                        page icon name for top bar
+            // data-scripts                     SSV script names w/o extensions
+            // data-styles                      SSV css names w/o extensions
+            // data-flags                       SSV page flags
+            // data-search 		                name of function to call on search
+            // data-buttons                     buttons to display in top bar
+            // data-selection-buttons           same but for bulk actions
+            // data-button-*                    data to define a button
             //
-            // 'data-sort'         // sort option, used by file lists
+            //////////////////////////////
+            /// Used by specific pages ///
+            //////////////////////////////
+            //
+            // data-sort                        sort option, used by file lists
 
             handlePageData(attrs);
         }
@@ -323,15 +332,15 @@ var flagOptions = {
     // top bar buttons
 	buttons: {
 		init: function () {
-            if (!a.currentData)
+            if (!a.data)
                 return;            
-            if (a.currentData['buttons'])
-                SSV(a.currentData['buttons']).each(function (btn) {
+            if (a.data.buttons)
+                SSV(a.data.buttons).each(function (btn) {
                 var but = makeButton(btn);
                 but.inject($$('.top-button').getLast(), 'after');
             });
-            if (a.currentData['selection-buttons'])
-                SSV(a.currentData['selection-buttons']).each(function (btn) {
+            if (a.data.selectionButtons)
+                SSV(a.data.selectionButtons).each(function (btn) {
                 var but = makeButton(btn);
                 but.addClass('action');
                 but.inject($('top-search'), 'after');
@@ -348,7 +357,7 @@ var flagOptions = {
 function makeButton (buttonID, where) {
 				
     // find opts
-    var buttonStuff = a.currentData['button-' + buttonID];
+    var buttonStuff = a.data['button' + buttonID.charAt(0).toUpperCase() + buttonID.slice(1)];
     if (!buttonStuff) {
         console.warn('Button "' + buttonID + '" is not configured');
         return;
@@ -418,11 +427,11 @@ function handlePageData (data) {
     pageScriptsDone = false;
 
     console.log(data);
-    a.currentData = data;
+    a.data = data;
     $('content').setStyle('user-select', 'none');
 
     // window redirect
-    var target = data['wredirect'];
+    var target = data.wredirect;
     if (target) {
         console.log('Redirecting to ' + target);
         window.location = target;
@@ -430,7 +439,7 @@ function handlePageData (data) {
     }
 
     // page redirect
-    target = data['redirect'];
+    target = data.redirect;
     if (target) {
         console.log('Redirecting to ' + target);
         history.pushState(page, '', adminifier.wikiRoot + '/' + target);
@@ -439,12 +448,12 @@ function handlePageData (data) {
     }
 
     // page title and icon
-    a.updatePageTitle(data['title']);
+    a.updatePageTitle(data.title);
     window.scrollTo(0, 0);
     // ^ not sure if scrolling necessary when setting display: none
 
     // highlight navigation item
-    var li = $$('li[data-nav="' + data['nav'] + '"]')[0];
+    var li = $$('li[data-nav="' + data.nav + '"]')[0];
     if (li) {
         $$('li.active').each(function (li) { li.removeClass('active'); });
         li.addClass('active');
@@ -455,14 +464,14 @@ function handlePageData (data) {
 
     // load new scripts
 	firedPageScriptsLoaded = false;
-    a.loadScripts(SSV(data['scripts']));
+    a.loadScripts(SSV(data.scripts));
 
 
     // destroy old styles
     $$('link.dynamic').each(function (link) { link.destroy(); });
 
     // inject new styles
-    SSV(data['styles']).each(function (style) {
+    SSV(data.styles).each(function (style) {
         if (!style.length) return;
 		var href;
 		if (style == 'colorpicker')
@@ -491,7 +500,7 @@ function handlePageData (data) {
 
     // initialize new page flags
     a.currentFlags = [];
-    SSV(data['flags']).each(function (flagName) {
+    SSV(data.flags).each(function (flagName) {
         var flag = flagOptions[flagName];
         if (!flag) return;
         a.currentFlags.push(flag);
@@ -531,11 +540,11 @@ function searchUpdate () {
     var text = $('top-search').get('value');
     
     // the page with search function has since been destroyed
-	if (!a.currentData || !a.currentData['search'])
+	if (!a.data || !a.data.search)
         return;
         
     // the page provides no search handler
-	var searchFunc = window[a.currentData['search']];
+	var searchFunc = window[a.data.search];
 	if (!searchFunc)
         return;
         
