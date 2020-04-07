@@ -147,17 +147,20 @@ a.fakeAdopt = function (child) {
     parent.appendChild(child);
 };
 
+window.addEvent('resize',       adjustCurrentPopup);
 window.addEvent('popstate',     loadURL);
 document.addEvent('domready', 	loadURL);
 document.addEvent('domready',	searchHandler);
 document.addEvent('domready',   addDocumentFrameClickHandler);
 document.addEvent('keyup',		handleEscapeKey);
 
+
 // PAGE LOADING
 
 // this adds the frame click handler to all .frame-click anchors in the DOM
 function addDocumentFrameClickHandler () {
     addFrameClickHandler($$('a.frame-click'));
+    document.body.addEvent('click', bodyClickPopoverCheck);
 }
 
 // export addFrameClickHandler so that dynamically created anchors from other scripts
@@ -383,6 +386,15 @@ function makeButton (buttonID, where) {
     // click click event if callback func is provided
     if (buttonStuff.func) anchor.addEvent('click', function (e) {
         e.preventDefault();
+        e.stopPropagation(); // don't let click out handler see this
+
+        // close current popup if there is one
+        if (a.currentPopup) {
+            closeCurrentPopup();
+            return;
+        }
+
+        // call click func
         var func = window[buttonStuff.func];
         if (!func) {
             console.warn(
@@ -391,7 +403,7 @@ function makeButton (buttonID, where) {
             );
             return;
         }
-        func();
+        func(but);
     });
 
     return but;
@@ -487,6 +499,17 @@ function handlePageData (data) {
 function handleEscapeKey (e) {
     if (e.key != 'esc')
         return;
+
+    // if there's a popup, exit it maybe
+    if (a.currentPopup) {
+        closeCurrentPopup({
+            unlessSticky: true,
+            reason: 'Escape key'
+        });
+        return;
+    }
+
+    // if there is a modal window, close it
     var container = document.getElement('.modal-container');
     if (container)
         container.retrieve('modal').destroy();
@@ -550,6 +573,172 @@ function handleCompactSidebarMouseleave (e) {
     setTimeout(function () {
         a.setStyle('overflow', 'hidden');
     }, 200);
+}
+
+// TOP BAR POPUP BOXES
+
+
+// create and return a new popup box
+a.createPopupBox = function (but) {
+    var box = new Element('div', { class: 'popup-box' });
+    if (but && but.hasClass('right'))
+        box.addClass('right');
+    return box;
+};
+
+// present a popup box
+a.displayPopupBox = function (box, height, but) {
+    
+    // can't open the but
+    if (!openBut(but))
+        return false;
+    
+    // add to body
+    document.body.appendChild(box);
+    
+    // set as current popup, initial adjustment
+    a.currentPopup = box;
+    box.store('but', but);
+    adjustCurrentPopup();
+    
+    // animate open
+    box.set('morph', { duration: 150 });
+    if (height == 'auto') {
+        height = window.innerHeight - parseInt(box.getStyle('top'));
+        box.set('morph', {
+            onComplete: function () { box.setStyle('height', 'auto'); }
+        });
+        box.morph({ height: height + 'px' });
+    }
+    else if (typeof height == 'number')
+        box.morph({ height: height + 'px' });
+    else
+        box.setStyle('height', height);
+        
+    return true;
+};
+
+// close the current popup box
+function closeCurrentPopup (opts) {
+    var box = a.currentPopup;
+    if (!box)
+        return;
+    if (!opts)
+        opts = {};
+
+    // check if sticky
+    if (opts.unlessSticky && box.hasClass('sticky')) {
+        console.log('Keeping popup open: Sticky');
+        return;
+    }
+
+    // check if mouse is over it.
+    // note this will only work if the box has at least one child with
+    // the hover selector active
+    if (opts.unlessActive && box.getElement(':hover')) {
+        console.log('Keeping popup open: Active');
+
+        // once the mouse exits, close it
+        box.addEvent('mouseleave', function () {
+            a.closePopup(box, opts);
+        });
+
+        return;
+    }
+
+    // Safe point - we will close the box.
+    if (opts.reason)
+        console.log('Closing popup: ' + opts.reason);
+        
+    // run destroy callback
+    if (a.onPopupDestroy) {
+        a.onPopupDestroy(box);
+        delete a.onPopupDestroy;
+    }
+
+    closeCurrentBut();
+    box.set('morph', {
+        duration: 150,
+        onComplete: function () {
+            a.currentPopup = null;
+            if (box) box.destroy();
+            if (opts.afterHide) opts.afterHide();
+        }
+    });
+    
+    if (box.getStyle('height') == 'auto')
+        box.setStyle('height', window.innerHeight - parseInt(box.getStyle('top')));
+    box.morph({ height: '0px' });
+}
+
+// move a popup when the window resizes
+function adjustCurrentPopup () {
+    
+    // no popup open
+    var box = a.currentPopup;
+    if (!box)
+        return;
+        
+    var but = box.retrieve('but');
+    var rect = but.getBoundingClientRect();
+            
+    // adjust top no matter what
+    box.setStyle('top', rect.top + but.offsetHeight);
+    
+    // this is a fixed box; don't change left or right
+    if (box.hasClass('fixed'))
+        return;
+    
+    // set left or right
+    box.setStyle('left',
+        box.hasClass('right') ?
+        rect.right - 300 :
+        rect.left
+    );
+};
+
+// close current popup on click outside
+function bodyClickPopoverCheck (e) {
+
+    // no popup is displayed
+    if (!a.currentPopup)
+        return;
+
+    // clicked within the popup
+    if (e.target == a.currentPopup || a.currentPopup.contains(e.target))
+        return;
+
+    // the target says not to do this
+    if (e.target && e.target.hasClass('no-close-popup'))
+        return;
+
+    closeCurrentPopup({
+        unlessSticky: true,
+        unlessActive: true,
+        reason: 'Clicked outside the popup'
+    });
+}
+
+// set button as active
+function openBut (but) {
+
+    // if a popup is open, ignore this.
+    if (a.currentPopup)
+        return false;
+
+    but.addClass('active');
+    a.currentBut = but;
+    return true;
+}
+
+// set current active button as inactive
+function closeCurrentBut () {
+    if (!a.currentBut)
+        return;
+    if (a.currentBut.hasClass('sticky'))
+        return;
+    a.currentBut.removeClass('active');
+    delete a.currentBut;
 }
 
 })(adminifier);

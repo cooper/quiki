@@ -75,6 +75,28 @@ i.fa {
 	border-bottom: 1px solid #222;
 }
 
+/* POPUPS */
+
+div.popup-box {
+    position: fixed;
+    overflow: hidden;
+    background-color: #696969;
+    color: #e2e2e2;
+    width: 200px;
+    height: 0px;
+    z-index: 300;
+}
+
+div.popup-large-button {
+    font-size: 14px;
+    line-height: 40px;
+    padding-left: 10px;
+    background-color: #333;
+    height: 40px;
+    cursor: pointer;
+    user-select: none;
+}
+
 /* LOGIN MODAL WINDOW */
 
 #login-window td {

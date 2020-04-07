@@ -119,9 +119,12 @@ div.navigation-popover {
     padding: 0 10px;
 }
 
-#top-bar span.top-title a:hover,
-#top-bar span.top-title.active a {
+#top-bar span.top-title a:hover {
     background-color: #696969;
+}
+
+#top-bar span.top-title.active a {
+    background-color: #2096ce;
 }
 
 #top-search {
