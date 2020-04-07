@@ -167,3 +167,7 @@ ul.file-list-toolbar li.disabled {
 .filter-row-inner i[class~="fa-plus-circle"] {
     cursor: pointer;
 }
+
+#file-delete-button:hover {
+    background-color: #D45D5D;
+}

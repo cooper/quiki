@@ -841,4 +841,33 @@ function updateURLParameter(url, param, paramVal){
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
+// FILE ACTIONS
+
+exports.deleteSelected = function (but) {
+    var box = a.createPopupBox(but);
+
+    var deleteBut = new Element('div', {
+        id:         'file-delete-button',
+        'class':    'popup-large-button',
+        text:       'Are you sure?'
+    });
+
+    // button text events
+    var shouldChange = function () {
+        return !deleteBut.hasClass('progress') &&
+            !deleteBut.hasClass('success')  &&
+            !deleteBut.hasClass('failure');
+    };
+    deleteBut.addEvent('mouseenter', function () {
+        if (shouldChange()) deleteBut.innerHTML = 'Delete';
+    });
+    deleteBut.addEvent('mouseleave', function () {
+        if (shouldChange()) deleteBut.innerHTML = 'Are you sure?';
+    });
+    
+
+    box.adopt(deleteBut);
+    a.displayPopupBox(box, 40, but);
+}
+
 })(adminifier, window);
