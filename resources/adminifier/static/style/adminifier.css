@@ -38,27 +38,18 @@ i.fa {
     width: 700px;
     margin: 90px auto 20px auto;
     padding: 0;
-    border: 1px solid #222;
 }
 
 .modal-content.padded {
-    padding: 10px 16px;
+    padding: 0.4em 1em;
 }
 
 .modal-done-button {
     float: right;
-    font-weight: bold;
-    display: inline-block;
-    background-color: #333;
-    border: 1px solid #222;
-    padding: 2px 12px;
-    font-size: 12px;
-    height: 25px;
-    line-height: 25px;
+    font-size: 0.8em;
+    padding: 0.2em 0.8em;
     margin-left: 16px;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
 }
 
 .modal-done-button:hover {
@@ -68,11 +59,10 @@ i.fa {
 }
 
 .modal-header {
-	font-size: 22px;
-    padding: 8px 16px;
+	font-size: 1.1em;
+    padding: 0.4em 1em;
     background-color: #555;
     color: #fff;
-	border-bottom: 1px solid #222;
 }
 
 /* POPUPS */

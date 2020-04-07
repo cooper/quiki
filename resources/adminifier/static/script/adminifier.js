@@ -171,7 +171,6 @@ function addFrameClickHandler (where) {
         where = [where];
     where.each(function (a) {
         a.addEvent('click', function (e) {
-            console.log("HANDLED IT FOR "+ a.href);
             e.preventDefault();
             var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '');
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
