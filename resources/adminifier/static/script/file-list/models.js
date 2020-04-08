@@ -1,8 +1,5 @@
 (function (a, exports) {
     
-if (!FileList || !a.json)
-    return;
-
 var modelList = new FileList({
     root: 'models',
     columns: ['Title', 'Author', 'Created', 'Modified'],

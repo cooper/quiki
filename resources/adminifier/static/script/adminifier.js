@@ -196,10 +196,10 @@ function frameLoad (page) {
     var handleResponse = function (html) {
 
         // the page may start with JSON metadata...
-        if (!html.indexOf('<!--JSON')) {
-            var json = JSON.parse(html.split('\n', 3)[1]);
-            a.json = json;
-        }
+        if (!html.indexOf('<!--JSON'))
+            a.json = JSON.parse(html.split('\n', 3)[1]);
+        else
+            a.json = {};
 
         // set the content
         $('content').innerHTML = html;

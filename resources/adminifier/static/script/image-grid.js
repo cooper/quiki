@@ -1,8 +1,5 @@
 (function (a, exports) {
     
-if (!a.json)
-    return;
-    
 var container = new Element('div', { class: 'image-grid' });
 $('content').appendChild(container);
 

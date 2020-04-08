@@ -183,7 +183,7 @@ ae.addToolbarFunctions = function (funcs) {
 
 // get current filename without extension
 ae.getFilenameNE = function () {
-    if (!a.json || !a.json.info)
+    if (!a.json.info)
         return;
     var ne = a.json.info.file_ne;
     if (typeOf(ne) == 'string')

@@ -1,7 +1,4 @@
 (function (a, exports) {
-    
-if (!FileList || !a.json)
-    return;
 
 var imageList = new FileList({
     root: 'images',
