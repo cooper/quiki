@@ -2,6 +2,7 @@
 
 window.addEvent('resize', resize);
 document.addEvent('pageUnloaded', pageUnloaded)
+setTimeout(resize, 100);
 
 function pageUnloaded () {
     window.removeEvent('resize', resize);
@@ -530,6 +531,7 @@ function resize () {
     $('content').setStyle('width', width);
     $$('table.file-list thead tr:first-child').each(function (tr) {
         tr.setStyle('width', width);
+        tr.setStyle('opacity', 1);
     });
 }
 
