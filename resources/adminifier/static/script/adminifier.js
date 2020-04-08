@@ -198,7 +198,7 @@ function frameLoad (page) {
         // the page may start with JSON metadata...
         if (!html.indexOf('<!--JSON')) {
             var json = JSON.parse(html.split('\n', 3)[1]);
-            a.currentJSONMetadata = json;
+            a.json = json;
         }
 
         // set the content
@@ -331,9 +331,7 @@ var flagOptions = {
     
     // top bar buttons
 	buttons: {
-		init: function () {
-            if (!a.data)
-                return;            
+		init: function () {           
             if (a.data.buttons)
                 SSV(a.data.buttons).each(function (btn) {
                 var but = makeButton(btn);
@@ -540,7 +538,7 @@ function searchUpdate () {
     var text = $('top-search').get('value');
     
     // the page with search function has since been destroyed
-	if (!a.data || !a.data.search)
+	if (!a.data.search)
         return;
         
     // the page provides no search handler

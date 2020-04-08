@@ -1,6 +1,6 @@
 (function (a, exports) {
     
-if (!FileList || !a.currentJSONMetadata)
+if (!FileList || !a.json)
     return;
 
 var catList = new FileList({
@@ -14,8 +14,8 @@ var catList = new FileList({
     }
 });
 
-if (a.currentJSONMetadata.results)
-a.currentJSONMetadata.results.each(function (catData) {
+if (a.json.results)
+a.json.results.each(function (catData) {
     var entry = new FileListEntry({
         Title:      catData.title || catData.file_ne || catData.file,
         Author:     catData.author,

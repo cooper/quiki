@@ -79,7 +79,7 @@ function editorLoadedHandler () {
     ae.resetSelectionAtTopLeft();
 
     // update warnings/errors
-    var meta = a.currentJSONMetadata;
+    var meta = a.json;
     if (meta)
         ae.handleWarningsAndError(meta.parse_warnings, meta.parse_error);    
 
@@ -183,9 +183,9 @@ ae.addToolbarFunctions = function (funcs) {
 
 // get current filename without extension
 ae.getFilenameNE = function () {
-    if (!a.currentJSONMetadata || !a.currentJSONMetadata.info)
+    if (!a.json || !a.json.info)
         return;
-    var ne = a.currentJSONMetadata.info.file_ne;
+    var ne = a.json.info.file_ne;
     if (typeOf(ne) == 'string')
         return ne;
     return ae.getFilename();
@@ -197,15 +197,15 @@ ae.getFilename = function () {
 };
 
 // file types
-ae.isPage       = function () { return a.currentJSONMetadata && a.currentJSONMetadata.page;     };
-ae.isModel      = function () { return a.currentJSONMetadata && a.currentJSONMetadata.model;    };
-ae.isCategory   = function () { return a.currentJSONMetadata && a.currentJSONMetadata.category; };
-ae.isConfig     = function () { return a.currentJSONMetadata && a.currentJSONMetadata.config;   };
+ae.isPage       = function () { return a.json && a.json.page;     };
+ae.isModel      = function () { return a.json && a.json.model;    };
+ae.isCategory   = function () { return a.json && a.json.category; };
+ae.isConfig     = function () { return a.json && a.json.config;   };
 
 // true if the file is read-only
 ae.isReadOnly = function () {
-    if (a.currentJSONMetadata.info)
-        return !!a.currentJSONMetadata.info.external;
+    if (a.json.info)
+        return !!a.json.info.external;
     return false;
 };
 

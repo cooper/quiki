@@ -1,13 +1,13 @@
 (function (a, exports) {
     
-if (!a.currentJSONMetadata)
+if (!a.json)
     return;
     
 var container = new Element('div', { class: 'image-grid' });
 $('content').appendChild(container);
 
-if (a.currentJSONMetadata.results)
-a.currentJSONMetadata.results.each(function (imageData) {
+if (a.json.results)
+a.json.results.each(function (imageData) {
     imageData.root = adminifier.wikiRoot;
 
     // the larger dimension dictates the image size

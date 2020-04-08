@@ -1,6 +1,6 @@
 (function (a, exports) {
     
-if (!FileList || !a.currentJSONMetadata)
+if (!FileList || !a.json)
     return;
 
 var pageList = new FileList({
@@ -14,8 +14,8 @@ var pageList = new FileList({
     }
 });
 
-if (a.currentJSONMetadata.results)
-a.currentJSONMetadata.results.each(function (pageData) {
+if (a.json.results)
+a.json.results.each(function (pageData) {
     var entry = new FileListEntry({
         data:       pageData,
         Title:      pageData.title || pageData.file_ne || pageData.file,

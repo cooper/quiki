@@ -1,6 +1,6 @@
 (function (a, exports) {
     
-if (!FileList || !a.currentJSONMetadata)
+if (!FileList || !a.json)
     return;
 
 var imageList = new FileList({
@@ -15,8 +15,8 @@ var imageList = new FileList({
     }
 });
 
-if (a.currentJSONMetadata.results)
-a.currentJSONMetadata.results.each(function (imageData) {
+if (a.json.results)
+a.json.results.each(function (imageData) {
     var dim = null;
     if (imageData.width && imageData.height)
         dim = imageData.width + 'x' + imageData.height;
