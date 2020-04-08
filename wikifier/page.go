@@ -39,6 +39,9 @@ type Page struct {
 	model      bool        // true if this is a model being generated
 	Warnings   []Warning   // parser warnings
 	Error      *Warning    // parser error, as an encodable Warning
+	_html      HTML
+	_text      string
+	_preview   string
 	*variableScope
 }
 
@@ -58,6 +61,7 @@ type PageInfo struct {
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
+	Preview     string     `json:"preview,omitempty"`   // first 25 words or 150 chars
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
@@ -189,7 +193,63 @@ func (p *Page) _parse() error {
 // HTML generates and returns the HTML code for the page.
 // The page must be parsed with Parse before attempting this method.
 func (p *Page) HTML() HTML {
-	return generateBlock(p.main, p)
+	if p._html == "" {
+		p._html = generateBlock(p.main, p)
+	}
+	return p._html
+}
+
+// Text generates and returns the rendered plain text for the page.
+// The page must be parsed with Parse before attempting this method.
+func (p *Page) Text() string {
+	if p._text != "" {
+		return p._text
+	}
+	p._text = html.UnescapeString(strip.StripTags(string(p.HTML())))
+	return p._text
+}
+
+// Preview returns a preview of the text on the page, up to 25 words or 150 characters.
+func (p *Page) Preview() string {
+	if p._preview != "" {
+		return p._preview
+	}
+
+	text := p.Text()
+
+	// remove excess whitespace
+	preview := ""
+	for _, line := range strings.Split(text, "\n") {
+		preview += strings.TrimSpace(line) + " "
+	}
+
+	// find the first 25 words or 150 characters
+	count := 25
+	lastSpace := 0
+	for i := range preview {
+
+		// found space
+		if preview[i] == ' ' {
+			lastSpace := i
+			count--
+
+			// reached word limit
+			if count == 0 {
+				preview = preview[:lastSpace]
+				break
+			}
+		}
+
+		// reached character limit
+		if i == 149 {
+			preview = preview[:lastSpace]
+			break
+		}
+	}
+
+	preview = strings.TrimSpace(preview)
+	p._preview = preview
+	return preview
 }
 
 // Exists is true if the page exists.
@@ -516,6 +576,7 @@ func (p *Page) Info() PageInfo {
 		Author:      p.Author(),
 		Description: p.Description(),
 		Keywords:    p.Keywords(),
+		Preview:     p.Preview(),
 		Warnings:    p.Warnings,
 		Error:       p.Error,
 	}

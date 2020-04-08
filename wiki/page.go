@@ -12,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	strip "github.com/grokify/html-strip-tags-go"
-
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -91,6 +89,9 @@ type DisplayPage struct {
 
 	// page keywords as extracted from the special @page.keywords variable
 	Keywords []string `json:"keywords,omitempty"`
+
+	// first formatting-stripped 25 words of page, up to 150 chars
+	Preview string `json:"preview,omitempty"`
 }
 
 type pageJSONManifest struct {
@@ -487,7 +488,7 @@ func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) interface{} {
 	}
 
 	// save the content with HTML tags stripped
-	textFile.WriteString(strip.StripTags(string(r.Content)))
+	textFile.WriteString(page.Text())
 
 	r.TextGenerated = true
 	return nil // success

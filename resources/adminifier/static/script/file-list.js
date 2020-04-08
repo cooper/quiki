@@ -243,8 +243,8 @@ var FileList = exports.FileList = new Class({
                     });
 
                     // add description to title cell
-                    if (true) td.appendChild(new Element('span', {
-                        text:  'Lorem ipsum',
+                    if (entry.data.preview) td.appendChild(new Element('span', {
+                        text:   entry.data.preview,
                         class: 'file-preview'
                     }));
                 }
