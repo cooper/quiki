@@ -298,6 +298,7 @@ var flagOptions = {
                     mouseleave: handleCompactSidebarMouseleave
                 });
             });
+            setTimeout(function () { window.fireEvent('resize') }, 500);
         },
         destroy: function () {
 			document.getElement('span.wiki-title').tween('min-width', '140px');
@@ -314,6 +315,7 @@ var flagOptions = {
                 p.parentElement.eliminate('popover');
                 p.parentElement.removeChild(p);
             });
+            setTimeout(function () { window.fireEvent('resize') }, 500);
         }
     },
 
