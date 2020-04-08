@@ -31,6 +31,11 @@ function SSV (str) {
     return str.split(' ');
 }
 
+// convert hyphens to camel case
+function camelCase (str) {
+    return str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })
+}
+
 // EXPORTS
 
 // update page title
@@ -216,9 +221,7 @@ function frameLoad (page) {
                     var val = attr.value;
                     if (val.textContent)
                         val = val.textContent;
-                    var name = attr.name
-                        .replace(/^data-/, '')
-                        .replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+                    var name = camelCase(attr.name.replace(/^data-/, ''));
                     attrs[name] = val;
                 }
             });
@@ -334,13 +337,11 @@ var flagOptions = {
     // top bar buttons
 	buttons: {
 		init: function () {           
-            if (a.data.buttons)
-                SSV(a.data.buttons).each(function (btn) {
+            SSV(a.data.buttons).each(function (btn) {
                 var but = makeButton(btn);
                 but.inject($$('.top-button').getLast(), 'after');
             });
-            if (a.data.selectionButtons)
-                SSV(a.data.selectionButtons).each(function (btn) {
+            SSV(a.data.selectionButtons).each(function (btn) {
                 var but = makeButton(btn);
                 but.addClass('action');
                 but.inject($('top-search'), 'after');
@@ -355,9 +356,9 @@ var flagOptions = {
 };
 
 function makeButton (buttonID, where) {
-				
+    
     // find opts
-    var buttonStuff = a.data['button' + buttonID.charAt(0).toUpperCase() + buttonID.slice(1)];
+    var buttonStuff = a.data[camelCase('button-' + buttonID)];
     if (!buttonStuff) {
         console.warn('Button "' + buttonID + '" is not configured');
         return;
