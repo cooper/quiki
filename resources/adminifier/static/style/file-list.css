@@ -90,6 +90,22 @@ table.file-list span.file-info {
     line-height: 18px; /* 22px - 2(2px padding) */
 }
 
+table.file-list span.file-info.error {
+    background-color: #D45D5D;
+}
+
+table.file-list span.file-info.warnings {
+    background-color: #ccaf3b;
+}
+
+table.file-list span.file-info.redirect {
+    background-color: #2da7ed;
+}
+
+table.file-list span.file-info.external {
+    background-color: #b58bfc;
+}
+
 table.file-list span.file-preview {
     font-size: 0.8em;
     color: #666;

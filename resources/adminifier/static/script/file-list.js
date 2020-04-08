@@ -237,7 +237,7 @@ var FileList = exports.FileList = new Class({
                     entry.infoState.each(function (name) {
                         var span = new Element('span', {
                             text:   name,
-                            class: 'file-info'
+                            class: 'file-info ' + name.toLowerCase()
                         });
                         td.appendChild(span);
                     });
