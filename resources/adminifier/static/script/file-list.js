@@ -231,14 +231,23 @@ var FileList = exports.FileList = new Class({
                     textContainer = new Element('span');
                 td.appendChild(textContainer);
                 
-                // add states to title cell
-                if (isTitle) entry.infoState.each(function (name) {
-                    var span = new Element('span', {
-                        text:   name,
-                        class: 'file-info'
+                if (isTitle) {
+
+                    // add states to title cell
+                    entry.infoState.each(function (name) {
+                        var span = new Element('span', {
+                            text:   name,
+                            class: 'file-info'
+                        });
+                        td.appendChild(span);
                     });
-                    td.appendChild(span);
-                });
+
+                    // add description to title cell
+                    if (true) td.appendChild(new Element('span', {
+                        text:  'Lorem ipsum',
+                        class: 'file-preview'
+                    }));
+                }
                                 
                 // apply fixer
                 var text  = entry.columns[col];

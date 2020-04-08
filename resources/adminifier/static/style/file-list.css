@@ -34,8 +34,12 @@ table.file-list td.info {
 table.file-list th.title,
 table.file-list td.title {
     width: 99%;
-    white-space: normal;
+    max-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 /* head cells */
 
@@ -74,11 +78,22 @@ table.file-list tbody tr:nth-child(even) {
 }
 
 table.file-list span.file-info {
-    font-size: small;
+    font-size: 0.7em;
     text-transform: uppercase;
     font-weight: bold;
-    color: #555;
-    margin: 0 8px;
+    margin: 0 0 0 8px;
+    float: right;
+    background-color: #999;
+    color: #fff;
+    border-radius: 3px;
+    padding: 2px 4px;
+    line-height: 18px; /* 22px - 2(2px padding) */
+}
+
+table.file-list span.file-preview {
+    font-size: 0.8em;
+    color: #666;
+    margin: 0 0 0 8px;
 }
 
 /* toolbar */
@@ -86,7 +101,6 @@ table.file-list span.file-info {
 ul.file-list-toolbar li {
     float: left;
     padding: 0 10px;
-    display: inline-block;
     height: 40px;
     overflow: hidden;
     cursor: pointer;
