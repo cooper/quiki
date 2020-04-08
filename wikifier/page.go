@@ -61,7 +61,7 @@ type PageInfo struct {
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
-	Preview     string     `json:"preview,omitempty"`   // first 25 words or 150 chars
+	Preview     string     `json:"preview,omitempty"`   // first 25 words or 150 chars. empty w/ description
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
@@ -210,6 +210,7 @@ func (p *Page) Text() string {
 }
 
 // Preview returns a preview of the text on the page, up to 25 words or 150 characters.
+// If the page has a Description, that is used instead of generating a preview.
 func (p *Page) Preview() string {
 	if p._preview != "" {
 		return p._preview
@@ -564,6 +565,15 @@ func (p *Page) Categories() []string {
 
 // Info returns the PageInfo for the page.
 func (p *Page) Info() PageInfo {
+
+	// generate preview only if there is no description available
+	prev := ""
+	desc := p.Description()
+	if desc == "" {
+		prev = p.Preview()
+	}
+
+	// info
 	info := PageInfo{
 		File:        p.Name(),
 		FileNE:      p.NameNE(),
@@ -574,12 +584,14 @@ func (p *Page) Info() PageInfo {
 		FmtTitle:    p.FmtTitle(),
 		Title:       p.Title(),
 		Author:      p.Author(),
-		Description: p.Description(),
+		Description: desc,
 		Keywords:    p.Keywords(),
-		Preview:     p.Preview(),
+		Preview:     prev,
 		Warnings:    p.Warnings,
 		Error:       p.Error,
 	}
+
+	// file times
 	mod, create := p.Modified(), p.Created()
 	if !mod.IsZero() {
 		info.Modified = &mod
@@ -588,6 +600,7 @@ func (p *Page) Info() PageInfo {
 	if !create.IsZero() {
 		info.Created = &create
 	}
+
 	return info
 }
 
