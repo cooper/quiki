@@ -38,6 +38,7 @@ table.file-list td.title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #666;
 }
 
 
@@ -108,7 +109,6 @@ table.file-list span.file-info.external {
 
 table.file-list span.file-preview {
     font-size: 0.8em;
-    color: #666;
     margin: 0 0 0 8px;
 }
 
