@@ -248,6 +248,10 @@ var FileList = exports.FileList = new Class({
                         text:   preview,
                         class: 'file-preview'
                     }));
+
+                    // set td title
+                    if (Browser.name == 'safari')
+                        td.set('title', preview);
                 }
                                 
                 // apply fixer
