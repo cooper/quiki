@@ -242,16 +242,18 @@ var FileList = exports.FileList = new Class({
                         td.appendChild(span);
                     });
 
-                    // add description to title cell
-                    var preview = entry.data.desc || entry.data.preview;
-                    if (preview) td.appendChild(new Element('span', {
-                        text:   preview,
-                        class: 'file-preview'
-                    }));
+                    if (entry.data) {
+                        // add description to title cell
+                        var preview = entry.data.desc || entry.data.preview;
+                        if (preview) td.appendChild(new Element('span', {
+                            text:   preview,
+                            class: 'file-preview'
+                        }));
 
-                    // set td title
-                    if (Browser.name == 'safari')
-                        td.set('title', preview);
+                        // set td title
+                        if (Browser.name == 'safari')
+                            td.set('title', preview);
+                    }
                 }
                                 
                 // apply fixer
