@@ -221,7 +221,11 @@ func (p *Page) Preview() string {
 	// remove excess whitespace
 	preview := ""
 	for _, line := range strings.Split(text, "\n") {
-		preview += strings.TrimSpace(line) + " "
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		preview += trimmed + " "
 	}
 
 	// find the first 25 words or 150 characters
@@ -231,7 +235,7 @@ func (p *Page) Preview() string {
 
 		// found space
 		if preview[i] == ' ' {
-			lastSpace := i
+			lastSpace = i
 			count--
 
 			// reached word limit
