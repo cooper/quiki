@@ -176,6 +176,7 @@ ul.q-toc {
     padding: 0.8em 1em;
     float: right;
     border-radius: 3px;
+    max-width: 30%;
 }
 
 ul.q-toc.qc-left {
