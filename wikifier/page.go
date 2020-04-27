@@ -35,7 +35,7 @@ type Page struct {
 	name       string
 	headingIDs map[string]int
 	Wiki       interface{} // only available during Parse() and HTML()
-	markdown   bool        // true if FilePath points to a markdown source
+	Markdown   bool        // true if this is a markdown source
 	model      bool        // true if this is a model being generated
 	Warnings   []Warning   // parser warnings
 	Error      *Warning    // parser error, as an encodable Warning
@@ -83,7 +83,7 @@ func NewPage(filePath string) *Page {
 		Models:        make(map[string]ModelInfo),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
-		markdown:      strings.HasSuffix(filePath, ".md"),
+		Markdown:      strings.HasSuffix(filePath, ".md"),
 	}
 }
 
@@ -137,9 +137,12 @@ func (p *Page) _parse() error {
 
 	// create reader from file path or source code provided
 	var reader io.Reader
-	if p.Source != "" {
+	if p.Markdown && p.Source != "" {
+		d := markdown.Run([]byte(p.Source))
+		reader = bytes.NewReader(d)
+	} else if p.Source != "" {
 		reader = strings.NewReader(p.Source)
-	} else if p.markdown && p.FilePath != "" {
+	} else if p.Markdown && p.FilePath != "" {
 		md, err := ioutil.ReadFile(p.FilePath)
 		if err != nil {
 			return err

@@ -20,12 +20,24 @@ func main() {
 			return mes.Command == "PRIVMSG" && strings.HasPrefix(mes.Content, "quiki")
 		},
 		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
-			lines := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
-			page := wikifier.NewPageSource(strings.Replace(lines, "_NL_", "\n", -1))
+			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
 
+			// markdown if starts with "md: "
+			md := false
+			withoutMd := strings.TrimPrefix(line, "md: ")
+			if withoutMd != line {
+				line = withoutMd
+				md = true
+			}
+
+			// create page
+			page := wikifier.NewPageSource(strings.Replace(line, "_NL_", "\n", -1))
+			if md {
+				page.Markdown = true
+			}
 			var reply string
 
-			// html
+			// parse/generate html
 			if err := page.Parse(); err != nil {
 				reply = err.Error()
 			} else {
@@ -49,6 +61,9 @@ func main() {
 
 			// reply
 			for _, line := range strings.Split(reply, "\n") {
+				if line == "" {
+					line = " "
+				}
 				irc.Send("PRIVMSG " + mes.To + " :" + line)
 			}
 
