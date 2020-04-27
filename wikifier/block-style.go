@@ -128,7 +128,7 @@ func (sb *styleBlock) html(page *Page, el element) {
 	// # if we're applying to main, add that to the front
 	//     push @apply, [ $parent_el->{id} ] if $style{apply_to_parent};
 	if style.applyToParent {
-		style.applyTo = append([][]string{[]string{parentEl.id()}}, style.applyTo...)
+		style.applyTo = append([][]string{{parentEl.id()}}, style.applyTo...)
 	}
 
 	// $style{main_el}  = $parent_el->{id};

@@ -72,7 +72,7 @@ func (is *infosec) html(page *Page, els element) {
 
 	// inject the title
 	if is.blockName() != "" {
-		is.mapList = append([]*mapListEntry{&mapListEntry{
+		is.mapList = append([]*mapListEntry{{
 			key:   "_infosec_title_",
 			metas: map[string]bool{"isTitle": true},
 			value: page.Fmt(is.blockName(), is.openPosition()),

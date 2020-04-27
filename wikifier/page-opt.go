@@ -174,7 +174,7 @@ var defaultPageOpt = PageOpt{
 		ParseCategory: nil,
 	},
 	External: map[string]PageOptExternal{
-		"wp": PageOptExternal{"Wikipedia", "https://en.wikipedia.org/wiki", PageOptExternalTypeMediaWiki},
+		"wp": {"Wikipedia", "https://en.wikipedia.org/wiki", PageOptExternalTypeMediaWiki},
 	},
 }
 
