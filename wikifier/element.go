@@ -371,22 +371,20 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 
 		case string:
 			stringLines := strings.Split(htmlfmt.EscapeString(v), "\n")
-			addLines = make([]indentedLine, len(stringLines))
 			for i, line := range stringLines {
 				if line == "" && i == len(stringLines)-1 {
 					continue
 				}
-				addLines[i] = indentedLine{line, myIndent}
+				addLines = append(addLines, indentedLine{line, myIndent})
 			}
 
 		case HTML:
 			htmlLines := strings.Split(string(v), "\n")
-			addLines = make([]indentedLine, len(htmlLines))
 			for i, line := range htmlLines {
 				if line == "" && i == len(htmlLines)-1 {
 					continue
 				}
-				addLines[i] = indentedLine{line, myIndent}
+				addLines = append(addLines, indentedLine{line, myIndent})
 			}
 
 		}
