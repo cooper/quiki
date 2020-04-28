@@ -20,6 +20,8 @@ a.json.results.each(function (pageData) {
         Created:    pageData.created,
         Modified:   pageData.modified
     });
+    if (pageData.redirect)
+        pageData.desc = "Redirect \u00BB " + pageData.redirect;
     entry.setInfoState('Draft',     pageData.draft);
     entry.setInfoState('Redirect',  pageData.redirect);
     entry.setInfoState('External',  pageData.external);
