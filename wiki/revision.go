@@ -198,6 +198,32 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 	return targetDir, nil
 }
 
+// the "and commit" portion of the *andCommit functions
+func (w *Wiki) andCommit(wt *git.Worktree, comment string, commit CommitOpts) error {
+	if commit.Comment != "" {
+		comment += ": " + commit.Comment
+	}
+
+	// time defaults to now
+	if commit.Time.IsZero() {
+		commit.Time = time.Now()
+	}
+
+	// commit
+	_, err := wt.Commit(comment, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  commit.Name,
+			Email: commit.Email,
+			When:  commit.Time,
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "git:worktree:Commit")
+	}
+
+	return nil
+}
+
 // addAndCommit adds a file and then commits changes
 func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
 
@@ -219,30 +245,31 @@ func (w *Wiki) addAndCommit(path string, commit CommitOpts) error {
 		return err
 	}
 
-	// determine comment
-	comment := "Update " + filepath.Base(path)
-	if commit.Comment != "" {
-		comment += ": " + commit.Comment
-	}
+	return w.andCommit(wt, "Update "+filepath.Base(path), commit)
+}
 
-	// time defaults to now
-	if commit.Time.IsZero() {
-		commit.Time = time.Now()
-	}
+// removeAndCommit removes a file and then commits changes
+func (w *Wiki) removeAndCommit(path string, commit CommitOpts) error {
 
-	// commit
-	_, err = wt.Commit(comment, &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  commit.Name,
-			Email: commit.Email,
-			When:  commit.Time,
-		},
-	})
+	// get repo
+	repo, err := w.repo()
 	if err != nil {
-		return errors.Wrap(err, "git:worktree:Commit")
+		return err
 	}
 
-	return nil
+	// get worktree
+	wt, err := repo.Worktree()
+	if err != nil {
+		return errors.Wrap(err, "git:repo:Worktree")
+	}
+
+	// remove the file
+	_, err = wt.Remove(path)
+	if err != nil {
+		return err
+	}
+
+	return w.andCommit(wt, "Delete "+filepath.Base(path), commit)
 }
 
 // Branch returns a Wiki instance for this wiki at another branch.
@@ -340,7 +367,6 @@ func ValidBranchName(name string) bool {
 // WriteFile writes a file in the wiki.
 //
 // The filename must be relative to the wiki directory.
-//
 // If the file does not exist and createOK is false, an error is returned.
 // If the file exists and is a symbolic link, an error is returned.
 //
@@ -377,4 +403,26 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 
 	// commit the change
 	return w.addAndCommit(name, commit)
+}
+
+// DeleteFile deletes a file in the wiki.
+//
+// The filename must be relative to the wiki directory.
+// If the file does not exist, an error is returned.
+//
+// This is a low-level API that allows deleting any file within the wiki
+// directory, so it should not be utilized directly by frontends.
+// Use DeletePage, DeleteModel, or DeleteImage instead.
+//
+func (w *Wiki) DeleteFile(name string, commit CommitOpts) error {
+
+	// error running lstat on file, might not exist or whatev
+	path := w.UnresolvedAbsFilePath(name)
+	_, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+
+	// delete the file and commit the change
+	return w.removeAndCommit(path, commit)
 }
