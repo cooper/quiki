@@ -409,6 +409,8 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 //
 // The filename must be relative to the wiki directory.
 // If the file does not exist, an error is returned.
+// If the file exists and is a symbolic link, the link itself is deleted,
+// not the target file.
 //
 // This is a low-level API that allows deleting any file within the wiki
 // directory, so it should not be utilized directly by frontends.
