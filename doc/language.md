@@ -432,6 +432,12 @@ at the very top of a page source file.
       introduction, so it will have the highest header level. Overrides the
       wiki configuration option
       [page.enable.title](configuration.md#pageenabletitle).
+* `@page.code` - Contains attributes for configuring [`code{}`](blocks.md#code)
+  blocks.
+    * `@page.code.lang` - [Language](https://github.com/alecthomas/chroma#supported-languages)
+      to use for syntax highlighting.
+    * `@page.code.style` - [Style](https://xyproto.github.io/splash/docs/index.html)
+      to use for syntax highlighting.
 
 `@category` is used to mark the page as belonging to a category. Each
 attribute of it is a boolean. If present, the page belongs to that category.

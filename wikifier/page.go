@@ -27,6 +27,7 @@ type Page struct {
 	Opt          *PageOpt // page options
 	styles       []styleEntry
 	staticStyles []string
+	codeStyles   bool
 	parser       *parser              // wikifier parser instance
 	main         block                // main block
 	Images       map[string][][]int   // references to images

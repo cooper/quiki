@@ -58,8 +58,12 @@ func (cb *codeBlock) html(page *Page, el element) {
 	// coalesce like adjacent tokens
 	lexer = chroma.Coalesce(lexer)
 
-	// get style (TODO: allow this to be configured)
-	style := styles.Get("swapoff")
+	// get style from page var or config
+	pageStyle, _ := page.getPageStr("code.style")
+	style := styles.Get(pageStyle)
+	if style == nil {
+		styles.Get(page.Opt.Page.Code.Style)
+	}
 	if style == nil {
 		style = styles.Fallback
 	}
@@ -81,7 +85,8 @@ func (cb *codeBlock) html(page *Page, el element) {
 	err = formatter.WriteCSS(&cssBuilder, style)
 	if err != nil {
 		cb.warn(cb.openPosition(), err.Error())
-	} else {
+	} else if !page.codeStyles {
 		page.staticStyles = append(page.staticStyles, cssBuilder.String())
+		page.codeStyles = true
 	}
 }

@@ -122,6 +122,22 @@ embedded within a template that has its own place for the page title:
 
     -@page.enable.title;
 
+### page.code.lang
+
+_Optional_. The default language to use for syntax highlighting of
+[`code{}`](blocks.md#code) blocks.
+
+See [this site](https://github.com/alecthomas/chroma#supported-languages) for
+a list of supported languages.
+
+### page.code.style
+
+_Optional_. The default style to use for syntax highlighting of
+[`code{}`](blocks.md#code) blocks.
+
+See [this site](https://xyproto.github.io/splash/docs/index.html) for
+a list of available styles.
+
 __Default__: Enabled
 
 ### image.size_method

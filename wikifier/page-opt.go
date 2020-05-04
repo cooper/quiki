@@ -38,13 +38,20 @@ type PageOpt struct {
 
 // PageOptPage describes option relating to a page.
 type PageOptPage struct {
-	EnableTitle bool // enable page title headings
-	EnableCache bool // enable page caching
+	EnableTitle bool        // enable page title headings
+	EnableCache bool        // enable page caching
+	Code        PageOptCode // `code{}` block options
 }
 
 // PageOptHost describes HTTP hosts for a wiki.
 type PageOptHost struct {
 	Wiki string // HTTP host for the wiki
+}
+
+// PageOptCode describes options for `code{}` blocks.
+type PageOptCode struct {
+	Lang  string
+	Style string
 }
 
 // PageOptDir describes actual filepaths to wiki resources.
@@ -184,18 +191,20 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy string options
 	pageOptString := map[string]*string{
-		"name":          &opt.Name,          // wiki name
-		"logo":          &opt.Logo,          // logo filename, relative to image dir
-		"main_page":     &opt.MainPage,      // main page name
-		"error_page":    &opt.ErrorPage,     // error page name
-		"template":      &opt.Template,      // template name
-		"host.wiki":     &opt.Host.Wiki,     // wiki host
-		"dir.wiki":      &opt.Dir.Wiki,      // wiki directory
-		"root.wiki":     &opt.Root.Wiki,     // http path to wiki
-		"root.image":    &opt.Root.Image,    // http path to images
-		"root.category": &opt.Root.Category, // http path to categories
-		"root.page":     &opt.Root.Page,     // http path to pages
-		"root.file":     &opt.Root.File,     // http path to file index
+		"name":            &opt.Name,            // wiki name
+		"logo":            &opt.Logo,            // logo filename, relative to image dir
+		"main_page":       &opt.MainPage,        // main page name
+		"error_page":      &opt.ErrorPage,       // error page name
+		"template":        &opt.Template,        // template name
+		"host.wiki":       &opt.Host.Wiki,       // wiki host
+		"dir.wiki":        &opt.Dir.Wiki,        // wiki directory
+		"root.wiki":       &opt.Root.Wiki,       // http path to wiki
+		"root.image":      &opt.Root.Image,      // http path to images
+		"root.category":   &opt.Root.Category,   // http path to categories
+		"root.page":       &opt.Root.Page,       // http path to pages
+		"root.file":       &opt.Root.File,       // http path to file index
+		"page.code.lang":  &opt.Page.Code.Lang,  // code{} language
+		"page.code.style": &opt.Page.Code.Style, // code{} style
 	}
 	for name, ptr := range pageOptString {
 		str, err := page.GetStr(name)
