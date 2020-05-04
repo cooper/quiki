@@ -6,7 +6,7 @@ require (
 	github.com/Songmu/go-httpdate v1.0.0
 	github.com/alecthomas/chroma v0.7.2
 	github.com/alexedwards/scs/v2 v2.3.1
-	github.com/cooper/ferret-chroma v0.0.0-20200504230625-92572e13953a
+	github.com/cooper/ferret-chroma v0.0.0-20200504231302-92ecda2e4348
 	github.com/cooper/go-git/v4 v4.14.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/dlclark/regexp2 v1.2.0 // indirect

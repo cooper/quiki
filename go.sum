@@ -16,6 +16,8 @@ github.com/cooper/ferret-chroma v0.0.0-20200504224634-e236c0df7739 h1:lyoLbFmFzE
 github.com/cooper/ferret-chroma v0.0.0-20200504224634-e236c0df7739/go.mod h1:10e8KTpMoT5CSiR/RLgGPZTVqDSfJDwEjG2yj1HSSEs=
 github.com/cooper/ferret-chroma v0.0.0-20200504230625-92572e13953a h1:8ZiEztmzZbTotl/hE6kUd6N8PgPLnwIwy58/raMLHmI=
 github.com/cooper/ferret-chroma v0.0.0-20200504230625-92572e13953a/go.mod h1:10e8KTpMoT5CSiR/RLgGPZTVqDSfJDwEjG2yj1HSSEs=
+github.com/cooper/ferret-chroma v0.0.0-20200504231302-92ecda2e4348 h1:zplQW7YDfALN1zvRP1bg5HWZxAVKoDDLlU2lQYENz2g=
+github.com/cooper/ferret-chroma v0.0.0-20200504231302-92ecda2e4348/go.mod h1:10e8KTpMoT5CSiR/RLgGPZTVqDSfJDwEjG2yj1HSSEs=
 github.com/cooper/go-git v1.0.0 h1:ZHGl9MTZ+MAuPKnyf2yZXWJC78hBI0kREzoGgZnNGgY=
 github.com/cooper/go-git v4.7.0+incompatible h1:nAHWJO4IjHpeJHtjx/kTXcp5tqeaKmjuVkRvBICMXPE=
 github.com/cooper/go-git/v4 v4.14.1 h1:HFJAICbUyBBGM6v+oWJL9vvuD4jtaTJDCDd1K2WEctk=
