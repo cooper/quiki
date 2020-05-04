@@ -144,6 +144,9 @@ var defaultPageOpt = PageOpt{
 	Page: PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
+		Code: PageOptCode{
+			Style: "monokailight",
+		},
 	},
 	Host: PageOptHost{
 		Wiki: "", // aka all hosts
