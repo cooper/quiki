@@ -21,27 +21,28 @@ import (
 // Page represents a single page or article, generally associated with a .page file.
 // It provides the most basic public interface to parsing with the wikifier engine.
 type Page struct {
-	Source     string   // source content
-	FilePath   string   // Path to the .page file
-	VarsOnly   bool     // True if Parse() should only extract variables
-	Opt        *PageOpt // page options
-	styles     []styleEntry
-	parser     *parser              // wikifier parser instance
-	main       block                // main block
-	Images     map[string][][]int   // references to images
-	Models     map[string]ModelInfo // references to models
-	PageLinks  map[string][]int     // references to other pages
-	sectionN   int
-	name       string
-	headingIDs map[string]int
-	Wiki       interface{} // only available during Parse() and HTML()
-	Markdown   bool        // true if this is a markdown source
-	model      bool        // true if this is a model being generated
-	Warnings   []Warning   // parser warnings
-	Error      *Warning    // parser error, as an encodable Warning
-	_html      HTML
-	_text      string
-	_preview   string
+	Source       string   // source content
+	FilePath     string   // Path to the .page file
+	VarsOnly     bool     // True if Parse() should only extract variables
+	Opt          *PageOpt // page options
+	styles       []styleEntry
+	staticStyles []string
+	parser       *parser              // wikifier parser instance
+	main         block                // main block
+	Images       map[string][][]int   // references to images
+	Models       map[string]ModelInfo // references to models
+	PageLinks    map[string][]int     // references to other pages
+	sectionN     int
+	name         string
+	headingIDs   map[string]int
+	Wiki         interface{} // only available during Parse() and HTML()
+	Markdown     bool        // true if this is a markdown source
+	model        bool        // true if this is a model being generated
+	Warnings     []Warning   // parser warnings
+	Error        *Warning    // parser error, as an encodable Warning
+	_html        HTML
+	_text        string
+	_preview     string
 	*variableScope
 }
 

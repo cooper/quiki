@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Songmu/go-httpdate v1.0.0
+	github.com/alecthomas/chroma v0.7.2
 	github.com/alexedwards/scs/v2 v2.3.0
 	github.com/cooper/go-git/v4 v4.14.1
 	github.com/disintegration/imaging v1.6.2

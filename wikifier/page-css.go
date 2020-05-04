@@ -13,6 +13,9 @@ func (p *Page) CSS() string {
 		}
 		generated += "}\n"
 	}
+	for _, style := range p.staticStyles {
+		generated += style + "\n"
+	}
 	return generated
 }
 
