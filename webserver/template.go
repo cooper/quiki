@@ -203,7 +203,6 @@ func (p wikiPage) Scripts() []string {
 	return []string{
 		"/static/ext/mootools.min.js",
 		"/static/quiki.js",
-		"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js",
 	}
 }
 
