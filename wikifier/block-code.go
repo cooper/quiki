@@ -8,6 +8,7 @@ import (
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
+	_ "github.com/cooper/ferret-chroma" // for ferret language support
 )
 
 type codeBlock struct {
