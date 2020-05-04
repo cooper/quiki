@@ -43,10 +43,19 @@ func (cb *codeBlock) html(page *Page, el element) {
 		text += piece
 	}
 
-	// if block name is provided, it's the language
+	// if block name or page.code.lang is provided, it's the language
 	var lexer chroma.Lexer
 	if cb.blockName() != "" {
 		lexer = lexers.Get(cb.blockName())
+		if lexer == nil {
+			cb.warn(cb.openPosition(), "No such code{} language '"+cb.blockName()+"'")
+		}
+	}
+	if lexer == nil && page.Opt.Page.Code.Lang != "" {
+		lexer = lexers.Get(page.Opt.Page.Code.Lang)
+		if lexer == nil {
+			cb.warn(cb.openPosition(), "No such code{} language '"+page.Opt.Page.Code.Lang+"' (from config)")
+		}
 	}
 
 	// did not find it by language name-- try to guess
@@ -62,9 +71,8 @@ func (cb *codeBlock) html(page *Page, el element) {
 	// coalesce like adjacent tokens
 	lexer = chroma.Coalesce(lexer)
 
-	style := styles.Fallback
-
 	// get style from page var or config
+	style := styles.Fallback
 	pageStyle, _ := page.getPageStr("code.style")
 	if pageStyle != "" {
 		style = styles.Get(pageStyle)
@@ -75,7 +83,7 @@ func (cb *codeBlock) html(page *Page, el element) {
 	if style == styles.Fallback && page.Opt.Page.Code.Style != "" {
 		style = styles.Get(page.Opt.Page.Code.Style)
 		if style == styles.Fallback {
-			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"' (from config)")
+			cb.warn(cb.openPosition(), "No such code{} style '"+page.Opt.Page.Code.Style+"' (from config)")
 		}
 	}
 
