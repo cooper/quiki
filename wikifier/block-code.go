@@ -16,6 +16,10 @@ type codeBlock struct {
 
 type quikiPreWrapper bool
 
+func init() {
+	styles.Fallback = styles.Get("monokailight")
+}
+
 func (p quikiPreWrapper) Start(code bool, styleAttr string) string {
 	return fmt.Sprintf(`<pre class="q-code chroma">`)
 }
