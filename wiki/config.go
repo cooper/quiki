@@ -47,7 +47,7 @@ var defaultWikiOpt = wikifier.PageOpt{
 		ParseCategory: linkCategoryExists,
 	},
 	External: map[string]wikifier.PageOptExternal{
-		"wp": wikifier.PageOptExternal{
+		"wp": {
 			Name: "Wikipedia",
 			Root: "https://en.wikipedia.org/wiki",
 			Type: wikifier.PageOptExternalTypeMediaWiki},

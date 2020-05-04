@@ -183,17 +183,17 @@ func setupWiki(wi *WikiInfo) error {
 	}
 
 	wikiRoots := []wikiHandler{
-		wikiHandler{
+		{
 			rootType: "page",
 			root:     wi.Opt.Root.Page,
 			handler:  handlePage,
 		},
-		wikiHandler{
+		{
 			rootType: "image",
 			root:     wi.Opt.Root.Image,
 			handler:  handleImage,
 		},
-		wikiHandler{
+		{
 			rootType: "category",
 			root:     wi.Opt.Root.Category,
 			handler:  handleCategoryPosts,
