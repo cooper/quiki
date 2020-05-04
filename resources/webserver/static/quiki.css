@@ -255,9 +255,6 @@ td.q-history-value {
 /* code */
 
 pre.q-code, .q-main code, .q-main a code {
-    background-color: #f8f8f8;
-    border: 1px solid;
-    border-color: #ccc !important;
     font-size: 90%;
     border-radius: 3px;
     font-family: Consolas, 'Liberation Mono', Courier, monospace;
