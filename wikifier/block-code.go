@@ -58,14 +58,21 @@ func (cb *codeBlock) html(page *Page, el element) {
 	// coalesce like adjacent tokens
 	lexer = chroma.Coalesce(lexer)
 
+	style := styles.Fallback
+
 	// get style from page var or config
 	pageStyle, _ := page.getPageStr("code.style")
-	style := styles.Get(pageStyle)
-	if style == nil {
-		style = styles.Get(page.Opt.Page.Code.Style)
+	if pageStyle != "" {
+		style = styles.Get(pageStyle)
+		if style == styles.Fallback {
+			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"'")
+		}
 	}
-	if style == nil {
-		style = styles.Fallback
+	if style == nil && page.Opt.Page.Code.Style != "" {
+		style = styles.Get(page.Opt.Page.Code.Style)
+		if style == styles.Fallback {
+			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"' (from config)")
+		}
 	}
 
 	// create HTML formatter with separate CSS
