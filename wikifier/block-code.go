@@ -72,7 +72,7 @@ func (cb *codeBlock) html(page *Page, el element) {
 			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"'")
 		}
 	}
-	if style == nil && page.Opt.Page.Code.Style != "" {
+	if style == styles.Fallback && page.Opt.Page.Code.Style != "" {
 		style = styles.Get(page.Opt.Page.Code.Style)
 		if style == styles.Fallback {
 			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"' (from config)")
