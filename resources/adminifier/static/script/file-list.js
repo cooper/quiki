@@ -922,11 +922,15 @@ exports.deleteSelected = function (but) {
         var fileNames = selection.map(function (entry) {
             return entry.data.file;
         });
-        console.log("Deleting: ", fileNames);
+        deleteFiles(fileNames);
     });
     
     box.adopt(deleteBut);
     a.displayPopupBox(box, 40, but);
+}
+
+function deleteFiles (fileNames) {
+    console.log("DeleteFiles", fileNames);
 }
 
 })(adminifier, window);
