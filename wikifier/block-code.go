@@ -62,7 +62,7 @@ func (cb *codeBlock) html(page *Page, el element) {
 	pageStyle, _ := page.getPageStr("code.style")
 	style := styles.Get(pageStyle)
 	if style == nil {
-		styles.Get(page.Opt.Page.Code.Style)
+		style = styles.Get(page.Opt.Page.Code.Style)
 	}
 	if style == nil {
 		style = styles.Fallback
