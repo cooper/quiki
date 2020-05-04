@@ -12,6 +12,9 @@ var defaultWikiOpt = wikifier.PageOpt{
 	Page: wikifier.PageOptPage{
 		EnableTitle: true,
 		EnableCache: true,
+		Code: wikifier.PageOptCode{
+			Style: "monokailight",
+		},
 	},
 	Dir: wikifier.PageOptDir{
 		Wiki:  "",
