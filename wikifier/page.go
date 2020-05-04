@@ -187,11 +187,6 @@ func (p *Page) _parse() error {
 		p.main.parse(p)
 	}
 
-	// inject variables set in the page to page opts
-	if err := InjectPageOpt(p, p.Opt); err != nil {
-		return err
-	}
-
 	return nil
 }
 
