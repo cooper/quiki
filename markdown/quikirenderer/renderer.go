@@ -27,6 +27,7 @@ package quikirenderer
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"strconv"
 
 	"github.com/yuin/goldmark/ast"
@@ -36,17 +37,21 @@ import (
 
 // A Config struct has configurations for the quiki markup renderer.
 type Config struct {
-	Writer    Writer
-	HardWraps bool
-	Unsafe    bool
+	Writer          Writer
+	HardWraps       bool
+	Unsafe          bool
+	PartialPage     bool
+	TableOfContents bool
 }
 
 // NewConfig returns a new Config with defaults.
 func NewConfig() Config {
 	return Config{
-		Writer:    DefaultWriter,
-		HardWraps: false,
-		Unsafe:    false,
+		Writer:          DefaultWriter,
+		HardWraps:       false,
+		Unsafe:          false,
+		PartialPage:     false,
+		TableOfContents: false,
 	}
 }
 
@@ -57,6 +62,10 @@ func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
 		c.HardWraps = value.(bool)
 	case optUnsafe:
 		c.Unsafe = value.(bool)
+	case optPartialPage:
+		c.PartialPage = value.(bool)
+	case optTableOfContents:
+		c.TableOfContents = value.(bool)
 	case optTextWriter:
 		c.Writer = value.(Writer)
 	}
@@ -137,6 +146,52 @@ func WithUnsafe() interface {
 	return &withUnsafe{}
 }
 
+// PartialPage is an option name used in WithPartialPage.
+const optPartialPage renderer.OptionName = "PartialPage"
+
+type withPartialPage struct {
+}
+
+func (o *withPartialPage) SetConfig(c *renderer.Config) {
+	c.Options[optPartialPage] = true
+}
+
+func (o *withPartialPage) SetQuikiOption(c *Config) {
+	c.PartialPage = true
+}
+
+// WithPartialPage is a functional option that renders the Markdown
+// as a portion of a page, without including quiki `@page` variables.
+func WithPartialPage() interface {
+	renderer.Option
+	Option
+} {
+	return &withPartialPage{}
+}
+
+// TableOfContents is an option name used in WithTableOfContents.
+const optTableOfContents renderer.OptionName = "TableOfContents"
+
+type withTableOfContents struct {
+}
+
+func (o *withTableOfContents) SetConfig(c *renderer.Config) {
+	c.Options[optTableOfContents] = true
+}
+
+func (o *withTableOfContents) SetQuikiOption(c *Config) {
+	c.TableOfContents = true
+}
+
+// WithTableOfContents is a functional option that renders a table
+// of contents on the page.
+func WithTableOfContents() interface {
+	renderer.Option
+	Option
+} {
+	return &withTableOfContents{}
+}
+
 // A Renderer struct is an implementation of renderer.NodeRenderer that renders
 // nodes as quiki markup.
 type Renderer struct {
@@ -214,7 +269,22 @@ var GlobalAttributeFilter = util.NewBytesFilter(
 )
 
 func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	// nothing to do
+
+	// partial page means don't include vars
+	if r.PartialPage {
+		return ast.WalkContinue, nil
+	}
+
+	// all the vars minus the title (has to be postposed til it is extracted)
+	io.WriteString(w, "@page.author:    	Markdown;\n")
+	io.WriteString(w, "@page.generator:		quiki/markdown/goldmark;\n")
+	io.WriteString(w, "@page.generated;\n\n")
+
+	// table of contents
+	if r.TableOfContents {
+		io.WriteString(w, "toc{}\n\n")
+	}
+
 	return ast.WalkContinue, nil
 }
 
