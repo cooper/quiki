@@ -22,6 +22,7 @@ func main() {
 		},
 		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
+			line = strings.Replace(line, "_NL_", "\n", -1)
 
 			// reply whenever we return
 			var reply string
@@ -50,7 +51,7 @@ func main() {
 			}
 
 			// create page
-			page := wikifier.NewPageSource(strings.Replace(line, "_NL_", "\n", -1))
+			page := wikifier.NewPageSource(line)
 			if md {
 				page.Markdown = true
 			}
