@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -42,6 +43,7 @@ type Config struct {
 	Unsafe          bool
 	PartialPage     bool
 	TableOfContents bool
+	PageTitle       string
 }
 
 // NewConfig returns a new Config with defaults.
@@ -52,6 +54,7 @@ func NewConfig() Config {
 		Unsafe:          false,
 		PartialPage:     false,
 		TableOfContents: false,
+		PageTitle:       "",
 	}
 }
 
@@ -66,6 +69,8 @@ func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
 		c.PartialPage = value.(bool)
 	case optTableOfContents:
 		c.TableOfContents = value.(bool)
+	case optPageTitle:
+		c.PageTitle = value.(string)
 	case optTextWriter:
 		c.Writer = value.(Writer)
 	}
@@ -192,6 +197,30 @@ func WithTableOfContents() interface {
 	return &withTableOfContents{}
 }
 
+// PageTitle is an option name used in WithPageTitle.
+const optPageTitle renderer.OptionName = "PageTitle"
+
+type withPageTitle struct {
+	title string
+}
+
+func (o *withPageTitle) SetConfig(c *renderer.Config) {
+	c.Options[optPageTitle] = o.title
+}
+
+func (o *withPageTitle) SetQuikiOption(c *Config) {
+	c.PageTitle = o.title
+}
+
+// WithPageTitle is a functional option that renders the `@page.title`
+// variable to the provided text.
+func WithPageTitle(title string) interface {
+	renderer.Option
+	Option
+} {
+	return &withPageTitle{title: title}
+}
+
 // A Renderer struct is an implementation of renderer.NodeRenderer that renders
 // nodes as quiki markup.
 type Renderer struct {
@@ -269,22 +298,28 @@ var GlobalAttributeFilter = util.NewBytesFilter(
 )
 
 func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	if entering {
+		// head of page
 
-	// partial page means don't include vars
-	if r.PartialPage {
-		return ast.WalkContinue, nil
+		// partial page means don't include vars
+		if r.PartialPage {
+			return ast.WalkContinue, nil
+		}
+
+		// all the vars minus the title (has to be postposed til it is extracted)
+		io.WriteString(w, "@page.author:    	Markdown;\n")
+		io.WriteString(w, "@page.generator:		quiki/markdown/goldmark;\n")
+		io.WriteString(w, "@page.generated;\n\n")
+
+		// table of contents
+		if r.TableOfContents {
+			io.WriteString(w, "toc{}\n\n")
+		}
+	} else if r.PageTitle != "" {
+
+		// foot of page
+		io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.PageTitle)+";\n")
 	}
-
-	// all the vars minus the title (has to be postposed til it is extracted)
-	io.WriteString(w, "@page.author:    	Markdown;\n")
-	io.WriteString(w, "@page.generator:		quiki/markdown/goldmark;\n")
-	io.WriteString(w, "@page.generated;\n\n")
-
-	// table of contents
-	if r.TableOfContents {
-		io.WriteString(w, "toc{}\n\n")
-	}
-
 	return ast.WalkContinue, nil
 }
 
@@ -856,4 +891,45 @@ func IsDangerousURL(url []byte) bool {
 	}
 	return bytes.HasPrefix(url, bJs) || bytes.HasPrefix(url, bVb) ||
 		bytes.HasPrefix(url, bFile) || bytes.HasPrefix(url, bData)
+}
+
+func quikiEsc(s string) string {
+
+	// escape existing escapes
+	s = strings.Replace(s, "\\", "\\\\", -1)
+
+	// ecape curly brackets
+	s = strings.Replace(s, "{", "\\{", -1)
+	s = strings.Replace(s, "}", "\\}", -1)
+
+	// fix comments (see wikifier#62)
+	s = strings.Replace(s, "/*", "\\/*", -1)
+
+	return s
+}
+
+// like quikiEsc except also escapes formatting tags
+func quikiEscFmt(s string) string {
+	s = quikiEsc(s)
+	s = strings.Replace(s, "[", "\\[", -1)
+	s = strings.Replace(s, "]", "\\]", -1)
+	return s
+}
+
+// like quikiEscFmt except also escapes pipe for [[ links ]]
+func quikiEscLink(s string) string {
+	s = quikiEscFmt(s)
+	return strings.Replace(s, "|", "\\|", -1)
+}
+
+// like quikiEscFmt except also escapes semicolon
+func quikiEscListMapValue(s string) string {
+	s = quikiEscFmt(s)
+	return strings.Replace(s, ";", "\\;", -1)
+}
+
+// like quikiEscFmt except also escapes colon and semicolon
+func quikiEscMapKey(s string) string {
+	s = quikiEscListMapValue(s)
+	return strings.Replace(s, ":", "\\:", -1)
 }

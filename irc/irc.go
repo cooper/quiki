@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cooper/quiki/markdown"
 	"github.com/cooper/quiki/wikifier"
 	hbot "github.com/whyrusleeping/hellabot"
 )
@@ -22,7 +23,25 @@ func main() {
 		Action: func(irc *hbot.Bot, mes *hbot.Message) bool {
 			line := strings.TrimLeft(strings.TrimPrefix(mes.Content, "quiki"), " ,:")
 
-			// markdown if starts with "md: "
+			// reply whenever we return
+			var reply string
+			defer (func() {
+				for _, line := range strings.Split(reply, "\n") {
+					if line == "" {
+						line = " "
+					}
+					irc.Send("PRIVMSG " + mes.To + " :" + line)
+				}
+			})()
+
+			// markdown to quiki markup if it starts with "mdq: "
+			withoutMdq := strings.TrimPrefix(line, "mdq: ")
+			if withoutMdq != line {
+				reply = string(markdown.Run([]byte(withoutMdq)))
+				return false
+			}
+
+			// markdown to HTML if starts with "md: "
 			md := false
 			withoutMd := strings.TrimPrefix(line, "md: ")
 			if withoutMd != line {
@@ -35,7 +54,6 @@ func main() {
 			if md {
 				page.Markdown = true
 			}
-			var reply string
 
 			// parse/generate html
 			if err := page.Parse(); err != nil {
@@ -57,14 +75,6 @@ func main() {
 			// keywords
 			if kw := page.Keywords(); len(kw) != 0 {
 				reply += "\n\nKeywords: " + strings.Join(kw, ", ")
-			}
-
-			// reply
-			for _, line := range strings.Split(reply, "\n") {
-				if line == "" {
-					line = " "
-				}
-				irc.Send("PRIVMSG " + mes.To + " :" + line)
 			}
 
 			return false
