@@ -225,6 +225,7 @@ func WithPageTitle(title string) interface {
 // nodes as quiki markup.
 type Renderer struct {
 	Config
+	headingLevel int
 }
 
 // NewRenderer returns a new Renderer with given options.
@@ -293,10 +294,18 @@ func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node
 		if r.TableOfContents {
 			io.WriteString(w, "toc{}\n\n")
 		}
-	} else if r.PageTitle != "" {
-
+	} else {
 		// foot of page
-		io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.PageTitle)+";\n")
+
+		// close open sections
+		for ; r.headingLevel > 0; r.headingLevel-- {
+			io.WriteString(w, "\n}")
+		}
+
+		// page title
+		if r.PageTitle != "" {
+			io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.PageTitle)+";\n")
+		}
 	}
 	return ast.WalkContinue, nil
 }
@@ -304,14 +313,57 @@ func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node
 func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Heading)
 	if entering {
-		_, _ = w.WriteString("<h")
-		_ = w.WriteByte("0123456"[n.Level])
-		_ = w.WriteByte('>')
+
+		// if we already have a header of this level open, this
+		// terminates it. if we have a header of a lower level (higher
+		// number) open, this terminates it and all others up to the
+		// biggest level.
+		for i := n.Level; i <= r.headingLevel; i++ {
+			io.WriteString(w, "\n}\n")
+		}
+
+		// e.g. going from # to ###
+		if n.Level > r.headingLevel+1 {
+			for i := r.headingLevel + 2; i <= n.Level; i++ {
+				io.WriteString(w, "~sec {\n")
+			}
+		}
+
+		// set level, start the section with name opening tag.
+		r.headingLevel = n.Level
+		io.WriteString(w, "~sec [")
+
 	} else {
-		_, _ = w.WriteString("</h")
-		_ = w.WriteByte("0123456"[n.Level])
-		_, _ = w.WriteString(">\n")
+		io.WriteString(w, "]")
+
+		// TODO: assume page title as first heading
+		// if r.PageTitle == "" {
+		// 	r.PageTitle = r.heading
+		// }
+
+		// TODO: figure the anchor for github compatibility
+		// id := node.HeadingID
+		// if node.HeadingID == "" {
+		// 	// https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
+		// 	// $section_id =~ tr/A-Z/a-z/;                 # ASCII downcase
+		// 	id = strings.ToLower(r.heading)                // downcase
+		// 	id = punctuationRegex.ReplaceAllString(id, "") // remove punctuation
+		// 	id = strings.Replace(id, " ", "-", -1)         // replace spaces with dashes
+		// 	r.heading = ""
+		// }
+
+		// // heading ID
+		// id = r.ensureUniqueHeadingID(id)
+		// if r.HeadingIDPrefix != "" {
+		// 	id = r.HeadingIDPrefix + id
+		// }
+		// if r.HeadingIDSuffix != "" {
+		// 	id = id + r.HeadingIDSuffix
+		// }
+		// r.addText(w, " "+id+"# ")
+		io.WriteString(w, " {\n")
 	}
+
 	return ast.WalkContinue, nil
 }
 
