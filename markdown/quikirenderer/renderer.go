@@ -43,6 +43,7 @@ type Config struct {
 	PartialPage     bool
 	TableOfContents bool
 	PageTitle       string
+	AbsolutePrefix  string
 }
 
 // NewConfig returns a new Config with defaults.
@@ -54,6 +55,7 @@ func NewConfig() Config {
 		PartialPage:     false,
 		TableOfContents: false,
 		PageTitle:       "",
+		AbsolutePrefix:  "",
 	}
 }
 
@@ -70,6 +72,8 @@ func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
 		c.TableOfContents = value.(bool)
 	case optPageTitle:
 		c.PageTitle = value.(string)
+	case optAbsolutePrefix:
+		c.AbsolutePrefix = value.(string)
 	case optTextWriter:
 		c.Writer = value.(Writer)
 	}
@@ -199,6 +203,30 @@ func WithTableOfContents() interface {
 // PageTitle is an option name used in WithPageTitle.
 const optPageTitle renderer.OptionName = "PageTitle"
 
+type withAbsolutePrefix struct {
+	pfx string
+}
+
+func (o *withAbsolutePrefix) SetConfig(c *renderer.Config) {
+	c.Options[optPageTitle] = o.pfx
+}
+
+func (o *withAbsolutePrefix) SetQuikiOption(c *Config) {
+	c.AbsolutePrefix = o.pfx
+}
+
+// WithAbsolutePrefix is a functional option that specifies the
+// absolute prefix.
+func WithAbsolutePrefix(pfx string) interface {
+	renderer.Option
+	Option
+} {
+	return &withAbsolutePrefix{pfx: pfx}
+}
+
+// AbsolutePrefix is an option name used in WithAbsolutePrefix.
+const optAbsolutePrefix renderer.OptionName = "AbsolutePrefix"
+
 type withPageTitle struct {
 	title string
 }
@@ -226,6 +254,7 @@ type Renderer struct {
 	Config
 	headingLevel int
 	braceEscape  bool
+	linkDest     string
 }
 
 // NewRenderer returns a new Renderer with given options.
@@ -564,19 +593,18 @@ func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node
 func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
-		w.WriteString("<a href=\"")
-		if r.Unsafe || !IsDangerousURL(n.Destination) {
-			w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+		// TODO: anything we can do with n.Title? quiki doesn't support this atm
+		link := string(r.addAbsPrefix(n.Destination))
+		link = quikiEscLink(link)
+		if hashIdx := strings.IndexByte(link, '#'); hashIdx != -1 {
+			r.linkDest = strings.TrimSuffix(link[:hashIdx], ".md") + link[hashIdx:]
+		} else {
+			r.linkDest = strings.TrimSuffix(link, ".md")
 		}
-		w.WriteByte('"')
-		if n.Title != nil {
-			w.WriteString(` title="`)
-			r.Writer.Write(w, n.Title)
-			w.WriteByte('"')
-		}
-		w.WriteByte('>')
+		w.WriteString("[[ ")
 	} else {
-		w.WriteString("</a>")
+		w.WriteString(" | " + r.linkDest + " ]]")
+		r.linkDest = ""
 	}
 	return ast.WalkContinue, nil
 }
@@ -655,6 +683,18 @@ func (r *Renderer) renderString(w util.BufWriter, source []byte, node ast.Node, 
 		}
 	}
 	return ast.WalkContinue, nil
+}
+
+func (r *Renderer) addAbsPrefix(link []byte) []byte {
+	if r.AbsolutePrefix != "" && isRelativeLink(link) && link[0] != '.' {
+		newDest := r.AbsolutePrefix
+		if link[0] != '/' {
+			newDest += "/"
+		}
+		newDest += string(link)
+		return []byte(newDest)
+	}
+	return link
 }
 
 var dataPrefix = []byte("data-")
@@ -841,4 +881,34 @@ func quikiEscListMapValue(s string) string {
 func quikiEscMapKey(s string) string {
 	s = quikiEscListMapValue(s)
 	return strings.Replace(s, ":", "\\:", -1)
+}
+
+func isRelativeLink(link []byte) (yes bool) {
+
+	// section
+	if link[0] == '#' {
+		return true
+	}
+
+	// link begin with '/' but not '//', the second maybe a protocol relative link
+	if len(link) >= 2 && link[0] == '/' && link[1] != '/' {
+		return true
+	}
+
+	// only the root '/'
+	if len(link) == 1 && link[0] == '/' {
+		return true
+	}
+
+	// current directory : begin with "./"
+	if bytes.HasPrefix(link, []byte("./")) {
+		return true
+	}
+
+	// parent directory : begin with "../"
+	if bytes.HasPrefix(link, []byte("../")) {
+		return true
+	}
+
+	return false
 }
