@@ -549,18 +549,14 @@ func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, e
 
 func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Emphasis)
-	tag := "em"
+	var tag byte = 'i'
 	if n.Level == 2 {
-		tag = "strong"
+		tag = 'b'
 	}
 	if entering {
-		w.WriteByte('<')
-		w.WriteString(tag)
-		w.WriteByte('>')
+		w.Write([]byte{'[', tag, ']'})
 	} else {
-		w.WriteString("</")
-		w.WriteString(tag)
-		w.WriteByte('>')
+		w.Write([]byte{'[', '/', tag, ']'})
 	}
 	return ast.WalkContinue, nil
 }
