@@ -226,6 +226,7 @@ func WithPageTitle(title string) interface {
 type Renderer struct {
 	Config
 	headingLevel int
+	braceEscape  bool
 }
 
 // NewRenderer returns a new Renderer with given options.
@@ -266,14 +267,6 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(ast.KindRawHTML, r.renderRawHTML)
 	reg.Register(ast.KindText, r.renderText)
 	reg.Register(ast.KindString, r.renderString)
-}
-
-func (r *Renderer) writeLines(w util.BufWriter, source []byte, n ast.Node) {
-	l := n.Lines().Len()
-	for i := 0; i < l; i++ {
-		line := n.Lines().At(i)
-		r.Writer.RawWrite(w, line.Value(source))
-	}
 }
 
 func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
@@ -325,13 +318,13 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 		// e.g. going from # to ###
 		if n.Level > r.headingLevel+1 {
 			for i := r.headingLevel + 2; i <= n.Level; i++ {
-				io.WriteString(w, "~sec {\n")
+				io.WriteString(w, "~sec{\n")
 			}
 		}
 
 		// set level, start the section with name opening tag.
 		r.headingLevel = n.Level
-		io.WriteString(w, "~sec [")
+		io.WriteString(w, "~sec[")
 
 	} else {
 		io.WriteString(w, "]")
@@ -361,7 +354,7 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 		// 	id = id + r.HeadingIDSuffix
 		// }
 		// r.addText(w, " "+id+"# ")
-		io.WriteString(w, " {\n")
+		io.WriteString(w, "{\n")
 	}
 
 	return ast.WalkContinue, nil
@@ -369,39 +362,79 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 
 func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<blockquote>\n")
+		_, _ = w.WriteString("~quote{\n")
 	} else {
-		_, _ = w.WriteString("</blockquote>\n")
+		_, _ = w.WriteString("\n}\n")
 	}
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderCodeBlockLang(lang string, w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<pre><code>")
-		r.writeLines(w, source, n)
+
+		// language
+		if lang != "" {
+			lang = "[" + quikiEscFmt(lang) + "]"
+		}
+
+		// extract the code
+		var code []byte
+		l := n.Lines().Len()
+		for i := 0; i < l; i++ {
+			line := n.Lines().At(i)
+			code = append(code, line.Value(source)...)
+		}
+
+		// if there is a closing brace for every opening brace, we can use brace-escape
+		braceLevel, braceCount := 0, 0
+		for _, c := range code {
+			if c == '{' {
+				braceLevel++
+				braceCount++
+			} else if c == '}' {
+				braceLevel--
+				if braceLevel < 0 {
+					break
+				}
+			}
+		}
+		r.braceEscape = braceLevel == 0 && braceCount != 0
+
+		if r.braceEscape {
+			// use brace-escape
+			_, _ = w.WriteString("~code" + lang + "{{\n")
+			_, _ = w.Write(code)
+		} else {
+			// can't use brace-escape; escape the code
+			_, _ = w.WriteString("~code" + lang + "{\n")
+			_, _ = w.WriteString(quikiEsc(string(code)))
+		}
 	} else {
-		_, _ = w.WriteString("</code></pre>\n")
+		// closing
+
+		if r.braceEscape {
+			_, _ = w.WriteString("\n}}\n")
+			r.braceEscape = false
+		} else {
+			_, _ = w.WriteString("\n}\n")
+		}
 	}
 	return ast.WalkContinue, nil
+}
+
+func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	return r.renderCodeBlockLang("", w, source, node, entering)
 }
 
 func (r *Renderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	n := node.(*ast.FencedCodeBlock)
+	lang := ""
 	if entering {
-		_, _ = w.WriteString("<pre><code")
-		language := n.Language(source)
+		language := node.(*ast.FencedCodeBlock).Language(source)
 		if language != nil {
-			_, _ = w.WriteString(" class=\"language-")
-			r.Writer.Write(w, language)
-			_, _ = w.WriteString("\"")
+			lang = string(language)
 		}
-		_ = w.WriteByte('>')
-		r.writeLines(w, source, n)
-	} else {
-		_, _ = w.WriteString("</code></pre>\n")
 	}
-	return ast.WalkContinue, nil
+	return r.renderCodeBlockLang(lang, w, source, node, entering)
 }
 
 func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {

@@ -31,7 +31,7 @@ func main() {
 					if line == "" {
 						line = " "
 					}
-					irc.Send("PRIVMSG " + mes.To + " :" + line)
+					irc.Reply(mes, line)
 				}
 			})()
 
