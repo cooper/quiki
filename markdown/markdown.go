@@ -21,7 +21,10 @@ func Run(input []byte) []byte {
 		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 		goldmark.WithRendererOptions(
-			quikirenderer.WithTableOfContents(), quikirenderer.WithPartialPage()),
+			quikirenderer.WithTableOfContents(),
+			quikirenderer.WithPartialPage(),
+			quikirenderer.WithUnsafe(),
+		),
 	)
 	var buf bytes.Buffer
 	if err := md.Convert(input, &buf); err != nil {

@@ -444,18 +444,20 @@ func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Nod
 			l := n.Lines().Len()
 			for i := 0; i < l; i++ {
 				line := n.Lines().At(i)
-				w.Write(line.Value(source))
+				w.WriteString("~html{")
+				w.WriteString(quikiEsc(string(line.Value(source))))
 			}
 		} else {
-			w.WriteString("<!-- raw HTML omitted -->\n")
+			w.WriteString("/* raw HTML omitted */\n")
 		}
 	} else {
 		if n.HasClosure() {
 			if r.Unsafe {
 				closure := n.ClosureLine
-				w.Write(closure.Value(source))
+				w.WriteString(quikiEsc(string(closure.Value(source))))
+				w.WriteByte('}')
 			} else {
-				w.WriteString("<!-- raw HTML omitted -->\n")
+				w.WriteString("/* raw HTML omitted */\n")
 			}
 		}
 	}
@@ -500,9 +502,9 @@ func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, e
 
 func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.WriteString("<p>")
+		w.WriteString("~p{\n")
 	} else {
-		w.WriteString("</p>\n")
+		w.WriteString("\n}\n")
 	}
 	return ast.WalkContinue, nil
 }
@@ -545,7 +547,7 @@ func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node
 
 func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.WriteString("<code>")
+		w.WriteString("[c]")
 		for c := n.FirstChild(); c != nil; c = c.NextSibling() {
 			segment := c.(*ast.Text).Segment
 			value := segment.Value(source)
@@ -560,7 +562,7 @@ func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, e
 		}
 		return ast.WalkSkipChildren, nil
 	}
-	w.WriteString("</code>")
+	w.WriteString("[/c]")
 	return ast.WalkContinue, nil
 }
 
@@ -632,11 +634,13 @@ func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node,
 		l := n.Segments.Len()
 		for i := 0; i < l; i++ {
 			segment := n.Segments.At(i)
-			w.Write(segment.Value(source))
+			w.WriteString("[html:")
+			w.WriteString(quikiEscFmt(string(segment.Value(source))))
+			w.WriteByte(']')
 		}
 		return ast.WalkSkipChildren, nil
 	}
-	w.WriteString("<!-- raw HTML omitted -->")
+	w.WriteString("/* raw HTML omitted */")
 	return ast.WalkSkipChildren, nil
 }
 
