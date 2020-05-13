@@ -26,7 +26,6 @@ package quikirenderer
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -466,36 +465,22 @@ func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Nod
 
 func (r *Renderer) renderList(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.List)
-	tag := "ul"
-	if n.IsOrdered() {
-		tag = "ol"
-	}
-	if entering {
-		w.WriteByte('<')
-		w.WriteString(tag)
-		if n.IsOrdered() && n.Start != 1 {
-			fmt.Fprintf(w, " start=\"%d\"", n.Start)
-		}
-		w.WriteString(">\n")
+	if entering && n.IsOrdered() {
+		// TODO: n.IsOrdered() && n.Start != 1
+		w.WriteString("~numlist{")
+	} else if entering {
+		w.WriteString("~list{")
 	} else {
-		w.WriteString("</")
-		w.WriteString(tag)
-		w.WriteString(">\n")
+		w.WriteString("\n}\n")
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.WriteString("<li>")
-		fc := n.FirstChild()
-		if fc != nil {
-			if _, ok := fc.(*ast.TextBlock); !ok {
-				w.WriteByte('\n')
-			}
-		}
+		w.WriteByte('\n')
 	} else {
-		w.WriteString("</li>\n")
+		w.WriteByte(';')
 	}
 	return ast.WalkContinue, nil
 }
