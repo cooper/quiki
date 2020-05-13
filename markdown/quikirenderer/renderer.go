@@ -362,9 +362,9 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 
 func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("~quote{\n")
+		w.WriteString("~quote{\n")
 	} else {
-		_, _ = w.WriteString("\n}\n")
+		w.WriteString("\n}\n")
 	}
 	return ast.WalkContinue, nil
 }
@@ -402,21 +402,21 @@ func (r *Renderer) renderCodeBlockLang(lang string, w util.BufWriter, source []b
 
 		if r.braceEscape {
 			// use brace-escape
-			_, _ = w.WriteString("~code" + lang + "{{\n")
-			_, _ = w.Write(code)
+			w.WriteString("~code" + lang + "{{\n")
+			w.Write(code)
 		} else {
 			// can't use brace-escape; escape the code
-			_, _ = w.WriteString("~code" + lang + "{\n")
-			_, _ = w.WriteString(quikiEsc(string(code)))
+			w.WriteString("~code" + lang + "{\n")
+			w.WriteString(quikiEsc(string(code)))
 		}
 	} else {
 		// closing
 
 		if r.braceEscape {
-			_, _ = w.WriteString("\n}}\n")
+			w.WriteString("\n}}\n")
 			r.braceEscape = false
 		} else {
-			_, _ = w.WriteString("\n}\n")
+			w.WriteString("\n}\n")
 		}
 	}
 	return ast.WalkContinue, nil
@@ -444,18 +444,18 @@ func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Nod
 			l := n.Lines().Len()
 			for i := 0; i < l; i++ {
 				line := n.Lines().At(i)
-				_, _ = w.Write(line.Value(source))
+				w.Write(line.Value(source))
 			}
 		} else {
-			_, _ = w.WriteString("<!-- raw HTML omitted -->\n")
+			w.WriteString("<!-- raw HTML omitted -->\n")
 		}
 	} else {
 		if n.HasClosure() {
 			if r.Unsafe {
 				closure := n.ClosureLine
-				_, _ = w.Write(closure.Value(source))
+				w.Write(closure.Value(source))
 			} else {
-				_, _ = w.WriteString("<!-- raw HTML omitted -->\n")
+				w.WriteString("<!-- raw HTML omitted -->\n")
 			}
 		}
 	}
@@ -469,40 +469,40 @@ func (r *Renderer) renderList(w util.BufWriter, source []byte, node ast.Node, en
 		tag = "ol"
 	}
 	if entering {
-		_ = w.WriteByte('<')
-		_, _ = w.WriteString(tag)
+		w.WriteByte('<')
+		w.WriteString(tag)
 		if n.IsOrdered() && n.Start != 1 {
 			fmt.Fprintf(w, " start=\"%d\"", n.Start)
 		}
-		_, _ = w.WriteString(">\n")
+		w.WriteString(">\n")
 	} else {
-		_, _ = w.WriteString("</")
-		_, _ = w.WriteString(tag)
-		_, _ = w.WriteString(">\n")
+		w.WriteString("</")
+		w.WriteString(tag)
+		w.WriteString(">\n")
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<li>")
+		w.WriteString("<li>")
 		fc := n.FirstChild()
 		if fc != nil {
 			if _, ok := fc.(*ast.TextBlock); !ok {
-				_ = w.WriteByte('\n')
+				w.WriteByte('\n')
 			}
 		}
 	} else {
-		_, _ = w.WriteString("</li>\n")
+		w.WriteString("</li>\n")
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<p>")
+		w.WriteString("<p>")
 	} else {
-		_, _ = w.WriteString("</p>\n")
+		w.WriteString("</p>\n")
 	}
 	return ast.WalkContinue, nil
 }
@@ -510,7 +510,7 @@ func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, 
 func (r *Renderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		if _, ok := n.NextSibling().(ast.Node); ok && n.FirstChild() != nil {
-			_ = w.WriteByte('\n')
+			w.WriteByte('\n')
 		}
 	}
 	return ast.WalkContinue, nil
@@ -520,8 +520,8 @@ func (r *Renderer) renderThematicBreak(w util.BufWriter, source []byte, n ast.No
 	if !entering {
 		return ast.WalkContinue, nil
 	}
-	_, _ = w.WriteString("<hr")
-	_, _ = w.WriteString(">\n")
+	w.WriteString("<hr")
+	w.WriteString(">\n")
 	return ast.WalkContinue, nil
 }
 
@@ -530,22 +530,22 @@ func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node
 	if !entering {
 		return ast.WalkContinue, nil
 	}
-	_, _ = w.WriteString(`<a href="`)
+	w.WriteString(`<a href="`)
 	url := n.URL(source)
 	label := n.Label(source)
 	if n.AutoLinkType == ast.AutoLinkEmail && !bytes.HasPrefix(bytes.ToLower(url), []byte("mailto:")) {
-		_, _ = w.WriteString("mailto:")
+		w.WriteString("mailto:")
 	}
-	_, _ = w.Write(util.EscapeHTML(util.URLEscape(url, false)))
-	_, _ = w.WriteString(`">`)
-	_, _ = w.Write(util.EscapeHTML(label))
-	_, _ = w.WriteString(`</a>`)
+	w.Write(util.EscapeHTML(util.URLEscape(url, false)))
+	w.WriteString(`">`)
+	w.Write(util.EscapeHTML(label))
+	w.WriteString(`</a>`)
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<code>")
+		w.WriteString("<code>")
 		for c := n.FirstChild(); c != nil; c = c.NextSibling() {
 			segment := c.(*ast.Text).Segment
 			value := segment.Value(source)
@@ -560,7 +560,7 @@ func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, e
 		}
 		return ast.WalkSkipChildren, nil
 	}
-	_, _ = w.WriteString("</code>")
+	w.WriteString("</code>")
 	return ast.WalkContinue, nil
 }
 
@@ -571,13 +571,13 @@ func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node
 		tag = "strong"
 	}
 	if entering {
-		_ = w.WriteByte('<')
-		_, _ = w.WriteString(tag)
-		_ = w.WriteByte('>')
+		w.WriteByte('<')
+		w.WriteString(tag)
+		w.WriteByte('>')
 	} else {
-		_, _ = w.WriteString("</")
-		_, _ = w.WriteString(tag)
-		_ = w.WriteByte('>')
+		w.WriteString("</")
+		w.WriteString(tag)
+		w.WriteByte('>')
 	}
 	return ast.WalkContinue, nil
 }
@@ -585,19 +585,19 @@ func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node
 func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
-		_, _ = w.WriteString("<a href=\"")
+		w.WriteString("<a href=\"")
 		if r.Unsafe || !IsDangerousURL(n.Destination) {
-			_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+			w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
 		}
-		_ = w.WriteByte('"')
+		w.WriteByte('"')
 		if n.Title != nil {
-			_, _ = w.WriteString(` title="`)
+			w.WriteString(` title="`)
 			r.Writer.Write(w, n.Title)
-			_ = w.WriteByte('"')
+			w.WriteByte('"')
 		}
-		_ = w.WriteByte('>')
+		w.WriteByte('>')
 	} else {
-		_, _ = w.WriteString("</a>")
+		w.WriteString("</a>")
 	}
 	return ast.WalkContinue, nil
 }
@@ -607,19 +607,19 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 		return ast.WalkContinue, nil
 	}
 	n := node.(*ast.Image)
-	_, _ = w.WriteString("<img src=\"")
+	w.WriteString("<img src=\"")
 	if r.Unsafe || !IsDangerousURL(n.Destination) {
-		_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+		w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
 	}
-	_, _ = w.WriteString(`" alt="`)
-	_, _ = w.Write(n.Text(source))
-	_ = w.WriteByte('"')
+	w.WriteString(`" alt="`)
+	w.Write(n.Text(source))
+	w.WriteByte('"')
 	if n.Title != nil {
-		_, _ = w.WriteString(` title="`)
+		w.WriteString(` title="`)
 		r.Writer.Write(w, n.Title)
-		_ = w.WriteByte('"')
+		w.WriteByte('"')
 	}
-	_, _ = w.WriteString(">")
+	w.WriteString(">")
 	return ast.WalkSkipChildren, nil
 }
 
@@ -632,11 +632,11 @@ func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node,
 		l := n.Segments.Len()
 		for i := 0; i < l; i++ {
 			segment := n.Segments.At(i)
-			_, _ = w.Write(segment.Value(source))
+			w.Write(segment.Value(source))
 		}
 		return ast.WalkSkipChildren, nil
 	}
-	_, _ = w.WriteString("<!-- raw HTML omitted -->")
+	w.WriteString("<!-- raw HTML omitted -->")
 	return ast.WalkSkipChildren, nil
 }
 
@@ -651,9 +651,9 @@ func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, en
 	} else {
 		r.Writer.Write(w, segment.Value(source))
 		if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
-			_, _ = w.WriteString("<br>\n")
+			w.WriteString("<br>\n")
 		} else if n.SoftLineBreak() {
-			_ = w.WriteByte('\n')
+			w.WriteByte('\n')
 		}
 	}
 	return ast.WalkContinue, nil
@@ -665,7 +665,7 @@ func (r *Renderer) renderString(w util.BufWriter, source []byte, node ast.Node, 
 	}
 	n := node.(*ast.String)
 	if n.IsCode() {
-		_, _ = w.Write(n.Value)
+		w.Write(n.Value)
 	} else {
 		if n.IsRaw() {
 			r.Writer.RawWrite(w, n.Value)
@@ -696,11 +696,11 @@ func escapeRune(writer util.BufWriter, r rune) {
 	if r < 256 {
 		v := util.EscapeHTMLByte(byte(r))
 		if v != nil {
-			_, _ = writer.Write(v)
+			writer.Write(v)
 			return
 		}
 	}
-	_, _ = writer.WriteRune(util.ToValidRune(r))
+	writer.WriteRune(util.ToValidRune(r))
 }
 
 func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
@@ -709,15 +709,15 @@ func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
 	for i := 0; i < l; i++ {
 		v := util.EscapeHTMLByte(source[i])
 		if v != nil {
-			_, _ = writer.Write(source[i-n : i])
+			writer.Write(source[i-n : i])
 			n = 0
-			_, _ = writer.Write(v)
+			writer.Write(v)
 			continue
 		}
 		n++
 	}
 	if n != 0 {
-		_, _ = writer.Write(source[l-n:])
+		writer.Write(source[l-n:])
 	}
 }
 
