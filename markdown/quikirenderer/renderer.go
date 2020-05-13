@@ -312,16 +312,22 @@ func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node
 	if !entering {
 		return ast.WalkContinue, nil
 	}
-	w.WriteString(`<a href="`)
+
+	// extract label and url
 	url := n.URL(source)
 	label := n.Label(source)
-	if n.AutoLinkType == ast.AutoLinkEmail && !bytes.HasPrefix(bytes.ToLower(url), []byte("mailto:")) {
-		w.WriteString("mailto:")
+
+	// escape link
+	if n.AutoLinkType != ast.AutoLinkEmail {
+		url = r.addAbsPrefix(url)
 	}
-	w.Write(util.EscapeHTML(util.URLEscape(url, false)))
-	w.WriteString(`">`)
-	w.Write(util.EscapeHTML(label))
-	w.WriteString(`</a>`)
+	link := quikiEscLink(string(url))
+
+	w.WriteString("[[ ")
+	w.WriteString(quikiEscFmt(string(label)))
+	w.WriteString(" | ")
+	w.WriteString(link)
+	w.WriteString(" ]]")
 	return ast.WalkContinue, nil
 }
 
