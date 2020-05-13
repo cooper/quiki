@@ -504,11 +504,7 @@ func (r *Renderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, 
 }
 
 func (r *Renderer) renderThematicBreak(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
-	if !entering {
-		return ast.WalkContinue, nil
-	}
-	w.WriteString("<hr")
-	w.WriteString(">\n")
+	// TODO
 	return ast.WalkContinue, nil
 }
 
