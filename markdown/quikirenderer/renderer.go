@@ -390,19 +390,18 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 		return ast.WalkContinue, nil
 	}
 	n := node.(*ast.Image)
-	w.WriteString("<img src=\"")
-	if r.Unsafe || !IsDangerousURL(n.Destination) {
-		w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+
+	dest := n.Destination
+	dest = r.addAbsPrefix(dest)
+	w.WriteString("~image{\n    file: ")
+	if r.Unsafe || !IsDangerousURL(dest) {
+		w.WriteString(quikiEscListMapValue(string(util.URLEscape(dest, true))))
 	}
-	w.WriteString(`" alt="`)
-	w.Write(n.Text(source))
-	w.WriteByte('"')
-	if n.Title != nil {
-		w.WriteString(` title="`)
-		r.Writer.Write(w, n.Title)
-		w.WriteByte('"')
-	}
-	w.WriteString(">")
+	w.WriteString(";\n    alt: ")
+	w.WriteString(quikiEscListMapValue(string(n.Text(source))))
+	// TODO: can we do anything with n.Title?
+	w.WriteString(";\n}\n")
+
 	return ast.WalkSkipChildren, nil
 }
 
