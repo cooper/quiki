@@ -435,7 +435,7 @@ func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, en
 	} else {
 		r.Writer.Write(w, segment.Value(source))
 		if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
-			w.WriteString("<br>\n")
+			w.WriteString("[nl]\n")
 		} else if n.SoftLineBreak() {
 			w.WriteByte('\n')
 		}
