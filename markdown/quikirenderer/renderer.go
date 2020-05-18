@@ -10,7 +10,6 @@ package quikirenderer
 
 import (
 	"bytes"
-	"io"
 	"strings"
 
 	"github.com/yuin/goldmark/ast"
@@ -77,25 +76,25 @@ func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node
 		}
 
 		// all the vars minus the title (has to be postposed til it is extracted)
-		io.WriteString(w, "@page.author:       Markdown;\n")
-		io.WriteString(w, "@page.generator:    quiki/markdown/goldmark;\n")
-		io.WriteString(w, "@page.generated;\n\n")
+		w.WriteString("@page.author:       Markdown;\n")
+		w.WriteString("@page.generator:    quiki/markdown/goldmark;\n")
+		w.WriteString("@page.generated;\n\n")
 
 		// table of contents
 		if r.TableOfContents {
-			io.WriteString(w, "toc{}\n\n")
+			w.WriteString("toc{}\n\n")
 		}
 	} else {
 		// foot of page
 
 		// close open sections
 		for ; r.headingLevel > 0; r.headingLevel-- {
-			io.WriteString(w, "\n}")
+			w.WriteString("\n}")
 		}
 
 		// page title
 		if r.PageTitle != "" {
-			io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.PageTitle)+";\n")
+			w.WriteString("\n@page.title: " + quikiEscFmt(r.PageTitle) + ";\n")
 		}
 	}
 	return ast.WalkContinue, nil
@@ -110,22 +109,22 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 		// number) open, this terminates it and all others up to the
 		// biggest level.
 		for i := n.Level; i <= r.headingLevel; i++ {
-			io.WriteString(w, "\n}\n")
+			w.WriteString("\n}\n")
 		}
 
 		// e.g. going from # to ###
 		if n.Level > r.headingLevel+1 {
 			for i := r.headingLevel + 2; i <= n.Level; i++ {
-				io.WriteString(w, "~sec{\n")
+				w.WriteString("~sec{\n")
 			}
 		}
 
 		// set level, start the section with name opening tag.
 		r.headingLevel = n.Level
-		io.WriteString(w, "~sec[")
+		w.WriteString("~sec[")
 
 	} else {
-		io.WriteString(w, "]")
+		w.WriteString("]")
 
 		// TODO: assume page title as first heading
 		// if r.PageTitle == "" {
@@ -152,7 +151,7 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 		// 	id = id + r.HeadingIDSuffix
 		// }
 		// r.addText(w, " "+id+"# ")
-		io.WriteString(w, "{\n")
+		w.WriteString("{\n")
 	}
 
 	return ast.WalkContinue, nil
