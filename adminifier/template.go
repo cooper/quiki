@@ -6,7 +6,7 @@ import (
 )
 
 // handlers that go straight to templates
-var tmplHandlers = []string{"login"}
+var tmplHandlers = []string{}
 
 func handleTemplate(w http.ResponseWriter, r *http.Request) {
 	relPath := strings.TrimPrefix(r.URL.Path, root)

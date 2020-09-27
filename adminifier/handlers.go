@@ -10,8 +10,11 @@ import (
 
 // handlers that call functions
 var funcHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
-	"func/login": handleLogin,
-	"logout":     handleLogout,
+	"login":            handleLoginPage,
+	"func/login":       handleLogin,
+	"create-user":      handleCreateUserPage,
+	"func/create-user": handleCreateUser,
+	"logout":           handleLogout,
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +42,17 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	// and deny access to the server admin panel
 }
 
+func handleLoginPage(w http.ResponseWriter, r *http.Request) {
+
+	// if no users exist, redirect to create-user
+	if len(webserver.Auth.Users) == 0 {
+		http.Redirect(w, r, "create-user", http.StatusTemporaryRedirect)
+		return
+	}
+
+	handleTemplate(w, r)
+}
+
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// missing parameters or malformed request
@@ -63,6 +77,49 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// redirect to dashboard, which is now located at adminifier root
 	http.Redirect(w, r, "../", http.StatusTemporaryRedirect)
+}
+
+func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
+
+	// if users exist, redirect to login
+	if len(webserver.Auth.Users) != 0 {
+		http.Redirect(w, r, "login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	handleTemplate(w, r)
+}
+
+func handleCreateUser(w http.ResponseWriter, r *http.Request) {
+
+	// missing parameters or malformed request
+	if !parsePost(w, r, "display", "email", "username", "password") {
+		return
+	}
+
+	// for now, you can only create a user if none exist
+	// not authorized otherwise
+	if len(webserver.Auth.Users) != 0 {
+		http.Error(w, "user already exists", http.StatusUnauthorized)
+		return
+	}
+
+	// create user
+	// TODO: validate things
+	err := webserver.Auth.NewUser(authenticator.User{
+		Username:    r.Form.Get("username"),
+		DisplayName: r.Form.Get("display"),
+		Email:       r.Form.Get("email"),
+	}, r.Form.Get("password"))
+
+	// error occurred
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// log 'em in by simulating a request to /func/login
+	handleLogin(w, r)
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
