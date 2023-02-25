@@ -14,11 +14,12 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.0-20200322061010-ea0c1cf2f119
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
+	github.com/mudler/sendfd v0.0.0-20150620134918-f0fc74c13877 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/whyrusleeping/hellabot v0.0.0-20191113145436-fd8fa1922281
-	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79
+	golang.org/x/crypto v0.1.0
 	gopkg.in/inconshreveable/log15.v2 v2.0.0-20200109203555-b30bc20e4fd1 // indirect
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2
