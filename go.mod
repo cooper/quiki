@@ -19,7 +19,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/whyrusleeping/hellabot v0.0.0-20191113145436-fd8fa1922281
-	golang.org/x/crypto v0.1.0
+	golang.org/x/crypto v0.31.0
 	gopkg.in/inconshreveable/log15.v2 v2.0.0-20200109203555-b30bc20e4fd1 // indirect
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2
