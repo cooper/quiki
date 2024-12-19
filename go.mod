@@ -1,6 +1,6 @@
 module github.com/cooper/quiki
 
-go 1.21
+go 1.23.1
 
 toolchain go1.23.4
 
@@ -43,3 +43,5 @@ require (
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
+
+replace github.com/disintegration/imaging => github.com/stephenfire/imaging v1.0.0
