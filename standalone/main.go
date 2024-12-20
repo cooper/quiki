@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -9,10 +10,17 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		log.Fatal("wrong # of args")
+	var page *wikifier.Page
+
+	if len(os.Args) > 1 {
+		page = wikifier.NewPage(os.Args[1])
+	} else {
+		input, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			log.Fatal(err)
+		}
+		page = wikifier.NewPageSource(string(input))
 	}
-	page := wikifier.NewPage(os.Args[1])
 
 	// parse
 	err := page.Parse()
