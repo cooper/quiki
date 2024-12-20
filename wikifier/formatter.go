@@ -5,6 +5,8 @@ import (
 	"html"
 	"regexp"
 	"strings"
+
+	"github.com/enescakir/emoji"
 )
 
 var (
@@ -14,6 +16,7 @@ var (
 	colorRegex    = regexp.MustCompile(`(?i)^#[\da-f]+$`)
 	wikiRegex     = regexp.MustCompile(`^(\w+):(.*)$`)
 	oldLinkRegex  = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
+	emojiRegex    = regexp.MustCompile(`:\w+:`)
 )
 
 var colors = map[string]string{
@@ -452,6 +455,14 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 	// [html:x<sup>2</sup>]
 	if strings.HasPrefix(formatType, "html:") {
 		return HTML(strings.TrimPrefix(formatType, "html:"))
+	}
+
+	// emoji
+	if emojiRegex.MatchString(formatType) {
+		if found, ok := emoji.Map()[formatType]; ok {
+			return HTML(found)
+		}
+		return HTML(formatType)
 	}
 
 	return HTML("")

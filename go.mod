@@ -24,6 +24,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/enescakir/emoji v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
