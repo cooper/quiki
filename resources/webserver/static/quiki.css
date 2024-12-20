@@ -342,5 +342,5 @@ table.q-table th {
 /* built-in classes */
 
 .qc-clear, .q-clear { clear: both; }
-.qc-clear-left { clear: left; }
-.qc-clear-right { clear: right; }
+.qc-clear-left, .q-clear.qc-left { clear: left; }
+.qc-clear-right .q-clear.qc-right { clear: right; }

@@ -9,5 +9,4 @@ func newClearBlock(name string, b *parserBlock) block {
 }
 
 func (b *clearBlock) html(page *Page, el element) {
-	el.addClass("clear")
 }
