@@ -2,6 +2,12 @@ package wikifier
 
 import "regexp"
 
+var (
+	variableNameRgx = regexp.MustCompile(`[\w\.\/]`)
+	spaceRgx        = regexp.MustCompile(`\s`)
+	anyCharRgx      = regexp.MustCompile(`.`)
+)
+
 type variableName struct {
 	parent catch
 	*genericCatch
@@ -21,15 +27,13 @@ func (vn *variableName) parentCatch() catch {
 }
 
 // word-like chars and periods are OK in var names
-func (vn *variableName) byteOK(b byte) bool {
-	ok, _ := regexp.Match(`[\w\.\/]`, []byte{b})
-	return ok
+func (vn *variableName) runeOk(r rune) bool {
+	return variableNameRgx.MatchString(string(r))
 }
 
 // skip whitespace in variable name
-func (vn *variableName) shouldSkipByte(b byte) bool {
-	skip, _ := regexp.Match(`\s`, []byte{b})
-	return skip
+func (vn *variableName) shouldSkipRune(r rune) bool {
+	return spaceRgx.MatchString(string(r))
 }
 
 type variableValue struct {
@@ -49,15 +53,13 @@ func (vv *variableValue) parentCatch() catch {
 	return vv.parent
 }
 
-func (vv *variableValue) byteOK(b byte) bool {
-	if b == '\n' {
+func (vv *variableValue) runeOk(r rune) bool {
+	if r == '\n' {
 		return true
 	}
-	ok, _ := regexp.Match(`.`, []byte{b})
-	return ok
+	return anyCharRgx.MatchString(string(r))
 }
 
-// skip whitespace in variable name
-func (vv *variableValue) shouldSkipByte(b byte) bool {
+func (vv *variableValue) shouldSkipRune(rune) bool {
 	return false
 }

@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 var (
@@ -17,13 +18,13 @@ var (
 type parser struct {
 	pos Position
 
-	last       byte // last byte
-	this       byte // current byte
-	next       byte // next byte
-	next2      byte // next-next byte
-	escape     bool // this byte is escaped
+	last       rune // last rune
+	this       rune // current rune
+	next       rune // next rune
+	next2      rune // next-next rune
+	escape     bool // this rune is escaped
 	parserChar bool // this character is handled by the master parser (for escapes)
-	skip       int  // number of next bytes to skip
+	skip       int  // number of next runes to skip
 
 	catch catch // current parser catch
 	block block // current parser block
@@ -101,39 +102,41 @@ func (p *parser) parseLine(line []byte, page *Page) error {
 		line = append(line, '\n')
 	}
 
-	// handle each byte
+	// handle each rune
 	p.lineHasStarted = false
-	for i, b := range line {
+	for i := 0; i < len(line); {
+		r, size := utf8.DecodeRune(line[i:])
+		i += size
 
-		// skip this byte
+		// skip this rune
 		if p.skip != 0 {
 			p.skip--
 			continue
 		}
 
-		// update column and bytes
-		p.pos.Column = i + 1
-		p.this = b
+		// update column and runes
+		p.pos.Column++
+		p.this = r
 
-		// next two bytes
-		if len(line) > i+1 {
-			p.next = line[i+1]
+		// next two runes
+		if len(line) > i {
+			p.next, _ = utf8.DecodeRune(line[i:])
 		} else {
 			p.next = 0
 		}
-		if len(line) > i+2 {
-			p.next2 = line[i+2]
+		if len(line) > i+size {
+			p.next2, _ = utf8.DecodeRune(line[i+size:])
 		} else {
 			p.next2 = 0
 		}
 
-		// handle this byte and give up if error occurred
-		if err := p.parseByte(b, page); err != nil {
+		// handle this rune and give up if error occurred
+		if err := p.parseRune(r, page); err != nil {
 			return err
 		}
 
 		// that was the very first non-space character on the line (quiki#3)
-		if !p.lineHasStarted && !unicode.IsSpace(rune(b)) {
+		if !p.lineHasStarted && !unicode.IsSpace(r) {
 			p.lineHasStarted = true
 		}
 	}
@@ -159,7 +162,7 @@ func parserError(pos Position, msg string) *ParserError {
 	return &ParserError{Pos: pos, Err: errors.New(msg)}
 }
 
-var variableTokens = map[byte]bool{
+var variableTokens = map[rune]bool{
 	'@': true,
 	'%': true,
 	':': true,
@@ -167,20 +170,20 @@ var variableTokens = map[byte]bool{
 	'-': true,
 }
 
-func (p *parser) parseByte(b byte, page *Page) error {
+func (p *parser) parseRune(r rune, page *Page) error {
 
 	// // fix extra newline added to code{} blocks
-	// if p.braceLevel == 0 && b == '{' && p.next == '\n' {
+	// if p.braceLevel == 0 && r == '{' && p.next == '\n' {
 	// 	p.skip++
 	// }
 
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
 
-		if b == '{' {
+		if r == '{' {
 			// increase brace depth
 			p.braceLevel++
-		} else if b == '}' {
+		} else if r == '}' {
 			// decrease brace depth
 			p.braceLevel--
 
@@ -191,59 +194,59 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 		}
 
-		// proceed to the next byte if this was the first or last brace
+		// proceed to the next rune if this was the first or last brace
 		if p.braceLevel == 0 {
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// otherwise, proceed to the catch
-		return p.handleByte(b)
+		return p.handleRune(r)
 	}
 
 	// COMMENTS
 
 	// entrance
-	if b == '/' && p.next == '*' {
+	if r == '/' && p.next == '*' {
 		p.parserChar = true
 
 		// this is escaped
 		if p.escape {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
 
-		// next byte
+		// next rune
 		p.commentLevel++
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
 	// exit
-	if b == '*' && p.next == '/' {
+	if r == '*' && p.next == '/' {
 
 		// we weren't in a comment, so handle normally
 		if p.commentLevel == 0 {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
 
-		// decrease comment level and skip this and next byte
+		// decrease comment level and skip this and next rune
 		p.commentLevel--
 		p.skip++
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
-	// we're inside a comment; skip to next byte
+	// we're inside a comment; skip to next rune
 	if p.commentLevel != 0 {
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
 	// BLOCKS
 
-	if b == '{' {
+	if r == '{' {
 		// opens a block
 		p.parserChar = true
 
 		// this is escaped
 		if p.escape {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
 
 		var blockClasses []string
@@ -376,10 +379,10 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			p.catch = catch
 		}
 
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
-	if b == '}' {
+	if r == '}' {
 		openPos := p.block.openPosition()
 
 		// closes a block
@@ -388,7 +391,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// this is escaped
 		if p.escape {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
 
 		// we cannot close the main block
@@ -409,6 +412,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 		// elsif [condition] { ... }
+
 		case "elsif":
 
 			// no conditional exists before this
@@ -483,31 +487,31 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		p.block = p.block.parentBlock()
 		p.catch = p.catch.parentCatch()
 
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
-	if b == '\\' {
+	if r == '\\' {
 		// the escape will be handled later
 		if p.escape {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
-		return p.nextByte(b)
+		return p.nextRune(r)
 	}
 
 	// VARIABLES
 
 	// FIXME: these tokens in stray text in the main block cause issues
-	if p.block.blockType() == "main" && variableTokens[b] && p.last != '[' {
+	if p.block.blockType() == "main" && variableTokens[r] && p.last != '[' {
 		// p.parserChar = true ???
 
 		if p.escape {
-			return p.handleByte(b)
+			return p.handleRune(r)
 		}
 
 		// entering a variable declaration on a NEW LINE (quiki#3)
 		potentiallyVar := false
 		if p.catch == p.block {
-			if b == '@' || b == '%' {
+			if r == '@' || r == '%' {
 				if p.varNegated && p.last == '-' {
 					// last char was - for negation, seems likely
 					potentiallyVar = true
@@ -515,7 +519,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 					// @ or % started the line, seems likely
 					potentiallyVar = true
 				}
-			} else if b == '-' && !p.lineHasStarted {
+			} else if r == '-' && !p.lineHasStarted {
 				p.varNegated = true
 			}
 		}
@@ -524,18 +528,18 @@ func (p *parser) parseByte(b byte, page *Page) error {
 		if potentiallyVar {
 
 			// disable interpolation if it's %var
-			p.varNotInterpolated = b == '%'
+			p.varNotInterpolated = r == '%'
 
 			// catch the var name
-			catch := newVariableName(string(b), p.pos)
+			catch := newVariableName(string(r), p.pos)
 			catch.parent = p.catch
 			p.catch = catch
 
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// terminate variable name, enter value
-		if b == ':' && p.catch.catchType() == catchTypeVariableName {
+		if r == ':' && p.catch.catchType() == catchTypeVariableName {
 			// starts a variable value
 
 			// fetch var name, clear the catch
@@ -552,11 +556,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			catch.parent = p.catch
 			p.catch = catch
 
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// terminate a boolean
-		if b == ';' && p.catch.catchType() == catchTypeVariableName {
+		if r == ';' && p.catch.catchType() == catchTypeVariableName {
 
 			// fetch var name, clear the catch
 			p.varName = p.catch.lastString()
@@ -571,11 +575,11 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			page.Set(p.varName, !p.varNegated)
 
 			p.clearVariableState()
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// terminate a string or block variable value
-		if b == ';' && p.catch.catchType() == catchTypeVariableValue {
+		if r == ';' && p.catch.catchType() == catchTypeVariableValue {
 
 			// we have to also check this here in case it was something like @;
 			if len(p.varName) == 0 {
@@ -616,43 +620,43 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			page.Set(p.varName, value)
 
 			p.clearVariableState()
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// negates a boolean variable
-		if b == '-' && (p.next == '@' || p.next == '%') {
+		if r == '-' && (p.next == '@' || p.next == '%') {
 			// do nothing yet; just make sure we don't get to default
-			return p.nextByte(b)
+			return p.nextRune(r)
 		}
 
 		// default
-		return p.handleByte(b)
+		return p.handleRune(r)
 	}
 
-	return p.handleByte(b)
+	return p.handleRune(r)
 }
 
 // (NEXT DEFAULT)
-func (p *parser) handleByte(b byte) error {
+func (p *parser) handleRune(r rune) error {
 
 	// if we have someplace to append this content, do that
 	if p.catch == nil {
 		// nothing to catch! I don't think this can ever happen since the main block
 		// is the top-level catch and cannot be closed, but it's here just in case
-		return errors.New("Nothing to catch byte: " + string(b))
+		return errors.New("Nothing to catch rune: " + string(r))
 	}
 
 	// at this point, anything that needs escaping should have been handled.
-	// so, if this byte is escaped and reached all the way to here, we will
+	// so, if this rune is escaped and reached all the way to here, we will
 	// pretend it's not escaped by reinjecting a backslash. this allows
 	// further parsers to handle escapes (in particular, Formatter.)
-	add := string(b)
+	add := string(r)
 	if p.escape && !p.parserChar {
-		add = string([]byte{p.last, b})
+		add = string([]rune{p.last, r})
 	}
 
-	// terminate the catch if the catch says to skip this byte
-	if p.catch.shouldSkipByte(b) {
+	// terminate the catch if the catch says to skip this rune
+	if p.catch.shouldSkipRune(r) {
 
 		// fetch the stuff caught up to this point
 		pc := p.catch.posContent()
@@ -666,14 +670,14 @@ func (p *parser) handleByte(b byte) error {
 		p.catch = p.catch.parentCatch()
 		p.catch.appendContents(pc)
 
-	} else if !p.catch.byteOK(b) {
-		// ask the catch if this byte is acceptable
+	} else if !p.catch.runeOk(r) {
+		// ask the catch if this rune is acceptable
 
-		char := string(b)
+		char := string(r)
 		if char == "\n" {
 			char = "\u2424"
 		}
-		err := "Invalid byte '" + char + "' in " + string(p.catch.catchType()) + "."
+		err := "Invalid rune '" + char + "' in " + string(p.catch.catchType()) + "."
 		if str := p.catch.lastString(); str != "" {
 			err += " Partial: " + str
 		}
@@ -682,28 +686,28 @@ func (p *parser) handleByte(b byte) error {
 
 	// so um, if the content is whitespace/newline
 	// and the catch has no content yet, ignore this
-	if len(p.catch.content()) == 0 && (b == '\n') {
-		return p.nextByte(b)
+	if len(p.catch.content()) == 0 && (r == '\n') {
+		return p.nextRune(r)
 	}
 
 	// append
 	p.catch.appendContent(add, p.pos)
 
-	return p.nextByte(b)
+	return p.nextRune(r)
 }
 
-// (NEXT BYTE)
-func (p *parser) nextByte(b byte) error {
+// (NEXT RUNE)
+func (p *parser) nextRune(r rune) error {
 
-	// if current byte is \, set escape for the next
-	if b == '\\' && !p.escape && p.braceLevel == 0 {
+	// if current rune is \, set escape for the next
+	if r == '\\' && !p.escape && p.braceLevel == 0 {
 		p.escape = true
 	} else {
 		p.escape = false
 	}
 
 	p.parserChar = false
-	p.last = b
+	p.last = r
 	return nil
 }
 

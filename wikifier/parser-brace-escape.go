@@ -17,10 +17,10 @@ func (be *braceEscape) parentCatch() catch {
 	return be.parent
 }
 
-func (be *braceEscape) byteOK(b byte) bool {
+func (be *braceEscape) runeOk(rune) bool {
 	return true
 }
 
-func (be *braceEscape) shouldSkipByte(b byte) bool {
+func (be *braceEscape) shouldSkipRune(r rune) bool {
 	return false
 }

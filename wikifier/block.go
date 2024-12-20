@@ -117,11 +117,11 @@ func (b *parserBlock) catchType() catchType {
 	return catchTypeBlock
 }
 
-func (b *parserBlock) byteOK(byte) bool {
+func (b *parserBlock) runeOk(rune) bool {
 	return true
 }
 
-func (b *parserBlock) shouldSkipByte(byte) bool {
+func (b *parserBlock) shouldSkipRune(rune) bool {
 	return false
 }
 

@@ -23,8 +23,8 @@ type catch interface {
 	setLastContent(item any)
 	appendContent(item any, pos Position)
 	appendContents(pc []posContent)
-	byteOK(b byte) bool
-	shouldSkipByte(b byte) bool
+	runeOk(r rune) bool
+	shouldSkipRune(r rune) bool
 	catchType() catchType
 }
 
