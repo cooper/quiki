@@ -172,7 +172,10 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 		return "", errors.New("cannot check out master in a linked repo")
 	}
 
-	// TODO: make sure name is a simple string with no path elements
+	// make sure name is a simple wordlike string with no path elements
+	if !ValidBranchName(name) {
+		return "", errors.New("invalid branch name")
+	}
 
 	// make cache/branch/ if needed
 	wikifier.MakeDir(filepath.Join(w.Opt.Dir.Cache, "branch"), "")
@@ -351,7 +354,7 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 	return w.Branch(name)
 }
 
-var branchNameRgx = regexp.MustCompile(`^[\w]+[\w\-/]*[\w]+$`)
+var branchNameRgx = regexp.MustCompile(`^[\w-]+$`)
 
 // ValidBranchName returns whether a branch name is valid.
 //

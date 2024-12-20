@@ -118,6 +118,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// possibly switch wikis
 			switchUserWiki(wr, wi)
 			if wr.err != nil {
+				// FIXME: don't panic
 				panic(wr.err)
 			}
 
@@ -182,6 +183,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// possibly switch wikis
 			switchUserWiki(wr, wi)
 			if wr.err != nil {
+				// FIXME: don't panic
 				panic(wr.err)
 			}
 
@@ -190,6 +192,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 
 			// handler returned an error
 			if wr.err != nil {
+				// FIXME: don't panic
 				panic(wr.err)
 			}
 		})
