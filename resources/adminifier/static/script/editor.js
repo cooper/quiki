@@ -8,7 +8,8 @@ var plugins = [
     'save',
     'link',
     'page-options',
-    'revision'
+    'revision',
+    'emoji',
 ];
 
 // PAGE EVENTS

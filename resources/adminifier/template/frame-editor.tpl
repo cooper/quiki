@@ -50,6 +50,7 @@
         <!--<li data-action="header"><i class="fa fa-header"></i> Header</li>-->
         <li class="hidden" data-action="image"><i class="fa fa-image"></i> Image</li>
         <li class="hidden" data-action="link"><i class="fa fa-link"></i> Link</li>
+        <li class="hidden" data-action="emoji"><i class="fa fa-smile"></i> Emoticons</li>
         <li class="hidden" data-action="file"><i class="fa fa-paperclip"></i> File</li>
         <li class="hidden" data-action="list"><i class="fa fa-list-ul"></i> List</li>
         <li class="hidden" data-action="list"><i class="fa fa-list-ol"></i> Num list</li>
