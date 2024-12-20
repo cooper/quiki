@@ -25,35 +25,35 @@ type Map struct {
 type mapListEntry struct {
 	keyTitle string          // displayed key text
 	key      string          // actual underlying key
-	value    interface{}     // string, html, block, or mixed []interface{}
+	value    any             // string, html, block, or mixed []any
 	typ      valueType       // value type
 	pos      Position        // position where the item started
 	metas    map[string]bool // metadata
 }
 
-func (entry *mapListEntry) setMeta(key string, val bool) {
-	if val == false {
-		delete(entry.metas, key)
-		return
-	}
-	entry.metas[key] = val
-}
+// func (entry *mapListEntry) setMeta(key string, val bool) {
+// 	if !val {
+// 		delete(entry.metas, key)
+// 		return
+// 	}
+// 	entry.metas[key] = val
+// }
 
 func (entry *mapListEntry) meta(key string) bool {
 	return entry.metas[key]
 }
 
 type mapParser struct {
-	key    interface{}
-	values []interface{}
+	key    any
+	values []any
 
 	escape        bool
 	inValue       bool
 	startPos      Position
 	pos           Position
-	overwroteKey  interface{}
-	overwroteWith interface{}
-	appendedKey   interface{}
+	overwroteKey  any
+	overwroteWith any
+	appendedKey   any
 }
 
 // NewMap creates a new map, given the main block of the page it is to be associated with.
@@ -205,7 +205,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		}
 
 		// fix the value
-		// this returns either a string, block, HTML, or []interface{} combination
+		// this returns either a string, block, HTML, or []any combination
 		// strings next to each other are merged; empty strings are removed
 		valueToStore := fixValuesForStorage(p.values, page, p.pos, !m.noFormatValues)
 
@@ -235,7 +235,7 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		// store the value in the map list
 		m.mapList = append(m.mapList, &mapListEntry{
 			keyTitle: keyTitle,                   // displayed key
-			value:    valueToStore,               // string, block, or mixed []interface{}
+			value:    valueToStore,               // string, block, or mixed []any
 			typ:      getValueType(valueToStore), // type of value
 			key:      strKey,                     // actual underlying key
 			pos:      p.startPos,                 // position where the item started
@@ -379,7 +379,7 @@ func (m *Map) mainBlock() block {
 }
 
 // Map returns the actual underlying Go map.
-func (m *Map) Map() map[string]interface{} {
+func (m *Map) Map() map[string]any {
 	return m.vars
 }
 

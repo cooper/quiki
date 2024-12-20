@@ -1,7 +1,6 @@
 package wiki
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,7 +32,7 @@ type DisplayFile struct {
 }
 
 // DisplayFile returns the display result for a plain text file.
-func (w *Wiki) DisplayFile(path string) interface{} {
+func (w *Wiki) DisplayFile(path string) any {
 	var r DisplayFile
 	path = filepath.FromSlash(path) // just in case
 
@@ -56,7 +55,7 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	}
 
 	// read file
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return DisplayError{
 			Error:         "Error reading file.",
@@ -92,10 +91,10 @@ func (w *Wiki) DisplayFile(path string) interface{} {
 	return r
 }
 
-func (w *Wiki) checkDirectories() {
-	// TODO
-	panic("unimplemented")
-}
+// func (w *Wiki) checkDirectories() {
+// 	// TODO
+// 	panic("unimplemented")
+// }
 
 // RelPath takes an absolute file path and attempts to make it relative
 // to the wiki directory, regardless of whether the path exists.
@@ -240,7 +239,6 @@ func (w *Wiki) Dir(dirs ...string) string {
 // directory. The result is an absolute path which may or may not exist.
 //
 // Symlinks are not followed. If that is desired, use absoluteFilePath instead.
-//
 func (w *Wiki) UnresolvedAbsFilePath(relPath string) string {
 
 	// sanitize

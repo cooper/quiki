@@ -81,7 +81,7 @@ func SizedImageFromName(name string) SizedImage {
 	if matches := imageScaleRegex.FindStringSubmatch(nameNE); len(matches) != 0 {
 		nameNE = matches[1]
 		scale, _ = strconv.Atoi(matches[2])
-		name = matches[1] + "." + ext
+		// name = matches[1] + "." + ext
 	}
 
 	// put it all together
@@ -192,18 +192,18 @@ type DisplayImage struct {
 }
 
 // DisplayImage returns the display result for an image.
-func (w *Wiki) DisplayImage(name string) interface{} {
+func (w *Wiki) DisplayImage(name string) any {
 	return w.DisplaySizedImageGenerate(SizedImageFromName(name), false)
 }
 
 // DisplaySizedImage returns the display result for an image in specific dimensions.
-func (w *Wiki) DisplaySizedImage(img SizedImage) interface{} {
+func (w *Wiki) DisplaySizedImage(img SizedImage) any {
 	return w.DisplaySizedImageGenerate(img, false)
 }
 
 // DisplaySizedImageGenerate returns the display result for an image in specific dimensions
 // and allows images to be generated in any dimension.
-func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{} {
+func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 	var r DisplayImage
 	logName := img.ScaleName()
 	w.Debug("display image:", logName)
@@ -461,7 +461,7 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 	return
 }
 
-func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) interface{} {
+func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) any {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
 	// open the full-size image
@@ -549,10 +549,10 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 
 func getImageDimensions(path string) (w, h int) {
 	file, err := os.Open(path)
-	defer file.Close()
 	if err != nil {
 		return
 	}
+	defer file.Close()
 	c, _, _ := image.DecodeConfig(file)
 	w = c.Width
 	h = c.Height

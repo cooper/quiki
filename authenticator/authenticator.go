@@ -3,7 +3,6 @@ package authenticator
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"sync"
 )
@@ -22,7 +21,7 @@ func Open(path string) (*Authenticator, error) {
 	auth := &Authenticator{path: path, mu: new(sync.Mutex)}
 
 	// attempt to read the file
-	jsonData, err := ioutil.ReadFile(path)
+	jsonData, err := os.ReadFile(path)
 
 	// it exists; try to unmarshal it
 	if err == nil {
@@ -60,5 +59,5 @@ func (auth *Authenticator) write() error {
 	}
 
 	// write
-	return ioutil.WriteFile(auth.path, jsonData, 0666)
+	return os.WriteFile(auth.path, jsonData, 0666)
 }

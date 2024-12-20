@@ -32,7 +32,7 @@ func (ib *infobox) html(page *Page, el element) {
 	}
 
 	// add the rows
-	infoTableAddRows(ib, el, page, ib.mapList)
+	infoTableAddRows(ib, el, ib.mapList)
 }
 
 // infosec{}
@@ -79,14 +79,14 @@ func (is *infosec) html(page *Page, els element) {
 		}}, is.mapList...)
 	}
 
-	infoTableAddRows(is, els, page, is.mapList)
+	infoTableAddRows(is, els, is.mapList)
 }
 
 // INTERNALS
 
 // infoTableAddRows appends each pair.
 // Note that table might actually be an element collection.
-func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*mapListEntry) {
+func infoTableAddRows(infoboxOrSec block, table element, pairs []*mapListEntry) {
 	hasTitle := false
 
 	// add a row for each entry
@@ -132,13 +132,13 @@ func infoTableAddRows(infoboxOrSec block, table element, page *Page, pairs []*ma
 		}
 
 		// not an infosec{}; this is a top-level pair
-		infoTableAddRow(infoboxOrSec, table, entry, classes)
+		infoTableAddRow(table, entry, classes)
 	}
 }
 
 // infoTableAddRow adds a row.
 // Note that table might actually be an element collection.
-func infoTableAddRow(infoboxOrSec block, table element, entry *mapListEntry, classes []string) {
+func infoTableAddRow(table element, entry *mapListEntry, classes []string) {
 
 	// create the row
 	tr := table.createChild("tr", "infobox-pair")

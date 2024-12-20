@@ -9,6 +9,11 @@ import (
 	"unicode"
 )
 
+var (
+	wordCharPattern = regexp.MustCompile(`[\w\-\$\.]`)
+	spacePattern    = regexp.MustCompile(`\s`)
+)
+
 type parser struct {
 	pos Position
 
@@ -57,12 +62,12 @@ func (pos *Position) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON decodes the position from `[line, column]`.
 func (pos *Position) UnmarshalJSON(data []byte) error {
-	var val interface{}
+	var val any
 	err := json.Unmarshal(data, &val)
 	if err != nil {
 		return err
 	}
-	ary, ok := val.([]interface{})
+	ary, ok := val.([]any)
 	if !ok || len(ary) != 2 {
 		return errors.New("(Position).UnmarshalJSON: expected JSON array with len(2)")
 	}
@@ -255,7 +260,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// if there is no lastContent, give up because the block has no type
 			if len(lastContent) == 0 {
-				return errors.New("Block has no type")
+				return errors.New("block has no type")
 			}
 
 			// scan the text backward to find the block type and name
@@ -297,14 +302,14 @@ func (p *parser) parseByte(b byte, page *Page) error {
 					if lastChar != ' ' && lastChar != '\t' {
 						headingID = string(lastChar) + headingID
 					}
-				} else if matched, _ := regexp.Match(`[\w\-\$\.]`, []byte{lastChar}); matched {
+				} else if matched := wordCharPattern.Match([]byte{lastChar}); matched {
 					// this could be part of the block type
 					blockType = string(lastChar) + blockType
 					continue
 				} else if lastChar == '~' && len(blockType) != 0 {
 					// tilde terminates block type
 					break
-				} else if matched, _ := regexp.Match(`\s`, []byte{lastChar}); matched && len(blockType) == 0 {
+				} else if matched := spacePattern.Match([]byte{lastChar}); matched && len(blockType) == 0 {
 					// space between things
 					continue
 				} else {
@@ -366,7 +371,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// start the brace escape catch
-			catch := newBraceEscape(p.pos)
+			catch := newBraceEscape()
 			catch.parent = p.catch
 			p.catch = catch
 		}
@@ -388,7 +393,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 		// we cannot close the main block
 		if p.block.blockType() == "main" {
-			return errors.New("Attempted to close main block")
+			return errors.New("attempted to close main block")
 		}
 
 		// if{}, elsif{}, else{}, {@vars}
@@ -451,16 +456,12 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			}
 
 			// find the value and make sure it's a block
-			obj, err := page.GetBlock(varName)
+			blk, err := page.GetBlock(varName)
 			if err != nil {
 				return parserError(openPos, "Variable block @"+varName+" does not contain a block")
 			}
-			if obj == nil {
+			if blk == nil {
 				return parserError(openPos, "Variable block @"+varName+" does not exist")
-			}
-			blk, ok := obj.(block)
-			if !ok {
-				return parserError(openPos, "Variable block @"+varName+" does not contain a block")
 			}
 
 			// overwrite the block's parent to the parent of the {@var}
@@ -543,7 +544,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// no var name
 			if len(p.varName) == 0 {
-				return errors.New("Variable has no name")
+				return errors.New("variable has no name")
 			}
 
 			// now catch the value
@@ -563,7 +564,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// no var name
 			if len(p.varName) == 0 {
-				return errors.New("Variable has no name")
+				return errors.New("variable has no name")
 			}
 
 			// set the value
@@ -578,7 +579,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 
 			// we have to also check this here in case it was something like @;
 			if len(p.varName) == 0 {
-				return errors.New("Variable has no name")
+				return errors.New("variable has no name")
 			}
 
 			// fetch content and clear catch
@@ -586,8 +587,8 @@ func (p *parser) parseByte(b byte, page *Page) error {
 			p.catch = p.catch.parentCatch()
 
 			switch val := value.(type) {
-			case []interface{}:
-				return fmt.Errorf("Variable '%s' contains both text and blocks", p.varName)
+			case []any:
+				return fmt.Errorf("variable '%s' contains both text and blocks", p.varName)
 
 			case string, HTML:
 				// do nothing
@@ -608,7 +609,7 @@ func (p *parser) parseByte(b byte, page *Page) error {
 				value = ""
 
 			default:
-				return fmt.Errorf("Not sure what to do with: %v", val)
+				return fmt.Errorf("not sure what to do with: %v", val)
 			}
 
 			// set the value

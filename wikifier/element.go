@@ -39,7 +39,7 @@ type element interface {
 	setMeta(name string, value bool)
 
 	// adding content
-	add(i interface{})
+	add(i any)
 	addText(s string)
 	addHTML(h HTML)
 	addChild(child element)
@@ -63,17 +63,17 @@ type element interface {
 }
 
 type genericElement struct {
-	_tag          string                 // html tag
-	_id           string                 // unique element identifier
-	attrs         map[string]interface{} // html attributes
-	styles        map[string]string      // inline styles
-	metas         map[string]bool        // metadata
-	typ           string                 // primary quiki class
-	classes       []string               // quiki user-defined classes
-	content       []interface{}          // mixed text and child elements
-	parentElement element                // parent element, if any
-	cachedHTML    HTML                   // cached version
-	shouldHide    bool                   // whether to hide the element
+	_tag          string            // html tag
+	_id           string            // unique element identifier
+	attrs         map[string]any    // html attributes
+	styles        map[string]string // inline styles
+	metas         map[string]bool   // metadata
+	typ           string            // primary quiki class
+	classes       []string          // quiki user-defined classes
+	content       []any             // mixed text and child elements
+	parentElement element           // parent element, if any
+	cachedHTML    HTML              // cached version
+	shouldHide    bool              // whether to hide the element
 }
 
 func newElement(tag, typ string) element {
@@ -82,7 +82,7 @@ func newElement(tag, typ string) element {
 		_tag:   tag,
 		_id:    typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:    typ,
-		attrs:  make(map[string]interface{}),
+		attrs:  make(map[string]any),
 		styles: make(map[string]string),
 		metas:  make(map[string]bool),
 	}
@@ -115,7 +115,7 @@ func (el *genericElement) meta(name string) bool {
 
 // set string value for a meta
 func (el *genericElement) setMeta(name string, value bool) {
-	if value == false {
+	if !value {
 		delete(el.metas, name)
 		return
 	}
@@ -163,7 +163,7 @@ func (el *genericElement) setAttr(name, value string) {
 
 // set a boolean attribute
 func (el *genericElement) setBoolAttr(name string, value bool) {
-	if value == false {
+	if !value {
 		delete(el.attrs, name)
 		return
 	}
@@ -187,7 +187,7 @@ func (el *genericElement) setStyle(name, value string) {
 }
 
 // add something
-func (el *genericElement) add(i interface{}) {
+func (el *genericElement) add(i any) {
 	switch v := i.(type) {
 	case string:
 		el.addText(v)
@@ -195,7 +195,7 @@ func (el *genericElement) add(i interface{}) {
 		el.addHTML(v)
 	case element:
 		el.addChild(v)
-	case []interface{}:
+	case []any:
 		for _, val := range v {
 			el.add(val)
 		}

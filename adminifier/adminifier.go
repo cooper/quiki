@@ -10,7 +10,6 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/webserver"
-	_ "github.com/cooper/quiki/webserver" // access existing ServeMux and config
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )

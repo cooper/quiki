@@ -2,7 +2,6 @@ package wikifier
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,13 +20,13 @@ const (
 	valueTypeBlock                    // Block
 	valueTypeHTML                     // Raw HTML
 	valueTypeElement                  // HTML element
-	valueTypeMixed                    // []interface{} with a mixture of these
+	valueTypeMixed                    // []any with a mixture of these
 )
 
 // Returns a quiki valueType, given a value. Accepted types are string,
-// block, HTML, element, or an []interface{} with mixed types.
+// block, HTML, element, or an []any with mixed types.
 // If i is none of these, returns -1.
-func getValueType(i interface{}) valueType {
+func getValueType(i any) valueType {
 	switch i.(type) {
 	case HTML:
 		return valueTypeHTML
@@ -37,7 +36,7 @@ func getValueType(i interface{}) valueType {
 		return valueTypeBlock
 	case element:
 		return valueTypeElement
-	case []interface{}:
+	case []any:
 		return valueTypeMixed
 	default:
 		return -1
@@ -49,16 +48,15 @@ func getValueType(i interface{}) valueType {
 // Strings are formatted with quiki's text formatter.
 // Blocks are converted to elements.
 // Preformatted HTML is left as-is.
-//
-func prepareForHTML(value interface{}, page *Page, pos Position) interface{} {
+func prepareForHTML(value any, page *Page, pos Position) any {
 	switch v := value.(type) {
 	case string:
 		value = page.Fmt(v, pos)
 	case block:
 		v.html(page, v.el())
 		value = v.el()
-	case []interface{}:
-		newValues := make([]interface{}, len(v))
+	case []any:
+		newValues := make([]any, len(v))
 		for idx, val := range v {
 			newValues[idx] = prepareForHTML(val, page, pos)
 		}
@@ -70,18 +68,14 @@ func prepareForHTML(value interface{}, page *Page, pos Position) interface{} {
 	return value
 }
 
-func pageNameLink(s string) string {
-	return ""
-}
-
 // convert wikifier values to human-readable form
-func humanReadableValue(i interface{}) string {
+func humanReadableValue(i any) string {
 	switch v := i.(type) {
 
 	// FIXME: recursions possible?
 
 	// list
-	case []interface{}:
+	case []any:
 		hrValues := make([]string, len(v))
 		for i, val := range v {
 			hrValues[i] = humanReadableValue(val)
@@ -118,9 +112,9 @@ func humanReadableValue(i interface{}) string {
 }
 
 // fix a value before storing it in a list or map
-// this returns either a string, block, or []interface{} of both
+// this returns either a string, block, or []any of both
 // strings next to each other are merged; empty strings are removed
-func fixValuesForStorage(values []interface{}, pageMaybe *Page, pos Position, fmtText bool) interface{} {
+func fixValuesForStorage(values []any, pageMaybe *Page, pos Position, fmtText bool) any {
 
 	// no items
 	if len(values) == 0 {
@@ -133,8 +127,8 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, pos Position, fm
 	}
 
 	// multiple values
-	var valuesToStore []interface{}
-	var lastValue interface{}
+	var valuesToStore []any
+	var lastValue any
 	for _, value := range values {
 
 		// fix this value; then skip it if it's nothin
@@ -173,7 +167,7 @@ func fixValuesForStorage(values []interface{}, pageMaybe *Page, pos Position, fm
 	return valuesToStore
 }
 
-func fixSingleValue(value interface{}, pageMaybe *Page, pos Position, fmtText bool) interface{} {
+func fixSingleValue(value any, pageMaybe *Page, pos Position, fmtText bool) any {
 	switch v := value.(type) {
 	case HTML:
 		return v
@@ -196,14 +190,6 @@ func fixSingleValue(value interface{}, pageMaybe *Page, pos Position, fmtText bo
 	default:
 		panic("somehow a non-string and non-block value got into a map or list")
 	}
-}
-
-func reverseString(s string) string {
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-	return string(runes)
 }
 
 // UniqueFilesInDir recursively scans a directory for files matching the
@@ -231,7 +217,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 		dir := filepath.Join(dir, pfx)
 
 		// can't open directory
-		files, err := ioutil.ReadDir(dir)
+		files, err := os.ReadDir(dir)
 		if err != nil {
 			// TODO: report the error somehow
 			return
@@ -248,7 +234,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 
 			// this is a symlink; follow it if it's a directory
 			isDir := file.IsDir()
-			if !isDir && file.Mode()&os.ModeSymlink != 0 {
+			if !isDir && file.Type()&os.ModeSymlink != 0 {
 				stat, err := os.Stat(path)
 				if err == nil && stat.IsDir() {
 					isDir = true
@@ -373,7 +359,7 @@ func PageNameLink(name string) string {
 		return name
 	}
 
-	// just in case, convert any native path separtors to /
+	// just in case, convert any native path separators to /
 	name = filepath.ToSlash(name)
 
 	// replace non-alphanumerics with _

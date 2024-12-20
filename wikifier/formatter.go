@@ -16,19 +16,6 @@ var (
 	oldLinkRegex  = regexp.MustCompile(`^([\!\$\~]+?)(.+)([\!\$\~]+?)$`)
 )
 
-var linkNormalizers = map[string]func(string) string{
-	"wikifier": func(s string) string {
-		return pageNameLink(s)
-	},
-	"mediawiki": func(s string) string {
-		s = strings.Replace(s, " ", "_", -1)
-		return html.EscapeString(s)
-	},
-	"none": func(s string) string {
-		return html.EscapeString(s)
-	},
-}
-
 var colors = map[string]string{
 	"aliceblue":            "#f0f8ff",
 	"antiquewhite":         "#faebd7",
@@ -235,7 +222,7 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 	}
 
 	// my @items;
-	var items []interface{} // string and html
+	var items []any // string and html
 	str := ""
 	formatType := "" // format name such as 'i' or '/b'
 	formatDepth := 0 // how far [[in]] we are

@@ -5,7 +5,7 @@ type braceEscape struct {
 	*genericCatch
 }
 
-func newBraceEscape(pos Position) *braceEscape {
+func newBraceEscape() *braceEscape {
 	return &braceEscape{genericCatch: &genericCatch{}}
 }
 

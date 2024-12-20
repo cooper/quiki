@@ -110,7 +110,7 @@ func handleCategoryPosts(wi *WikiInfo, relPath string, w http.ResponseWriter, r 
 	handleResponse(wi, wi.DisplayCategoryPosts(catName, pageN), w, r)
 }
 
-func handleResponse(wi *WikiInfo, res interface{}, w http.ResponseWriter, r *http.Request) {
+func handleResponse(wi *WikiInfo, res any, w http.ResponseWriter, r *http.Request) {
 	switch res := res.(type) {
 
 	// page content
@@ -159,7 +159,7 @@ func handleResponse(wi *WikiInfo, res interface{}, w http.ResponseWriter, r *htt
 // between handleError and handlePage
 var useLowLevelError bool
 
-func handleError(wi *WikiInfo, errMaybe interface{}, w http.ResponseWriter, r *http.Request) {
+func handleError(wi *WikiInfo, errMaybe any, w http.ResponseWriter, r *http.Request) {
 	status := http.StatusNotFound
 	msg := "An unknown error has occurred"
 	switch err := errMaybe.(type) {

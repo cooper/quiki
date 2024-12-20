@@ -2,7 +2,7 @@ package wiki
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -330,7 +330,7 @@ func (w *Wiki) NewBranch(name string) (*Wiki, error) {
 			return nil, err
 		}
 		defer f1.Close()
-		masterRef, err := ioutil.ReadAll(f1)
+		masterRef, err := io.ReadAll(f1)
 		if err != nil {
 			return nil, err
 		}
@@ -357,7 +357,6 @@ var branchNameRgx = regexp.MustCompile(`^[\w]+[\w\-/]*[\w]+$`)
 //
 // quiki branch names may contain word-like characters `\w` and
 // forward slash (`/`) but may not start or end with a slash.
-//
 func ValidBranchName(name string) bool {
 	return branchNameRgx.MatchString(name)
 }
@@ -373,7 +372,6 @@ func ValidBranchName(name string) bool {
 // This is a low-level API that allows writing any file within the wiki
 // directory, so it should not be utilized directly by frontends.
 // Use WritePage, WriteModel, WriteImage, or WriteConfig instead.
-//
 func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error {
 	path := w.UnresolvedAbsFilePath(name)
 	fi, err := os.Lstat(path)
@@ -397,7 +395,7 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 	}
 
 	// write file all at once
-	if err := ioutil.WriteFile(path, content, 0644); err != nil {
+	if err := os.WriteFile(path, content, 0644); err != nil {
 		return err
 	}
 
@@ -415,7 +413,6 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 // This is a low-level API that allows deleting any file within the wiki
 // directory, so it should not be utilized directly by frontends.
 // Use DeletePage, DeleteModel, or DeleteImage instead.
-//
 func (w *Wiki) DeleteFile(name string, commit CommitOpts) error {
 
 	// error running lstat on file, might not exist or whatev

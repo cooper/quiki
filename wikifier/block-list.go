@@ -16,22 +16,22 @@ type List struct {
 }
 
 type listEntry struct {
-	value interface{}       // string, html, block, or mixed []interface{}
-	typ   valueType         // value type
-	pos   Position          // position where the item started
-	metas map[string]string // metadata
+	value any       // string, html, block, or mixed []any
+	typ   valueType // value type
+	pos   Position  // position where the item started
+	// metas map[string]string // metadata
 }
 
-func (entry *listEntry) setMeta(key, val string) {
-	entry.metas[key] = val
-}
+// func (entry *listEntry) setMeta(key, val string) {
+// 	entry.metas[key] = val
+// }
 
-func (entry *listEntry) meta(key string) string {
-	return entry.metas[key]
-}
+// func (entry *listEntry) meta(key string) string {
+// 	return entry.metas[key]
+// }
 
 type listParser struct {
-	values   []interface{}
+	values   []any
 	escape   bool
 	startPos Position
 	pos      Position
@@ -125,7 +125,7 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine 
 		// store the value
 		valueToStore := fixValuesForStorage(p.values, page, p.pos, true)
 		l.list = append(l.list, &listEntry{
-			value: valueToStore,               // string, block, or mixed []interface{}
+			value: valueToStore,               // string, block, or mixed []any
 			typ:   getValueType(valueToStore), // type of value
 			pos:   p.startPos,                 // position where the item started
 		})
@@ -193,10 +193,10 @@ func (l *List) html(page *Page, el element) {
 	}
 }
 
-func (l *List) mainBlock() block {
-	var b block = l
-	for b.parentBlock() != nil {
-		b = b.parentBlock()
-	}
-	return b
-}
+// func (l *List) mainBlock() block {
+// 	var b block = l
+// 	for b.parentBlock() != nil {
+// 		b = b.parentBlock()
+// 	}
+// 	return b
+// }

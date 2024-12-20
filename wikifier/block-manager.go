@@ -62,7 +62,7 @@ func newBlock(blockType, blockName, headingID string, blockClasses []string, par
 
 		return b
 	}
-	return newUnknownBlock(blockName, underlying)
+	return newUnknownBlock(underlying)
 }
 
 func generateBlock(b block, page *Page) HTML {

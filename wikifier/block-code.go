@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/alecthomas/chroma"
@@ -22,7 +21,7 @@ func init() {
 }
 
 func (p quikiPreWrapper) Start(code bool, styleAttr string) string {
-	return fmt.Sprintf(`<pre class="q-code chroma">`)
+	return `<pre class="q-code chroma">`
 }
 
 func (p quikiPreWrapper) End(code bool) string {
@@ -94,11 +93,15 @@ func (cb *codeBlock) html(page *Page, el element) {
 
 	// HTML
 	iterator, err := lexer.Tokenise(nil, text)
-	err = formatter.Format(&htmlBuilder, style, iterator)
 	if err != nil {
 		cb.warn(cb.openPosition(), err.Error())
 	} else {
-		el.addHTML(HTML(htmlBuilder.String()))
+		err := formatter.Format(&htmlBuilder, style, iterator)
+		if err != nil {
+			cb.warn(cb.openPosition(), err.Error())
+		} else {
+			el.addHTML(HTML(htmlBuilder.String()))
+		}
 	}
 
 	// CSS

@@ -5,7 +5,7 @@ type htmlBlock struct {
 }
 
 func newHTMLBlock(name string, b *parserBlock) block {
-	return &fmtBlock{parserBlock: b}
+	return &htmlBlock{parserBlock: b}
 }
 
 func (b *htmlBlock) html(page *Page, el element) {

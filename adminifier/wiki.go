@@ -3,8 +3,8 @@ package adminifier
 import (
 	"encoding/json"
 	"html/template"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -61,16 +61,16 @@ type wikiRequest struct {
 	w         http.ResponseWriter
 	r         *http.Request
 	tmplName  string
-	dot       interface{}
+	dot       any
 	err       error
 }
 
 type editorOpts struct {
-	page   bool        // true if editing a page
-	model  bool        // true if editing a model
-	config bool        // true if editing the config
-	cat    bool        // true if editing a category
-	info   interface{} // PageInfo or ModelInfo
+	page   bool // true if editing a page
+	model  bool // true if editing a model
+	config bool // true if editing the config
+	cat    bool // true if editing a category
+	info   any  // PageInfo or ModelInfo
 }
 
 // TODO: verify session on ALL wiki handlers
@@ -103,7 +103,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		tmplName := "frame-" + frameName + ".tpl"
 
 		// call func to create template params
-		var dot interface{} = nil
+		var dot any = nil
 
 		if handler, exist := frameHandlers[frameNameFull]; exist {
 			// create wiki request
@@ -208,7 +208,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 	if javascriptTemplates == "" {
 		files, _ := filepath.Glob(dirAdminifier + "/template/js-tmpl/*.tpl")
 		for _, fileName := range files {
-			data, _ := ioutil.ReadFile(fileName)
+			data, _ := os.ReadFile(fileName)
 			javascriptTemplates += string(data)
 		}
 	}
@@ -233,7 +233,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 func handleDashboardFrame(wr *wikiRequest) {
 
 	// wiki logs
-	logs, _ := ioutil.ReadFile(wr.wi.Dir("cache", "wiki.log"))
+	logs, _ := os.ReadFile(wr.wi.Dir("cache", "wiki.log"))
 
 	// pages with errors and warnings
 	var errors []wikifier.PageInfo
@@ -303,10 +303,10 @@ func handleCategoriesFrame(wr *wikiRequest) {
 	handleFileFrames(wr, cats)
 }
 
-func handleFileFrames(wr *wikiRequest, results interface{}, extras ...string) {
+func handleFileFrames(wr *wikiRequest, results any, extras ...string) {
 
 	// json stuffs
-	res, err := json.Marshal(map[string]interface{}{
+	res, err := json.Marshal(map[string]any{
 		"sort_types": append([]string{"t", "a", "c", "m"}, extras...),
 		"results":    results,
 	})
@@ -422,11 +422,11 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 
 	// json stuff
 	jsonData, err := json.Marshal(struct {
-		Page     bool        `json:"page"`
-		Model    bool        `json:"model"`
-		Config   bool        `json:"config"`
-		Category bool        `json:"category"`
-		Info     interface{} `json:"info,omitempty"` // PageInfo or ModelInfo
+		Page     bool `json:"page"`
+		Model    bool `json:"model"`
+		Config   bool `json:"config"`
+		Category bool `json:"category"`
+		Info     any  `json:"info,omitempty"` // PageInfo or ModelInfo
 		wiki.DisplayFile
 	}{
 		Page:        o.page,
@@ -445,14 +445,14 @@ func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 	wr.dot = struct {
 		Found    bool
 		JSON     template.HTML
-		Page     bool        // true if editing a page
-		Model    bool        // true if editing a model
-		Config   bool        // true if editing config
-		Category bool        // true if editing a category
-		Info     interface{} // PageInfo, ModelInfo, or CategoryInfo
-		Title    string      // page title or filename
-		File     string      // filename
-		Content  string      // file content
+		Page     bool   // true if editing a page
+		Model    bool   // true if editing a model
+		Config   bool   // true if editing config
+		Category bool   // true if editing a category
+		Info     any    // PageInfo, ModelInfo, or CategoryInfo
+		Title    string // page title or filename
+		File     string // filename
+		Content  string // file content
 		wikiTemplate
 	}{
 		Found:        true,

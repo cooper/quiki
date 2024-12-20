@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +19,7 @@ import (
 var templateDirs string
 var templates = make(map[string]wikiTemplate)
 
-var templateFuncs = map[string]interface{}{
+var templateFuncs = map[string]any{
 	"even": func(i int) bool {
 		return i%2 == 0
 	},
@@ -134,7 +133,7 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 		if info.Name() == "manifest.json" {
 
 			// couldn't read manifest
-			contents, err := ioutil.ReadFile(filePath)
+			contents, err := os.ReadFile(filePath)
 			if err != nil {
 				return err
 			}

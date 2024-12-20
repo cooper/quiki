@@ -4,7 +4,7 @@ type unknownBlock struct {
 	*parserBlock
 }
 
-func newUnknownBlock(name string, b *parserBlock) block {
+func newUnknownBlock(b *parserBlock) block {
 	return &unknownBlock{parserBlock: b}
 }
 

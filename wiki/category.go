@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math"
 	"os"
 	"sort"
@@ -32,7 +31,6 @@ const (
 //
 // A page can belong to many categories. Category memberships and metadata
 // are stored in JSON manifests.
-//
 type Category struct {
 
 	// category path
@@ -145,7 +143,7 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 
 	// load the category if it exists
 	var cat Category
-	jsonData, err := ioutil.ReadFile(path)
+	jsonData, err := os.ReadFile(path)
 	if err == nil {
 		// file exists
 		err = json.Unmarshal(jsonData, &cat)
@@ -330,7 +328,7 @@ func (cat *Category) write(w *Wiki) {
 	}
 
 	// write
-	ioutil.WriteFile(cat.Path, jsonData, 0666)
+	os.WriteFile(cat.Path, jsonData, 0666)
 }
 
 func (cat *Category) update(w *Wiki) {
@@ -540,9 +538,8 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 }
 
 // DisplayCategoryPosts returns the display result for a category.
-func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{} {
+func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) any {
 	cat := w.GetCategory(catName)
-	catName = cat.Name
 
 	// update info
 	// note: this needs to be before existence check because it may purge

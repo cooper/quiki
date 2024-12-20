@@ -6,7 +6,6 @@ import (
 	"errors"
 	"html"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -36,11 +35,11 @@ type Page struct {
 	sectionN     int
 	name         string
 	headingIDs   map[string]int
-	Wiki         interface{} // only available during Parse() and HTML()
-	Markdown     bool        // true if this is a markdown source
-	model        bool        // true if this is a model being generated
-	Warnings     []Warning   // parser warnings
-	Error        *Warning    // parser error, as an encodable Warning
+	Wiki         any       // only available during Parse() and HTML()
+	Markdown     bool      // true if this is a markdown source
+	model        bool      // true if this is a model being generated
+	Warnings     []Warning // parser warnings
+	Error        *Warning  // parser error, as an encodable Warning
 	_html        HTML
 	_text        string
 	_preview     string
@@ -145,7 +144,7 @@ func (p *Page) _parse() error {
 	} else if p.Source != "" {
 		reader = strings.NewReader(p.Source)
 	} else if p.Markdown && p.FilePath != "" {
-		md, err := ioutil.ReadFile(p.FilePath)
+		md, err := os.ReadFile(p.FilePath)
 		if err != nil {
 			return err
 		}
@@ -277,7 +276,6 @@ func (p *Page) CacheExists() bool {
 // This DOES take symbolic links into account.
 // and DOES include the page prefix if applicable.
 // Any prefix will have forward slashes regardless of OS.
-//
 func (p *Page) Name() string {
 	dir := pageAbs(p.Opt.Dir.Page)
 	path := p.Path()
@@ -321,7 +319,6 @@ func (p *Page) OSNameNE() string {
 //
 // For example, for a page named a/b.page, this is a.
 // For a page named a.page, this is an empty string.
-//
 func (p *Page) Prefix() string {
 	dir := strings.TrimSuffix(filepath.ToSlash(filepath.Dir(p.Name())), "/")
 	if dir == "." {

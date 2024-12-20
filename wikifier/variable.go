@@ -10,32 +10,31 @@ import (
 //
 // For example, a Page is an attributed object since it contains variables.
 // Likewise, a Map is an attributed object because it has named properties.
-//
 type AttributedObject interface {
 
 	// getters
-	Get(key string) (interface{}, error)
+	Get(key string) (any, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
 	GetBlock(key string) (block, error)
 	GetObj(key string) (AttributedObject, error)
 
 	// setters
-	Set(key string, value interface{}) error
+	Set(key string, value any) error
 
 	// internal use
 	mainBlock() block
-	setOwn(key string, value interface{})
-	getOwn(key string) interface{}
+	setOwn(key string, value any)
+	getOwn(key string) any
 }
 
 type variableScope struct {
-	vars map[string]interface{}
+	vars map[string]any
 }
 
 // newVariableScope creates a variable scope
 func newVariableScope() *variableScope {
-	return &variableScope{make(map[string]interface{})}
+	return &variableScope{make(map[string]any)}
 }
 
 func (scope *variableScope) mainBlock() block {
@@ -49,8 +48,7 @@ func (scope *variableScope) mainBlock() block {
 //
 // If attempting to write to a property of an object that does not
 // support properties, such as a string, Set returns an error.
-//
-func (scope *variableScope) Set(key string, value interface{}) error {
+func (scope *variableScope) Set(key string, value any) error {
 	var where AttributedObject = scope
 
 	// split into parts
@@ -89,8 +87,7 @@ func (scope *variableScope) Set(key string, value interface{}) error {
 // support properties, such as a string, Get returns an error.
 //
 // If the key is valid but nothing exists at it, Get returns (nil, nil).
-//
-func (scope *variableScope) Get(key string) (interface{}, error) {
+func (scope *variableScope) Get(key string) (any, error) {
 	var where AttributedObject = scope
 
 	parts := strings.Split(key, ".")
@@ -116,7 +113,6 @@ func (scope *variableScope) Get(key string) (interface{}, error) {
 // GetStr is like Get except it always returns a string.
 //
 // If the value is HTML, it is converted to a string.
-//
 func (scope *variableScope) GetStr(key string) (string, error) {
 	val, err := scope.Get(key)
 	if err != nil {
@@ -209,7 +205,6 @@ func (scope *variableScope) GetBlock(key string) (block, error) {
 //
 // If the value is a string, it is treated as a comma-separated list,
 // and each item is trimmed of prepending or suffixing whitespace.
-//
 func (scope *variableScope) GetStrList(key string) ([]string, error) {
 	val, err := scope.Get(key)
 	if err != nil {
@@ -265,12 +260,12 @@ func (scope *variableScope) GetStrList(key string) ([]string, error) {
 // INTERNAL
 
 // set own property
-func (scope *variableScope) setOwn(key string, value interface{}) {
+func (scope *variableScope) setOwn(key string, value any) {
 	scope.vars[key] = value
 }
 
 // fetch own property
-func (scope *variableScope) getOwn(key string) interface{} {
+func (scope *variableScope) getOwn(key string) any {
 	if val, exist := scope.vars[key]; exist {
 		return val
 	}

@@ -54,7 +54,7 @@ func (els *elements) meta(name string) bool {
 
 // Sets a value in the collection's metadata.
 func (els *elements) setMeta(name string, value bool) {
-	if value == false {
+	if !value {
 		delete(els.metas, name)
 		return
 	}
@@ -108,7 +108,7 @@ func (els *elements) setStyle(name, value string) {
 }
 
 // Adds another element. If i is not an element, panics.
-func (els *elements) add(i interface{}) {
+func (els *elements) add(i any) {
 	if child, ok := i.(element); ok {
 		els.addChild(child)
 	}

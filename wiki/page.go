@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -106,7 +105,6 @@ type pageJSONManifest struct {
 // If a page by this name exists, the returned page represents it.
 // Otherwise, a new page representing the lowercased, normalized .page
 // file is returned in the standard quiki filename format.
-//
 func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 
 	// separate into prefix and base
@@ -151,7 +149,7 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 }
 
 // DisplayPage returns the display result for a page.
-func (w *Wiki) DisplayPage(name string) interface{} {
+func (w *Wiki) DisplayPage(name string) any {
 	return w.DisplayPageDraft(name, false)
 }
 
@@ -159,8 +157,7 @@ func (w *Wiki) DisplayPage(name string) interface{} {
 //
 // Unlike DisplayPage, if draftOK is true, the content is served even if it is
 // marked as draft.
-//
-func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{} {
+func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 	var r DisplayPage
 
 	// create the page
@@ -402,10 +399,10 @@ func (w *Wiki) writeVarsCache(page *wikifier.Page) {
 
 	// open the cache file for writing
 	cacheFile, err := os.Create(page.CachePath())
-	defer cacheFile.Close()
 	if err != nil {
 		return
 	}
+	defer cacheFile.Close()
 
 	// create manifest with just page info (includes redirect/error)
 	j, err := json.Marshal(pageJSONManifest{PageInfo: page.Info()})
@@ -417,7 +414,7 @@ func (w *Wiki) writeVarsCache(page *wikifier.Page) {
 	cacheFile.Write([]byte{'\n'})
 }
 
-func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
+func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) any {
 
 	// caching isn't enabled
 	if !page.Opt.Page.EnableCache || page.CachePath() == "" {
@@ -426,13 +423,13 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 
 	// open the cache file for writing
 	cacheFile, err := os.Create(page.CachePath())
-	defer cacheFile.Close()
 	if err != nil {
 		return DisplayError{
 			Error:         "Could not write page cache file.",
 			DetailedError: "Open '" + page.CachePath() + "' for write error: " + err.Error(),
 		}
 	}
+	defer cacheFile.Close()
 
 	// generate page info
 	info := pageJSONManifest{
@@ -470,7 +467,7 @@ func (w *Wiki) writePageCache(page *wikifier.Page, r *DisplayPage) interface{} {
 	return nil // success
 }
 
-func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) interface{} {
+func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) any {
 
 	// search optimization isn't enabled
 	if !page.Opt.Search.Enable || page.SearchPath() == "" || r.Content == "" {
@@ -479,13 +476,13 @@ func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) interface{} {
 
 	// open the text file for writing
 	textFile, err := os.Create(page.SearchPath())
-	defer textFile.Close()
 	if err != nil {
 		return DisplayError{
 			Error:         "Could not write page text file.",
 			DetailedError: "Open '" + page.SearchPath() + "' for write error: " + err.Error(),
 		}
 	}
+	defer textFile.Close()
 
 	// save the content with HTML tags stripped
 	textFile.WriteString(page.Text())
@@ -494,7 +491,7 @@ func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) interface{} {
 	return nil // success
 }
 
-func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bool) interface{} {
+func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bool) any {
 	cacheModify := page.CacheModified()
 	timeStr := httpdate.Time2Str(cacheModify)
 
@@ -508,7 +505,7 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	content := "<!-- cached page dated " + timeStr + " -->\n"
 
 	// open cache file for reading
-	cacheContent, err := ioutil.ReadFile(page.CachePath())
+	cacheContent, err := os.ReadFile(page.CachePath())
 	if err != nil {
 		return DisplayError{
 			Error:         "Could not read page cache file.",
