@@ -3,12 +3,12 @@ package adminifier
 
 import (
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
@@ -18,7 +18,7 @@ var tmpl *template.Template
 var mux *http.ServeMux
 var conf *wikifier.Page
 var sessMgr *scs.SessionManager
-var host, root, dirResource, dirAdminifier string
+var host, root string
 
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
 func Configure() {
@@ -32,9 +32,8 @@ func Configure() {
 
 	// extract strings
 	for key, ptr := range map[string]*string{
-		"server.dir.resource": &dirResource,
-		"adminifier.host":     &host,
-		"adminifier.root":     &root,
+		"adminifier.host": &host,
+		"adminifier.root": &root,
 	} {
 		str, err := conf.GetStr(key)
 		if err != nil {
@@ -43,8 +42,6 @@ func Configure() {
 		*ptr = str
 	}
 
-	dirResource = filepath.FromSlash(dirResource)
-	dirAdminifier = filepath.Join(dirResource, "adminifier")
 	root += "/"
 
 	// configure session manager
@@ -53,17 +50,17 @@ func Configure() {
 	sessMgr.Cookie.Path = root
 
 	// setup adminifier static files server
-	if err := setupStatic(filepath.Join(dirAdminifier, "static"), root+"static/"); err != nil {
+	if err := setupStatic(resources.Adminifier, root+"static/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier static"))
 	}
 
 	// setup webserver static files server
-	if err := setupStatic(filepath.Join(dirResource, "webserver", "static"), root+"qstatic/"); err != nil {
+	if err := setupStatic(resources.Webserver, root+"qstatic/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier qstatic"))
 	}
 
 	// create template
-	tmpl = template.Must(tmpl.ParseGlob(filepath.Join(dirAdminifier, "template", "*.tpl")))
+	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
 
 	// main handler
 	mux.HandleFunc(host+root, handleRoot)
@@ -84,15 +81,12 @@ func Configure() {
 		setupWikiHandlers(shortcode, wi)
 	}
 }
-
-func setupStatic(staticPath, staticRoot string) error {
-	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
-		if err == nil {
-			err = errors.New("not a directory")
-		}
-		return err
+func setupStatic(efs fs.FS, staticRoot string) error {
+	subFS, err := fs.Sub(efs, "static")
+	if err != nil {
+		return errors.Wrap(err, "creating static sub filesystem")
 	}
-	fileServer := http.FileServer(http.Dir(staticPath))
+	fileServer := http.FileServer(http.FS(subFS))
 	mux.Handle(host+staticRoot, http.StripPrefix(staticRoot, fileServer))
 	return nil
 }

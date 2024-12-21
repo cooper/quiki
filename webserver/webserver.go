@@ -6,14 +6,15 @@ package webserver
 
 import (
 	"encoding/gob"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -65,12 +66,10 @@ func Configure(confFile string) {
 	}
 
 	// extract strings
-	var dirResource string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &Port,
 		"server.http.bind":    &Bind,
 		"server.dir.template": &templateDirs,
-		"server.dir.resource": &dirResource,
 	} {
 		str, err := Conf.GetStr(key)
 		if err != nil {
@@ -81,8 +80,6 @@ func Configure(confFile string) {
 
 	// normalize paths
 	templateDirs = filepath.FromSlash(templateDirs)
-	dirResource = filepath.FromSlash(dirResource)
-	dirStatic := filepath.Join(dirResource, "webserver", "static")
 
 	// set up wikis
 	if err = initWikis(); err != nil {
@@ -90,7 +87,7 @@ func Configure(confFile string) {
 	}
 
 	// setup static files from wikifier
-	if err = setupStatic(dirStatic); err != nil {
+	if err = setupStatic(); err != nil {
 		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
@@ -127,14 +124,12 @@ func Listen() {
 	}
 }
 
-func setupStatic(staticPath string) error {
-	if stat, err := os.Stat(staticPath); err != nil || !stat.IsDir() {
-		if err == nil {
-			err = errors.New("not a directory")
-		}
-		return err
+func setupStatic() error {
+	subFS, err := fs.Sub(resources.Webserver, "static")
+	if err != nil {
+		return errors.Wrap(err, "creating static sub filesystem")
 	}
-	fileServer := http.FileServer(http.Dir(staticPath))
+	fileServer := http.FileServer(http.FS(subFS))
 	Mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 	return nil
 }

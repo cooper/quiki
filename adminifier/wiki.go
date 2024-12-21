@@ -3,6 +3,8 @@ package adminifier
 import (
 	"encoding/json"
 	"html/template"
+	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
@@ -209,9 +212,15 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 
 	// load javascript templates
 	if javascriptTemplates == "" {
-		files, _ := filepath.Glob(dirAdminifier + "/template/js-tmpl/*.tpl")
-		for _, fileName := range files {
-			data, _ := os.ReadFile(fileName)
+		files, err := fs.ReadDir(resources.Adminifier, "js-tmpl")
+		if err != nil {
+			log.Printf("error reading js-tmpl directory: %v", err)
+		}
+		for _, file := range files {
+			data, err := fs.ReadFile(resources.Adminifier, "js-tmpl/"+file.Name())
+			if err != nil {
+				log.Printf("error reading js-tmpl file %s: %v", file.Name(), err)
+			}
 			javascriptTemplates += string(data)
 		}
 	}
@@ -550,15 +559,16 @@ func handleHelpFrame(wr *wikiRequest) {
 	}
 	wr.dot = &dot
 
+	// FIXME
 	// create the help wiki if not already loaded
-	if helpWiki == nil {
-		var err error
-		helpWiki, err = wiki.NewWiki(filepath.Join(dirAdminifier, "help"))
-		if err != nil {
-			wr.err = err
-			return
-		}
-	}
+	// if helpWiki == nil {
+	// 	var err error
+	// 	helpWiki, err = wiki.NewWiki(filepath.Join(dirAdminifier, "help"))
+	// 	if err != nil {
+	// 		wr.err = err
+	// 		return
+	// 	}
+	// }
 
 	// determine page
 	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
