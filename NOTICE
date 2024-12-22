@@ -1,0 +1,40 @@
+NOTICE
+
+This project includes third-party libraries and code. We acknowledge and thank the authors of these projects for their contributions.
+
+1. Ace Editor
+   https://github.com/ajaxorg/ace
+   License: "New" BSD 3-clause
+   Copyright (c) 2010, Ajax.org B.V.
+
+2. Pikaday
+   https://github.com/Pikaday/Pikaday
+   License: BSD & MIT
+   Copyright (c) 2014 David Bushell
+
+3. MooTools
+   https://mootools.net
+   License: MIT
+   Copyright (c) 2006-2014 Valerio Proietti
+
+4. tmpl.min.js
+   https://github.com/blueimp/JavaScript-Templates
+   License: MIT
+   Copyright (c) 2011 Sebastian Tschan, https://blueimp.net
+
+5. diff2html
+   https://github.com/rtfpessoa/diff2html
+   License: MIT
+   Copyright 2014-2016 Rodrigo Fernandes https://rtfpessoa.github.io/
+
+6. Font Awesome
+   https://github.com/FortAwesome/Font-Awesome
+   License: https://fontawesome.com/license/free
+        (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+   Copyright (c) 2024 Fonticons, Inc.
+
+7. Color Picker
+   License: MIT
+   Copyright (c) 2007 John Dyer (http://johndyer.name)
+
+For full license texts, please refer to the LICENSE files in the respective repositories.

@@ -1,0 +1,30 @@
+{
+  "name": "pikaday",
+  "description": "A refreshing JavaScript Datepicker — lightweight, no dependencies, modular CSS",
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "date"
+  ],
+  "main": [
+    "./pikaday.js",
+    "./css/pikaday.css"
+  ],
+  "dependencies": {},
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "examples",
+    "tests"
+  ],
+  "license" : [
+    "0BSD",
+    "MIT"
+  ],
+  "homepage": "https://pikaday.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pikaday/Pikaday.git"
+  }
+}

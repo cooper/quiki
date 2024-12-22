@@ -1,0 +1,39 @@
+{
+  "name": "pikaday",
+  "version": "1.8.2",
+  "description": "A refreshing JavaScript Datepicker — lightweight, no dependencies, modular CSS",
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "date"
+  ],
+  "homepage": "https://pikaday.com",
+  "bugs": "https://github.com/Pikaday/Pikaday/issues",
+  "license": "(0BSD OR MIT)",
+  "main": "pikaday.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pikaday/Pikaday.git"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "jshint": "^2.12.0",
+    "mocha": "^8.2.0"
+  },
+  "testling": {
+    "harness": "mocha",
+    "files": "tests/*.js",
+    "browsers": [
+      "ie/7..latest",
+      "chrome/latest",
+      "firefox/3.6",
+      "firefox/latest",
+      "safari/latest",
+      "opera/latest"
+    ]
+  },
+  "scripts": {
+    "test": "testling",
+    "lint": "jshint *.js plugins/*.js tests/*.js"
+  }
+}
