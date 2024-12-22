@@ -1,15 +1,13 @@
 # quiki
 
-[quiki](https://quiki.app)
-is a fully-featured wiki suite and standalone web server that is
-completely file-based. instead of storing content in a database, each page
-is represented by a text file written in the clean and productive
-[quiki source language](doc/language.md).
+[quiki](https://quiki.app) is a wiki suite and standalone web server that is
+completely file-based. instead of storing content in a database, each page is
+represented by a text file written in the clean and productive
+[quiki source language](doc/language.md) or [markdown](doc/markdown.md).
 
-it sports caching, image generation, category management,
-[templates](doc/models.md),
-[markdown integration](doc/markdown.md),
-git-based revision tracking, a web-based editor, and much more.
+it sports caching, image generation, category management, [templates](doc/models.md),
+git-based revision tracking, and more. while it is meant to be easily maintainable
+from the command line, you may optionally enable the web-based editor.
 
 * [install](#install)
 * [configure](#configure)
@@ -23,18 +21,14 @@ go get github.com/cooper/quiki
 
 ## configure
 
-quiki ships with a working example configuration and detailed
-[configuration spec](doc/configuration.md).
+create a `quiki.conf` configuration file based on the
+[provided example](quiki.conf.example) and place it somewhere readable by the user
+that will run quiki.
 
-```sh
-cp quiki.conf.example quiki.conf
-nano -w quiki.conf
-```
+see the [configuration spec](doc/configuration.md) for all options.
 
 ## run
 
 ```sh
-quiki quiki.conf    # ($GOPATH/bin/quiki if PATH not configured for go)
+quiki quiki.conf
 ```
-
-Did you expect this page to be longer?
