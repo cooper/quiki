@@ -15,8 +15,8 @@ import (
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
+	"github.com/cooper/imaging"
 	"github.com/cooper/quiki/wikifier"
-	"github.com/disintegration/imaging"
 )
 
 var (

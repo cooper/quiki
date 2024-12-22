@@ -10,7 +10,8 @@ require (
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/cooper/ferret-chroma v0.0.0-20201209083634-9d9918e49841
 	github.com/cooper/go-git/v4 v4.14.1
-	github.com/disintegration/imaging v1.6.2
+	github.com/cooper/imaging v1.0.0
+	github.com/enescakir/emoji v1.0.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/grokify/html-strip-tags-go v0.1.0
 	github.com/pkg/errors v0.9.1
@@ -24,7 +25,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/enescakir/emoji v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
@@ -44,5 +44,3 @@ require (
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
-
-replace github.com/disintegration/imaging => github.com/stephenfire/imaging v1.0.0

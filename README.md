@@ -30,5 +30,5 @@ see the [configuration spec](doc/configuration.md) for all options.
 ## run
 
 ```sh
-quiki quiki.conf
+quiki quiki.conf    # or $GOPATH/bin/quiki
 ```
