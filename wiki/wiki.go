@@ -1,10 +1,11 @@
 package wiki
 
 import (
-	"errors"
 	"log"
 	"path/filepath"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/cooper/go-git/v4"
 	"github.com/cooper/quiki/authenticator"
@@ -30,7 +31,6 @@ func NewWiki(path string) (*Wiki, error) {
 // NewWikiConfig creates a Wiki given the configuration file path.
 //
 // Deprecated: Use NewWiki instead.
-//
 func NewWikiConfig(confPath string) (*Wiki, error) {
 	confPath = filepath.FromSlash(confPath)
 	w := &Wiki{
@@ -57,7 +57,7 @@ func NewWikiConfig(confPath string) (*Wiki, error) {
 	// create authenticator
 	w.Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confPath), "auth.json"))
 	if err != nil {
-		return nil, errors.New("init authenticator")
+		return nil, errors.Wrap(err, "init authenticator")
 	}
 
 	// no errors occurred
