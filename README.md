@@ -16,7 +16,7 @@ from the command line, you may optionally enable the web-based editor.
 ## install
 
 ```sh
-go get github.com/cooper/quiki
+go install github.com/cooper/quiki@latest
 ```
 
 ## configure
