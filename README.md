@@ -1,6 +1,6 @@
 # quiki
 
-[quiki](https://quiki.app) is a wiki suite and standalone web server that is
+[quiki](https://quiki.rlygd.net) is a wiki suite and standalone web server that is
 completely file-based. instead of storing content in a database, each page is
 represented by a text file written in the clean and productive
 [quiki source language](doc/language.md) or [markdown](doc/markdown.md).

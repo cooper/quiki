@@ -39,7 +39,7 @@ type CommitOpts struct {
 var quikiCommitOpts = &git.CommitOptions{
 	Author: &object.Signature{
 		Name:  "quiki",
-		Email: "quiki@quiki.app",
+		Email: "quiki@quiki.rlygd.net",
 		When:  time.Now(),
 	},
 }
