@@ -3,6 +3,8 @@ package adminifier
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
@@ -88,7 +90,20 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handleTemplate(w, r)
+	// get default wikis path if not configured
+	wikiPathConfigured, _ := webserver.Conf.GetStr("server.dir.wiki")
+	var defaultWikiPath string
+	if wikiPathConfigured == "" {
+		// use whatever dir the webserver.Conf.Path() is in as the default
+		defaultWikiPath = filepath.Join(filepath.Dir(webserver.Conf.Path()), "wikis")
+	}
+
+	// render template with default wikis path if not configured
+	tmpl.ExecuteTemplate(w, "create-user.tpl", struct {
+		DefaultWikiPath string
+	}{
+		DefaultWikiPath: defaultWikiPath,
+	})
 }
 
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -117,15 +132,17 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// remove the token from config
-	err = webserver.Conf.Unset("adminifier.token")
-	if err != nil {
-		http.Error(w, "unsetting token in config: "+err.Error(), http.StatusInternalServerError)
-		return
+	// create the wiki path if not exists
+	wikiPath := r.Form.Get("path")
+	if wikiPath == "" {
+		wikiPath, err = webserver.Conf.GetStr("server.dir.wiki")
+		if err != nil || wikiPath == "" {
+			http.Error(w, "no wiki path configured", http.StatusInternalServerError)
+			return
+		}
 	}
-	err = webserver.Conf.Write()
-	if err != nil {
-		http.Error(w, "remove token from config: "+err.Error(), http.StatusInternalServerError)
+	if err = os.MkdirAll(wikiPath, 0755); err != nil {
+		http.Error(w, "creating wikis directory: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -140,6 +157,16 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	// error occurred
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// remove token from config, add wiki path
+	// do this last in case other errors occurred first
+	webserver.Conf.Set("server.dir.wiki", wikiPath)
+	webserver.Conf.Unset("adminifier.token")
+	err = webserver.Conf.Write()
+	if err != nil {
+		http.Error(w, "remove token from config: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

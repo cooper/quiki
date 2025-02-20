@@ -53,6 +53,12 @@
                     <td class="left">Token</td>
                     <td><input type="text" name="token" required placeholder=" " /></td>
                 </tr>
+                {{if .DefaultWikiPath}}
+                <tr>
+                    <td class="left">Wikis Path</td>
+                    <td><input type="text" name="path" required value="{{.DefaultWikiPath}}" placeholder=" " /></td>
+                </tr>
+                {{end}}
                 <tr>
                     <td><input type="submit" name="submit" value="Create" /></td>
                 </tr>
