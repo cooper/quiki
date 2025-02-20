@@ -36,6 +36,10 @@ func initWikis() error {
 	if err != nil {
 		return err
 	}
+	if found == nil {
+		log.Println("no wikis are configured yet")
+		return nil
+	}
 	wikiMap, ok := found.(*wikifier.Map)
 	if !ok {
 		return errors.New("server.wiki is not a map")

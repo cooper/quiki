@@ -19,6 +19,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Options is the webserver command line options.
+type Options struct {
+	Config string
+	Bind   string
+	Port   string
+}
+
 // Conf is the webserver configuration page.
 //
 // It is available only after Configure is called.
@@ -53,17 +60,20 @@ var SessMgr *scs.SessionManager
 // Configure parses a configuration file and initializes webserver.
 //
 // If any errors occur, the program is terminated.
-func Configure(confFile string) {
+func Configure(opts Options) {
 	var err error
 	Mux = http.NewServeMux()
 	gob.Register(&authenticator.User{})
 
 	// parse configuration
-	Conf = wikifier.NewPage(confFile)
+	Conf = wikifier.NewPage(opts.Config)
 	Conf.VarsOnly = true
 	if err = Conf.Parse(); err != nil {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
+
+	Bind = opts.Bind
+	Port = opts.Port
 
 	// extract strings
 	for key, ptr := range map[string]*string{
@@ -71,6 +81,10 @@ func Configure(confFile string) {
 		"server.http.bind":    &Bind,
 		"server.dir.template": &templateDirs,
 	} {
+		if *ptr != "" {
+			// already set by opts
+			continue
+		}
 		str, err := Conf.GetStr(key)
 		if err != nil {
 			log.Fatal(err)
@@ -99,7 +113,7 @@ func Configure(confFile string) {
 	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
-	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(confFile), "quiki-auth.json"))
+	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(opts.Config), "quiki-auth.json"))
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "init server authenticator"))
 	}

@@ -1,6 +1,7 @@
 package adminifier
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -93,7 +94,7 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// missing parameters or malformed request
-	if !parsePost(w, r, "display", "email", "username", "password") {
+	if !parsePost(w, r, "display", "email", "username", "password", "token") {
 		return
 	}
 
@@ -104,9 +105,33 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// validate token
+	expectedToken, err := webserver.Conf.GetStr("adminifier.token")
+	if err != nil || expectedToken == "" {
+		http.Error(w, "no token set", http.StatusInternalServerError)
+		return
+	}
+	if r.Form.Get("token") != expectedToken {
+		log.Printf("expected token: %s, got: %s", expectedToken, r.Form.Get("token"))
+		http.Error(w, "invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	// remove the token from config
+	err = webserver.Conf.Unset("adminifier.token")
+	if err != nil {
+		http.Error(w, "unsetting token in config: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = webserver.Conf.Write()
+	if err != nil {
+		http.Error(w, "remove token from config: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	// create user
 	// TODO: validate things
-	err := webserver.Auth.NewUser(authenticator.User{
+	err = webserver.Auth.NewUser(authenticator.User{
 		Username:    r.Form.Get("username"),
 		DisplayName: r.Form.Get("display"),
 		Email:       r.Form.Get("email"),

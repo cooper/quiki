@@ -50,6 +50,10 @@
                     <td><input type="password" name="password" required pattern="\S+" placeholder=" " /></td>
                 </tr>
                 <tr>
+                    <td class="left">Token</td>
+                    <td><input type="text" name="token" required placeholder=" " /></td>
+                </tr>
+                <tr>
                     <td><input type="submit" name="submit" value="Create" /></td>
                 </tr>
             </table>

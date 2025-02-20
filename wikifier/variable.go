@@ -21,11 +21,13 @@ type AttributedObject interface {
 
 	// setters
 	Set(key string, value any) error
+	Unset(key string) error
 
 	// internal use
 	mainBlock() block
 	setOwn(key string, value any)
 	getOwn(key string) any
+	unsetOwn(key string)
 }
 
 type variableScope struct {
@@ -75,6 +77,39 @@ func (scope *variableScope) Set(key string, value any) error {
 
 	// finally, set it on the last object
 	where.setOwn(setting, value)
+	return nil
+}
+
+// Unset removes a value at the given key.
+//
+// The key may be segmented to indicate properties of each object
+// (e.g. person.name).
+//
+// If attempting to unset a property of an object that does not
+// support properties, such as a string, Unset returns an error.
+func (scope *variableScope) Unset(key string) error {
+	var where AttributedObject = scope
+
+	// split into parts
+	parts := strings.Split(key, ".")
+	setting, parts := parts[len(parts)-1], parts[:len(parts)-1]
+
+	for _, name := range parts {
+		newWhere, err := where.GetObj(name)
+		if err != nil {
+			return err
+		}
+
+		// no error, but there's nothing there
+		if newWhere == nil {
+			return nil
+		}
+
+		where = newWhere
+	}
+
+	// finally, unset it on the last object
+	where.unsetOwn(setting)
 	return nil
 }
 
@@ -262,6 +297,11 @@ func (scope *variableScope) GetStrList(key string) ([]string, error) {
 // set own property
 func (scope *variableScope) setOwn(key string, value any) {
 	scope.vars[key] = value
+}
+
+// unset own property
+func (scope *variableScope) unsetOwn(key string) {
+	delete(scope.vars, key)
 }
 
 // fetch own property

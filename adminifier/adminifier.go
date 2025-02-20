@@ -80,6 +80,12 @@ func Configure() {
 	for shortcode, wi := range webserver.Wikis {
 		setupWikiHandlers(shortcode, wi)
 	}
+
+	// if there are no users yet, let them know token
+	if tok, _ := conf.Get("adminifier.token"); tok != nil && len(webserver.Auth.Users) == 0 {
+		log.Printf("no admin users exist yet, visit %screate-user to create one", host+root)
+		log.Printf("your setup token: %s", tok)
+	}
 }
 func setupStatic(efs fs.FS, staticRoot string) error {
 	subFS, err := fs.Sub(efs, "static")
