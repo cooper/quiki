@@ -26,6 +26,8 @@ If you want to store the config elsewhere, you can specify like so:
 quki -w -config=/path/to/quiki.conf
 ```
 
+See the [configuration spec](doc/configuration.md) for all options.
+
 ### Admin account setup
 When running with `-w`, after the configuration file is written, the server
 begins listening. You should navigate your browser to the adminifier setup page,
@@ -56,6 +58,8 @@ To run with a different config, use
 ```
 quiki -config=/path/to/quiki.conf
 ```
+
+See the [configuration spec](doc/configuration.md) for all options.
 
 ### Override host or port
 The host and port typically are specified in the webserver config file.

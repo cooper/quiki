@@ -19,14 +19,6 @@ from the command line, you may optionally enable the web-based editor.
 go install github.com/cooper/quiki@latest
 ```
 
-## configure
-
-create a `quiki.conf` configuration file based on the
-[provided example](quiki.conf.example) and place it somewhere readable by the user
-that will run quiki.
-
-see the [configuration spec](doc/configuration.md) for all options.
-
 ## run
 
 the easiest way to get started is run the setup wizard:
