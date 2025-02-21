@@ -195,6 +195,11 @@ func setupWiki(wi *WikiInfo) error {
 
 	wikiRoots := []wikiHandler{
 		{
+			rootType: "wiki",
+			root:     wi.Opt.Root.Wiki,
+			handler:  handleWiki,
+		},
+		{
 			rootType: "page",
 			root:     wi.Opt.Root.Page,
 			handler:  handlePage,
@@ -213,21 +218,24 @@ func setupWiki(wi *WikiInfo) error {
 
 	// setup handlers
 	wikiRoot := wi.Opt.Root.Wiki
+	if !strings.HasPrefix(wikiRoot, "/") {
+		wikiRoot = "/" + wikiRoot
+	}
 	for _, item := range wikiRoots {
 		rootType, root, handler := item.rootType, item.root, item.handler
 
+		if !strings.HasPrefix(root, "/") {
+			root = "/" + root
+		}
+
 		// if this is the page root and it's blank, skip it
-		if rootType == "page" && root == "" {
+		if rootType == "page" && root == "/" {
 			log.Printf("[%s] pages will be handled at wiki root: %s/", wi.Name, wi.Host+wikiRoot)
 			continue
 		}
 
 		// if it doesn't already have the wiki root as the prefix, add it
 		if !strings.HasPrefix(root, wikiRoot) {
-			log.Printf(
-				"@root.%s (%s) is configured outside of @root.wiki (%s); assuming %s%s",
-				rootType, root, wikiRoot, wikiRoot, root,
-			)
 			root = wikiRoot + root
 		}
 

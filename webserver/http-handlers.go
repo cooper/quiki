@@ -48,22 +48,8 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 		// show the main page for the delayed wiki
 		wikiRoot := delayedWiki.Opt.Root.Wiki
-		mainPage := delayedWiki.Opt.MainPage
-		if mainPage != "" && (r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/") {
-
-			// main page redirect is enabled
-			if delayedWiki.Opt.MainRedirect {
-				http.Redirect(
-					w, r,
-					delayedWiki.Opt.Root.Page+
-						"/"+mainPage,
-					http.StatusMovedPermanently,
-				)
-				return
-			}
-
-			// display main page
-			handlePage(delayedWiki, mainPage, w, r)
+		if r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/" {
+			handleWiki(delayedWiki, wikiRoot, w, r)
 			return
 		}
 
@@ -81,6 +67,28 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 	// anything else is a generic 404
 	http.NotFound(w, r)
+}
+
+// wiki root
+func handleWiki(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	mainPage := wi.Opt.MainPage
+	isRoot := relPath == "" || relPath == "/"
+
+	// main page redirect is enabled
+	if isRoot && wi.Opt.MainRedirect {
+		http.Redirect(
+			w, r,
+			wi.Opt.Root.Page+
+				"/"+mainPage,
+			http.StatusMovedPermanently,
+		)
+		return
+	} else if isRoot {
+		relPath = mainPage
+	}
+
+	// display page
+	handlePage(wi, relPath, w, r)
 }
 
 // page request
