@@ -227,11 +227,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	opt.Dir.Category = filepath.Join(opt.Dir.Wiki, "cache", "category")
 
 	// convert all HTTP roots to /
-	opt.Root.Wiki = filepath.ToSlash(opt.Root.Wiki)
-	opt.Root.Image = filepath.ToSlash(opt.Root.Image)
-	opt.Root.Category = filepath.ToSlash(opt.Root.Category)
-	opt.Root.Page = filepath.ToSlash(opt.Root.Page)
-	opt.Root.File = filepath.ToSlash(opt.Root.File)
+	opt.Root.Wiki = startWithSlash(filepath.ToSlash(opt.Root.Wiki))
+	opt.Root.Image = startWithSlash(filepath.ToSlash(opt.Root.Image))
+	opt.Root.Category = startWithSlash(filepath.ToSlash(opt.Root.Category))
+	opt.Root.Page = startWithSlash(filepath.ToSlash(opt.Root.Page))
+	opt.Root.File = startWithSlash(filepath.ToSlash(opt.Root.File))
 
 	// easy bool options
 	pageOptBool := map[string]*bool{
@@ -328,4 +328,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	// TODO: External wikis
 
 	return nil
+}
+
+func startWithSlash(s string) string {
+	if s == "" || s[0] == '/' {
+		return s
+	}
+	return "/" + s
 }
