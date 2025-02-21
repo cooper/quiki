@@ -1,7 +1,0 @@
-@page.title: A page in a category;
-
-@category.mytopic;
-@category.another/topic;
-
-Page three. It uses a model:
-$obnoxious { worksWith: variables; }
