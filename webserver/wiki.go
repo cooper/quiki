@@ -230,7 +230,7 @@ func setupWiki(wi *WikiInfo) error {
 
 		// if this is the page root and it's blank, skip it
 		if rootType == "page" && root == "/" {
-			log.Printf("[%s] pages will be handled at wiki root: %s/", wi.Name, wi.Host+wikiRoot)
+			log.Printf("[%s] pages will be handled at wiki root: %s", wi.Name, wi.Host+wikiRoot)
 			continue
 		}
 
@@ -239,7 +239,9 @@ func setupWiki(wi *WikiInfo) error {
 			root = wikiRoot + root
 		}
 
-		root += "/"
+		if !strings.HasSuffix(root, "/") {
+			root += "/"
+		}
 
 		// add the real handler
 		wi := wi // copy pointer so the handler below always refer to this one
