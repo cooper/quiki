@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -219,12 +220,29 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		}
 	}
 
-	// all of these deprecated options are now overridden
+	// these dirs are derived from wiki dir
 	opt.Dir.Page = filepath.Join(opt.Dir.Wiki, "pages")
 	opt.Dir.Image = filepath.Join(opt.Dir.Wiki, "images")
 	opt.Dir.Model = filepath.Join(opt.Dir.Wiki, "models")
 	opt.Dir.Cache = filepath.Join(opt.Dir.Wiki, "cache")
 	opt.Dir.Category = filepath.Join(opt.Dir.Wiki, "cache", "category")
+
+	// ensure they all exist
+	for _, dir := range []string{
+		opt.Dir.Wiki,
+		opt.Dir.Page,
+		opt.Dir.Image,
+		opt.Dir.Model,
+		opt.Dir.Cache,
+		opt.Dir.Category,
+	} {
+		if _, err := os.Lstat(dir); err != nil && os.IsNotExist(err) {
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				return errors.Wrap(err, "creating "+dir)
+			}
+		}
+	}
 
 	// convert all HTTP roots to /
 	opt.Root.Wiki = startWithSlash(filepath.ToSlash(opt.Root.Wiki))

@@ -59,6 +59,9 @@ func NewWikiConfig(confPath string) (*Wiki, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "init authenticator")
 	}
+	if w.Auth.IsNew {
+		w.Log("created wiki authentication file")
+	}
 
 	// no errors occurred
 	return w, nil
