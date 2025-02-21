@@ -77,9 +77,7 @@ func Configure() {
 	}
 
 	// handlers for each site at shortcode/
-	for shortcode, wi := range webserver.Wikis {
-		setupWikiHandlers(shortcode, wi)
-	}
+	InitWikis()
 
 	// if there are no users yet, let them know token
 	if tok, _ := conf.Get("adminifier.token"); tok != nil && len(webserver.Auth.Users) == 0 {

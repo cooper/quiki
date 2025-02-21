@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -29,7 +28,7 @@ type WikiInfo struct {
 var Wikis map[string]*WikiInfo
 
 // initialize all the wikis in the configuration
-func initWikis() error {
+func InitWikis() error {
 
 	// find wikis
 	found, err := Conf.Get("server.wiki")
@@ -51,8 +50,16 @@ func initWikis() error {
 	}
 
 	// set up each wiki
-	Wikis = make(map[string]*WikiInfo, len(wikiNames))
+	if Wikis == nil {
+		Wikis = make(map[string]*WikiInfo)
+	}
 	for _, wikiName := range wikiNames {
+
+		// already loaded
+		if _, ok := Wikis[wikiName]; ok {
+			continue
+		}
+
 		configPfx := "server.wiki." + wikiName
 
 		// not enabled
@@ -150,7 +157,7 @@ func setupWiki(wi *WikiInfo) error {
 	var err error
 	if strings.Contains(templateNameOrPath, "/") {
 		// if a path is given, try to load the template at this exact path
-		template, err = loadTemplate(path.Base(templateNameOrPath), templateNameOrPath)
+		template, err = loadTemplateAtPath(templateNameOrPath)
 	} else {
 		// otherwise, search template directories
 		template, err = findTemplate(templateNameOrPath)

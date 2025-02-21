@@ -76,7 +76,19 @@ type editorOpts struct {
 	info   any  // PageInfo or ModelInfo
 }
 
+var loadedWikiShortcodes = make(map[string]bool)
+
 // TODO: verify session on ALL wiki handlers
+
+func InitWikis() {
+	for shortcode, wi := range webserver.Wikis {
+		if loadedWikiShortcodes[shortcode] {
+			continue
+		}
+		setupWikiHandlers(shortcode, wi)
+		loadedWikiShortcodes[shortcode] = true
+	}
+}
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 

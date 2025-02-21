@@ -3,8 +3,6 @@ package adminifier
 import (
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
@@ -18,6 +16,7 @@ var funcHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
 	"create-user":      handleCreateUserPage,
 	"func/create-user": handleCreateUser,
 	"logout":           handleLogout,
+	"func/create-wiki": handleCreateWiki,
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -35,11 +34,13 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.ExecuteTemplate(w, "server.tpl", struct {
-		User  *authenticator.User
-		Wikis map[string]*webserver.WikiInfo
+		User      *authenticator.User
+		Wikis     map[string]*webserver.WikiInfo
+		Templates []string
 	}{
-		User:  sessMgr.Get(r.Context(), "user").(*authenticator.User),
-		Wikis: webserver.Wikis,
+		User:      sessMgr.Get(r.Context(), "user").(*authenticator.User),
+		Wikis:     webserver.Wikis,
+		Templates: webserver.TemplateNames(),
 	})
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
 	// and deny access to the server admin panel
@@ -90,20 +91,7 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get default wikis path if not configured
-	wikiPathConfigured, _ := webserver.Conf.GetStr("server.dir.wiki")
-	var defaultWikiPath string
-	if wikiPathConfigured == "" {
-		// use whatever dir the webserver.Conf.Path() is in as the default
-		defaultWikiPath = filepath.Join(filepath.Dir(webserver.Conf.Path()), "wikis")
-	}
-
-	// render template with default wikis path if not configured
-	tmpl.ExecuteTemplate(w, "create-user.tpl", struct {
-		DefaultWikiPath string
-	}{
-		DefaultWikiPath: defaultWikiPath,
-	})
+	handleTemplate(w, r)
 }
 
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -132,17 +120,15 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// create the wiki path if not exists
-	wikiPath := r.Form.Get("path")
-	if wikiPath == "" {
-		wikiPath, err = webserver.Conf.GetStr("server.dir.wiki")
-		if err != nil || wikiPath == "" {
-			http.Error(w, "no wiki path configured", http.StatusInternalServerError)
-			return
-		}
+	// remove the token from config
+	err = webserver.Conf.Unset("adminifier.token")
+	if err != nil {
+		http.Error(w, "unsetting token in config: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
-	if err = os.MkdirAll(wikiPath, 0755); err != nil {
-		http.Error(w, "creating wikis directory: "+err.Error(), http.StatusInternalServerError)
+	err = webserver.Conf.Write()
+	if err != nil {
+		http.Error(w, "remove token from config: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -157,16 +143,6 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	// error occurred
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// remove token from config, add wiki path
-	// do this last in case other errors occurred first
-	webserver.Conf.Set("server.dir.wiki", wikiPath)
-	webserver.Conf.Unset("adminifier.token")
-	err = webserver.Conf.Write()
-	if err != nil {
-		http.Error(w, "remove token from config: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

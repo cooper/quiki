@@ -7,16 +7,16 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
 )
 
-var templateDirs string
+var templateFses []fs.FS
 var templates = make(map[string]wikiTemplate)
 
 var templateFuncs = map[string]any{
@@ -29,7 +29,7 @@ var templateFuncs = map[string]any{
 }
 
 type wikiTemplate struct {
-	path       string             // template directory path
+	// path       string             // template directory path
 	template   *template.Template // master HTML template
 	staticPath string             // static file directory path, if any
 	staticRoot string             // static file directory HTTP root, if any
@@ -57,6 +57,24 @@ type wikiTemplate struct {
 	}
 }
 
+// Returns the names of all available templates.
+func TemplateNames() []string {
+	names := make([]string, 0)
+	for _, templateFs := range templateFses {
+		dirs, err := fs.ReadDir(templateFs, ".")
+		if err != nil {
+			log.Printf("error reading template directory: %s", err)
+			continue
+		}
+		for _, dir := range dirs {
+			if dir.IsDir() {
+				names = append(names, dir.Name())
+			}
+		}
+	}
+	return names
+}
+
 // search all template directories for a template by its name
 func findTemplate(name string) (wikiTemplate, error) {
 
@@ -65,31 +83,27 @@ func findTemplate(name string) (wikiTemplate, error) {
 		return t, nil
 	}
 
-	for _, templateDir := range strings.Split(templateDirs, ",") {
-		templatePath := filepath.Join(templateDir, name)
-		t, err := loadTemplate(name, templatePath)
-
-		// an error occurred in loading the template
-		if err != nil {
-			return t, err
-		}
-
-		// no template but no error means try the next directory
-		if t.template == nil {
-			continue
-		}
-
-		return t, nil
+	t, err := loadTemplate(name, templateFses)
+	if err != nil {
+		return t, err
 	}
 
 	// never found a template
-	return wikiTemplate{}, fmt.Errorf("unable to find template '%s' in any of %v", name, templateDirs)
+	if t.template == nil {
+		return wikiTemplate{}, fmt.Errorf("unable to find template '%s' in any of the provided directories", name)
+	}
+
+	return t, nil
 }
 
 // load a template from its known path
-func loadTemplate(name, templatePath string) (wikiTemplate, error) {
+func loadTemplateAtPath(path string) (wikiTemplate, error) {
+	return loadTemplate(path, []fs.FS{os.DirFS(path)})
+}
+
+// load template given fses
+func loadTemplate(name string, fses []fs.FS) (wikiTemplate, error) {
 	var t wikiTemplate
-	var tryNextDirectory bool
 
 	// template is already cached
 	if t, ok := templates[name]; ok {
@@ -98,69 +112,74 @@ func loadTemplate(name, templatePath string) (wikiTemplate, error) {
 
 	// parse HTML templates
 	tmpl := template.New("")
-	err := filepath.Walk(templatePath, func(filePath string, info os.FileInfo, err error) error {
+	for _, templateFs := range fses {
+		var tryNextDirectory bool
+		err := fs.WalkDir(templateFs, name, func(filePath string, d fs.DirEntry, err error) error {
 
-		// walk error, probably missing template
-		if err != nil {
-			tryNextDirectory = true
+			// walk error, probably missing template
+			if err != nil {
+				tryNextDirectory = true
+				return err
+			}
+
+			// found template file
+			if strings.HasSuffix(filePath, ".tpl") {
+
+				// error in parsing
+				subTmpl, err := tmpl.ParseFS(templateFs, filePath)
+				if err != nil {
+					return err
+				}
+
+				// add funcs
+				subTmpl.Funcs(templateFuncs)
+			}
+
+			// found static content directory
+			if d.IsDir() && d.Name() == "static" {
+				t.staticPath = filePath
+				t.staticRoot = "/tmpl/" + name
+				fileServer := http.FileServer(http.FS(templateFs))
+				pfx := t.staticRoot + "/"
+				Mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
+				log.Printf("[%s] template registered: %s", name, pfx)
+			}
+
+			// found manifest
+			if d.Name() == "manifest.json" {
+
+				// couldn't read manifest
+				contents, err := fs.ReadFile(templateFs, filePath)
+				if err != nil {
+					return err
+				}
+
+				// couldn't parse manifest
+				if err := json.Unmarshal(contents, &t.manifest); err != nil {
+					return err
+				}
+			}
+
 			return err
+		})
+
+		// not found
+		if tryNextDirectory {
+			continue
 		}
 
-		// found template file
-		if strings.HasSuffix(filePath, ".tpl") {
-
-			// error in parsing
-			subTmpl, err := tmpl.ParseFiles(filePath)
-			if err != nil {
-				return err
-			}
-
-			// add funcs
-			subTmpl.Funcs(templateFuncs)
+		// other error
+		if err != nil {
+			return t, err
 		}
 
-		// found static content directory
-		if info.IsDir() && info.Name() == "static" {
-			t.staticPath = filePath
-			t.staticRoot = "/tmpl/" + name
-			fileServer := http.FileServer(http.Dir(filePath))
-			pfx := t.staticRoot + "/"
-			Mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
-			log.Printf("[%s] template registered: %s", name, pfx)
-		}
+		// cache the template
+		// t.path = name
+		t.template = tmpl
+		templates[name] = t
 
-		// found manifest
-		if info.Name() == "manifest.json" {
-
-			// couldn't read manifest
-			contents, err := os.ReadFile(filePath)
-			if err != nil {
-				return err
-			}
-
-			// couldn't parse manifest
-			if err := json.Unmarshal(contents, &t.manifest); err != nil {
-				return err
-			}
-		}
-
-		return err
-	})
-
-	// not found
-	if tryNextDirectory {
 		return t, nil
 	}
-
-	// other error
-	if err != nil {
-		return t, err
-	}
-
-	// cache the template
-	t.path = templatePath
-	t.template = tmpl
-	templates[name] = t
 
 	return t, nil
 }

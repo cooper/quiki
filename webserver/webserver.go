@@ -10,7 +10,9 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/authenticator"
@@ -76,6 +78,7 @@ func Configure(opts Options) {
 	Port = opts.Port
 
 	// extract strings
+	var templateDirs string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &Port,
 		"server.http.bind":    &Bind,
@@ -92,11 +95,24 @@ func Configure(opts Options) {
 		*ptr = str
 	}
 
-	// normalize paths
-	templateDirs = filepath.FromSlash(templateDirs)
+	// convert templateDirs to fs.FSes on the os filesystem
+	for _, dir := range strings.Split(templateDirs, ",") {
+		if dir == "" {
+			continue
+		}
+		templateFs := os.DirFS(dir)
+		templateFses = append(templateFses, templateFs)
+	}
+
+	// add embedded templates
+	if sub, err := fs.Sub(resources.Webserver, "templates"); err == nil {
+		templateFses = append(templateFses, sub)
+	} else {
+		log.Fatal(errors.Wrap(err, "loading embedded templates"))
+	}
 
 	// set up wikis
-	if err = initWikis(); err != nil {
+	if err = InitWikis(); err != nil {
 		log.Fatal(errors.Wrap(err, "init wikis"))
 	}
 
