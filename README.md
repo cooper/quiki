@@ -29,6 +29,10 @@ see the [configuration spec](doc/configuration.md) for all options.
 
 ## run
 
+the easiest way to get started is run the setup wizard:
+
 ```sh
-quiki quiki.conf    # or $GOPATH/bin/quiki
+quiki -w        # or $GOPATH/bin/quiki
 ```
+
+for all options see [RUNNING](RUNNING.md).
