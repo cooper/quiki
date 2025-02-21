@@ -14,7 +14,6 @@ func (w *Wiki) Log(i ...any) {
 
 // Debug logs debug info for a wiki.
 func (w *Wiki) Debug(i ...any) {
-	w.logger().Println(i...)
 	log.Println(i...)
 }
 
@@ -26,7 +25,6 @@ func (w *Wiki) Logf(format string, i ...any) {
 
 // Debugf logs debug info for a wiki.
 func (w *Wiki) Debugf(format string, i ...any) {
-	w.logger().Printf(format+"\n", i...)
 	log.Printf(format+"\n", i...)
 }
 
