@@ -8,7 +8,6 @@ templates/*
 !templates/default
 wikis/*
 !wikis/mywiki
-cache
 .DS_Store
 standalone/standalone
 irc/irc

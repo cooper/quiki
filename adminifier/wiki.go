@@ -571,16 +571,35 @@ func handleHelpFrame(wr *wikiRequest) {
 	}
 	wr.dot = &dot
 
-	// FIXME
 	// create the help wiki if not already loaded
-	// if helpWiki == nil {
-	// 	var err error
-	// 	helpWiki, err = wiki.NewWiki(filepath.Join(dirAdminifier, "help"))
-	// 	if err != nil {
-	// 		wr.err = err
-	// 		return
-	// 	}
-	// }
+	if helpWiki == nil {
+
+		// find dir of config file
+		helpDir := filepath.Join(filepath.Dir(webserver.Conf.Path()), "help")
+
+		// check if help dir exists already
+		if _, err := os.Stat(helpDir); err != nil {
+
+			// copy help resources
+			subFs, err := fs.Sub(resources.Adminifier, "help")
+			if err != nil {
+				wr.err = errors.Wrap(err, "reading help resource")
+				return
+			}
+			err = os.CopyFS(helpDir, subFs)
+			if err != nil {
+				wr.err = errors.Wrap(err, "copying help resource")
+				return
+			}
+		}
+
+		var err error
+		helpWiki, err = wiki.NewWiki(helpDir)
+		if err != nil {
+			wr.err = err
+			return
+		}
+	}
 
 	// determine page
 	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
