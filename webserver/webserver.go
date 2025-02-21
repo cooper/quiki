@@ -26,6 +26,7 @@ type Options struct {
 	Config string
 	Bind   string
 	Port   string
+	Pregen bool
 }
 
 // Conf is the webserver configuration page.

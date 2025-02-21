@@ -4,10 +4,6 @@
 quiki
 quiki.exe
 quiki.conf
-templates/*
-!templates/default
-wikis/*
-!wikis/mywiki
 .DS_Store
 standalone/standalone
 irc/irc

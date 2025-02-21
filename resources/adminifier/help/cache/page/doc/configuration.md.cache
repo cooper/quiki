@@ -1,0 +1,1007 @@
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/configuration.md","file_ne":"doc/configuration","created":"2020-05-04T17:04:59-04:00","modified":"2020-05-04T17:04:59-04:00","generated":true,"external":true,"fmt_title":"Configuration","title":"Configuration","author":"Markdown","preview":"Contents Configuration Configuration files wikifier options name host.wiki dir.wiki root external page.enable.title page.code.lang page.code.style","warnings":[{"message":"No such code{} style 'monokailight' (from config)","position":[22,657]},{"message":"No such code{} style 'monokailight' (from config)","position":[149,3108]},{"message":"No such code{} style 'monokailight' (from config)","position":[216,4396]},{"message":"No such code{} style 'monokailight' (from config)","position":[228,4584]},{"message":"No such code{} style 'monokailight' (from config)","position":[245,4999]},{"message":"No such code{} style 'monokailight' (from config)","position":[398,8191]},{"message":"No such code{} style 'monokailight' (from config)","position":[448,9132]},{"message":"No such code{} style 'monokailight' (from config)","position":[486,9842]},{"message":"No such code{} style 'monokailight' (from config)","position":[495,9959]},{"message":"No such code{} style 'monokailight' (from config)","position":[519,10437]},{"message":"No such code{} style 'monokailight' (from config)","position":[535,10725]},{"message":"No such code{} style 'monokailight' (from config)","position":[555,11017]},{"message":"No such code{} style 'monokailight' (from config)","position":[579,11433]},{"message":"No such code{} style 'monokailight' (from config)","position":[591,11697]},{"message":"No such code{} style 'monokailight' (from config)","position":[613,12034]},{"message":"No such code{} style 'monokailight' (from config)","position":[633,12363]},{"message":"No such code{} style 'monokailight' (from config)","position":[651,12603]},{"message":"No such code{} style 'monokailight' (from config)","position":[708,13796]},{"message":"No such code{} style 'monokailight' (from config)","position":[723,13983]},{"message":"No such code{} style 'monokailight' (from config)","position":[731,14069]},{"message":"No such code{} style 'monokailight' (from config)","position":[747,14305]},{"message":"No such code{} style 'monokailight' (from config)","position":[823,16164]}]}
+<div class="q-main-16 q-main">
+    <ul class="q-toc">
+        <li><strong>Contents</strong></li>
+        <li>
+            <a class="q-link-internal" href="#configuration">
+                Configuration
+            </a>
+            <ul>
+                <li>
+                    <a class="q-link-internal" href="#configuration-files">
+                        Configuration files
+                    </a>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#wikifier-options">
+                        wikifier options
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#name">
+                                name
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#hostwiki">
+                                host.wiki
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#dirwiki">
+                                dir.wiki
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#root">
+                                root
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#external">
+                                external
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#pageenabletitle">
+                                page.enable.title
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#pagecodelang">
+                                page.code.lang
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#pagecodestyle">
+                                page.code.style
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagesize_method">
+                                image.size_method
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagecalc">
+                                image.calc
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagesizer">
+                                image.sizer
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#wiki-public-options">
+                        Wiki public options
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#imagetype">
+                                image.type
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagequality">
+                                image.quality
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imageretina">
+                                image.retina
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#pageenablecache">
+                                page.enable.cache
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#catper_page">
+                                cat.per_page
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#catnamemain">
+                                cat.[name].main
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#catnametitle">
+                                cat.[name].title
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#var">
+                                var.*
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#wiki-extended-options">
+                        Wiki extended options
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#main_page">
+                                main_page
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#main_redirect">
+                                main_redirect
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#error_page">
+                                error_page
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#navigation">
+                                navigation
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#template">
+                                template
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#logo">
+                                logo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#webserver-options">
+                        webserver options
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#serverdirresource">
+                                server.dir.resource
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverdirwiki">
+                                server.dir.wiki
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverenablepregeneration">
+                                server.enable.pregeneration
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverenablemonitor">
+                                server.enable.monitor
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverhttpport">
+                                server.http.port
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverhttpbind">
+                                server.http.bind
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverdirtemplate">
+                                server.dir.template
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverwikinameenable">
+                                server.wiki.[name].enable
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverwikinamedir">
+                                server.wiki.[name].dir
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#adminifierenable">
+                                adminifier.enable
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#adminifierhost">
+                                adminifier.host
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#adminifierroot">
+                                adminifier.root
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div class="q-sec">
+        <h1 class="q-sec-title" id="qa-configuration">
+            Configuration
+        </h1>
+        <p class="q-p">
+            This document describes all of the available configuration options. The options
+            are categorized by the lowest-level quiki interface at which they are used.
+            Some are required for the generation of a single page, others for the operation
+            of a full wiki, and others yet for the operation of a webserver or frontend.
+        </p>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-configuration-files">
+                Configuration files
+            </h2>
+            <p class="q-p">
+                The primary method of configuration is to define options in a configuration
+                file. All quiki configuration files are written in the quiki language:
+            </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@name:      MyWiki;             /* assign a string option */
+</span></span><span class="line"><span class="cl">@page.enable.cache;             /* enable a boolean option */
+</span></span><span class="line"><span class="cl">-@page.enable.title;            /* disable a boolean option */
+</span></span></pre>
+            <p class="q-p">
+                If you are using <span style="font-weight: bold;">quiki webserver</span>, you must have a dedicated configuration
+                file for the webserver. This tells it where to listen and where to find the
+                wikis you have configured on the server. This is typically called <code>quiki.conf</code>,
+                and is required as the first argument to the <code>quiki</code> executable.
+            </p>
+            <p class="q-p">
+                <span style="font-weight: bold;">Every wiki</span> also requires its own configuration file called
+                <code>wiki.conf</code> at the root level of the wiki directory.
+            </p>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-wikifier-options">
+                wikifier options
+            </h2>
+            <p class="q-p">
+                These options are available to the wikifier engine, the lowest level API
+                for rendering pages.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-name">
+                    name
+                </h3>
+                <p class="q-p">
+                    Name of the wiki.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">Wiki</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-hostwiki">
+                    host.wiki
+                </h3>
+                <p class="q-p">
+                    Hostname for the wiki.
+                </p>
+                <p class="q-p">
+                    It may be overridden in the server configuration by
+                    <a class="q-link-internal" href="#serverwikinamehost" title="§ serverwikinamehost"><code>server.wiki.[name].host</code></a>.
+                </p>
+                <p class="q-p">
+                    If specified in neither place, the wiki is accessible from all available hosts.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: None (all hosts)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-dirwiki">
+                    dir.wiki
+                </h3>
+                <p class="q-p">
+                    Path to the wiki.
+                </p>
+                <p class="q-p">
+                    With webserver, this can be omitted if either:
+                </p>
+                <ol class="q-numlist">
+                    <li class="q-list-item">
+                        <a class="q-link-internal" href="#serverdirwiki" title="§ serverdirwiki"><code>server.dir.wiki</code></a> is configured, and the wiki is located in that directory.
+                    </li>
+                    <li class="q-list-item">
+                        <a class="q-link-internal" href="#serverwikinamedir" title="§ serverwikinamedir"><code>server.wiki.[name].dir</code></a> is configured.
+                    </li>
+                </ol>
+                <p class="q-p">
+                    In all other cases, it is <span style="font-weight: bold;">Required</span>.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): <a class="q-link-internal" href="#serverdirwiki" title="§ serverdirwiki"><code>server.dir.wiki</code></a><code>/[name]</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-root">
+                    root
+                </h3>
+&lt;table class=&#34;q-table&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Option&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Default&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;[c]root.wiki[/c]&lt;/td&gt;
+&lt;td&gt;Wiki root&lt;/td&gt;
+&lt;td&gt;None (i.e. /)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]root.page[/c]&lt;/td&gt;
+&lt;td&gt;Page root&lt;/td&gt;
+&lt;td&gt;[i]/page[/i]&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]root.image[/c]&lt;/td&gt;
+&lt;td&gt;Image root&lt;/td&gt;
+&lt;td&gt;[i]/images[/i]&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]root.file[/c]&lt;/td&gt;
+&lt;td&gt;File root&lt;/td&gt;
+&lt;td&gt;None&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. HTTP roots. These are relative to the server HTTP root, NOT the
+                    wiki root. They are used for link targets and image URLs; they will never be
+                    used to locate content on the filesystem. Do not include trailing slashes.
+                </p>
+                <p class="q-p">
+                    It may be useful to use <code>root.wiki</code> within the definitions of the rest:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@root.wiki:     /mywiki;
+</span></span><span class="line"><span class="cl">@root.page:     [@root.wiki]/page;
+</span></span><span class="line"><span class="cl">@root.image:    [@root.wiki]/images;
+</span></span></pre>
+                <p class="q-p">
+                    If you specify <code>root.file</code>, the entire wiki directory (as specified by
+                    <a class="q-link-internal" href="#dirwiki" title="§ dirwiki"><code>dir.wiki</code></a>) will be indexed by the web server at this path. Note
+                    that this will likely expose your wiki configuration.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-external">
+                    external
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. External wiki information.
+                </p>
+                <p class="q-p">
+                    You can configure any number of external wikis, each referred to by a shorthand
+                    identifier <code>[wiki_id]</code> consisting of word-like characters.
+                </p>
+&lt;table class=&#34;q-table&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Option&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Default&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;[c]external.\[wiki_id\].name[/c]&lt;/td&gt;
+&lt;td&gt;External wiki name, displayed in link tooltips&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]external.\[wiki_id\].root[/c]&lt;/td&gt;
+&lt;td&gt;External wiki page root&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]external.\[wiki_id\].type[/c]&lt;/td&gt;
+&lt;td&gt;External wiki type&lt;/td&gt;
+&lt;td&gt;[i]quiki[/i]&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+                <p class="q-p">
+                    Accepted values for <code>type</code>
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">quiki</span> (this is default)
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">mediawiki</span>
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">none</span> (URI encode only)
+                    </li>
+                </ul>
+                <p class="q-p">
+                    The default configuration includes the <code>wp</code> identifier for the
+                    <a class="q-link-other" href="http://en.wikipedia.org">English Wikipedia</a>:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@external.wp: {
+</span></span><span class="line"><span class="cl">    name: Wikipedia;  /* appears in tooltip */
+</span></span><span class="line"><span class="cl">    root: http://en.wikipedia.org/wiki;
+</span></span><span class="line"><span class="cl">    type: mediawiki;
+</span></span><span class="line"><span class="cl">};
+</span></span></pre>
+                <p class="q-p">
+                    From the page source, this looks like:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">[[ Cats | wp: Cat ]] are a type of [[ wp: animal ]].
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-pageenabletitle">
+                    page.enable.title
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. If enabled, the first section&#39;s heading defaults to the title of the
+                    page, and all other headings on the page are sized down one.
+                </p>
+                <p class="q-p">
+                    You may want to disable this at the wiki level if your wiki content is
+                    embedded within a template that has its own place for the page title:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">-@page.enable.title;
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-pagecodelang">
+                    page.code.lang
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The default language to use for syntax highlighting of
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#code" title="blocks § code"><code>code{}</code></a> blocks.
+                </p>
+                <p class="q-p">
+                    See <a class="q-link-other" href="https://github.com/alecthomas/chroma#supported-languages">this site</a> for
+                    a list of supported languages.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-pagecodestyle">
+                    page.code.style
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The default style to use for syntax highlighting of
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#code" title="blocks § code"><code>code{}</code></a> blocks.
+                </p>
+                <p class="q-p">
+                    See <a class="q-link-other" href="https://xyproto.github.io/splash/docs/index.html">this site</a> for
+                    a list of available styles.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Enabled
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagesize_method">
+                    image.size_method
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The method which quiki should use to scale images.
+                </p>
+                <p class="q-p">
+                    This is here for purposes of documentation only; there&#39;s probably no reason
+                    to ever stray away from the default for whichever quiki interface is used.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Accepted values</span>
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">javascript</span> - JavaScript-injected image sizing
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">server</span> - server-side image sizing using <a class="q-link-internal" href="#imagesizer" title="§ imagesizer"><code>image.sizer</code></a> and <a class="q-link-internal" href="#imagecalc" title="§ imagecalc"><code>image.calc</code></a> (recommended)
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): <span style="font-style: italic;">server</span>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (low-level): <span style="font-style: italic;">javascript</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagecalc">
+                    image.calc
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. A function reference that calculates a missing dimension of an image.
+                    This is utilized only when <a class="q-link-internal" href="#imagesize_method" title="§ imagesize_method"><code>image.size_method</code></a> is <span style="font-style: italic;">server</span>.
+                </p>
+                <p class="q-p">
+                    This is here for purposes of documentation only and can only be configured
+                    using quiki&#39;s wikifier engine API directly.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: (webserver) built-in function
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagesizer">
+                    image.sizer
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. A function reference that returns the URL to a sized version of an image. After
+                    using <a class="q-link-internal" href="#imagecalc" title="§ imagecalc"><code>image.calc</code></a> to find the dimensions of an image,
+                    <code>image.sizer</code> is called to generate a URL for the image at those dimensions.
+                </p>
+                <p class="q-p">
+                    This is here for purposes of documentation only and can only be configured
+                    using quiki&#39;s wikifier engine API directly.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: (webserver) built-in function
+                </p>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-wiki-public-options">
+                Wiki public options
+            </h2>
+            <p class="q-p">
+                These options are available to the wiki website interface.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagetype">
+                    image.type
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The desired file type for generated images.
+                </p>
+                <p class="q-p">
+                    When configured, all resulting images will be in this format, regardless of
+                    their original format. Unless you have a specific reason to do this, omit
+                    this option to preserve original image formats.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Accepted values</span>
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">png</span> - larger, lossless compression
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">jpeg</span> - smaller, lossy compression
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: none (preserve original format)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagequality">
+                    image.quality
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The desired quality of generated images with lossy compression. This is only
+                    utilized if <a class="q-link-internal" href="#imagetype" title="§ imagetype"><code>image.type</code></a> is set to <span style="font-style: italic;">jpeg</span>.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">100</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imageretina">
+                    image.retina
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Image scales to enable for displays with a greater than 1:1 pixel ratio.
+                </p>
+                <p class="q-p">
+                    For instance, to support both @2x and @3x scaling:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@image.retina: 2, 3;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">2, 3</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-pageenablecache">
+                    page.enable.cache
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Enable caching of generated pages.
+                </p>
+                <p class="q-p">
+                    For best performance, page caching is enabled by default, and quiki will
+                    only generate pages if the source file has been modified since the cache
+                    file was last written.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Enabled
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-catper_page">
+                    cat.per_page
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Maximum number of pages to display on a single category posts page.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">5</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-catnamemain">
+                    cat.[name].main
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Set the main page for the category by the name of <code>[name]</code>.
+                    This means that it will be displayed before all other categories, regardless
+                    of their creation dates. The value of this option is the page filename.
+                </p>
+                <p class="q-p">
+                    You can also mark a page as the main page of a category from within the page
+                    source itself, like so:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@category.some_cat.main;
+</span></span></pre>
+                <p class="q-p">
+                    If multiple pages are marked as the main page of a category, the one with
+                    the most recent creation time is preferred. If this option is provided,
+                    however, the page specified by it will always take precedence.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: none (show newest first)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-catnametitle">
+                    cat.[name].title
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Sets the human-readable title for the category by the name of <code>[name]</code>.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: none
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-var">
+                    var.*
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Global wiki variable space. Variables defined in this space will be
+                    available throughout the wiki. However they may be overwritten on a
+                    particular page.
+                </p>
+                <p class="q-p">
+                    Example (in config):
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@var.site.url: http://mywiki.example.com;
+</span></span><span class="line"><span class="cl">@var.site.display_name: MyWiki;
+</span></span></pre>
+                <p class="q-p">
+                    Example (on main page):
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">Welcome to [@site.display_name]!
+</span></span></pre>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-wiki-extended-options">
+                Wiki extended options
+            </h2>
+            <p class="q-p">
+                These options are not used by the wiki API directly but are standardized
+                here so that there is consistency amongst various frontends such as webserver.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-main_page">
+                    main_page
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Name of the main page.
+                </p>
+                <p class="q-p">
+                    This should not be the page&#39;s title but rather a filename, relative to the
+                    wiki page directory. The extension is not necessary.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@main_page: Welcome Page; /* normalized to welcome_page.page */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): None
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-main_redirect">
+                    main_redirect
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. If enabled, the wiki root redirects to the main page rather than just
+                    rendering it at the root location.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@main_redirect;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): Disabled
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-error_page">
+                    error_page
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Name of the error page.
+                </p>
+                <p class="q-p">
+                    This should not be the page&#39;s title but rather a filename, relative to the
+                    wiki page directory. The extension is not necessary.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@error_page: Error; /* normalized to error.page */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): None (show generic error text)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-navigation">
+                    navigation
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Navigation items.
+                </p>
+                <p class="q-p">
+                    Keys are unformatted text to be displayed, with spaces permitted.
+                    Values are URLs, relative to the current page (NOT the wiki root).
+                </p>
+                <p class="q-p">
+                    It is good practice to refer to <a class="q-link-internal" href="#root" title="§ root"><code>root</code></a>:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@navigation: {
+</span></span><span class="line"><span class="cl">    Main page:  [@root.page]/welcome_page;
+</span></span><span class="line"><span class="cl">    Rules:      [@root.page]/rules;
+</span></span><span class="line"><span class="cl">};
+</span></span></pre>
+                <p class="q-p">
+                    You can nest maps to create sublists at any level, but the number of levels
+                    supported depends on the frontend or template being used by the wiki.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@navigation: {
+</span></span><span class="line"><span class="cl">    Home: /page/welcome;
+</span></span><span class="line"><span class="cl">    About: {
+</span></span><span class="line"><span class="cl">        Company info: /page/our_company;
+</span></span><span class="line"><span class="cl">        Facebook: http://facebook.com/our.company;
+</span></span><span class="line"><span class="cl">    };
+</span></span><span class="line"><span class="cl">    Contact: /contact;
+</span></span><span class="line"><span class="cl">};
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): None
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-template">
+                    template
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Name or path of the template used by the wiki.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@template: default;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span> (webserver): <span style="font-style: italic;">default</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-logo">
+                    logo
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Filename for the wiki logo, relative to the wiki image directory.
+                </p>
+                <p class="q-p">
+                    Frontends like webserver automatically generate the logo in whatever dimensions
+                    are needed and display it where appropriate.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@logo: logo.png;
+</span></span></pre>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-webserver-options">
+                webserver options
+            </h2>
+            <p class="q-p">
+                These options are respected by the quiki webserver.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverdirresource">
+                    server.dir.resource
+                </h3>
+                <p class="q-p">
+                    Path to quiki&#39;s <code>resources</code> directory.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@repo: .;       /* where quiki is cloned */
+</span></span><span class="line"><span class="cl">@server.dir.resource:   [@repo]/resources;
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverdirwiki">
+                    server.dir.wiki
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Path to some directory where wikis are stored.
+                </p>
+                <p class="q-p">
+                    Your wikis do not all have to be in the same directory, so this is optional.
+                    However, if you make use of this, quiki can infer <a class="q-link-internal" href="#dirwiki" title="§ dirwiki"><code>dir.wiki</code></a> for each
+                    wiki, allowing you to omit the <a class="q-link-internal" href="#serverwikinamedir" title="§ serverwikinamedir"><code>server.wiki.[name].dir</code></a>
+                    options.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverenablepregeneration">
+                    server.enable.pregeneration
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. If enabled, webserver pre-generates all pages and images upon start.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Requires</span>: <a class="q-link-internal" href="#pageenablecache" title="§ pageenablecache"><code>page.enable.cache</code></a>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Enabled
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverenablemonitor">
+                    server.enable.monitor
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. If enabled, webserver uses operating system facilities to monitor wiki
+                    directories and pre-generate content when the source files are changed.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Requires</span>: <a class="q-link-internal" href="#pageenablecache" title="§ pageenablecache"><code>page.enable.cache</code></a>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Enabled
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverhttpport">
+                    server.http.port
+                </h3>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Required</span>. Port for HTTP server to listen on.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">server.http.port: 8080;
+</span></span></pre>
+                <p class="q-p">
+                    You can also say <code>unix</code> to listen on a UNIX socket.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverhttpbind">
+                    server.http.bind
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Host to bind to.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.http.bind: 127.0.0.1;
+</span></span></pre>
+                <p class="q-p">
+                    Or, you can listen on a UNIX socket:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.http.port:  unix;
+</span></span><span class="line"><span class="cl">@server.http.bind:  /var/run/quiki.sock;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: none (bind to all available hosts)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverdirtemplate">
+                    server.dir.template
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Template search paths.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.dir.template: /home/www/wiki-templates;
+</span></span></pre>
+                <p class="q-p">
+                    This is a comma-separated list of paths to look for templates when they are
+                    specified by name in the wiki configuration. If you&#39;re running multiple wikis
+                    that share a template, or if you are using the default template, this
+                    is useful. Otherwise, you can just specify the absolute path to each wiki&#39;s
+                    template in the <a class="q-link-internal" href="#template" title="§ template">template</a> directive.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverwikinameenable">
+                    server.wiki.[name].enable
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Enable the wiki with shortname <code>[name]</code>.
+                </p>
+                <p class="q-p">
+                    Any wikis configured that do not have this option present are skipped.
+                    Any number of wikis can be configured on a single server using this.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverwikinamedir">
+                    server.wiki.[name].dir
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Path to the wiki with shortname <code>[name]</code>.
+                </p>
+                <p class="q-p">
+                    This can be omitted if <a class="q-link-internal" href="#serverdirwiki" title="§ serverdirwiki"><code>server.dir.wiki</code></a> is set and
+                    the wiki is located within that container. The shortname becomes the name of
+                    its directory inside <code>server.dir.wiki</code>.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <a class="q-link-internal" href="#serverdirwiki" title="§ serverdirwiki"><code>server.dir.wiki</code></a><code>/[name]</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-adminifierenable">
+                    adminifier.enable
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Enables the adminifier server administration panel.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Disabled (but enabled in the example configuration)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-adminifierhost">
+                    adminifier.host
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Specifies an HTTP host to bind to for the adminifier web panel.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: None (i.e., adminifier is available on all hosts)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-adminifierroot">
+                    adminifier.root
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Specifies the HTTP root for the adminifier web panel.
+                </p>
+                <p class="q-p">
+                    If <a class="q-link-internal" href="#adminifierhost" title="§ adminifierhost"><code>adminifier.host</code></a> is specified and that hostname is
+                    dedicated to adminifier, you can set <code>adminifier.root</code> empty to occupy the
+                    entire host, for example:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@adminifier.host: admin.mywiki.example.com;
+</span></span><span class="line"><span class="cl">@adminifier.root: ;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: None (i.e., <code>/</code>)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

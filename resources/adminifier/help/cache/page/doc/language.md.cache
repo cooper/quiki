@@ -1,0 +1,856 @@
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/language.md","file_ne":"doc/language","created":"2020-05-04T17:06:31-04:00","modified":"2020-05-04T17:06:31-04:00","generated":true,"external":true,"fmt_title":"Language","title":"Language","author":"Markdown","preview":"Contents Language Syntax Comments Escapes Blocks Nameless blocks Named blocks Block type inference Model shorthand Data types Variables Assignment","warnings":[{"message":"No such code{} style 'monokailight' (from config)","position":[15,350]},{"message":"No such code{} style 'monokailight' (from config)","position":[59,1533]},{"message":"No such code{} style 'monokailight' (from config)","position":[67,1632]},{"message":"No such code{} style 'monokailight' (from config)","position":[174,3815]},{"message":"No such code{} style 'monokailight' (from config)","position":[203,4488]},{"message":"No such code{} style 'monokailight' (from config)","position":[228,5414]},{"message":"No such code{} style 'monokailight' (from config)","position":[238,5465]},{"message":"No such code{} style 'monokailight' (from config)","position":[258,6017]},{"message":"No such code{} style 'monokailight' (from config)","position":[268,6081]},{"message":"No such code{} style 'monokailight' (from config)","position":[286,6408]},{"message":"No such code{} style 'monokailight' (from config)","position":[298,6639]},{"message":"No such code{} style 'monokailight' (from config)","position":[330,7595]},{"message":"No such code{} style 'monokailight' (from config)","position":[346,7835]},{"message":"No such code{} style 'monokailight' (from config)","position":[381,8440]},{"message":"No such code{} style 'monokailight' (from config)","position":[390,8589]},{"message":"No such code{} style 'monokailight' (from config)","position":[399,8705]},{"message":"No such code{} style 'monokailight' (from config)","position":[415,9067]},{"message":"No such code{} style 'monokailight' (from config)","position":[425,9369]},{"message":"No such code{} style 'monokailight' (from config)","position":[436,9530]},{"message":"No such code{} style 'monokailight' (from config)","position":[448,9715]},{"message":"No such code{} style 'monokailight' (from config)","position":[467,10125]},{"message":"No such code{} style 'monokailight' (from config)","position":[483,10535]},{"message":"No such code{} style 'monokailight' (from config)","position":[507,11139]},{"message":"No such code{} style 'monokailight' (from config)","position":[531,11638]},{"message":"No such code{} style 'monokailight' (from config)","position":[553,12105]},{"message":"No such code{} style 'monokailight' (from config)","position":[567,12492]}]}
+<div class="q-main-10 q-main">
+    <ul class="q-toc">
+        <li><strong>Contents</strong></li>
+        <li>
+            <a class="q-link-internal" href="#language">
+                Language
+            </a>
+            <ul>
+                <li>
+                    <a class="q-link-internal" href="#syntax">
+                        Syntax
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#comments">
+                                Comments
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#escapes">
+                                Escapes
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#blocks">
+                        Blocks
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#nameless-blocks">
+                                Nameless blocks
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#named-blocks">
+                                Named blocks
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#block-type-inference">
+                                Block type inference
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#model-shorthand">
+                                Model shorthand
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#data-types">
+                                Data types
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#variables">
+                        Variables
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#assignment">
+                                Assignment
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#retrieval">
+                                Retrieval
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#formatted-variables">
+                                Formatted variables
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#attributes">
+                                Attributes
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#conditionals">
+                                Conditionals
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#interpolable-variables">
+                                Interpolable variables
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#special-variables">
+                                Special variables
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#text-formatting">
+                        Text formatting
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#basic-formatting">
+                                Basic formatting
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#variables-1">
+                                Variables
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#links">
+                                Links
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#references">
+                                References
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#characters">
+                                Characters
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div class="q-sec">
+        <h1 class="q-sec-title" id="qa-language">
+            Language
+        </h1>
+        <p class="q-p">
+            quiki&#39;s source language is designed to be easily legible by the naked eye.
+            That&#39;s the main goal: Anyone can read it and know what&#39;s going on.
+            (Have you tried looking at a Wikipedia page source?) Anyone can write it, too.
+        </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">infobox [quiki] {
+</span></span><span class="line"><span class="cl">    image {
+</span></span><span class="line"><span class="cl">        file: quiki-logo.png;
+</span></span><span class="line"><span class="cl">    };
+</span></span><span class="line"><span class="cl">    Type:           [[ Wiki ]] suite;
+</span></span><span class="line"><span class="cl">    Established:    February 2013;
+</span></span><span class="line"><span class="cl">    Author:         [[ Mitchell Cooper | https://github.com/cooper ]];
+</span></span><span class="line"><span class="cl">    Website:        [[ https://quiki.mitchellcooper.me ]];
+</span></span><span class="line"><span class="cl">    Code:           [[ quiki on GitHub | https://github.com/cooper/quiki ]];
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">quiki is a file-based wiki suite and standalone web server.
+</span></span></pre>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-syntax">
+                Syntax
+            </h2>
+            <p class="q-p">
+                The quiki source language is <a class="q-link-internal" href="/pagereplace/doc/technical/parsing" title="technical/parsing">parsed hierarchically</a>.
+                The source is divided into <a class="q-link-internal" href="#blocks" title="§ blocks">blocks</a>, each of which
+                is responsible for parsing its inner contents. The master parser is
+                concerned only with the most basic syntax:
+            </p>
+            <ul class="q-list">
+                <li class="q-list-item">
+                    Dividing the source into <a class="q-link-internal" href="#blocks" title="§ blocks">blocks</a>
+                </li>
+                <li class="q-list-item">
+                    Stripping <a class="q-link-internal" href="#comments" title="§ comments">comments</a>
+                </li>
+                <li class="q-list-item">
+                    <a class="q-link-internal" href="#assignment" title="§ assignment">Variable assignment</a>
+                </li>
+                <li class="q-list-item">
+                    <a class="q-link-internal" href="#conditionals" title="§ conditionals">Conditionals</a>
+                </li>
+            </ul>
+            <p class="q-p">
+                Further parsing is provided by:
+            </p>
+            <ul class="q-list">
+                <li class="q-list-item">
+                    <a class="q-link-internal" href="#text-formatting" title="§ text-formatting">Text formatter</a>
+                </li>
+                <li class="q-list-item">
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map">Map</a> base block type
+                </li>
+                <li class="q-list-item">
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list">List</a> base block type
+                </li>
+                <li class="q-list-item">
+                    Additional block types may implement custom parsing
+                </li>
+            </ul>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-comments">
+                    Comments
+                </h3>
+                <p class="q-p">
+                    C-style block comments are supported:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">/* Some text */
+</span></span></pre>
+                <p class="q-p">
+                    These can span multiple lines and be nested within each other:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">/*
+</span></span><span class="line"><span class="cl">    Line one
+</span></span><span class="line"><span class="cl">    Line two has /* a nested comment */
+</span></span><span class="line"><span class="cl">*/
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-escapes">
+                    Escapes
+                </h3>
+                <p class="q-p">
+                    Some characters must be escaped for literal use. The escape character (<code>\</code>)
+                    denotes the character immediately following it as escaped.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Anywhere</span> in a document, these characters MUST be escaped for literal use:
+                </p>
+&lt;table class=&#34;q-table&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Character&lt;/th&gt;
+&lt;th&gt;Reason for escape&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;[c]\\[/c]&lt;/td&gt;
+&lt;td&gt;Escape character&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]{[/c]&lt;/td&gt;
+&lt;td&gt;Starts a [[ block | #blocks ]]&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]}[/c]&lt;/td&gt;
+&lt;td&gt;Terminates a [[ block | #blocks ]]&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+                <p class="q-p">
+                    Within <a class="q-link-internal" href="#text-formatting" title="§ text-formatting"><span style="font-weight: bold;">formatted text</span></a>, the following characters must be
+                    escaped in addition to those listed above:
+                </p>
+&lt;table class=&#34;q-table&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Character&lt;/th&gt;
+&lt;th&gt;Reason for escape&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;[c]\[[/c]&lt;/td&gt;
+&lt;td&gt;Starts a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]\][/c]&lt;/td&gt;
+&lt;td&gt;Terminates a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+                <p class="q-p">
+                    Within <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map"><span style="font-weight: bold;">maps</span></a> and <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list"><span style="font-weight: bold;">lists</span></a>, these
+                    characters must also be escaped:
+                </p>
+&lt;table class=&#34;q-table&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Character&lt;/th&gt;
+&lt;th&gt;Must be escaped in&lt;/th&gt;
+&lt;th&gt;Reason for escape&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;[c];[/c]&lt;/td&gt;
+&lt;td&gt;Map keys and values, list values&lt;/td&gt;
+&lt;td&gt;Terminates a value&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;[c]:[/c]&lt;/td&gt;
+&lt;td&gt;Map keys&lt;/td&gt;
+&lt;td&gt;Terminates a key&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+                <p class="q-p">
+                    <span style="font-weight: bold;">Brace-escape</span>. Sometimes it may be desirable to disable all parsing within a
+                    particular block. This is especially useful for things like
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#code" title="blocks § code"><code>code{}</code></a>, <a class="q-link-internal" href="/pagereplace/doc/blocks#html" title="blocks § html"><code>html{}</code></a>, and
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#fmt" title="blocks § fmt"><code>fmt{}</code></a> because then you do not have to escape every
+                    instance of special characters like <code>{</code>, <code>}</code>, and <code>\</code>. It works as long as there
+                    is a closing bracket <code>}</code> to correspond with every opening bracket <code>{</code>. To enable
+                    brace-escape mode, open and close the block with double curly brackets:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="nx">code</span> <span class="p">{{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ae</span><span class="p">.</span><span class="nx">removeLinesInRanges</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ranges</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ranges</span> <span class="o">||</span> <span class="o">!</span><span class="nx">ranges</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">biggest</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="nx">smallest</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">rows</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">lastLine</span> <span class="o">!=</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nx">editor</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">doc</span><span class="p">.</span><span class="nx">removeFullLines</span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">lastLine</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nx">lastLine</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">lastLine</span> <span class="o">==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">lastLine</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}}</span>
+</span></span></pre>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-blocks">
+                Blocks
+            </h2>
+            <p class="q-p">
+                The fundamental component of the quiki language is the <span style="font-weight: bold;">block</span>.
+                The syntax for a block is as follows:
+            </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">Type [Name] { Content }
+</span></span></pre>
+            <ul class="q-list">
+                <li class="q-list-item">
+                    <span style="font-weight: bold;">Type</span> - The kind of block. The block type provides a unique function. For instance, <a class="q-link-internal" href="/pagereplace/doc/blocks#imagebox" title="blocks § imagebox"><code>imagebox{}</code></a> displays a bordered image with a caption and link to the full size original.
+                </li>
+                <li class="q-list-item">
+                    <span style="font-weight: bold;">Name</span> - Depending on its type, a block may have a name. Each block type may use the name field for a different purpose. For example, <a class="q-link-internal" href="/pagereplace/doc/blocks#infobox" title="blocks § infobox"><code>infobox{}</code></a> uses the field to display a title bar across the top of the info table.
+                </li>
+                <li class="q-list-item">
+                    <span style="font-weight: bold;">Content</span> - Inside the block, there may be additional blocks and/or text. Each block handles the content within differently. Some may treat it as plain text, while others may do further parsing on it.
+                </li>
+            </ul>
+            <p class="q-p">
+                See <a class="q-link-internal" href="/pagereplace/doc/blocks" title="blocks">Blocks</a> for a list of built-in block types.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-nameless-blocks">
+                    Nameless blocks
+                </h3>
+                <p class="q-p">
+                    The <code>[block name]</code> field may be omitted for block types that do not require it.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">blocktype {
+</span></span><span class="line"><span class="cl">    ...
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+                <p class="q-p">
+                    Example
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">imagebox {
+</span></span><span class="line"><span class="cl">    desc:   [[Foxy]], supreme librarian;
+</span></span><span class="line"><span class="cl">    align:  left;
+</span></span><span class="line"><span class="cl">    file:   foxy2.png;
+</span></span><span class="line"><span class="cl">    width:  100px;
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-named-blocks">
+                    Named blocks
+                </h3>
+                <p class="q-p">
+                    For block types that support a <code>[block name]</code> field, it should follow the block
+                    type and be delimited by square brackets <code>[</code> and <code>]</code>. The name field may
+                    contain additional square brackets inside it without the need for the escape
+                    character (<code>\</code>) as long as the number of opening brackets and closing brackets
+                    are equal. Otherwise, they must be escaped.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">blocktype [block name] {
+</span></span><span class="line"><span class="cl">    ...
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+                <p class="q-p">
+                    Example
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">sec [Statistics] {
+</span></span><span class="line"><span class="cl">    This website currently hosts
+</span></span><span class="line"><span class="cl">    [@stats.site.articles] articles.
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-block-type-inference">
+                    Block type inference
+                </h3>
+                <p class="q-p">
+                    quiki assumes block type <code>sec{}</code> for any named block whose type is unspecified.
+                </p>
+                <p class="q-p">
+                    That example from just above can be more conveniently written as
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">[Statistics] {
+</span></span><span class="line"><span class="cl">    This website currently hosts
+</span></span><span class="line"><span class="cl">    [@stats.site.articles] articles.
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+                <p class="q-p">
+                    The one exception to this is that if the immediate parent is <code>infobox{}</code>, an
+                    <code>infosec{}</code> is assumed instead:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">infobox [United States of America] {
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    Capital:        [! Washington, DC !];  
+</span></span><span class="line"><span class="cl">    Largest city:   [! New York City !];   
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [Goverment] {
+</span></span><span class="line"><span class="cl">        :[! Federal presidential constitutional republic | Republic !];   
+</span></span><span class="line"><span class="cl">        President:              [! Donald Trump !];
+</span></span><span class="line"><span class="cl">        Vice President:         [! Mike Pence !];
+</span></span><span class="line"><span class="cl">        Speaker of the House:   [! Paul Ryan !];
+</span></span><span class="line"><span class="cl">        Chief Justice:          [! John Roberts !];
+</span></span><span class="line"><span class="cl">    };
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    [Independence[nl]from [! Great Britain !]] {
+</span></span><span class="line"><span class="cl">        Declaration:            July 4, 1776;
+</span></span><span class="line"><span class="cl">        Confederation:          March 1, 1781;
+</span></span><span class="line"><span class="cl">        Treaty of Paris:        September 3, 1783;
+</span></span><span class="line"><span class="cl">        Constitution:           June 21, 1788;
+</span></span><span class="line"><span class="cl">        Last polity admitted:   March 24, 1976;
+</span></span><span class="line"><span class="cl">    };
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-model-shorthand">
+                    Model shorthand
+                </h3>
+                <p class="q-p">
+                    quiki has a special syntax for using <a class="q-link-internal" href="/pagereplace/doc/models" title="models"><span style="font-weight: bold;">models</span></a>. Write them like
+                    any block, except prefix the model name with a dollar sign (<code>$</code>).
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">$my_model {
+</span></span><span class="line"><span class="cl">    option1: Something;
+</span></span><span class="line"><span class="cl">    option2: Another option;
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+                <p class="q-p">
+                    Note: From within the model source, those options can be retrieved with
+                    <code>@m.option1</code> and <code>@m.option2</code>.
+                </p>
+                <p class="q-p">
+                    Same as writing the long form:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">model [my_model] {
+</span></span><span class="line"><span class="cl">    option1: Something;
+</span></span><span class="line"><span class="cl">    option2: Another option;
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-data-types">
+                    Data types
+                </h3>
+                <p class="q-p">
+                    <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map"><code>map{}</code></a> provides a key-value map datatype. It serves as the
+                    base of many other block types. Likewise, <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list"><code>list{}</code></a> provides an
+                    array datatype.
+                </p>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-variables">
+                Variables
+            </h2>
+            <p class="q-p">
+                quiki supports string, boolean, and block variables.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-assignment">
+                    Assignment
+                </h3>
+                <p class="q-p">
+                    Variables can be assigned at the document level only.
+                    Each assignment must occur on its own line.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">String</span> variables look like this:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@some_variable:     The value;
+</span></span><span class="line"><span class="cl">@another_variable:  You can escape semicolons\\; I think;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Boolean</span> variables look like this:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@some_bool;     /* true  */
+</span></span><span class="line"><span class="cl">-@some_bool;    /* false */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Block</span> variables look like this:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@my_box: infobox [United States of America] {
+</span></span><span class="line"><span class="cl">    Declaration:    1776;
+</span></span><span class="line"><span class="cl">    States:         50;
+</span></span><span class="line"><span class="cl">};
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-retrieval">
+                    Retrieval
+                </h3>
+                <p class="q-p">
+                    Once variables are assigned, they are typically used in
+                    <a class="q-link-internal" href="#text-formatting" title="§ text-formatting">formatted text</a> or <a class="q-link-internal" href="#conditionals" title="§ conditionals">conditionals</a>. You can use
+                    variables anywhere that formatted text is accepted like this:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">I am allowed to use [b]bold text[/b], as well as [@variables].
+</span></span></pre>
+                <p class="q-p">
+                    If the variable contains a block, you can display it using <code>{@var_name}</code>. This
+                    syntax works anywhere, not just in places where formatted text is accepted
+                    like with the <code>[@var_name]</code> syntax. So if you have:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@my_box: infobox [United States of America] {
+</span></span><span class="line"><span class="cl">    Declaration:    1776;
+</span></span><span class="line"><span class="cl">    States:         50;
+</span></span><span class="line"><span class="cl">};
+</span></span></pre>
+                <p class="q-p">
+                    You can display the infobox later using:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">{@my_box}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-formatted-variables">
+                    Formatted variables
+                </h3>
+                <p class="q-p">
+                    By the way, you can use text formatting within string variables, including other
+                    embedded variables:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@site:      [b]MyWiki[/b];
+</span></span><span class="line"><span class="cl">@name:      John;
+</span></span><span class="line"><span class="cl">@welcome:   Welcome to [@site], [@name].
+</span></span></pre>
+                <p class="q-p">
+                    If you don&#39;t want that to happen, take a look at
+                    <a class="q-link-internal" href="#interpolable-variables" title="§ interpolable-variables">interpolable variables</a>, the values of which are
+                    formatted upon retrieval rather than at the time of assignment.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-attributes">
+                    Attributes
+                </h3>
+                <p class="q-p">
+                    Variables can have <span style="font-weight: bold;">attributes</span>. This helps to organize things:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@page.title:    Hello World!;
+</span></span><span class="line"><span class="cl">@page.author:   John Doe;
+</span></span></pre>
+                <p class="q-p">
+                    You don&#39;t have to worry about whether a variable exists to define attributes on
+                    it. A new <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map"><code>map{}</code></a> is created on the fly if necessary
+                    (in the above example, <code>@page</code> does not initially exist, but an empty map is
+                    allocated automatically).
+                </p>
+                <p class="q-p">
+                    Some block types support attribute fetching and/or setting:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">/* define the infobox in a variable so we can access attributes */
+</span></span><span class="line"><span class="cl">@person: infobox [Britney Spears] {
+</span></span><span class="line"><span class="cl">    First name:     Britney;
+</span></span><span class="line"><span class="cl">    Last name:      Spears;
+</span></span><span class="line"><span class="cl">    Age:            35;
+</span></span><span class="line"><span class="cl">};
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/* display the infobox */
+</span></span><span class="line"><span class="cl">{@person}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/* access attributes from it elsewhere
+</span></span><span class="line"><span class="cl">   btw this works for all map-based block types */
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Did you know that [@person.First_name] [@person.Last_name] is
+</span></span><span class="line"><span class="cl">[@person.Age] years old?
+</span></span></pre>
+                <p class="q-p">
+                    Some data types may not support attributes at all. Others might only support
+                    certain attributes. For example, <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list"><code>list{}</code></a> only allows
+                    numeric indices.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@alphabet: list {
+</span></span><span class="line"><span class="cl">    a;
+</span></span><span class="line"><span class="cl">    b;
+</span></span><span class="line"><span class="cl">    c;
+</span></span><span class="line"><span class="cl">    ... the rest;
+</span></span><span class="line"><span class="cl">};
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sec {
+</span></span><span class="line"><span class="cl">    Breaking News: [@alphabet.0] is the first letter of the alphabet,
+</span></span><span class="line"><span class="cl">    and [@alphabet.25] is the last.
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-conditionals">
+                    Conditionals
+                </h3>
+                <p class="q-p">
+                    You can use the <span style="font-weight: bold;">conditional blocks</span> <code>if{}</code>, <code>elsif{}</code>, and <code>else{}</code> on
+                    variables. Currently all that can be tested is the boolean value of a variable.
+                    Boolean and block variables are always true, and all strings besides zero are
+                    true.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">if [@page.draft] {
+</span></span><span class="line"><span class="cl">    Note to self: Don&#39;t forget to publish this page.
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">else {
+</span></span><span class="line"><span class="cl">    Thanks for checking out my page.
+</span></span><span class="line"><span class="cl">}
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-interpolable-variables">
+                    Interpolable variables
+                </h3>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Interpolable variables</span> (with the <code>%</code> sigil) allow you to evaluate the
+                    formatting of a string variable at some point after the variable was defined.
+                </p>
+                <p class="q-p">
+                    Normally the formatting of string variables is evaluated immediately as the
+                    variable is defined.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@another_variable: references other variables;
+</span></span><span class="line"><span class="cl">@my_text: This string variable has [b]bold text[/b] and [@another_variable];
+</span></span><span class="line"><span class="cl">/* ok, @my_text now is:
+</span></span><span class="line"><span class="cl">   This string variable has &lt;strong&gt;bold text&lt;/strong&gt; and references
+</span></span><span class="line"><span class="cl">   other variables
+</span></span><span class="line"><span class="cl">*/
+</span></span></pre>
+                <p class="q-p">
+                    Interpolate variables are different in that their contents
+                    are evaluated as they are accessed rather than as they are defined.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@another_variable: references other variables;
+</span></span><span class="line"><span class="cl">%my_text: This string variable has [b]bold text[/b] and [@another_variable];
+</span></span><span class="line"><span class="cl">/* ok, @my_text now is:
+</span></span><span class="line"><span class="cl">   This string variable has [b]bold text[/b] and [@another_variable];
+</span></span><span class="line"><span class="cl">*/
+</span></span></pre>
+                <p class="q-p">
+                    Now the variable is defined with the formatting still unevaluated, so
+                    accessing it as <code>[@my_text]</code> would display the raw formatting code. Instead,
+                    we use <code>[%my_text]</code> to display it which tells the parser to format the
+                    contents of the variable as we retrieve its value.
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-special-variables">
+                    Special variables
+                </h3>
+                <p class="q-p">
+                    <code>@page</code> contains information about the current page. Its attributes are set
+                    at the very top of a page source file.
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>@page.title</code> - Human-readable page title. Utilized internally quiki, so it is required for most purposes. Often used as the <code>&lt;title&gt;</code> of the page, as well as in the <code>&lt;h1&gt;</code> above the first <code>section{}</code> block. The title can contain <a class="q-link-internal" href="#text-formatting" title="§ text-formatting">formatted text</a>, but it may be stripped down to plaintext in certain places.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.created</code> - UNIX timestamp or HTTP date format of the page creation time. Used for sorting the pages by creation date.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.author</code> - Name of the page author. This is also optional but may be used by frontends to organize pages by author.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.desc</code> - Page description. This is optional but can be used by frontends for search results and search engine optimization. Max 160 characters.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.keywords</code> - Comma-separated list of keywords. This is optional but can be used by frontends for search results and search engine optimization. Max 160 characters.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.draft</code> - <a class="q-link-internal" href="#assignment" title="§ assignment">Boolean</a> value which marks the page as a draft. This means that it will not be served to unauthenticated users.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.redirect</code> - Page redirect target. All <a class="q-link-internal" href="#links" title="§ links">link types</a> are supported, including pages, categories, external wiki links, and external site links.
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.enable</code> - Contains <a class="q-link-internal" href="#assignment" title="§ assignment">boolean</a> attributes which allow you to enable or disable certain features specific to the page.
+                        <ul class="q-list">
+                            <li class="q-list-item">
+                                <code>@page.enable.title</code> - Whether to display the page title (from <code>@page.title</code>) as the header of the first <code>section{}</code> block if no other section title is specified. This assumes that the first section is an introduction, so it will have the highest header level. Overrides the wiki configuration option <a class="q-link-internal" href="/pagereplace/doc/configuration#pageenabletitle" title="configuration § pageenabletitle">page.enable.title</a>.
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="q-list-item">
+                        <code>@page.code</code> - Contains attributes for configuring <a class="q-link-internal" href="/pagereplace/doc/blocks#code" title="blocks § code"><code>code{}</code></a> blocks.
+                        <ul class="q-list">
+                            <li class="q-list-item">
+                                <code>@page.code.lang</code> - <a class="q-link-other" href="https://github.com/alecthomas/chroma#supported-languages">Language</a> to use for syntax highlighting.
+                            </li>
+                            <li class="q-list-item">
+                                <code>@page.code.style</code> - <a class="q-link-other" href="https://xyproto.github.io/splash/docs/index.html">Style</a> to use for syntax highlighting.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <code>@category</code> is used to mark the page as belonging to a category. Each
+                    attribute of it is a boolean. If present, the page belongs to that category.
+                    Example:
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>@category.news;</code>
+                    </li>
+                    <li class="q-list-item">
+                        <code>@category.important;</code>
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <code>@m</code> is a special variable used in <a class="q-link-internal" href="/pagereplace/doc/models" title="models">models</a>. Its attributes are
+                    mapped to any options provided in the model block.
+                </p>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-text-formatting">
+                Text formatting
+            </h2>
+            <p class="q-p">
+                Many block types, as well as values in <a class="q-link-internal" href="#assignment" title="§ assignment">variable assignment</a>, can
+                contain <span style="font-weight: bold;">formatted text</span>. Square brackets <code>[</code> and <code>]</code> are used to delimit text
+                formatting tokens.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-basic-formatting">
+                    Basic formatting
+                </h3>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>[b]bold text[/b]</code> - <span style="font-weight: bold;">bold text</span>
+                    </li>
+                    <li class="q-list-item">
+                        <code>[s]strikethrough text[/s]</code> - <span style="text-decoration: line-through;">strikethrough text</span>
+                    </li>
+                    <li class="q-list-item">
+                        <code>[i]italicized text[/i]</code> - <span style="font-style: italic;">italicized text</span>
+                    </li>
+                    <li class="q-list-item">
+                        <code>[c]inline code[/c]</code> - <code>inline code</code>
+                    </li>
+                    <li class="q-list-item">
+                        <code>superscript[^]text[/^]</code> - superscript<sup>text</sup>
+                    </li>
+                    <li class="q-list-item">
+                        <code>subscript[v]text[/v]</code> - subscript<sub>text</sub>
+                    </li>
+                    <li class="q-list-item">
+                        <code>[aquamarine]some colored text by color name[/]</code>
+                    </li>
+                    <li class="q-list-item">
+                        <code>[#ff1337]some colored text by hex code[/]</code>
+                    </li>
+                </ul>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-variables-1">
+                    Variables
+                </h3>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>[@some.variable]</code> - normal variable
+                    </li>
+                    <li class="q-list-item">
+                        <code>[%some.variable]</code> - interpolable variable
+                    </li>
+                    <li class="q-list-item">
+                        See <a class="q-link-internal" href="#variables" title="§ variables">Variables</a> above
+                    </li>
+                </ul>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-links">
+                    Links
+                </h3>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>[[ Page name ]]</code> - internal wiki page link
+                    </li>
+                    <li class="q-list-item">
+                        <code>[[ wp: Page name ]]</code> - <a class="q-link-internal" href="/pagereplace/doc/configuration#external" title="configuration § external">external wiki</a> page link
+                    </li>
+                    <li class="q-list-item">
+                        <code>[[ ~ Cat name ]]</code> - category link
+                    </li>
+                    <li class="q-list-item">
+                        <code>[[ http://google.com ]]</code> - external site link
+                    </li>
+                    <li class="q-list-item">
+                        <code>[[ someone@example.com ]]</code> - email link
+                    </li>
+                    <li class="q-list-item">
+                        For any link type, you can change the display text: <code>[[ Google | http://google.com ]]</code>
+                    </li>
+                </ul>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-references">
+                    References
+                </h3>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>[ref]</code> - a fake reference. just to make your wiki look credible.
+                    </li>
+                    <li class="q-list-item">
+                        <code>[1]</code> - an actual reference number. a true reference.
+                    </li>
+                </ul>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-characters">
+                    Characters
+                </h3>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>[nl]</code> - a line break
+                    </li>
+                    <li class="q-list-item">
+                        <code>[--]</code> - an en dash
+                    </li>
+                    <li class="q-list-item">
+                        <code>[---]</code> - an em dash
+                    </li>
+                    <li class="q-list-item">
+                        <code>[&amp;copy]</code> - HTML entities by name
+                    </li>
+                    <li class="q-list-item">
+                        <code>[&amp;#34]</code> - HTML entities by number
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

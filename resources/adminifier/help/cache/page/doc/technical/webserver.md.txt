@@ -1,0 +1,169 @@
+
+    
+        Contents
+        
+            
+                webserver
+            
+            
+                
+                    
+                        Usage
+                    
+                    
+                        
+                            
+                                func  Configure
+                            
+                        
+                        
+                            
+                                func  Listen
+                            
+                        
+                        
+                            
+                                type WikiInfo
+                            
+                        
+                        
+                            
+                                func (*WikiInfo) Copy
+                            
+                        
+                    
+                
+            
+        
+    
+    
+        
+            webserver
+        
+        
+            --
+        
+import "github.com/cooper/quiki/webserver"
+
+        
+            Package webserver is the newest webserver.
+        
+        
+            
+                Usage
+            
+var Auth *authenticator.Authenticator
+
+            
+                Auth is the server authentication service.
+            
+var Bind string
+
+            
+                Bind is the string to bind to, as extracted from the configuration file.
+            
+            
+                It is available only after Configure is called.
+            
+var Conf *wikifier.Page
+
+            
+                Conf is the webserver configuration page.
+            
+            
+                It is available only after Configure is called.
+            
+var Mux *http.ServeMux
+
+            
+                Mux is the *http.ServeMux.
+            
+            
+                It is available only after Configure is called.
+            
+var Port string
+
+            
+                Port is the port to bind to or "unix" for a UNIX socket, as extracted from the
+                configuration file.
+            
+            
+                It is available only after Configure is called.
+            
+var Server *http.Server
+
+            
+                Server is the *http.Server.
+            
+            
+                It is available only after Configure is called.
+            
+var SessMgr *scs.SessionManager
+
+            
+                SessMgr is the session manager service.
+            
+var Wikis map[string]*WikiInfo
+
+            
+                Wikis is all wikis served by this webserver.
+            
+            
+                
+                    
+                        func  Configure
+                    
+func Configure(confFile string)
+
+                    
+                        Configure parses a configuration file and initializes webserver.
+                    
+                    
+                        If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        func  Listen
+                    
+func Listen()
+
+                    
+                        Listen runs the webserver indefinitely.
+                    
+                    
+                        Configure must be called first. If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        type WikiInfo
+                    
+type WikiInfo struct {
+	Name  string // wiki shortname
+	Title string // wiki title from @name in the wiki config
+	Logo  string
+	Host  string
+
+	*wiki.Wiki
+}
+
+                    
+                        WikiInfo represents a wiki hosted on this webserver.
+                    
+                
+                
+                    
+                        func (*WikiInfo) Copy
+                    
+func (wi *WikiInfo) Copy(w *wiki.Wiki) *WikiInfo
+
+                    
+                        Copy creates a WikiInfo with all the same options, minus Wiki. It is used for
+                        working with multiple branches within a wiki.
+                    
+                
+            
+        
+    
+
