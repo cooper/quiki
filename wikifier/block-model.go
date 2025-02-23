@@ -92,7 +92,7 @@ func (mb *modelBlock) html(page *Page, mbEl element) {
 	// these properties are set just incase @model.tags is true
 	// FIXME: need to remove q-main
 	mainEl.addClass("model", "model-"+mb.modelName)
-	mainEl.setMeta("needID", true)
+	mainEl.setId(mb.modelName)
 
 	// disable tags on the main block element also unless @model.tags
 	if !mb.includeTags {

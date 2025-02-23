@@ -2,6 +2,7 @@ package wikifier
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -112,8 +113,9 @@ func (sb *styleBlock) html(page *Page, el element) {
 	// my $parent_el = $block->parent->element;
 	parentEl := sb.parentBlock().el()
 
-	// $parent_el->{need_id}++;
-	parentEl.setMeta("needID", true)
+	// set an id on the parent el like blocktype-pagename-n
+	page._styleId++
+	parentEl.setId(page.NameNE() + "-" + strconv.Itoa(page._styleId))
 
 	// # add other things, if any.
 	// foreach my $item (@{ $style{apply_to} }) {

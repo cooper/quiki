@@ -63,7 +63,7 @@ func (mb *mainBlock) html(page *Page, el element) {
 
 	// always include the ID so that element styles can refer to it
 	// (needed when more than 1 logical page is displayed in a browser window)
-	el.setMeta("needID", true)
+	el.setId(page.NameNE())
 
 	// everything should be converted to blocks by now
 	for _, item := range mb.blockContent() {

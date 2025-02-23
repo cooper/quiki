@@ -43,6 +43,7 @@ type Page struct {
 	_html        HTML
 	_text        string
 	_preview     string
+	_styleId     int
 	*variableScope
 }
 

@@ -15,7 +15,11 @@ func newElements(els []element) *elements {
 }
 
 func (els *elements) id() string {
-	return "elements"
+	return ""
+}
+
+func (els *elements) setId(id string) {
+	// do nothing
 }
 
 func (els *elements) hide() {

@@ -2,7 +2,6 @@ package wikifier
 
 import (
 	htmlfmt "html"
-	"strconv"
 	"strings"
 )
 
@@ -16,6 +15,7 @@ type element interface {
 
 	// ID
 	id() string
+	setId(id string)
 
 	// tag/type
 	tag() string
@@ -77,10 +77,8 @@ type genericElement struct {
 }
 
 func newElement(tag, typ string) element {
-	identifiers[typ]++
 	return &genericElement{
 		_tag:   tag,
-		_id:    typ + "-" + strconv.Itoa(identifiers[typ]),
 		typ:    typ,
 		attrs:  make(map[string]any),
 		styles: make(map[string]string),
@@ -91,6 +89,11 @@ func newElement(tag, typ string) element {
 // fetch ID
 func (el *genericElement) id() string {
 	return el._id
+}
+
+// set id
+func (el *genericElement) setId(id string) {
+	el._id = id
 }
 
 // fetch tag
@@ -307,8 +310,8 @@ func (el *genericElement) generateIndented(indent int) []indentedLine {
 		}
 
 		// inject ID
-		if el.meta("needID") {
-			classes = append([]string{"q-" + el._id}, classes...)
+		if el._id != "" {
+			classes = append([]string{"q-" + el.typ + "-" + el._id}, classes...)
 		}
 		if len(classes) != 0 {
 			openingTag += ` class="` + strings.Join(classes, " ") + `"`
