@@ -143,7 +143,7 @@ func (m *Map) parse(page *Page) {
 
 }
 
-func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
+func (m *Map) handleChar(_ *Page, i int, p *mapParser, c rune) {
 	p.pos.Column = i
 
 	if c == ':' && !p.inValue && !p.escape {
@@ -288,7 +288,11 @@ func (m *Map) handleChar(page *Page, i int, p *mapParser, c rune) {
 		// this is part of the key
 
 		// starting a new key
-		if p.key == nil && add != "\n" {
+		if p.key == nil {
+			if strings.TrimSpace(add) == "" {
+				// ignore whitespace at the start of keys
+				return
+			}
 			p.startPos = p.pos
 			p.key = add
 			return
