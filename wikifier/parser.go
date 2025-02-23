@@ -586,7 +586,7 @@ func (p *parser) parseRune(r rune, page *Page) error {
 			}
 
 			// fetch content and clear catch
-			value := fixValuesForStorage(p.catch.content(), page, p.pos, !p.varNotInterpolated)
+			value := fixValuesForStorage(p.catch.content(), p.block, p.pos, !p.varNotInterpolated)
 			p.catch = p.catch.parentCatch()
 
 			switch val := value.(type) {

@@ -23,7 +23,10 @@ type block interface {
 	variables() *variableScope         // block variables or the page by default
 	openPosition() Position            // position opened at
 	warn(pos Position, warning string) // produce parser warning
-	catch                              // all blocks must conform to catch
+	page() *Page                       // page
+	Fmt(string, Position) HTML         // format a string
+	parseLink(string, *FmtOpt) (bool, string, string, string, HTML)
+	catch // all blocks must conform to catch
 }
 
 // generic base for all blocks
@@ -153,4 +156,8 @@ func (b *parserBlock) textContent() []string {
 		}
 	}
 	return text
+}
+
+func (b *parserBlock) page() *Page {
+	return b._page
 }

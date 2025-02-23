@@ -123,7 +123,7 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine 
 		// terminates a value
 
 		// store the value
-		valueToStore := fixValuesForStorage(p.values, page, p.pos, true)
+		valueToStore := fixValuesForStorage(p.values, l, p.pos, true)
 		l.list = append(l.list, &listEntry{
 			value: valueToStore,               // string, block, or mixed []any
 			typ:   getValueType(valueToStore), // type of value
@@ -184,7 +184,7 @@ func (l *List) html(page *Page, el element) {
 	for i, entry := range l.list {
 
 		// prepare the value for inclusion in HTML element
-		value := prepareForHTML(entry.value, page, entry.pos)
+		value := prepareForHTML(entry.value, l, entry.pos)
 		l.list[i].value = value
 		l.list[i].typ = getValueType(value)
 

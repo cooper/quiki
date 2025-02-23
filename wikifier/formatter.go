@@ -202,17 +202,17 @@ type FmtOpt struct {
 }
 
 // Fmt generates HTML from a quiki-encoded formatted string.
-func (p *Page) Fmt(text string, pos Position) HTML {
-	return p._parseFormattedText(text, &FmtOpt{Pos: pos})
+func (b *parserBlock) Fmt(text string, pos Position) HTML {
+	return b._parseFormattedText(text, &FmtOpt{Pos: pos})
 }
 
 // FmtOpts is like Fmt except you can specify additional options with the FmtOpt argument.
-func (p *Page) FmtOpts(text string, pos Position, o FmtOpt) HTML {
+func (b *parserBlock) FmtOpts(text string, pos Position, o FmtOpt) HTML {
 	o.Pos = pos
-	return p._parseFormattedText(text, &o)
+	return b._parseFormattedText(text, &o)
 }
 
-func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
+func (b *parserBlock) _parseFormattedText(text string, o *FmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -220,8 +220,8 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 	}
 
 	// find and copy the position
-	if o.Pos.none() && p.parser != nil {
-		o.Pos = p.parser.pos
+	if o.Pos.none() && b._page.parser != nil {
+		o.Pos = b._page.parser.pos
 	}
 
 	// my @items;
@@ -263,7 +263,7 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 			// marks the end of a formatting element
 			formatDepth--
 			if formatDepth == 0 {
-				items = append(items, p.parseFormatType(formatType, o))
+				items = append(items, b.parseFormatType(formatType, o))
 				continue
 			}
 		}
@@ -310,7 +310,7 @@ func (p *Page) _parseFormattedText(text string, o *FmtOpt) HTML {
 	return HTML(final)
 }
 
-func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
+func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
 
 	// static format
 	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
@@ -322,16 +322,16 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 		if variableRegex.MatchString(formatType) {
 
 			// fetch the value
-			val, err := p.Get(formatType[1:])
+			val, err := b.variables().Get(formatType[1:])
 			if err != nil {
 				if !o.NoWarnings {
-					p.warn(o.Pos, err.Error())
+					b.warn(o.Pos, err.Error())
 				}
 				return HTML("(error: " + formatType + ": " + html.EscapeString(err.Error()) + ")")
 			}
 			if val == nil {
 				if !o.NoWarnings {
-					p.warn(o.Pos, "Variable "+formatType+" is undefined")
+					b.warn(o.Pos, "Variable "+formatType+" is undefined")
 				}
 				return HTML("(null)")
 			}
@@ -343,14 +343,14 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 			if formatType[0] == '%' {
 				if isHTML {
 					// warn that HTML is being double-encoded
-					p.warn(o.Pos, "Variable "+formatType+" already formatted; use @"+formatType[1:])
+					b.warn(o.Pos, "Variable "+formatType+" already formatted; use @"+formatType[1:])
 					return htmlVal
 				} else if !isStr {
 					// other non-string value, probably a block
-					p.warn(o.Pos, "Can't interpolate non-string variable "+formatType)
+					b.warn(o.Pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
-				return p.FmtOpts(strVal, o.Pos, FmtOpt{noVariables: true})
+				return b.FmtOpts(strVal, o.Pos, FmtOpt{noVariables: true})
 			}
 
 			// @var with a string (was set with %var but should not be interpolated)
@@ -412,7 +412,7 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
-		ok, target, linkType, tooltip, display := p.parseLink(formatType[1:len(formatType)-1], o)
+		ok, target, linkType, tooltip, display := b.parseLink(formatType[1:len(formatType)-1], o)
 		invalid := ""
 		if !ok {
 			invalid = " invalid"
@@ -468,7 +468,7 @@ func (p *Page) parseFormatType(formatType string, o *FmtOpt) HTML {
 	return HTML("")
 }
 
-func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
+func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
 
 	// nothing in, nothing out
@@ -480,7 +480,7 @@ func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, too
 	split := strings.SplitN(link, "|", 2)
 	displayDefault := ""
 	if len(split) == 2 {
-		display = p.Fmt(strings.TrimSpace(split[0]), o.Pos)
+		display = b.Fmt(strings.TrimSpace(split[0]), o.Pos)
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
@@ -528,7 +528,7 @@ func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, too
 		tooltip = strings.TrimSpace(s[1]) // for now
 		target = strings.TrimSpace(s[2])  // for now
 		displayDefault = target
-		handler = p.Opt.Link.ParseExternal
+		handler = b._page.Opt.Link.ParseExternal
 		if handler == nil {
 			handler = defaultExternalLink
 		}
@@ -537,9 +537,9 @@ func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, too
 		// ~ some category
 		linkType = "category"
 		tooltip = strings.TrimPrefix(target, "~")
-		target = p.Opt.Root.Category + "/" + CategoryNameNE(tooltip)
+		target = b._page.Opt.Root.Category + "/" + CategoryNameNE(tooltip)
 		displayDefault = tooltip
-		handler = p.Opt.Link.ParseCategory
+		handler = b._page.Opt.Link.ParseCategory
 
 	} else {
 		// normal page link
@@ -553,7 +553,7 @@ func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, too
 		} else {
 			// determine page prefix
 			// TODO: resolve . and .. safely
-			pfx = p.Prefix()
+			pfx = b._page.Prefix()
 			if pfx != "" {
 				pfx += "/"
 			}
@@ -574,15 +574,15 @@ func (p *Page) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, too
 			target = sec
 		} else {
 			// other page link
-			target = p.Opt.Root.Page + "/" + pfx + PageNameNE(target) + sec
+			target = b._page.Opt.Root.Page + "/" + pfx + PageNameNE(target) + sec
 		}
 
-		handler = p.Opt.Link.ParseInternal
+		handler = b._page.Opt.Link.ParseInternal
 	}
 
 	// call link handler
 	if handler != nil {
-		handler(p, &PageOptLinkOpts{
+		handler(b._page, &PageOptLinkOpts{
 			Ok:             &ok,
 			Target:         &target,
 			Tooltip:        &tooltip,

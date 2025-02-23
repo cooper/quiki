@@ -48,17 +48,17 @@ func getValueType(i any) valueType {
 // Strings are formatted with quiki's text formatter.
 // Blocks are converted to elements.
 // Preformatted HTML is left as-is.
-func prepareForHTML(value any, page *Page, pos Position) any {
+func prepareForHTML(value any, b block, pos Position) any {
 	switch v := value.(type) {
 	case string:
-		value = page.Fmt(v, pos)
+		value = b.Fmt(v, pos)
 	case block:
-		v.html(page, v.el())
+		v.html(b.page(), v.el())
 		value = v.el()
 	case []any:
 		newValues := make([]any, len(v))
 		for idx, val := range v {
-			newValues[idx] = prepareForHTML(val, page, pos)
+			newValues[idx] = prepareForHTML(val, b, pos)
 		}
 		value = newValues
 	case HTML:
@@ -114,7 +114,7 @@ func humanReadableValue(i any) string {
 // fix a value before storing it in a list or map
 // this returns either a string, block, or []any of both
 // strings next to each other are merged; empty strings are removed
-func fixValuesForStorage(values []any, pageMaybe *Page, pos Position, fmtText bool) any {
+func fixValuesForStorage(values []any, blockMaybe block, pos Position, fmtText bool) any {
 
 	// no items
 	if len(values) == 0 {
@@ -123,7 +123,7 @@ func fixValuesForStorage(values []any, pageMaybe *Page, pos Position, fmtText bo
 
 	// one value in; one value out!
 	if len(values) == 1 {
-		return fixSingleValue(values[0], pageMaybe, pos, fmtText)
+		return fixSingleValue(values[0], blockMaybe, pos, fmtText)
 	}
 
 	// multiple values
@@ -132,7 +132,7 @@ func fixValuesForStorage(values []any, pageMaybe *Page, pos Position, fmtText bo
 	for _, value := range values {
 
 		// fix this value; then skip it if it's nothin
-		value = fixSingleValue(value, pageMaybe, pos, fmtText)
+		value = fixSingleValue(value, blockMaybe, pos, fmtText)
 		if value == nil {
 			continue
 		}
@@ -167,7 +167,7 @@ func fixValuesForStorage(values []any, pageMaybe *Page, pos Position, fmtText bo
 	return valuesToStore
 }
 
-func fixSingleValue(value any, pageMaybe *Page, pos Position, fmtText bool) any {
+func fixSingleValue(value any, blockMaybe block, pos Position, fmtText bool) any {
 	switch v := value.(type) {
 	case HTML:
 		return v
@@ -176,8 +176,8 @@ func fixSingleValue(value any, pageMaybe *Page, pos Position, fmtText bool) any 
 		if v == "" {
 			return nil
 		}
-		if fmtText && pageMaybe != nil {
-			return pageMaybe.Fmt(v, pos)
+		if fmtText && blockMaybe != nil {
+			return blockMaybe.Fmt(v, pos)
 		}
 		return v
 	case block:
