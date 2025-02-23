@@ -183,7 +183,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 	}
 
 	// caching is enabled, so serve the cached copy if available
-	if w.Opt.Page.EnableCache && page.CacheExists() {
+	if w.Opt.Page.EnableCache && !w.Opt.Page.ForceGen && page.CacheExists() {
 		if errOrRedir := w.displayCachedPage(page, &r, draftOK); errOrRedir != nil {
 			return errOrRedir
 		}
@@ -493,11 +493,12 @@ func (w *Wiki) writePageText(page *wikifier.Page, r *DisplayPage) any {
 
 func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bool) any {
 	cacheModify := page.CacheModified()
+	pageModified := page.Modified()
 	timeStr := httpdate.Time2Str(cacheModify)
 
 	// the page's file is more recent than the cache file.
 	// discard the outdated cached copy
-	if page.Modified().After(cacheModify) {
+	if pageModified.After(cacheModify) {
 		os.Remove(page.CachePath())
 		return nil // OK
 	}
@@ -570,8 +571,8 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	r.FromCache = true
 	r.CSS = info.CSS
 	r.Content = wikifier.HTML(content)
-	r.Modified = &cacheModify
-	r.ModifiedHTTP = httpdate.Time2Str(cacheModify)
+	r.Modified = &pageModified
+	r.ModifiedHTTP = httpdate.Time2Str(pageModified)
 
 	return nil // success
 }

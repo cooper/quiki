@@ -1,2 +1,2 @@
-./quiki -wiki=help-wiki
-cp -rv help-wiki resources/adminifier/help
+./quiki -wiki=help-wiki -force-gen
+cp -r help-wiki resources/adminifier/help
