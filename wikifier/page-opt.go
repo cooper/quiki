@@ -41,6 +41,7 @@ type PageOpt struct {
 type PageOptPage struct {
 	EnableTitle bool        // enable page title headings
 	EnableCache bool        // enable page caching
+	ForceGen    bool        // force generation of page even if unchanged
 	Code        PageOptCode // `code{}` block options
 }
 
@@ -145,6 +146,7 @@ var defaultPageOpt = PageOpt{
 	Page: PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
+		ForceGen:    false,
 		Code: PageOptCode{
 			Style: "monokailight",
 		},

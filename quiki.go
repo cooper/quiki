@@ -19,6 +19,7 @@ var (
 	interactive bool
 	wizard      bool
 	wikiPath    string
+	forceGen    bool
 	opts        webserver.Options
 )
 
@@ -27,6 +28,7 @@ func main() {
 	flag.BoolVar(&interactive, "i", false, "interactive mode, read from stdin")
 	flag.BoolVar(&wizard, "w", false, "run setup wizard")
 	flag.StringVar(&wikiPath, "wiki", "", "path to a wiki to run standalone")
+	flag.BoolVar(&forceGen, "force-gen", false, "regenerate pages even if unchanged")
 	flag.StringVar(&opts.Bind, "bind", "", "address to bind to")
 	flag.StringVar(&opts.Port, "port", "", "port to listen on")
 	flag.Parse()
@@ -44,6 +46,9 @@ func main() {
 		w, err = wiki.NewWiki(wikiPath)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "load wiki"))
+		}
+		if forceGen {
+			w.Opt.Page.ForceGen = true
 		}
 	}
 
