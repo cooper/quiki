@@ -76,13 +76,13 @@ func (cb *codeBlock) html(page *Page, el element) {
 	pageStyle, _ := page.getPageStr("code.style")
 	if pageStyle != "" {
 		style = styles.Get(pageStyle)
-		if style == styles.Fallback {
+		if style == styles.Fallback && pageStyle != styles.Fallback.Name {
 			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"'")
 		}
 	}
-	if style == styles.Fallback && page.Opt.Page.Code.Style != "" && page.Opt.Page.Code.Style != styles.Fallback.Name {
+	if style == styles.Fallback && page.Opt.Page.Code.Style != "" {
 		style = styles.Get(page.Opt.Page.Code.Style)
-		if style == styles.Fallback {
+		if style == styles.Fallback && page.Opt.Page.Code.Style != styles.Fallback.Name {
 			cb.warn(cb.openPosition(), "No such code{} style '"+page.Opt.Page.Code.Style+"' (from config)")
 		}
 	}
