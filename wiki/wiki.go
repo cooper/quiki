@@ -25,28 +25,19 @@ type Wiki struct {
 
 // NewWiki creates a Wiki given its directory path.
 func NewWiki(path string) (*Wiki, error) {
-	return NewWikiConfig(filepath.Join(path, "wiki.conf"))
-}
 
-// NewWikiConfig creates a Wiki given the configuration file path.
-//
-// Deprecated: Use NewWiki instead.
-func NewWikiConfig(confPath string) (*Wiki, error) {
-	confPath = filepath.FromSlash(confPath)
+	if path == "" {
+		return nil, errors.New("no wiki path specified")
+	}
+
+	confPath := filepath.Join(path, "wiki.conf")
 	w := &Wiki{
 		ConfigFile: confPath,
 		Opt:        defaultWikiOpt,
 		pageLocks:  make(map[string]*sync.Mutex),
 	}
 
-	// there's no config!
-	if confPath == "" {
-		return nil, errors.New("no config file specified")
-	}
-
-	// guess dir.wiki from config location
-	// (if the conf specifies an absolute path, this will be overwritten)
-	w.Opt.Dir.Wiki = filepath.Dir(confPath)
+	w.Opt.Dir.Wiki = path
 
 	// parse the config
 	err := w.readConfig(confPath)

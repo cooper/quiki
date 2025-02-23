@@ -83,17 +83,6 @@ func InitWikis() error {
 			}
 		}
 
-		// that didn't work. try server.wiki.[name].config (deprecated)
-		if w == nil {
-			wikiConfPath, _ := Conf.GetStr(configPfx + ".config")
-			if wikiConfPath != "" {
-				w, err = wiki.NewWikiConfig(wikiConfPath)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
 		// still no??? use server.dir.wiki/[name]
 		if w == nil {
 
