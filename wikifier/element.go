@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-var identifiers = make(map[string]int)
-
 // HTML encapsulates a string to indicate that it is preformatted HTML.
 // It lets quiki's parsers know not to attempt to format it any further.
 type HTML string
@@ -60,6 +58,8 @@ type element interface {
 	// html generation
 	generate() HTML
 	generateIndented(indent int) []indentedLine
+
+	copy() element
 }
 
 type genericElement struct {
@@ -274,6 +274,35 @@ func (el *genericElement) generate() HTML {
 
 	el.cachedHTML = generateIndentedLines(el.generateIndented(0))
 	return el.cachedHTML
+}
+
+// copy this element
+func (el *genericElement) copy() element {
+	newEl := newElement(el._tag, el.typ).(*genericElement)
+	newEl._id = el._id
+	for key, val := range el.attrs {
+		newEl.attrs[key] = val
+	}
+	for key, val := range el.styles {
+		newEl.styles[key] = val
+	}
+	for key, val := range el.metas {
+		newEl.metas[key] = val
+	}
+	newEl.classes = make([]string, len(el.classes))
+	copy(newEl.classes, el.classes)
+	newEl.content = make([]any, len(el.content))
+	for i, val := range el.content {
+		switch v := val.(type) {
+		case string:
+			newEl.content[i] = v
+		case HTML:
+			newEl.content[i] = v
+		case element:
+			newEl.content[i] = v.copy()
+		}
+	}
+	return newEl
 }
 
 type indentedLine struct {

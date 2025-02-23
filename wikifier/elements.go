@@ -197,3 +197,11 @@ func (els *elements) generateIndented(indent int) []indentedLine {
 
 	return lines
 }
+
+func (els *elements) copy() element {
+	elsCopy := newElements(nil)
+	for _, el := range els.elements {
+		elsCopy.addChild(el.copy())
+	}
+	return elsCopy
+}

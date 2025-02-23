@@ -5,7 +5,9 @@
 };
 
 for [@list as @value] {
-    Item at index [@index]: [@value]
+    p {
+        Item at index [@index]: [@value]
+    }
 }
 
 Item at index 0: [@list.0]
