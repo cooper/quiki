@@ -31,6 +31,9 @@ type mapListEntry struct {
 	metas    map[string]bool // metadata
 }
 
+// ensure Map implements AttributedObject
+var _ AttributedObject = (*Map)(nil)
+
 // func (entry *mapListEntry) setMeta(key string, val bool) {
 // 	if !val {
 // 		delete(entry.metas, key)

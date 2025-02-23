@@ -51,7 +51,7 @@ func getValueType(i any) valueType {
 func prepareForHTML(value any, b block, pos Position) any {
 	switch v := value.(type) {
 	case string:
-		value = b.Fmt(v, pos)
+		value = format(b, v, pos)
 	case block:
 		v.html(b.page(), v.el())
 		value = v.el()
@@ -177,7 +177,7 @@ func fixSingleValue(value any, blockMaybe block, pos Position, fmtText bool) any
 			return nil
 		}
 		if fmtText && blockMaybe != nil {
-			return blockMaybe.Fmt(v, pos)
+			return format(blockMaybe, v, pos)
 		}
 		return v
 	case block:

@@ -201,18 +201,18 @@ type FmtOpt struct {
 	noVariables bool     // set internally to prevent recursive interpolation
 }
 
-// Fmt generates HTML from a quiki-encoded formatted string.
-func (b *parserBlock) Fmt(text string, pos Position) HTML {
-	return b._parseFormattedText(text, &FmtOpt{Pos: pos})
+// format generates HTML from a quiki-encoded formatted string.
+func format(b block, text string, pos Position) HTML {
+	return _parseFormattedText(b, text, &FmtOpt{Pos: pos})
 }
 
-// FmtOpts is like Fmt except you can specify additional options with the FmtOpt argument.
-func (b *parserBlock) FmtOpts(text string, pos Position, o FmtOpt) HTML {
+// formatOpts is like Fmt except you can specify additional options with the FmtOpt argument.
+func formatOpts(b block, text string, pos Position, o FmtOpt) HTML {
 	o.Pos = pos
-	return b._parseFormattedText(text, &o)
+	return _parseFormattedText(b, text, &o)
 }
 
-func (b *parserBlock) _parseFormattedText(text string, o *FmtOpt) HTML {
+func _parseFormattedText(b block, text string, o *FmtOpt) HTML {
 
 	// let's not waste any time here
 	if text == "" {
@@ -220,8 +220,8 @@ func (b *parserBlock) _parseFormattedText(text string, o *FmtOpt) HTML {
 	}
 
 	// find and copy the position
-	if o.Pos.none() && b._page.parser != nil {
-		o.Pos = b._page.parser.pos
+	if o.Pos.none() && b.page().parser != nil {
+		o.Pos = b.page().parser.pos
 	}
 
 	// my @items;
@@ -263,7 +263,7 @@ func (b *parserBlock) _parseFormattedText(text string, o *FmtOpt) HTML {
 			// marks the end of a formatting element
 			formatDepth--
 			if formatDepth == 0 {
-				items = append(items, b.parseFormatType(formatType, o))
+				items = append(items, parseFormatType(b, formatType, o))
 				continue
 			}
 		}
@@ -310,7 +310,7 @@ func (b *parserBlock) _parseFormattedText(text string, o *FmtOpt) HTML {
 	return HTML(final)
 }
 
-func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
+func parseFormatType(b block, formatType string, o *FmtOpt) HTML {
 
 	// static format
 	if format, exists := staticFormats[strings.ToLower(formatType)]; exists {
@@ -331,7 +331,7 @@ func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
 			}
 			if val == nil {
 				if !o.NoWarnings {
-					b.warn(o.Pos, "Variable "+formatType+" is undefined")
+					b.warn(o.Pos, "Variable "+formatType+" is undefined (in "+b.blockType()+"{} scope)")
 				}
 				return HTML("(null)")
 			}
@@ -350,7 +350,7 @@ func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
 					b.warn(o.Pos, "Can't interpolate non-string variable "+formatType)
 					return HTML("(error: " + formatType + ": interpolating non-string)")
 				}
-				return b.FmtOpts(strVal, o.Pos, FmtOpt{noVariables: true})
+				return formatOpts(b, strVal, o.Pos, FmtOpt{noVariables: true})
 			}
 
 			// @var with a string (was set with %var but should not be interpolated)
@@ -412,7 +412,7 @@ func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
 
 	// [[link]]
 	if formatType[0] == '[' && formatType[len(formatType)-1] == ']' {
-		ok, target, linkType, tooltip, display := b.parseLink(formatType[1:len(formatType)-1], o)
+		ok, target, linkType, tooltip, display := parseLink(b, formatType[1:len(formatType)-1], o)
 		invalid := ""
 		if !ok {
 			invalid = " invalid"
@@ -468,7 +468,7 @@ func (b *parserBlock) parseFormatType(formatType string, o *FmtOpt) HTML {
 	return HTML("")
 }
 
-func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
+func parseLink(b block, link string, o *FmtOpt) (ok bool, target, linkType, tooltip string, display HTML) {
 	ok = true
 
 	// nothing in, nothing out
@@ -480,7 +480,7 @@ func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkTy
 	split := strings.SplitN(link, "|", 2)
 	displayDefault := ""
 	if len(split) == 2 {
-		display = b.Fmt(strings.TrimSpace(split[0]), o.Pos)
+		display = format(b, strings.TrimSpace(split[0]), o.Pos)
 		target = strings.TrimSpace(split[1])
 	} else {
 		target = strings.TrimSpace(split[0])
@@ -528,7 +528,7 @@ func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkTy
 		tooltip = strings.TrimSpace(s[1]) // for now
 		target = strings.TrimSpace(s[2])  // for now
 		displayDefault = target
-		handler = b._page.Opt.Link.ParseExternal
+		handler = b.page().Opt.Link.ParseExternal
 		if handler == nil {
 			handler = defaultExternalLink
 		}
@@ -537,9 +537,9 @@ func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkTy
 		// ~ some category
 		linkType = "category"
 		tooltip = strings.TrimPrefix(target, "~")
-		target = b._page.Opt.Root.Category + "/" + CategoryNameNE(tooltip)
+		target = b.page().Opt.Root.Category + "/" + CategoryNameNE(tooltip)
 		displayDefault = tooltip
-		handler = b._page.Opt.Link.ParseCategory
+		handler = b.page().Opt.Link.ParseCategory
 
 	} else {
 		// normal page link
@@ -553,7 +553,7 @@ func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkTy
 		} else {
 			// determine page prefix
 			// TODO: resolve . and .. safely
-			pfx = b._page.Prefix()
+			pfx = b.page().Prefix()
 			if pfx != "" {
 				pfx += "/"
 			}
@@ -574,15 +574,15 @@ func (b *parserBlock) parseLink(link string, o *FmtOpt) (ok bool, target, linkTy
 			target = sec
 		} else {
 			// other page link
-			target = b._page.Opt.Root.Page + "/" + pfx + PageNameNE(target) + sec
+			target = b.page().Opt.Root.Page + "/" + pfx + PageNameNE(target) + sec
 		}
 
-		handler = b._page.Opt.Link.ParseInternal
+		handler = b.page().Opt.Link.ParseInternal
 	}
 
 	// call link handler
 	if handler != nil {
-		handler(b._page, &PageOptLinkOpts{
+		handler(b.page(), &PageOptLinkOpts{
 			Ok:             &ok,
 			Target:         &target,
 			Tooltip:        &tooltip,

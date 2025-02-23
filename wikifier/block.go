@@ -24,9 +24,7 @@ type block interface {
 	openPosition() Position            // position opened at
 	warn(pos Position, warning string) // produce parser warning
 	page() *Page                       // page
-	Fmt(string, Position) HTML         // format a string
-	parseLink(string, *FmtOpt) (bool, string, string, string, HTML)
-	catch // all blocks must conform to catch
+	catch                              // all blocks must conform to catch
 }
 
 // generic base for all blocks

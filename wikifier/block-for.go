@@ -63,7 +63,7 @@ func (b *forBlock) html(p *Page, el element) {
 	switch v := iterable.(type) {
 	case *List:
 		for i, item := range v.list {
-			b.variables().setOwn(b.itemName, item)
+			b.variables().setOwn(b.itemName, item.value)
 			b.variables().setOwn("index", i)
 			b.injectContent(el)
 		}
@@ -81,6 +81,8 @@ func (b *forBlock) html(p *Page, el element) {
 
 func (b *forBlock) injectContent(el element) {
 	for _, item := range b.posContent() {
+		// FIXME: it needs to work like a section,
+		// adding paragraphs and such for text nodes
 		value := prepareForHTML(item.content, b, item.pos)
 		el.add(value)
 	}
