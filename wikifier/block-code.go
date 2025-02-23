@@ -3,10 +3,10 @@ package wikifier
 import (
 	"strings"
 
-	"github.com/alecthomas/chroma"
-	"github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
+	"github.com/alecthomas/chroma/v2"
+	"github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 	_ "github.com/cooper/ferret-chroma" // for ferret language support
 )
 
@@ -80,7 +80,7 @@ func (cb *codeBlock) html(page *Page, el element) {
 			cb.warn(cb.openPosition(), "No such code{} style '"+pageStyle+"'")
 		}
 	}
-	if style == styles.Fallback && page.Opt.Page.Code.Style != "" {
+	if style == styles.Fallback && page.Opt.Page.Code.Style != "" && page.Opt.Page.Code.Style != styles.Fallback.Name {
 		style = styles.Get(page.Opt.Page.Code.Style)
 		if style == styles.Fallback {
 			cb.warn(cb.openPosition(), "No such code{} style '"+page.Opt.Page.Code.Style+"' (from config)")

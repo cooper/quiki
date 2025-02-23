@@ -6,7 +6,7 @@ toolchain go1.23.4
 
 require (
 	github.com/Songmu/go-httpdate v1.0.0
-	github.com/alecthomas/chroma v0.10.0
+	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/cooper/ferret-chroma v0.0.0-20201209083634-9d9918e49841
 	github.com/cooper/go-git/v4 v4.14.1
@@ -23,6 +23,7 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
+	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
