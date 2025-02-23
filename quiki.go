@@ -97,6 +97,7 @@ func main() {
 	webserver.Listen()
 }
 
+// reads from stdin
 func interactiveMode() {
 	input, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -106,26 +107,40 @@ func interactiveMode() {
 	runPageAndExit(page)
 }
 
+// runs a page
 func runPageAndExit(page *wikifier.Page) {
 	err := page.Parse()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(page.HTML())
-	os.Exit(0)
+	printPageResultAndExit(page.RelPath(), page.HTML(), page.Warnings)
 }
 
+// runs a wiki page
 func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
 	res := w.DisplayPage(pagePath)
 	switch r := res.(type) {
 	case wiki.DisplayPage:
-		fmt.Println(r.Content)
+		printPageResultAndExit(r.Path, r.Content, r.Warnings)
 	case wiki.DisplayError:
 		log.Fatal(r.Error)
 	case wiki.DisplayRedirect:
 		log.Fatal("Redirect: " + r.Redirect)
 	default:
-		log.Fatal("unknown response")
+		log.Fatal("unsupported response type from wiki.DisplayPage()")
 	}
+}
+
+// prints the page result and exits
+func printPageResultAndExit(path string, html wikifier.HTML, warnings []wikifier.Warning) {
+
+	// print warnings to stderr
+	for _, w := range warnings {
+		log.Printf("%s:%d:%d: %s", path, w.Pos.Line, w.Pos.Column, w.Message)
+	}
+
+	// print html to stdout
+	fmt.Println(html)
+
 	os.Exit(0)
 }

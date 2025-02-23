@@ -1,0 +1,6 @@
+@list: one, two, three;
+
+for [@list as @value] {
+    Item at index [@index]: [@value]
+}
+

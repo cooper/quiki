@@ -6,6 +6,7 @@ import (
 	"errors"
 	"html"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -131,6 +132,7 @@ func (p *Page) Parse() error {
 		Message: perr.Err.Error(),
 		Pos:     perr.Pos,
 	}
+	p.Error.Log(p.RelPath())
 
 	return perr
 }
@@ -610,6 +612,7 @@ func (p *Page) Info() PageInfo {
 func (p *Page) warn(pos Position, warning string) {
 	w := Warning{warning, pos}
 	p.Warnings = append(p.Warnings, w)
+	w.Log(p.RelPath())
 }
 
 func (p *Page) mainBlock() block {
@@ -629,4 +632,8 @@ func pageAbs(path string) string {
 		return followed
 	}
 	return path
+}
+
+func (w Warning) Log(path string) {
+	log.Printf("%s:%d:%d: %s", path, w.Pos.Line, w.Pos.Column, w.Message)
 }

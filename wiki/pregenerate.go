@@ -2,13 +2,18 @@ package wiki
 
 // Pregenerate simulates requests for all wiki resources
 // such that content caches can be pregenerated and stored.
-func (w *Wiki) Pregenerate() {
+func (w *Wiki) Pregenerate() (results []any) {
 	w.pregenerating = true
-
-	for _, pageName := range w.allPageFiles() {
-		w.Debug("pregen page:", pageName)
-		w.DisplayPageDraft(pageName, true)
+	allPageFiles := w.allPageFiles()
+	results = make([]any, len(allPageFiles))
+	for i, pageName := range allPageFiles {
+		results[i] = w.DisplayPageDraft(pageName, true)
+		if dp, ok := results[i].(DisplayPage); ok {
+			if !dp.FromCache {
+				w.Log("pregenerated " + pageName)
+			}
+		}
 	}
-
 	w.pregenerating = false
+	return
 }
