@@ -1,6 +1,6 @@
 # webserver
 --
-    import "github.com/cooper/quiki/webserver"
+    import "."
 
 Package webserver is the newest webserver.
 
@@ -60,11 +60,24 @@ Wikis is all wikis served by this webserver.
 #### func  Configure
 
 ```go
-func Configure(confFile string)
+func Configure(opts Options)
 ```
 Configure parses a configuration file and initializes webserver.
 
 If any errors occur, the program is terminated.
+
+#### func  CreateWizardConfig
+
+```go
+func CreateWizardConfig(opts Options)
+```
+
+#### func  InitWikis
+
+```go
+func InitWikis() error
+```
+initialize all the wikis in the configuration
 
 #### func  Listen
 
@@ -74,6 +87,26 @@ func Listen()
 Listen runs the webserver indefinitely.
 
 Configure must be called first. If any errors occur, the program is terminated.
+
+#### func  TemplateNames
+
+```go
+func TemplateNames() []string
+```
+Returns the names of all available templates.
+
+#### type Options
+
+```go
+type Options struct {
+	Config string
+	Bind   string
+	Port   string
+	Pregen bool
+}
+```
+
+Options is the webserver command line options.
 
 #### type WikiInfo
 

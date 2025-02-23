@@ -18,7 +18,27 @@
                         
                         
                             
+                                func  CreateWizardConfig
+                            
+                        
+                        
+                            
+                                func  InitWikis
+                            
+                        
+                        
+                            
                                 func  Listen
+                            
+                        
+                        
+                            
+                                func  TemplateNames
+                            
+                        
+                        
+                            
+                                type Options
                             
                         
                         
@@ -43,7 +63,7 @@
         
             --
         
-import "github.com/cooper/quiki/webserver"
+import "."
 
         
             Package webserver is the newest webserver.
@@ -113,13 +133,30 @@ var Wikis map[string]*WikiInfo
                     
                         func  Configure
                     
-func Configure(confFile string)
+func Configure(opts Options)
 
                     
                         Configure parses a configuration file and initializes webserver.
                     
                     
                         If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        func  CreateWizardConfig
+                    
+func CreateWizardConfig(opts Options)
+
+                
+                
+                    
+                        func  InitWikis
+                    
+func InitWikis() error
+
+                    
+                        initialize all the wikis in the configuration
                     
                 
                 
@@ -133,6 +170,31 @@ func Listen()
                     
                     
                         Configure must be called first. If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        func  TemplateNames
+                    
+func TemplateNames() []string
+
+                    
+                        Returns the names of all available templates.
+                    
+                
+                
+                    
+                        type Options
+                    
+type Options struct {
+	Config string
+	Bind   string
+	Port   string
+	Pregen bool
+}
+
+                    
+                        Options is the webserver command line options.
                     
                 
                 

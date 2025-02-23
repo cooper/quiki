@@ -1,6 +1,6 @@
 # wikifier
 --
-    import "github.com/cooper/quiki/wikifier"
+    import "."
 
 
 ## Usage
@@ -106,14 +106,15 @@ redirects), there is only one occurrence in the output.
 type AttributedObject interface {
 
 	// getters
-	Get(key string) (interface{}, error)
+	Get(key string) (any, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
 	GetBlock(key string) (block, error)
 	GetObj(key string) (AttributedObject, error)
 
 	// setters
-	Set(key string, value interface{}) error
+	Set(key string, value any) error
+	Unset(key string) error
 	// contains filtered or unexported methods
 }
 ```
@@ -122,6 +123,18 @@ An AttributedObject is any object on which you can set and retrieve attributes.
 
 For example, a Page is an attributed object since it contains variables.
 Likewise, a Map is an attributed object because it has named properties.
+
+#### type FmtOpt
+
+```go
+type FmtOpt struct {
+	Pos        Position // position used for warnings (set internally)
+	NoEntities bool     // disables html entity conversion
+	NoWarnings bool     // silence warnings for undefined variables
+}
+```
+
+FmtOpt describes options for page.FmtOpts.
 
 #### type HTML
 
@@ -150,6 +163,21 @@ func NewList(mb block) *List
 NewList creates a new list, given the main block of the page it is to be
 associated with.
 
+#### func (List) Fmt
+
+```go
+func (b List) Fmt(text string, pos Position) HTML
+```
+Fmt generates HTML from a quiki-encoded formatted string.
+
+#### func (List) FmtOpts
+
+```go
+func (b List) FmtOpts(text string, pos Position, o FmtOpt) HTML
+```
+FmtOpts is like Fmt except you can specify additional options with the FmtOpt
+argument.
+
 #### func (List) String
 
 ```go
@@ -174,10 +202,25 @@ func NewMap(mb block) *Map
 NewMap creates a new map, given the main block of the page it is to be
 associated with.
 
+#### func (Map) Fmt
+
+```go
+func (b Map) Fmt(text string, pos Position) HTML
+```
+Fmt generates HTML from a quiki-encoded formatted string.
+
+#### func (Map) FmtOpts
+
+```go
+func (b Map) FmtOpts(text string, pos Position, o FmtOpt) HTML
+```
+FmtOpts is like Fmt except you can specify additional options with the FmtOpt
+argument.
+
 #### func (Map) Get
 
 ```go
-func (scope Map) Get(key string) (interface{}, error)
+func (scope Map) Get(key string) (any, error)
 ```
 Get fetches a a value regardless of type.
 
@@ -242,7 +285,7 @@ Keys returns a string of actual underlying map keys.
 #### func (*Map) Map
 
 ```go
-func (m *Map) Map() map[string]interface{}
+func (m *Map) Map() map[string]any
 ```
 Map returns the actual underlying Go map.
 
@@ -257,7 +300,7 @@ Keys that were set internally (and not from quiki source code) are omitted.
 #### func (Map) Set
 
 ```go
-func (scope Map) Set(key string, value interface{}) error
+func (scope Map) Set(key string, value any) error
 ```
 Set sets a value at the given key.
 
@@ -272,6 +315,19 @@ properties, such as a string, Set returns an error.
 ```go
 func (b Map) String() string
 ```
+
+#### func (Map) Unset
+
+```go
+func (scope Map) Unset(key string) error
+```
+Unset removes a value at the given key.
+
+The key may be segmented to indicate properties of each object (e.g.
+person.name).
+
+If attempting to unset a property of an object that does not support properties,
+such as a string, Unset returns an error.
 
 #### type ModelInfo
 
@@ -303,7 +359,8 @@ type Page struct {
 	Models    map[string]ModelInfo // references to models
 	PageLinks map[string][]int     // references to other pages
 
-	Wiki interface{} // only available during Parse() and HTML()
+	Wiki     any  // only available during Parse() and HTML()
+	Markdown bool // true if this is a markdown source
 
 	Warnings []Warning // parser warnings
 	Error    *Warning  // parser error, as an encodable Warning
@@ -434,7 +491,7 @@ content.
 #### func (Page) Get
 
 ```go
-func (scope Page) Get(key string) (interface{}, error)
+func (scope Page) Get(key string) (any, error)
 ```
 Get fetches a a value regardless of type.
 
@@ -586,6 +643,15 @@ Prefix returns the page prefix.
 For example, for a page named a/b.page, this is a. For a page named a.page, this
 is an empty string.
 
+#### func (*Page) Preview
+
+```go
+func (p *Page) Preview() string
+```
+Preview returns a preview of the text on the page, up to 25 words or 150
+characters. If the page has a Description, that is used instead of generating a
+preview.
+
 #### func (*Page) Redirect
 
 ```go
@@ -629,7 +695,7 @@ SearchPath returns the absolute path to the page search text file.
 #### func (Page) Set
 
 ```go
-func (scope Page) Set(key string, value interface{}) error
+func (scope Page) Set(key string, value any) error
 ```
 Set sets a value at the given key.
 
@@ -638,6 +704,14 @@ person.name).
 
 If attempting to write to a property of an object that does not support
 properties, such as a string, Set returns an error.
+
+#### func (*Page) Text
+
+```go
+func (p *Page) Text() string
+```
+Text generates and returns the rendered plain text for the page. The page must
+be parsed with Parse before attempting this method.
 
 #### func (*Page) Title
 
@@ -652,6 +726,25 @@ Title returns the page title with HTML text formatting tags stripped.
 func (p *Page) TitleOrName() string
 ```
 TitleOrName returns the result of Title if available, otherwise that of Name.
+
+#### func (Page) Unset
+
+```go
+func (scope Page) Unset(key string) error
+```
+Unset removes a value at the given key.
+
+The key may be segmented to indicate properties of each object (e.g.
+person.name).
+
+If attempting to unset a property of an object that does not support properties,
+such as a string, Unset returns an error.
+
+#### func (*Page) Write
+
+```go
+func (p *Page) Write() error
+```
 
 #### type PageInfo
 
@@ -671,6 +764,7 @@ type PageInfo struct {
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
+	Preview     string     `json:"preview,omitempty"`   // first 25 words or 150 chars. empty w/ description
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
@@ -712,6 +806,17 @@ type PageOptCategory struct {
 ```
 
 PageOptCategory describes wiki category options.
+
+#### type PageOptCode
+
+```go
+type PageOptCode struct {
+	Lang  string
+	Style string
+}
+```
+
+PageOptCode describes options for `code{}` blocks.
 
 #### type PageOptDir
 
@@ -800,6 +905,7 @@ type PageOptLinkOpts struct {
 	Target         *string // func sets to overwrite the link target
 	Tooltip        *string // func sets tooltip to display
 	DisplayDefault *string // func sets default text to display (if no pipe)
+	*FmtOpt                // formatter options available to func
 }
 ```
 
@@ -820,8 +926,10 @@ PageOptNavigation represents an ordered navigation item.
 
 ```go
 type PageOptPage struct {
-	EnableTitle bool // enable page title headings
-	EnableCache bool // enable page caching
+	EnableTitle bool        // enable page title headings
+	EnableCache bool        // enable page caching
+	ForceGen    bool        // force generation of page even if unchanged
+	Code        PageOptCode // `code{}` block options
 }
 ```
 
@@ -855,8 +963,8 @@ PageOptSearch describes wiki search options.
 
 ```go
 type ParserError struct {
-	Position Position
-	Err      error
+	Pos Position
+	Err error
 }
 ```
 
@@ -909,8 +1017,8 @@ UnmarshalJSON decodes the position from `[line, column]`.
 
 ```go
 type Warning struct {
-	Message  string   `json:"message"`
-	Position Position `json:"position"`
+	Message string   `json:"message"`
+	Pos     Position `json:"position"`
 }
 ```
 

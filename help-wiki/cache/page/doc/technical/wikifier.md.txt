@@ -73,6 +73,11 @@
                         
                         
                             
+                                type FmtOpt
+                            
+                        
+                        
+                            
                                 type HTML
                             
                         
@@ -88,6 +93,16 @@
                         
                         
                             
+                                func (List) Fmt
+                            
+                        
+                        
+                            
+                                func (List) FmtOpts
+                            
+                        
+                        
+                            
                                 func (List) String
                             
                         
@@ -99,6 +114,16 @@
                         
                             
                                 func  NewMap
+                            
+                        
+                        
+                            
+                                func (Map) Fmt
+                            
+                        
+                        
+                            
+                                func (Map) FmtOpts
                             
                         
                         
@@ -154,6 +179,11 @@
                         
                             
                                 func (Map) String
+                            
+                        
+                        
+                            
+                                func (Map) Unset
                             
                         
                         
@@ -338,6 +368,11 @@
                         
                         
                             
+                                func (*Page) Preview
+                            
+                        
+                        
+                            
                                 func (*Page) Redirect
                             
                         
@@ -368,12 +403,27 @@
                         
                         
                             
+                                func (*Page) Text
+                            
+                        
+                        
+                            
                                 func (*Page) Title
                             
                         
                         
                             
                                 func (*Page) TitleOrName
+                            
+                        
+                        
+                            
+                                func (Page) Unset
+                            
+                        
+                        
+                            
+                                func (*Page) Write
                             
                         
                         
@@ -389,6 +439,11 @@
                         
                             
                                 type PageOptCategory
+                            
+                        
+                        
+                            
+                                type PageOptCode
                             
                         
                         
@@ -503,7 +558,7 @@
         
             --
         
-import "github.com/cooper/quiki/wikifier"
+import "."
 
         
             
@@ -643,14 +698,15 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 type AttributedObject interface {
 
 	// getters
-	Get(key string) (interface{}, error)
+	Get(key string) (any, error)
 	GetBool(key string) (bool, error)
 	GetStr(key string) (string, error)
 	GetBlock(key string) (block, error)
 	GetObj(key string) (AttributedObject, error)
 
 	// setters
-	Set(key string, value interface{}) error
+	Set(key string, value any) error
+	Unset(key string) error
 	// contains filtered or unexported methods
 }
 
@@ -660,6 +716,20 @@ type AttributedObject interface {
                     
                         For example, a Page is an attributed object since it contains variables.
                         Likewise, a Map is an attributed object because it has named properties.
+                    
+                
+                
+                    
+                        type FmtOpt
+                    
+type FmtOpt struct {
+	Pos        Position // position used for warnings (set internally)
+	NoEntities bool     // disables html entity conversion
+	NoWarnings bool     // silence warnings for undefined variables
+}
+
+                    
+                        FmtOpt describes options for page.FmtOpts.
                     
                 
                 
@@ -698,6 +768,27 @@ func NewList(mb block) *List
                 
                 
                     
+                        func (List) Fmt
+                    
+func (b List) Fmt(text string, pos Position) HTML
+
+                    
+                        Fmt generates HTML from a quiki-encoded formatted string.
+                    
+                
+                
+                    
+                        func (List) FmtOpts
+                    
+func (b List) FmtOpts(text string, pos Position, o FmtOpt) HTML
+
+                    
+                        FmtOpts is like Fmt except you can specify additional options with the FmtOpt
+                        argument.
+                    
+                
+                
+                    
                         func (List) String
                     
 func (b List) String() string
@@ -728,9 +819,30 @@ func NewMap(mb block) *Map
                 
                 
                     
+                        func (Map) Fmt
+                    
+func (b Map) Fmt(text string, pos Position) HTML
+
+                    
+                        Fmt generates HTML from a quiki-encoded formatted string.
+                    
+                
+                
+                    
+                        func (Map) FmtOpts
+                    
+func (b Map) FmtOpts(text string, pos Position, o FmtOpt) HTML
+
+                    
+                        FmtOpts is like Fmt except you can specify additional options with the FmtOpt
+                        argument.
+                    
+                
+                
+                    
                         func (Map) Get
                     
-func (scope Map) Get(key string) (interface{}, error)
+func (scope Map) Get(key string) (any, error)
 
                     
                         Get fetches a a value regardless of type.
@@ -822,7 +934,7 @@ func (m *Map) Keys() []string
                     
                         func (*Map) Map
                     
-func (m *Map) Map() map[string]interface{}
+func (m *Map) Map() map[string]any
 
                     
                         Map returns the actual underlying Go map.
@@ -843,7 +955,7 @@ func (m *Map) OrderedKeys() []string
                     
                         func (Map) Set
                     
-func (scope Map) Set(key string, value interface{}) error
+func (scope Map) Set(key string, value any) error
 
                     
                         Set sets a value at the given key.
@@ -863,6 +975,24 @@ func (scope Map) Set(key string, value interface{}) error
                     
 func (b Map) String() string
 
+                
+                
+                    
+                        func (Map) Unset
+                    
+func (scope Map) Unset(key string) error
+
+                    
+                        Unset removes a value at the given key.
+                    
+                    
+                        The key may be segmented to indicate properties of each object (e.g.
+                        person.name).
+                    
+                    
+                        If attempting to unset a property of an object that does not support properties,
+                        such as a string, Unset returns an error.
+                    
                 
                 
                     
@@ -897,7 +1027,8 @@ type Page struct {
 	Models    map[string]ModelInfo // references to models
 	PageLinks map[string][]int     // references to other pages
 
-	Wiki interface{} // only available during Parse() and HTML()
+	Wiki     any  // only available during Parse() and HTML()
+	Markdown bool // true if this is a markdown source
 
 	Warnings []Warning // parser warnings
 	Error    *Warning  // parser error, as an encodable Warning
@@ -1079,7 +1210,7 @@ func (p *Page) Generated() bool
                     
                         func (Page) Get
                     
-func (scope Page) Get(key string) (interface{}, error)
+func (scope Page) Get(key string) (any, error)
 
                     
                         Get fetches a a value regardless of type.
@@ -1294,6 +1425,18 @@ func (p *Page) Prefix() string
                 
                 
                     
+                        func (*Page) Preview
+                    
+func (p *Page) Preview() string
+
+                    
+                        Preview returns a preview of the text on the page, up to 25 words or 150
+                        characters. If the page has a Description, that is used instead of generating a
+                        preview.
+                    
+                
+                
+                    
                         func (*Page) Redirect
                     
 func (p *Page) Redirect() string
@@ -1351,7 +1494,7 @@ func (p *Page) SearchPath() string
                     
                         func (Page) Set
                     
-func (scope Page) Set(key string, value interface{}) error
+func (scope Page) Set(key string, value any) error
 
                     
                         Set sets a value at the given key.
@@ -1363,6 +1506,17 @@ func (scope Page) Set(key string, value interface{}) error
                     
                         If attempting to write to a property of an object that does not support
                         properties, such as a string, Set returns an error.
+                    
+                
+                
+                    
+                        func (*Page) Text
+                    
+func (p *Page) Text() string
+
+                    
+                        Text generates and returns the rendered plain text for the page. The page must
+                        be parsed with Parse before attempting this method.
                     
                 
                 
@@ -1387,6 +1541,31 @@ func (p *Page) TitleOrName() string
                 
                 
                     
+                        func (Page) Unset
+                    
+func (scope Page) Unset(key string) error
+
+                    
+                        Unset removes a value at the given key.
+                    
+                    
+                        The key may be segmented to indicate properties of each object (e.g.
+                        person.name).
+                    
+                    
+                        If attempting to unset a property of an object that does not support properties,
+                        such as a string, Unset returns an error.
+                    
+                
+                
+                    
+                        func (*Page) Write
+                    
+func (p *Page) Write() error
+
+                
+                
+                    
                         type PageInfo
                     
 type PageInfo struct {
@@ -1404,6 +1583,7 @@ type PageInfo struct {
 	Author      string     `json:"author,omitempty"`    // author's name
 	Description string     `json:"desc,omitempty"`      // description
 	Keywords    []string   `json:"keywords,omitempty"`  // keywords
+	Preview     string     `json:"preview,omitempty"`   // first 25 words or 150 chars. empty w/ description
 	Warnings    []Warning  `json:"warnings,omitempty"`  // parser warnings
 	Error       *Warning   `json:"error,omitempty"`     // parser error, as an encodable warning
 }
@@ -1449,6 +1629,19 @@ type PageOptCategory struct {
 
                     
                         PageOptCategory describes wiki category options.
+                    
+                
+                
+                    
+                        type PageOptCode
+                    
+type PageOptCode struct {
+	Lang  string
+	Style string
+}
+
+                    
+                        PageOptCode describes options for code{} blocks.
                     
                 
                 
@@ -1553,6 +1746,7 @@ type PageOptLinkOpts struct {
 	Target         *string // func sets to overwrite the link target
 	Tooltip        *string // func sets tooltip to display
 	DisplayDefault *string // func sets default text to display (if no pipe)
+	*FmtOpt                // formatter options available to func
 }
 
                     
@@ -1577,8 +1771,10 @@ type PageOptNavigation struct {
                         type PageOptPage
                     
 type PageOptPage struct {
-	EnableTitle bool // enable page title headings
-	EnableCache bool // enable page caching
+	EnableTitle bool        // enable page title headings
+	EnableCache bool        // enable page caching
+	ForceGen    bool        // force generation of page even if unchanged
+	Code        PageOptCode // `code{}` block options
 }
 
                     
@@ -1618,8 +1814,8 @@ type PageOptSearch struct {
                         type ParserError
                     
 type ParserError struct {
-	Position Position
-	Err      error
+	Pos Position
+	Err error
 }
 
                     
@@ -1687,8 +1883,8 @@ func (pos *Position) UnmarshalJSON(data []byte) error
                         type Warning
                     
 type Warning struct {
-	Message  string   `json:"message"`
-	Position Position `json:"position"`
+	Message string   `json:"message"`
+	Pos     Position `json:"position"`
 }
 
                     

@@ -1,6 +1,6 @@
 # authenticator
 --
-    import "github.com/cooper/quiki/authenticator"
+    import "."
 
 Package authenticator provides server and site authentication services.
 
@@ -11,6 +11,7 @@ Package authenticator provides server and site authentication services.
 ```go
 type Authenticator struct {
 	Users map[string]User `json:"users,omitempty"`
+	IsNew bool            `json:"-"`
 }
 ```
 

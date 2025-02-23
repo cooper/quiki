@@ -228,6 +228,11 @@
                         
                         
                             
+                                func (*Wiki) DeleteFile
+                            
+                        
+                        
+                            
                                 func (*Wiki) Dir
                             
                         
@@ -388,7 +393,7 @@
         
             --
         
-import "github.com/cooper/quiki/wiki"
+import "."
 
         
             
@@ -488,6 +493,10 @@ type Category struct {
 
 	// human-readable category title
 	Title string `json:"title,omitempty"`
+
+	// number of posts per page when displaying as posts
+	// (@category.per_page)
+	PerPage int `json:"per_page,omitempty"`
 
 	// time when the category was created
 	Created     *time.Time `json:"created,omitempty"`
@@ -676,7 +685,7 @@ type DisplayError struct {
 
 	// if the error occurred during parsing, this is the position.
 	// for all non-parsing errors, this is 0:0
-	Position wikifier.Position
+	Pos wikifier.Position
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
@@ -845,6 +854,9 @@ type DisplayPage struct {
 
 	// page keywords as extracted from the special @page.keywords variable
 	Keywords []string `json:"keywords,omitempty"`
+
+	// first formatting-stripped 25 words of page, up to 150 chars
+	Preview string `json:"preview,omitempty"`
 }
 
                     
@@ -1131,7 +1143,7 @@ func (w *Wiki) CategoryMap() map[string]CategoryInfo
                     
                         func (*Wiki) Debug
                     
-func (w *Wiki) Debug(i ...interface{})
+func (w *Wiki) Debug(i ...any)
 
                     
                         Debug logs debug info for a wiki.
@@ -1141,10 +1153,30 @@ func (w *Wiki) Debug(i ...interface{})
                     
                         func (*Wiki) Debugf
                     
-func (w *Wiki) Debugf(format string, i ...interface{})
+func (w *Wiki) Debugf(format string, i ...any)
 
                     
                         Debugf logs debug info for a wiki.
+                    
+                
+                
+                    
+                        func (*Wiki) DeleteFile
+                    
+func (w *Wiki) DeleteFile(name string, commit CommitOpts) error
+
+                    
+                        DeleteFile deletes a file in the wiki.
+                    
+                    
+                        The filename must be relative to the wiki directory. If the file does not exist,
+                        an error is returned. If the file exists and is a symbolic link, the link itself
+                        is deleted, not the target file.
+                    
+                    
+                        This is a low-level API that allows deleting any file within the wiki directory,
+                        so it should not be utilized directly by frontends. Use DeletePage, DeleteModel,
+                        or DeleteImage instead.
                     
                 
                 
@@ -1166,7 +1198,7 @@ func (w *Wiki) Dir(dirs ...string) string
                     
                         func (*Wiki) DisplayCategoryPosts
                     
-func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{}
+func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) any
 
                     
                         DisplayCategoryPosts returns the display result for a category.
@@ -1176,7 +1208,7 @@ func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{}
                     
                         func (*Wiki) DisplayFile
                     
-func (w *Wiki) DisplayFile(path string) interface{}
+func (w *Wiki) DisplayFile(path string) any
 
                     
                         DisplayFile returns the display result for a plain text file.
@@ -1186,7 +1218,7 @@ func (w *Wiki) DisplayFile(path string) interface{}
                     
                         func (*Wiki) DisplayImage
                     
-func (w *Wiki) DisplayImage(name string) interface{}
+func (w *Wiki) DisplayImage(name string) any
 
                     
                         DisplayImage returns the display result for an image.
@@ -1196,7 +1228,7 @@ func (w *Wiki) DisplayImage(name string) interface{}
                     
                         func (*Wiki) DisplayPage
                     
-func (w *Wiki) DisplayPage(name string) interface{}
+func (w *Wiki) DisplayPage(name string) any
 
                     
                         DisplayPage returns the display result for a page.
@@ -1206,7 +1238,7 @@ func (w *Wiki) DisplayPage(name string) interface{}
                     
                         func (*Wiki) DisplayPageDraft
                     
-func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{}
+func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any
 
                     
                         DisplayPageDraft returns the display result for a page.
@@ -1220,7 +1252,7 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{}
                     
                         func (*Wiki) DisplaySizedImage
                     
-func (w *Wiki) DisplaySizedImage(img SizedImage) interface{}
+func (w *Wiki) DisplaySizedImage(img SizedImage) any
 
                     
                         DisplaySizedImage returns the display result for an image in specific
@@ -1231,7 +1263,7 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) interface{}
                     
                         func (*Wiki) DisplaySizedImageGenerate
                     
-func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{}
+func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any
 
                     
                         DisplaySizedImageGenerate returns the display result for an image in specific
@@ -1321,7 +1353,7 @@ func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo
                     
                         func (*Wiki) Log
                     
-func (w *Wiki) Log(i ...interface{})
+func (w *Wiki) Log(i ...any)
 
                     
                         Log logs info for a wiki.
@@ -1331,7 +1363,7 @@ func (w *Wiki) Log(i ...interface{})
                     
                         func (*Wiki) Logf
                     
-func (w *Wiki) Logf(format string, i ...interface{})
+func (w *Wiki) Logf(format string, i ...any)
 
                     
                         Logf logs info for a wiki.
@@ -1490,11 +1522,9 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
                         WriteFile writes a file in the wiki.
                     
                     
-                        The filename must be relative to the wiki directory.
-                    
-                    
-                        If the file does not exist and createOK is false, an error is returned. If the
-                        file exists and is a symbolic link, an error is returned.
+                        The filename must be relative to the wiki directory. If the file does not exist
+                        and createOK is false, an error is returned. If the file exists and is a
+                        symbolic link, an error is returned.
                     
                     
                         This is a low-level API that allows writing any file within the wiki directory,

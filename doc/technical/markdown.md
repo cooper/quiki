@@ -1,6 +1,6 @@
 # markdown
 --
-    import "github.com/cooper/quiki/markdown"
+    import "."
 
 Package markdown translates Markdown to quiki source code.
 

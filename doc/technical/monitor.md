@@ -1,6 +1,6 @@
 # monitor
 --
-    import "github.com/cooper/quiki/monitor"
+    import "."
 
 Package monitor provides a file monitor that pre-generates wiki pages and images
 each time a change is detected on the filesystem.
