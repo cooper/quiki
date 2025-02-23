@@ -293,8 +293,7 @@ func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions
 
 	// ok, at this point we're gonna add or update the page if there is one
 	now := time.Now()
-	cat.Modified = &now
-	cat.ModifiedHTTP = httpdate.Time2Str(now)
+	changed := false
 	if pageMaybe != nil {
 		if cat.Pages == nil {
 			cat.Pages = make(map[string]CategoryEntry)
@@ -305,6 +304,13 @@ func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions
 			Dimensions: dimensions,
 			Lines:      lines,
 		}
+		changed = true
+	}
+
+	// update modified time only if something changed
+	if changed {
+		cat.Modified = &now
+		cat.ModifiedHTTP = httpdate.Time2Str(now)
 	}
 
 	// write it
@@ -409,14 +415,12 @@ func (cat *Category) update(w *Wiki) {
 		newPages[pageName] = entry
 	}
 
-	// nothing changed
-	if !changed {
-		return
+	// update modified time only if something changed
+	if changed {
+		cat.Modified = &now
+		cat.ModifiedHTTP = httpdate.Time2Str(now)
+		cat.Pages = newPages
 	}
-
-	// update information
-	cat.Modified = &now
-	cat.Pages = newPages
 
 	// category should be deleted
 	if cat.shouldPurge(w) {
@@ -425,7 +429,9 @@ func (cat *Category) update(w *Wiki) {
 	}
 
 	// write update
-	cat.write(w)
+	if changed {
+		cat.write(w)
+	}
 }
 
 // checks if a category should be deleted
