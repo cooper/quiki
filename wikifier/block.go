@@ -20,6 +20,7 @@ type block interface {
 	hierarchy() string                 // human-readable hierarchy
 	blockContent() []block             // block children
 	textContent() []string             // text children
+	variables() *variableScope         // block variables or the page by default
 	openPosition() Position            // position opened at
 	warn(pos Position, warning string) // produce parser warning
 	catch                              // all blocks must conform to catch
@@ -74,6 +75,11 @@ func (b *parserBlock) blockType() string {
 
 func (b *parserBlock) blockName() string {
 	return b.name
+}
+
+// can be overridden by blocks that have their own variable scope
+func (b *parserBlock) variables() *variableScope {
+	return b._page.variableScope
 }
 
 func (b *parserBlock) close(pos Position) {

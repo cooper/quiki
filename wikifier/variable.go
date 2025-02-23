@@ -27,16 +27,23 @@ type AttributedObject interface {
 	mainBlock() block
 	setOwn(key string, value any)
 	getOwn(key string) any
+	get(key string) any
 	unsetOwn(key string)
 }
 
 type variableScope struct {
-	vars map[string]any
+	vars   map[string]any
+	parent *variableScope
 }
 
 // newVariableScope creates a variable scope
 func newVariableScope() *variableScope {
-	return &variableScope{make(map[string]any)}
+	return &variableScope{vars: make(map[string]any)}
+}
+
+// newVariableScopeWithParent creates a variable scope with a parent scope
+func newVariableScopeWithParent(parent *variableScope) *variableScope {
+	return &variableScope{vars: make(map[string]any), parent: parent}
 }
 
 func (scope *variableScope) mainBlock() block {
@@ -142,7 +149,7 @@ func (scope *variableScope) Get(key string) (any, error) {
 		where = newWhere
 	}
 
-	return where.getOwn(setting), nil
+	return where.get(setting), nil
 }
 
 // GetStr is like Get except it always returns a string.
@@ -300,6 +307,7 @@ func (scope *variableScope) setOwn(key string, value any) {
 }
 
 // unset own property
+// note this does not unset properties of parent scopes
 func (scope *variableScope) unsetOwn(key string) {
 	delete(scope.vars, key)
 }
@@ -308,6 +316,17 @@ func (scope *variableScope) unsetOwn(key string) {
 func (scope *variableScope) getOwn(key string) any {
 	if val, exist := scope.vars[key]; exist {
 		return val
+	}
+	return nil
+}
+
+// fetch own or parent scope property
+func (scope *variableScope) get(key string) any {
+	if val, exist := scope.vars[key]; exist {
+		return val
+	}
+	if scope.parent != nil {
+		return scope.parent.get(key)
 	}
 	return nil
 }
