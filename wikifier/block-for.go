@@ -48,6 +48,8 @@ func (b *forBlock) parse(p *Page) {
 }
 
 func (b *forBlock) html(p *Page, el element) {
+	el.setMeta("noTags", true)
+	el.setMeta("noIndent", true)
 
 	// do nothing, this was warned above
 	if b.itemName == "" || b.iterableName == "" {
@@ -65,25 +67,16 @@ func (b *forBlock) html(p *Page, el element) {
 		for i, item := range v.list {
 			b.variables().setOwn(b.itemName, item.value)
 			b.variables().setOwn("index", i)
-			b.injectContent(el)
+			handleGenericContent(b, p, el)
 		}
 	case *Map:
 		for i, item := range v.mapList {
 			b.variables().setOwn(b.itemName, item.value)
-			b.variables().setOwn("key", item.key)
+			b.variables().setOwn("key", item.keyTitle)
 			b.variables().setOwn("index", i)
-			b.injectContent(el)
+			handleGenericContent(b, p, el)
 		}
 	default:
 		b.warn(b.openPos, "for{} block: @"+b.iterableName+" is not iterable")
-	}
-}
-
-func (b *forBlock) injectContent(el element) {
-	for _, item := range b.posContent() {
-		// FIXME: it needs to work like a section,
-		// adding paragraphs and such for text nodes
-		value := prepareForHTML(item.content, b, item.pos)
-		el.add(value)
 	}
 }
