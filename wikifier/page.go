@@ -288,6 +288,10 @@ func (p *Page) Name() string {
 		return p.RelName()
 	}
 
+	if path == "" {
+		return ""
+	}
+
 	// make relative to page directory
 	if name, err := filepath.Rel(dir, path); err == nil {
 
@@ -333,7 +337,11 @@ func (p *Page) Prefix() string {
 // Path returns the absolute path to the page as resolved.
 // If the path does not resolve, returns an empty string.
 func (p *Page) Path() string {
-	return pageAbs(p.RelPath())
+	relPath := p.RelPath()
+	if relPath == "" {
+		return ""
+	}
+	return pageAbs(relPath)
 }
 
 // RelName returns the unresolved page filename, with or without extension.
@@ -348,6 +356,9 @@ func (p *Page) RelName() string {
 
 	dir := pageAbs(p.Opt.Dir.Page)
 	path := p.RelPath() // this is what makes it different from Name()
+	if path == "" {
+		return ""
+	}
 
 	// make relative to page directory
 	if name, err := filepath.Rel(dir, path); err == nil {
@@ -376,6 +387,9 @@ func (p *Page) RelNameNE() string {
 func (p *Page) RelPath() string {
 	if p.FilePath != "" {
 		return p.FilePath
+	}
+	if p.name == "" {
+		return ""
 	}
 	return filepath.Join(p.Opt.Dir.Page, p.name)
 }

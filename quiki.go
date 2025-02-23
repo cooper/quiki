@@ -113,7 +113,8 @@ func runPageAndExit(page *wikifier.Page) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	printPageResultAndExit(page.RelPath(), page.HTML(), page.Warnings)
+	fmt.Println(page.HTML())
+	os.Exit(0)
 }
 
 // runs a wiki page
@@ -121,7 +122,7 @@ func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
 	res := w.DisplayPage(pagePath)
 	switch r := res.(type) {
 	case wiki.DisplayPage:
-		printPageResultAndExit(r.Path, r.Content, r.Warnings)
+		fmt.Println(r.Content)
 	case wiki.DisplayError:
 		log.Fatal(r.Error)
 	case wiki.DisplayRedirect:
@@ -129,18 +130,5 @@ func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
 	default:
 		log.Fatal("unsupported response type from wiki.DisplayPage()")
 	}
-}
-
-// prints the page result and exits
-func printPageResultAndExit(path string, html wikifier.HTML, warnings []wikifier.Warning) {
-
-	// print warnings to stderr
-	for _, w := range warnings {
-		log.Printf("%s:%d:%d: %s", path, w.Pos.Line, w.Pos.Column, w.Message)
-	}
-
-	// print html to stdout
-	fmt.Println(html)
-
 	os.Exit(0)
 }
