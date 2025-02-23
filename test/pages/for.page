@@ -19,3 +19,13 @@ Item at index 0: [@list.0]
 for [@map] {
     Pair key = [@key]; value = [@value]
 }
+
+for [@nonexist] {
+    test
+}
+
+for [@nonexist as] {
+}
+
+for {
+}

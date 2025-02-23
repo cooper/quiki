@@ -45,7 +45,7 @@ func (sb *styleBlock) parse(page *Page) {
 		if str, ok := entry.value.(string); ok {
 			rules[entry.keyTitle] = str
 		} else {
-			sb.warn(entry.pos, "non-string value to style{}")
+			sb.warn(entry.pos, "Only string values are allowed")
 		}
 	}
 

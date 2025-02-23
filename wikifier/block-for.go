@@ -7,13 +7,14 @@ import (
 type forBlock struct {
 	iterableName string
 	itemName     string
+	invalid      bool
 	_scope       *variableScope
 	*parserBlock
 }
 
 func newForBlock(name string, b *parserBlock) block {
 	scope := newVariableScopeWithParent(b.parentBlock().variables())
-	return &forBlock{"", "", scope, b}
+	return &forBlock{"", "", false, scope, b}
 }
 
 func (b *forBlock) variables() *variableScope {
@@ -33,13 +34,27 @@ func (b *forBlock) parse(p *Page) {
 
 	// warn if missing iterable name
 	if b.iterableName == "" {
-		b.warn(b.openPos, "for{} block is missing iterable name; should be for [@var]")
+		b.warn(b.openPos, "Missing iterable name, should be: for [@var] {...}")
+		b.invalid = true
 		return
 	}
 
 	// warn if missing item name
 	if b.itemName == "" {
-		b.warn(b.openPos, "for{} block is missing item name after 'as'")
+		b.warn(b.openPos, "Missing item name after 'as', should be: for [@var as @item] {...}")
+		b.invalid = true
+		return
+	}
+
+	found, err := b.variables().Get(b.iterableName)
+	if err != nil {
+		b.warn(b.openPos, err.Error())
+		b.invalid = true
+		return
+	}
+	if found == nil {
+		b.warn(b.openPos, "@"+b.iterableName+" is not defined")
+		b.invalid = true
 		return
 	}
 
@@ -51,14 +66,14 @@ func (b *forBlock) html(p *Page, el element) {
 	el.setMeta("noTags", true)
 	el.setMeta("noIndent", true)
 
-	// do nothing, this was warned above
-	if b.itemName == "" || b.iterableName == "" {
+	// do nothing if invalid
+	if b.invalid {
 		return
 	}
 
 	iterable, err := b.variables().Get(b.iterableName)
 	if err != nil {
-		b.warn(b.openPos, "for{} block: "+err.Error())
+		b.warn(b.openPos, err.Error())
 		return
 	}
 
@@ -77,6 +92,6 @@ func (b *forBlock) html(p *Page, el element) {
 			handleGenericContent(b, p, el)
 		}
 	default:
-		b.warn(b.openPos, "for{} block: @"+b.iterableName+" is not iterable")
+		b.warn(b.openPos, "@"+b.iterableName+" is not iterable")
 	}
 }

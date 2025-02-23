@@ -137,6 +137,7 @@ func (b *parserBlock) shouldSkipRune(rune) bool {
 }
 
 func (b *parserBlock) warn(pos Position, warning string) {
+	warning = fmt.Sprintf("%s{}: %s", b.blockType(), warning)
 	b._page.warn(pos, warning)
 }
 
