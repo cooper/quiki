@@ -91,6 +91,7 @@ func newParser(page *Page) *parser {
 
 func (p *parser) parseLine(line []byte, page *Page) error {
 	p.pos.Line++
+	p.pos.Column = 0 // Reset column position at the start of each line
 
 	// this is a hack to fix extra whitespace in blocks just before they close
 	if p.braceLevel == 0 && strings.TrimSpace(string(line)) == "}" {
@@ -171,15 +172,8 @@ var variableTokens = map[rune]bool{
 }
 
 func (p *parser) parseRune(r rune, page *Page) error {
-
-	// // fix extra newline added to code{} blocks
-	// if p.braceLevel == 0 && r == '{' && p.next == '\n' {
-	// 	p.skip++
-	// }
-
 	// BRACE ESCAPE
 	if p.braceLevel != 0 {
-
 		if r == '{' {
 			// increase brace depth
 			p.braceLevel++
@@ -221,7 +215,6 @@ func (p *parser) parseRune(r rune, page *Page) error {
 
 	// exit
 	if r == '*' && p.next == '/' {
-
 		// we weren't in a comment, so handle normally
 		if p.commentLevel == 0 {
 			return p.handleRune(r)
@@ -282,7 +275,6 @@ func (p *parser) parseRune(r rune, page *Page) error {
 						continue
 					}
 				} else if lastChar == '[' {
-
 					// exiting block name
 					inBlockName--
 
