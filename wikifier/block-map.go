@@ -233,6 +233,7 @@ func (m *Map) handleChar(_ *Page, i int, p *mapParser, c rune) {
 		}
 
 		// store the value in the underlying variableScope
+		// FIXME: should this be setOwn?
 		m.Set(strKey, valueToStore)
 
 		// store the value in the map list

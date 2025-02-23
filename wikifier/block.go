@@ -29,15 +29,16 @@ type block interface {
 
 // generic base for all blocks
 type parserBlock struct {
-	typ, name string
-	classes   []string
-	openPos   Position
-	closePos  Position
-	parentB   block
-	parentC   catch
-	element   element
-	headingID string
-	_page     *Page // used for warnings
+	typ, name  string
+	classes    []string
+	openPos    Position
+	closePos   Position
+	parentB    block
+	parentC    catch
+	element    element
+	headingID  string
+	_page      *Page // used for warnings
+	_variables *variableScope
 	*genericCatch
 }
 
@@ -80,6 +81,9 @@ func (b *parserBlock) blockName() string {
 
 // can be overridden by blocks that have their own variable scope
 func (b *parserBlock) variables() *variableScope {
+	if b._variables != nil {
+		return b._variables
+	}
 	return b._page.variableScope
 }
 

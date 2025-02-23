@@ -1,10 +1,9 @@
 package wikifier
 
 import (
+	"strconv"
 	"strings"
 )
-
-// TODO: Make list comply to AttributedObject but only accept integer keys
 
 // List represents a list of items.
 // It is a quiki data type as well as the base of many block types.
@@ -13,6 +12,7 @@ type List struct {
 	didParse bool
 	list     []*listEntry
 	*parserBlock
+	*variableScope
 }
 
 type listEntry struct {
@@ -21,6 +21,9 @@ type listEntry struct {
 	pos   Position  // position where the item started
 	// metas map[string]string // metadata
 }
+
+// ensure List implements AttributedObject
+var _ AttributedObject = (*List)(nil)
 
 // func (entry *listEntry) setMeta(key, val string) {
 // 	entry.metas[key] = val
@@ -47,15 +50,15 @@ func NewList(mb block) *List {
 		element:      newElement("div", "list"),
 		genericCatch: &genericCatch{},
 	}
-	return &List{false, false, nil, underlying}
+	return &List{false, false, nil, underlying, newVariableScope()}
 }
 
 func newListBlock(name string, b *parserBlock) block {
-	return &List{false, false, nil, b}
+	return &List{false, false, nil, b, newVariableScope()}
 }
 
 func newNumlistBlock(name string, b *parserBlock) block {
-	return &List{true, false, nil, b}
+	return &List{true, false, nil, b, newVariableScope()}
 }
 
 func (l *List) parse(page *Page) {
@@ -112,7 +115,7 @@ func (l *List) parse(page *Page) {
 	}
 }
 
-func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine bool) {
+func (l *List) handleChar(_ *Page, i int, p *listParser, c rune, startedLine bool) {
 	p.pos.Column = i
 
 	if c == '\\' && !p.escape {
@@ -129,6 +132,7 @@ func (l *List) handleChar(page *Page, i int, p *listParser, c rune, startedLine 
 			typ:   getValueType(valueToStore), // type of value
 			pos:   p.startPos,                 // position where the item started
 		})
+		l.setOwn(strconv.Itoa(len(l.list)-1), valueToStore)
 
 		// reset
 		p.values = nil

@@ -51,7 +51,11 @@ func newBlock(blockType, blockName, headingID string, blockClasses []string, par
 		classes:      blockClasses,
 		element:      el,
 		genericCatch: &genericCatch{},
+		_variables:   page.variableScope,
 		_page:        page,
+	}
+	if parentBlock != nil {
+		underlying._variables = parentBlock.variables()
 	}
 	if init, ok := blockInitializers[blockType]; ok {
 		b := init(blockName, underlying)
