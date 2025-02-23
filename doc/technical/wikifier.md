@@ -1023,3 +1023,9 @@ type Warning struct {
 ```
 
 Warning represents a warning on a page.
+
+#### func (Warning) Log
+
+```go
+func (w Warning) Log(path string)
+```

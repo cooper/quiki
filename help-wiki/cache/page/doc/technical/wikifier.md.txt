@@ -546,6 +546,11 @@
                                 type Warning
                             
                         
+                        
+                            
+                                func (Warning) Log
+                            
+                        
                     
                 
             
@@ -1890,6 +1895,13 @@ type Warning struct {
                     
                         Warning represents a warning on a page.
                     
+                
+                
+                    
+                        func (Warning) Log
+                    
+func (w Warning) Log(path string)
+
                 
             
         

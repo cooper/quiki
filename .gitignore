@@ -13,3 +13,4 @@ markdown/markdown
 quiki-auth.json
 auth.json
 test/cache
+wiki.log

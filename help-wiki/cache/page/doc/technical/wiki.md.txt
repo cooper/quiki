@@ -178,11 +178,6 @@
                         
                         
                             
-                                func  NewWikiConfig
-                            
-                        
-                        
-                            
                                 func (*Wiki) AbsFilePath
                             
                         
@@ -1048,19 +1043,6 @@ func NewWiki(path string) (*Wiki, error)
                 
                 
                     
-                        func  NewWikiConfig
-                    
-func NewWikiConfig(confPath string) (*Wiki, error)
-
-                    
-                        NewWikiConfig creates a Wiki given the configuration file path.
-                    
-                    
-                        Deprecated: Use NewWiki instead.
-                    
-                
-                
-                    
                         func (*Wiki) AbsFilePath
                     
 func (w *Wiki) AbsFilePath(relPath string) string
@@ -1471,7 +1453,7 @@ func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInf
                     
                         func (*Wiki) Pregenerate
                     
-func (w *Wiki) Pregenerate()
+func (w *Wiki) Pregenerate() (results []any)
 
                     
                         Pregenerate simulates requests for all wiki resources such that content caches

@@ -1,8 +1,0 @@
-#!/bin/bash
-for d in */; do
-    d=${d::${#d}-1}
-    count=`ls -1 $d/*.go 2>/dev/null | wc -l`
-    if [ $count != 0 ]; then 
-        godocdown $d > doc/technical/$d.md
-    fi 
-done

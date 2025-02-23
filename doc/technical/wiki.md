@@ -568,15 +568,6 @@ func NewWiki(path string) (*Wiki, error)
 ```
 NewWiki creates a Wiki given its directory path.
 
-#### func  NewWikiConfig
-
-```go
-func NewWikiConfig(confPath string) (*Wiki, error)
-```
-NewWikiConfig creates a Wiki given the configuration file path.
-
-Deprecated: Use NewWiki instead.
-
 #### func (*Wiki) AbsFilePath
 
 ```go
@@ -874,7 +865,7 @@ SortModified.
 #### func (*Wiki) Pregenerate
 
 ```go
-func (w *Wiki) Pregenerate()
+func (w *Wiki) Pregenerate() (results []any)
 ```
 Pregenerate simulates requests for all wiki resources such that content caches
 can be pregenerated and stored.

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$1" == "gendoc" ]; then
+    for d in */; do
+        d=${d::${#d}-1}
+        count=`ls -1 $d/*.go 2>/dev/null | wc -l`
+        if [ $count != 0 ]; then 
+            godocdown $d > doc/technical/$d.md
+        fi 
+    done
+elif [ "$1" == "help" ]; then
+    ./quiki -wiki=help-wiki -force-gen
+    cp -r help-wiki resources/adminifier/help
+elif [ "$1" == "test" ]; then
+    ./quiki -wiki=test -force-gen
+else
+    echo "Usage: $0 {gendoc|help|test}"
+    exit 1
+fi
