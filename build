@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" == "gendoc" ]; then
+if [ "$1" == "doc" ]; then
     for d in */; do
         d=${d::${#d}-1}
         count=`ls -1 $d/*.go 2>/dev/null | wc -l`
@@ -14,6 +14,6 @@ elif [ "$1" == "help" ]; then
 elif [ "$1" == "test" ]; then
     ./quiki -wiki=test -force-gen
 else
-    echo "Usage: $0 {gendoc|help|test}"
+    echo "Usage: $0 {doc|help|test}"
     exit 1
 fi

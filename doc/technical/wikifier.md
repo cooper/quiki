@@ -163,26 +163,95 @@ func NewList(mb block) *List
 NewList creates a new list, given the main block of the page it is to be
 associated with.
 
-#### func (List) Fmt
+#### func (List) Get
 
 ```go
-func (b List) Fmt(text string, pos Position) HTML
+func (scope List) Get(key string) (any, error)
 ```
-Fmt generates HTML from a quiki-encoded formatted string.
+Get fetches a a value regardless of type.
 
-#### func (List) FmtOpts
+The key may be segmented to indicate properties of each object (e.g.
+person.name).
+
+If attempting to read a property of an object that does not support properties,
+such as a string, Get returns an error.
+
+If the key is valid but nothing exists at it, Get returns (nil, nil).
+
+#### func (List) GetBlock
 
 ```go
-func (b List) FmtOpts(text string, pos Position, o FmtOpt) HTML
+func (scope List) GetBlock(key string) (block, error)
 ```
-FmtOpts is like Fmt except you can specify additional options with the FmtOpt
-argument.
+GetBlock is like Get except it always returns a block.
+
+#### func (List) GetBool
+
+```go
+func (scope List) GetBool(key string) (bool, error)
+```
+GetBool is like Get except it always returns a boolean.
+
+#### func (List) GetObj
+
+```go
+func (scope List) GetObj(key string) (AttributedObject, error)
+```
+GetObj is like Get except it always returns an AttributedObject.
+
+#### func (List) GetStr
+
+```go
+func (scope List) GetStr(key string) (string, error)
+```
+GetStr is like Get except it always returns a string.
+
+If the value is HTML, it is converted to a string.
+
+#### func (List) GetStrList
+
+```go
+func (scope List) GetStrList(key string) ([]string, error)
+```
+GetStrList is like Get except it always returns a list of strings.
+
+If the value is a `list{}` block, the list's values are returned, with
+non-strings quietly filtered out.
+
+If the value is a string, it is treated as a comma-separated list, and each item
+is trimmed of prepending or suffixing whitespace.
+
+#### func (List) Set
+
+```go
+func (scope List) Set(key string, value any) error
+```
+Set sets a value at the given key.
+
+The key may be segmented to indicate properties of each object (e.g.
+person.name).
+
+If attempting to write to a property of an object that does not support
+properties, such as a string, Set returns an error.
 
 #### func (List) String
 
 ```go
 func (b List) String() string
 ```
+
+#### func (List) Unset
+
+```go
+func (scope List) Unset(key string) error
+```
+Unset removes a value at the given key.
+
+The key may be segmented to indicate properties of each object (e.g.
+person.name).
+
+If attempting to unset a property of an object that does not support properties,
+such as a string, Unset returns an error.
 
 #### type Map
 
@@ -201,21 +270,6 @@ func NewMap(mb block) *Map
 ```
 NewMap creates a new map, given the main block of the page it is to be
 associated with.
-
-#### func (Map) Fmt
-
-```go
-func (b Map) Fmt(text string, pos Position) HTML
-```
-Fmt generates HTML from a quiki-encoded formatted string.
-
-#### func (Map) FmtOpts
-
-```go
-func (b Map) FmtOpts(text string, pos Position, o FmtOpt) HTML
-```
-FmtOpts is like Fmt except you can specify additional options with the FmtOpt
-argument.
 
 #### func (Map) Get
 

@@ -1,4 +1,4 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wiki.md","file_ne":"doc/technical/wiki","created":"2025-02-23T11:47:37.063655906-05:00","modified":"2025-02-23T11:47:37.063655906-05:00","generated":true,"external":true,"fmt_title":"wiki","title":"wiki","author":"Markdown","preview":"Contents wiki Usage func  SortAuthor func  SortCreated func  SortDimensions func  SortModified func  SortTitle func  ValidBranchName type Category","warnings":[{"message":"No such code{} style 'monokailight' (from config)","position":[13,7]},{"message":"No such code{} style 'monokailight' (from config)","position":[18,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[33,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[44,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[55,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[66,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[77,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[88,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[104,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[172,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[188,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[199,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[228,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[241,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[252,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[277,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[305,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[336,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[366,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[420,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[506,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[522,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[540,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[558,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[569,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[580,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[591,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[603,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[614,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[625,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[637,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[648,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[665,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[678,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[693,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[704,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[723,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[735,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[746,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[757,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[769,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[780,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[792,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[803,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[814,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[837,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[854,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[865,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[876,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[887,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[898,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[914,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[926,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[938,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[956,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[967,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[978,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[989,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1001,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1012,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1025,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1036,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1047,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1059,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1071,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1082,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1095,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1107,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1119,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1130,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1141,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1154,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1166,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1188,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1205,12]}]}
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wiki.md","file_ne":"doc/technical/wiki","created":"2025-02-23T13:47:47.552713863-05:00","modified":"2025-02-23T13:47:47.552713863-05:00","generated":true,"external":true,"fmt_title":"wiki","title":"wiki","author":"Markdown","preview":"Contents wiki Usage func  SortAuthor func  SortCreated func  SortDimensions func  SortModified func  SortTitle func  ValidBranchName type Category"}
 <div class="q-main-doc/technical/wiki q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
@@ -396,14 +396,14 @@
                 Usage
             </h2>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypeImage is a type of category that tracks which pages use an image.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CategoryTypeImage</span> <span class="nx">CategoryType</span> <span class="p">=</span> <span class="s">&#34;image&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypeImage is a type of category that tracks which pages use an image.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CategoryTypeImage</span> <span class="nx">CategoryType</span> <span class="p">=</span> <span class="s">&#34;image&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypeModel is a metacategory that tracks which pages use a model.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CategoryTypeModel</span> <span class="p">=</span> <span class="s">&#34;model&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypeModel is a metacategory that tracks which pages use a model.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CategoryTypeModel</span> <span class="p">=</span> <span class="s">&#34;model&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypePage is a metacategory that tracks which pages reference another page.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CategoryTypePage</span> <span class="p">=</span> <span class="s">&#34;page&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// CategoryTypePage is a metacategory that tracks which pages reference another page.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CategoryTypePage</span> <span class="p">=</span> <span class="s">&#34;page&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span></pre>
             <div class="q-sec">
@@ -477,53 +477,53 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Category</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// category path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;-&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// category path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;-&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// category filename, including the .cat extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// category filename, including the .cat extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// category name without extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Name</span>   <span class="kt">string</span> <span class="s">`json:&#34;name,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">FileNE</span> <span class="kt">string</span> <span class="s">`json:&#34;file_ne,omitempty&#34;`</span> <span class="c1">// alias for consistency
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// human-readable category title
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Title</span> <span class="kt">string</span> <span class="s">`json:&#34;title,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// category name without extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Name</span>   <span class="kt">string</span> <span class="s">`json:&#34;name,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FileNE</span> <span class="kt">string</span> <span class="s">`json:&#34;file_ne,omitempty&#34;`</span> <span class="c1">// alias for consistency</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// number of posts per page when displaying as posts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// (@category.per_page)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PerPage</span> <span class="kt">int</span> <span class="s">`json:&#34;per_page,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// human-readable category title</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Title</span> <span class="kt">string</span> <span class="s">`json:&#34;title,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category was created
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">CreatedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;created_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category was last modified.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this is updated when pages are added and deleted
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category metafile was last read.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Asof</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;asof,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// number of posts per page when displaying as posts</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// (@category.per_page)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PerPage</span> <span class="kt">int</span> <span class="s">`json:&#34;per_page,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// pages in the category. keys are filenames
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Pages</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">CategoryEntry</span> <span class="s">`json:&#34;pages,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category was created</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CreatedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;created_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// when true, the category is preserved even when no pages remain
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Preserve</span> <span class="kt">bool</span> <span class="s">`json:&#34;preserve,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category was last modified.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this is updated when pages are added and deleted</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// if applicable, this is the type of special category.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// for normal categories, this is empty
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Type</span> <span class="nx">CategoryType</span> <span class="s">`json:&#34;type,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the category metafile was last read.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Asof</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;asof,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypePage, this is the info for the tracked page
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageInfo</span> <span class="o">*</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">PageInfo</span> <span class="s">`json:&#34;page_info,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// pages in the category. keys are filenames</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Pages</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">CategoryEntry</span> <span class="s">`json:&#34;pages,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeModel, this is the info for the tracked model
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ModelInfo</span> <span class="o">*</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">ModelInfo</span> <span class="s">`json:&#34;model_info,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// when true, the category is preserved even when no pages remain</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Preserve</span> <span class="kt">bool</span> <span class="s">`json:&#34;preserve,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeImage, this is the info for the tracked image
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ImageInfo</span> <span class="o">*</span><span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if applicable, this is the type of special category.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for normal categories, this is empty</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Type</span> <span class="nx">CategoryType</span> <span class="s">`json:&#34;type,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypePage, this is the info for the tracked page</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageInfo</span> <span class="o">*</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">PageInfo</span> <span class="s">`json:&#34;page_info,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeModel, this is the info for the tracked model</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ModelInfo</span> <span class="o">*</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">ModelInfo</span> <span class="s">`json:&#34;model_info,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeImage, this is the info for the tracked image</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ImageInfo</span> <span class="o">*</span><span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">		<span class="nx">Width</span>  <span class="kt">int</span> <span class="s">`json:&#34;width,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">		<span class="nx">Height</span> <span class="kt">int</span> <span class="s">`json:&#34;height,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="s">`json:&#34;image_info,omitempty&#34;`</span>
@@ -567,22 +567,22 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">CategoryEntry</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time at which the page metadata in this category file was last updated.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this is compared against page file modification time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Asof</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;asof,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time at which the page metadata in this category file was last updated.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this is compared against page file modification time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Asof</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;asof,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// embedded page info
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// note this info is accurate only as of the Asof time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">wikifier</span><span class="p">.</span><span class="nx">PageInfo</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// embedded page info</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// note this info is accurate only as of the Asof time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">wikifier</span><span class="p">.</span><span class="nx">PageInfo</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeImage, an array of image dimensions used on this page.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// dimensions are guaranteed to be positive integers. the number of elements will
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// always be even, since each occurrence of the image produces two (width and then height)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Dimensions</span> <span class="p">[][]</span><span class="kt">int</span> <span class="s">`json:&#34;dimensions,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypeImage, an array of image dimensions used on this page.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// dimensions are guaranteed to be positive integers. the number of elements will</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// always be even, since each occurrence of the image produces two (width and then height)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Dimensions</span> <span class="p">[][]</span><span class="kt">int</span> <span class="s">`json:&#34;dimensions,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypePage, an array of line numbers on which the tracked page is
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// referenced on the page described by this entry
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Lines</span> <span class="p">[]</span><span class="kt">int</span> <span class="s">`json:&#34;lines,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for CategoryTypePage, an array of line numbers on which the tracked page is</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// referenced on the page described by this entry</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Lines</span> <span class="p">[]</span><span class="kt">int</span> <span class="s">`json:&#34;lines,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -617,18 +617,18 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">CommitOpts</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// Comment is the commit description.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Comment</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Comment is the commit description.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Comment</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// Name is the fullname of the user committing changes.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Name</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Name is the fullname of the user committing changes.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Name</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// Email is the email address of the user committing changes.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Email</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Email is the email address of the user committing changes.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Email</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// Time is the timestamp to associate with the revision.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// If unspecified, current time is used.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Time</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Time is the timestamp to associate with the revision.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// If unspecified, current time is used.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Time</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -641,21 +641,21 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayCategoryPosts</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// DisplayPage results
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// overrides the Category Pages field
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Pages</span> <span class="p">[]</span><span class="nx">DisplayPage</span> <span class="s">`json:&#34;pages,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// DisplayPage results</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// overrides the Category Pages field</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Pages</span> <span class="p">[]</span><span class="nx">DisplayPage</span> <span class="s">`json:&#34;pages,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// the page number (first page = 0)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageN</span> <span class="kt">int</span> <span class="s">`json:&#34;page_n&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the page number (first page = 0)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageN</span> <span class="kt">int</span> <span class="s">`json:&#34;page_n&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// the total number of pages
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">NumPages</span> <span class="kt">int</span> <span class="s">`json:&#34;num_pages&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the total number of pages</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">NumPages</span> <span class="kt">int</span> <span class="s">`json:&#34;num_pages&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// this is the combined CSS for all pages we&#39;re displaying
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CSS</span> <span class="kt">string</span> <span class="s">`json:&#34;css,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this is the combined CSS for all pages we&#39;re displaying</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CSS</span> <span class="kt">string</span> <span class="s">`json:&#34;css,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// all other fields are inherited from the category itself
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="o">*</span><span class="nx">Category</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// all other fields are inherited from the category itself</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">Category</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -667,25 +667,25 @@
                         type DisplayError
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayError</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// a human-readable error string. sensitive info is never
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// included, so this may be shown to users
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Error</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// a human-readable error string. sensitive info is never</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// included, so this may be shown to users</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Error</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// a more detailed human-readable error string that MAY contain
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// sensitive data. can be used for debugging and logging but should
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// not be presented to users
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">DetailedError</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// a more detailed human-readable error string that MAY contain</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// sensitive data. can be used for debugging and logging but should</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// not be presented to users</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">DetailedError</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// HTTP status code. if zero, 404 should be used
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Status</span> <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// HTTP status code. if zero, 404 should be used</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Status</span> <span class="kt">int</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// if the error occurred during parsing, this is the position.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// for all non-parsing errors, this is 0:0
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Pos</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">Position</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if the error occurred during parsing, this is the position.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for all non-parsing errors, this is 0:0</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Pos</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">Position</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content cannot be displayed because it has
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// not yet been published for public access
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Draft</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content cannot be displayed because it has</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// not yet been published for public access</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Draft</span> <span class="kt">bool</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -698,22 +698,22 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayFile</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// file name relative to wiki root.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// path delimiter &#39;/&#39; is always used, regardless of OS.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// file name relative to wiki root.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// path delimiter &#39;/&#39; is always used, regardless of OS.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// absolute file path of the file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// OS-specific path delimiter is used.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// absolute file path of the file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// OS-specific path delimiter is used.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// the plain text file content
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Content</span> <span class="kt">string</span> <span class="s">`json:&#34;-&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the plain text file content</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Content</span> <span class="kt">string</span> <span class="s">`json:&#34;-&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the file was last modified
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the file was last modified</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span> <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// for pages/models/etc, parser warnings and error
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">Warning</span> <span class="s">`json:&#34;parse_warnings,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for pages/models/etc, parser warnings and error</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">Warning</span> <span class="s">`json:&#34;parse_warnings,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">	<span class="nx">Error</span>    <span class="o">*</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">Warning</span>  <span class="s">`json:&#34;parse_error,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
@@ -727,47 +727,47 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayImage</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the scaled image file
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the scaled image file</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// absolute path to the scaled image.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this file should be served to the user
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// absolute path to the scaled image.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this file should be served to the user</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// absolute path to the full-size image.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if the full-size image is being displayed, same as Path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FullsizePath</span> <span class="kt">string</span> <span class="s">`json:&#34;fullsize_path,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// absolute path to the full-size image.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if the full-size image is being displayed, same as Path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FullsizePath</span> <span class="kt">string</span> <span class="s">`json:&#34;fullsize_path,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// image type
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;png&#39; or &#39;jpeg&#39;
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ImageType</span> <span class="kt">string</span> <span class="s">`json:&#34;image_type,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// image type</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// &#39;png&#39; or &#39;jpeg&#39;</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ImageType</span> <span class="kt">string</span> <span class="s">`json:&#34;image_type,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// mime &#39;image/png&#39; or &#39;image/jpeg&#39;
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// suitable for the Content-Type header
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Mime</span> <span class="kt">string</span> <span class="s">`json:&#34;mime,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// mime &#39;image/png&#39; or &#39;image/jpeg&#39;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// suitable for the Content-Type header</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Mime</span> <span class="kt">string</span> <span class="s">`json:&#34;mime,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// bytelength of image data
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// suitable for use in the Content-Length header
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Length</span> <span class="kt">int64</span> <span class="s">`json:&#34;length,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// bytelength of image data</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// suitable for use in the Content-Length header</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Length</span> <span class="kt">int64</span> <span class="s">`json:&#34;length,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the image was last modified.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if Generated is true, this is the current time.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if FromCache is true, this is the modified date of the cache file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// otherwise, this is the modified date of the image file itself.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP format for Last-Modified
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being sered was read from a cache file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// opposite of Generated
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FromCache</span> <span class="kt">bool</span> <span class="s">`json:&#34;cached,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the image was last modified.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if Generated is true, this is the current time.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if FromCache is true, this is the modified date of the cache file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// otherwise, this is the modified date of the image file itself.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP format for Last-Modified</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being served was just generated.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// opposite of FromCache
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Generated</span> <span class="kt">bool</span> <span class="s">`json:&#34;generated,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being sered was read from a cache file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// opposite of Generated</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FromCache</span> <span class="kt">bool</span> <span class="s">`json:&#34;cached,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content generated in order to fulfill this request was
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// written to cache. this can only been true when Generated is true
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CacheGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;cache_gen,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being served was just generated.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// opposite of FromCache</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Generated</span> <span class="kt">bool</span> <span class="s">`json:&#34;generated,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content generated in order to fulfill this request was</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// written to cache. this can only been true when Generated is true</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CacheGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;cache_gen,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -780,79 +780,79 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayPage</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the page, with the extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the page, with the extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span> <span class="kt">string</span> <span class="s">`json:&#34;file,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the page, without the extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Name</span> <span class="kt">string</span> <span class="s">`json:&#34;name,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// basename of the page, without the extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Name</span> <span class="kt">string</span> <span class="s">`json:&#34;name,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// absolute file path of the page
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// absolute file path of the page</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span> <span class="kt">string</span> <span class="s">`json:&#34;path,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// the page content (HTML)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Content</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">HTML</span> <span class="s">`json:&#34;-&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the page content (HTML)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Content</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">HTML</span> <span class="s">`json:&#34;-&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the page was last modified.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if Generated is true, this is the current time.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if FromCache is true, this is the modified date of the cache file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// otherwise, this is the modified date of the page file itself.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted for Last-Modified
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// CSS generated for the page from style{} blocks
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CSS</span> <span class="kt">string</span> <span class="s">`json:&#34;css,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the page was last modified.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if Generated is true, this is the current time.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// if FromCache is true, this is the modified date of the cache file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// otherwise, this is the modified date of the page file itself.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ModifiedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;modified_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted for Last-Modified</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if this content was read from a cache file. opposite of Generated
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FromCache</span> <span class="kt">bool</span> <span class="s">`json:&#34;cached,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// CSS generated for the page from style{} blocks</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CSS</span> <span class="kt">string</span> <span class="s">`json:&#34;css,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being served was just generated on the fly.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// opposite of FromCache
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Generated</span> <span class="kt">bool</span> <span class="s">`json:&#34;generated,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if this content was read from a cache file. opposite of Generated</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FromCache</span> <span class="kt">bool</span> <span class="s">`json:&#34;cached,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if this request resulted in the writing of a new cache file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this can only be true if Generated is true
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">CacheGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;cache_gen,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the content being served was just generated on the fly.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// opposite of FromCache</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Generated</span> <span class="kt">bool</span> <span class="s">`json:&#34;generated,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if this request resulted in the writing of a text file.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this can only be true if Generated is true
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">TextGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;text_gen,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if this request resulted in the writing of a new cache file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this can only be true if Generated is true</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CacheGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;cache_gen,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// true if the page has not yet been published for public viewing.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// this only occurs when it is specified that serving drafts is OK,
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// since normally a draft page instead results in a DisplayError.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Draft</span> <span class="kt">bool</span> <span class="s">`json:&#34;draft,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if this request resulted in the writing of a text file.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this can only be true if Generated is true</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">TextGenerated</span> <span class="kt">bool</span> <span class="s">`json:&#34;text_gen,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// warnings and errors produced by the parser
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">Warning</span> <span class="s">`json:&#34;warnings,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// true if the page has not yet been published for public viewing.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// this only occurs when it is specified that serving drafts is OK,</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// since normally a draft page instead results in a DisplayError.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Draft</span> <span class="kt">bool</span> <span class="s">`json:&#34;draft,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// time when the page was created, as extracted from
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// the special @page.created variable
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">CreatedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;created_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// name of the page author, as extracted from the special @page.author
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// variable
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Author</span> <span class="kt">string</span> <span class="s">`json:&#34;author,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// warnings and errors produced by the parser</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">wikifier</span><span class="p">.</span><span class="nx">Warning</span> <span class="s">`json:&#34;warnings,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// list of categories the page belongs to, without the &#39;.cat&#39; extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Categories</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;categories,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// time when the page was created, as extracted from</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the special @page.created variable</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">CreatedHTTP</span> <span class="kt">string</span>     <span class="s">`json:&#34;created_http,omitempty&#34;`</span> <span class="c1">// HTTP formatted</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// page title as extracted from the special @page.title variable, including
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// any possible HTML-encoded formatting
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FmtTitle</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">HTML</span> <span class="s">`json:&#34;fmt_title,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// name of the page author, as extracted from the special @page.author</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// variable</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Author</span> <span class="kt">string</span> <span class="s">`json:&#34;author,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// like FmtTitle except that all text formatting has been stripped.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// suitable for use in the &lt;title&gt; tag
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Title</span> <span class="kt">string</span> <span class="s">`json:&#34;title,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// list of categories the page belongs to, without the &#39;.cat&#39; extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Categories</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;categories,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// page description as extracted from the special @page.desc variable.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Description</span> <span class="kt">string</span> <span class="s">`json:&#34;desc,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// page title as extracted from the special @page.title variable, including</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// any possible HTML-encoded formatting</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FmtTitle</span> <span class="nx">wikifier</span><span class="p">.</span><span class="nx">HTML</span> <span class="s">`json:&#34;fmt_title,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// page keywords as extracted from the special @page.keywords variable
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Keywords</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;keywords,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// like FmtTitle except that all text formatting has been stripped.</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// suitable for use in the &lt;title&gt; tag</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Title</span> <span class="kt">string</span> <span class="s">`json:&#34;title,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// first formatting-stripped 25 words of page, up to 150 chars
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Preview</span> <span class="kt">string</span> <span class="s">`json:&#34;preview,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// page description as extracted from the special @page.desc variable.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Description</span> <span class="kt">string</span> <span class="s">`json:&#34;desc,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// page keywords as extracted from the special @page.keywords variable</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Keywords</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;keywords,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// first formatting-stripped 25 words of page, up to 150 chars</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Preview</span> <span class="kt">string</span> <span class="s">`json:&#34;preview,omitempty&#34;`</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -865,9 +865,9 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">DisplayRedirect</span> <span class="kd">struct</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// a relative or absolute URL to which the request should redirect,
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// suitable for use in a Location header
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Redirect</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// a relative or absolute URL to which the request should redirect,</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// suitable for use in a Location header</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Redirect</span> <span class="kt">string</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
@@ -879,13 +879,13 @@
                         type ImageInfo
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">ImageInfo</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">File</span>       <span class="kt">string</span>     <span class="s">`json:&#34;file&#34;`</span>               <span class="c1">// filename
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Width</span>      <span class="kt">int</span>        <span class="s">`json:&#34;width,omitempty&#34;`</span>    <span class="c1">// full-size width
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Height</span>     <span class="kt">int</span>        <span class="s">`json:&#34;height,omitempty&#34;`</span>   <span class="c1">// full-size height
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Created</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>  <span class="c1">// creation time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>   <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span> <span class="c1">// modify time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Dimensions</span> <span class="p">[][]</span><span class="kt">int</span>    <span class="s">`json:&#34;-&#34;`</span>                  <span class="c1">// dimensions used throughout the wiki
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span>       <span class="kt">string</span>     <span class="s">`json:&#34;file&#34;`</span>               <span class="c1">// filename</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Width</span>      <span class="kt">int</span>        <span class="s">`json:&#34;width,omitempty&#34;`</span>    <span class="c1">// full-size width</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Height</span>     <span class="kt">int</span>        <span class="s">`json:&#34;height,omitempty&#34;`</span>   <span class="c1">// full-size height</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>  <span class="c1">// creation time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>   <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span> <span class="c1">// modify time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Dimensions</span> <span class="p">[][]</span><span class="kt">int</span>    <span class="s">`json:&#34;-&#34;`</span>                  <span class="c1">// dimensions used throughout the wiki</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         ImageInfo represents a full-size image on the wiki.
@@ -896,13 +896,13 @@
                         type SizedImage
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">SizedImage</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// for example mydir/100x200-myimage@3x.png
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Width</span><span class="p">,</span> <span class="nx">Height</span> <span class="kt">int</span>    <span class="c1">// 100, 200 (dimensions as requested)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Scale</span>         <span class="kt">int</span>    <span class="c1">// 3 (scale as requested)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Prefix</span>        <span class="kt">string</span> <span class="c1">// mydir
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">RelNameNE</span>     <span class="kt">string</span> <span class="c1">// myimage (name without extension)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Ext</span>           <span class="kt">string</span> <span class="c1">// png (extension)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// for example mydir/100x200-myimage@3x.png</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Width</span><span class="p">,</span> <span class="nx">Height</span> <span class="kt">int</span>    <span class="c1">// 100, 200 (dimensions as requested)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Scale</span>         <span class="kt">int</span>    <span class="c1">// 3 (scale as requested)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Prefix</span>        <span class="kt">string</span> <span class="c1">// mydir</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">RelNameNE</span>     <span class="kt">string</span> <span class="c1">// myimage (name without extension)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Ext</span>           <span class="kt">string</span> <span class="c1">// png (extension)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         SizedImage represents an image in specific dimensions.
@@ -1126,7 +1126,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-debug">
                         func (*Wiki) Debug
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Debug</span><span class="p">(</span><span class="nx">i</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Debug</span><span class="p">(</span><span class="nx">i</span> <span class="o">...</span><span class="kt">any</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Debug logs debug info for a wiki.
@@ -1136,7 +1136,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-debugf">
                         func (*Wiki) Debugf
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Debugf</span><span class="p">(</span><span class="nx">format</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">i</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Debugf</span><span class="p">(</span><span class="nx">format</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">i</span> <span class="o">...</span><span class="kt">any</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Debugf logs debug info for a wiki.
@@ -1181,7 +1181,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displaycategoryposts">
                         func (*Wiki) DisplayCategoryPosts
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayCategoryPosts</span><span class="p">(</span><span class="nx">catName</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pageN</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayCategoryPosts</span><span class="p">(</span><span class="nx">catName</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pageN</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplayCategoryPosts returns the display result for a category.
@@ -1191,7 +1191,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displayfile">
                         func (*Wiki) DisplayFile
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayFile</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayFile</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplayFile returns the display result for a plain text file.
@@ -1201,7 +1201,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displayimage">
                         func (*Wiki) DisplayImage
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayImage</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayImage</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplayImage returns the display result for an image.
@@ -1211,7 +1211,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displaypage">
                         func (*Wiki) DisplayPage
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayPage</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayPage</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplayPage returns the display result for a page.
@@ -1221,7 +1221,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displaypagedraft">
                         func (*Wiki) DisplayPageDraft
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayPageDraft</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">draftOK</span> <span class="kt">bool</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplayPageDraft</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">draftOK</span> <span class="kt">bool</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplayPageDraft returns the display result for a page.
@@ -1235,7 +1235,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displaysizedimage">
                         func (*Wiki) DisplaySizedImage
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplaySizedImage</span><span class="p">(</span><span class="nx">img</span> <span class="nx">SizedImage</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplaySizedImage</span><span class="p">(</span><span class="nx">img</span> <span class="nx">SizedImage</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplaySizedImage returns the display result for an image in specific
@@ -1246,7 +1246,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-displaysizedimagegenerate">
                         func (*Wiki) DisplaySizedImageGenerate
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplaySizedImageGenerate</span><span class="p">(</span><span class="nx">img</span> <span class="nx">SizedImage</span><span class="p">,</span> <span class="nx">generateOK</span> <span class="kt">bool</span><span class="p">)</span> <span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">DisplaySizedImageGenerate</span><span class="p">(</span><span class="nx">img</span> <span class="nx">SizedImage</span><span class="p">,</span> <span class="nx">generateOK</span> <span class="kt">bool</span><span class="p">)</span> <span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         DisplaySizedImageGenerate returns the display result for an image in specific
@@ -1336,7 +1336,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-log">
                         func (*Wiki) Log
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Log</span><span class="p">(</span><span class="nx">i</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Log</span><span class="p">(</span><span class="nx">i</span> <span class="o">...</span><span class="kt">any</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Log logs info for a wiki.
@@ -1346,7 +1346,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-logf">
                         func (*Wiki) Logf
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Logf</span><span class="p">(</span><span class="nx">format</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">i</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Logf</span><span class="p">(</span><span class="nx">format</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">i</span> <span class="o">...</span><span class="kt">any</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Logf logs info for a wiki.
@@ -1454,7 +1454,7 @@
                     <h4 class="q-sec-title" id="qa-func-wiki-pregenerate">
                         func (*Wiki) Pregenerate
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Pregenerate</span><span class="p">()</span> <span class="p">(</span><span class="nx">results</span> <span class="p">[]</span><span class="nx">any</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">Pregenerate</span><span class="p">()</span> <span class="p">(</span><span class="nx">results</span> <span class="p">[]</span><span class="kt">any</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Pregenerate simulates requests for all wiki resources such that content caches

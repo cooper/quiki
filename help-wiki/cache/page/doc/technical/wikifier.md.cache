@@ -1,4 +1,4 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wikifier.md","file_ne":"doc/technical/wikifier","created":"2025-02-23T11:47:37.091379005-05:00","modified":"2025-02-23T11:47:37.091379005-05:00","generated":true,"external":true,"fmt_title":"wikifier","title":"wikifier","author":"Markdown","preview":"Contents wikifier Usage func  CategoryName func  CategoryNameNE func  InjectPageOpt func  MakeDir func  ModelName func  PageName func  PageNameExt","warnings":[{"message":"No such code{} style 'monokailight' (from config)","position":[13,7]},{"message":"No such code{} style 'monokailight' (from config)","position":[18,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[34,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[45,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[56,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[68,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[79,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[90,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[101,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[112,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[123,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[134,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[145,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[159,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[188,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[203,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[215,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[228,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[240,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[251,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[263,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[270,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[283,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[295,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[306,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[318,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[343,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[354,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[365,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[376,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[391,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[412,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[423,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[434,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[446,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[467,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[474,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[495,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[515,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[543,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[554,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[565,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[576,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[587,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[598,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[609,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[620,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[631,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[642,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[653,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[664,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[675,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[686,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[703,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[714,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[726,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[751,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[762,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[773,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[784,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[799,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[820,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[832,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[843,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[856,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[867,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[878,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[894,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[905,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[917,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[929,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[941,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[953,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[969,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[982,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[994,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1006,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1019,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1031,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1042,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1063,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1075,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1086,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1097,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1118,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1125,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1154,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1182,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1195,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1209,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1228,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1243,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1254,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1267,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1283,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1298,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1309,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1326,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1340,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1356,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1373,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1386,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1400,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1407,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1414,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1427,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1438,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1449,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1460,12]},{"message":"No such code{} style 'monokailight' (from config)","position":[1474,12]}]}
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wikifier.md","file_ne":"doc/technical/wikifier","created":"2025-02-23T13:47:47.582599144-05:00","modified":"2025-02-23T13:47:47.582599144-05:00","generated":true,"external":true,"fmt_title":"wikifier","title":"wikifier","author":"Markdown","preview":"Contents wikifier Usage func  CategoryName func  CategoryNameNE func  InjectPageOpt func  MakeDir func  ModelName func  PageName func  PageNameExt"}
 <div class="q-main-doc/technical/wikifier q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
@@ -93,18 +93,48 @@
                             </a>
                         </li>
                         <li>
-                            <a class="q-link-internal" href="#func-list-fmt">
-                                func (List) Fmt
+                            <a class="q-link-internal" href="#func-list-get">
+                                func (List) Get
                             </a>
                         </li>
                         <li>
-                            <a class="q-link-internal" href="#func-list-fmtopts">
-                                func (List) FmtOpts
+                            <a class="q-link-internal" href="#func-list-getblock">
+                                func (List) GetBlock
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-getbool">
+                                func (List) GetBool
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-getobj">
+                                func (List) GetObj
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-getstr">
+                                func (List) GetStr
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-getstrlist">
+                                func (List) GetStrList
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-set">
+                                func (List) Set
                             </a>
                         </li>
                         <li>
                             <a class="q-link-internal" href="#func-list-string">
                                 func (List) String
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func-list-unset">
+                                func (List) Unset
                             </a>
                         </li>
                         <li>
@@ -115,16 +145,6 @@
                         <li>
                             <a class="q-link-internal" href="#func--newmap">
                                 func  NewMap
-                            </a>
-                        </li>
-                        <li>
-                            <a class="q-link-internal" href="#func-map-fmt">
-                                func (Map) Fmt
-                            </a>
-                        </li>
-                        <li>
-                            <a class="q-link-internal" href="#func-map-fmtopts">
-                                func (Map) FmtOpts
                             </a>
                         </li>
                         <li>
@@ -571,15 +591,15 @@
                 Usage
             </h2>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeQuiki is the external type for quiki sites.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageOptExternalTypeQuiki</span> <span class="nx">PageOptExternalType</span> <span class="p">=</span> <span class="s">&#34;quiki&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeQuiki is the external type for quiki sites.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageOptExternalTypeQuiki</span> <span class="nx">PageOptExternalType</span> <span class="p">=</span> <span class="s">&#34;quiki&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeMediaWiki is the external type for MediaWiki sites.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageOptExternalTypeMediaWiki</span> <span class="p">=</span> <span class="s">&#34;mediawiki&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeMediaWiki is the external type for MediaWiki sites.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageOptExternalTypeMediaWiki</span> <span class="p">=</span> <span class="s">&#34;mediawiki&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeNone is an external type that can be used for websites that
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// perform no normalization of page targets beyond normal URI escaping.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageOptExternalTypeNone</span> <span class="p">=</span> <span class="s">&#34;none&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// PageOptExternalTypeNone is an external type that can be used for websites that</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// perform no normalization of page targets beyond normal URI escaping.</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageOptExternalTypeNone</span> <span class="p">=</span> <span class="s">&#34;none&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span></pre>
             <div class="q-sec">
@@ -703,18 +723,18 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">AttributedObject</span> <span class="kd">interface</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// getters
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// getters</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">	<span class="nf">GetBool</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">	<span class="nf">GetStr</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">	<span class="nf">GetBlock</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">block</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">	<span class="nf">GetObj</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">AttributedObject</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// setters
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="nx">any</span><span class="p">)</span> <span class="kt">error</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// setters</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">any</span><span class="p">)</span> <span class="kt">error</span>
 </span></span><span class="line"><span class="cl">	<span class="nf">Unset</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// contains filtered or unexported methods
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// contains filtered or unexported methods</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         An AttributedObject is any object on which you can set and retrieve attributes.
@@ -729,10 +749,10 @@
                         type FmtOpt
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">FmtOpt</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Pos</span>        <span class="nx">Position</span> <span class="c1">// position used for warnings (set internally)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">NoEntities</span> <span class="kt">bool</span>     <span class="c1">// disables html entity conversion
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">NoWarnings</span> <span class="kt">bool</span>     <span class="c1">// silence warnings for undefined variables
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Pos</span>        <span class="nx">Position</span> <span class="c1">// position used for warnings (set internally)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">NoEntities</span> <span class="kt">bool</span>     <span class="c1">// disables html entity conversion</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">NoWarnings</span> <span class="kt">bool</span>     <span class="c1">// silence warnings for undefined variables</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         FmtOpt describes options for page.FmtOpts.
@@ -773,24 +793,103 @@
                     </p>
                 </div>
                 <div class="q-sec">
-                    <h4 class="q-sec-title" id="qa-func-list-fmt">
-                        func (List) Fmt
+                    <h4 class="q-sec-title" id="qa-func-list-get">
+                        func (List) Get
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">Fmt</span><span class="p">(</span><span class="nx">text</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pos</span> <span class="nx">Position</span><span class="p">)</span> <span class="nx">HTML</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
-                        Fmt generates HTML from a quiki-encoded formatted string.
+                        Get fetches a a value regardless of type.
+                    </p>
+                    <p class="q-p">
+                        The key may be segmented to indicate properties of each object (e.g.
+                        person.name).
+                    </p>
+                    <p class="q-p">
+                        If attempting to read a property of an object that does not support properties,
+                        such as a string, Get returns an error.
+                    </p>
+                    <p class="q-p">
+                        If the key is valid but nothing exists at it, Get returns (nil, nil).
                     </p>
                 </div>
                 <div class="q-sec">
-                    <h4 class="q-sec-title" id="qa-func-list-fmtopts">
-                        func (List) FmtOpts
+                    <h4 class="q-sec-title" id="qa-func-list-getblock">
+                        func (List) GetBlock
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">FmtOpts</span><span class="p">(</span><span class="nx">text</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pos</span> <span class="nx">Position</span><span class="p">,</span> <span class="nx">o</span> <span class="nx">FmtOpt</span><span class="p">)</span> <span class="nx">HTML</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">GetBlock</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">block</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
-                        FmtOpts is like Fmt except you can specify additional options with the FmtOpt
-                        argument.
+                        GetBlock is like Get except it always returns a block.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-getbool">
+                        func (List) GetBool
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">GetBool</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span></pre>
+                    <p class="q-p">
+                        GetBool is like Get except it always returns a boolean.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-getobj">
+                        func (List) GetObj
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">GetObj</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">AttributedObject</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span></pre>
+                    <p class="q-p">
+                        GetObj is like Get except it always returns an AttributedObject.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-getstr">
+                        func (List) GetStr
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">GetStr</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span></pre>
+                    <p class="q-p">
+                        GetStr is like Get except it always returns a string.
+                    </p>
+                    <p class="q-p">
+                        If the value is HTML, it is converted to a string.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-getstrlist">
+                        func (List) GetStrList
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">GetStrList</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span></pre>
+                    <p class="q-p">
+                        GetStrList is like Get except it always returns a list of strings.
+                    </p>
+                    <p class="q-p">
+                        If the value is a <code>list{}</code> block, the list&#39;s values are returned, with
+                        non-strings quietly filtered out.
+                    </p>
+                    <p class="q-p">
+                        If the value is a string, it is treated as a comma-separated list, and each item
+                        is trimmed of prepending or suffixing whitespace.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-set">
+                        func (List) Set
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">any</span><span class="p">)</span> <span class="kt">error</span>
+</span></span></pre>
+                    <p class="q-p">
+                        Set sets a value at the given key.
+                    </p>
+                    <p class="q-p">
+                        The key may be segmented to indicate properties of each object (e.g.
+                        person.name).
+                    </p>
+                    <p class="q-p">
+                        If attempting to write to a property of an object that does not support
+                        properties, such as a string, Set returns an error.
                     </p>
                 </div>
                 <div class="q-sec">
@@ -799,6 +898,24 @@
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">String</span><span class="p">()</span> <span class="kt">string</span>
 </span></span></pre>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-list-unset">
+                        func (List) Unset
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">List</span><span class="p">)</span> <span class="nf">Unset</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span>
+</span></span></pre>
+                    <p class="q-p">
+                        Unset removes a value at the given key.
+                    </p>
+                    <p class="q-p">
+                        The key may be segmented to indicate properties of each object (e.g.
+                        person.name).
+                    </p>
+                    <p class="q-p">
+                        If attempting to unset a property of an object that does not support properties,
+                        such as a string, Unset returns an error.
+                    </p>
                 </div>
                 <div class="q-sec">
                     <h4 class="q-sec-title" id="qa-type-map">
@@ -824,31 +941,10 @@
                     </p>
                 </div>
                 <div class="q-sec">
-                    <h4 class="q-sec-title" id="qa-func-map-fmt">
-                        func (Map) Fmt
-                    </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">Fmt</span><span class="p">(</span><span class="nx">text</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pos</span> <span class="nx">Position</span><span class="p">)</span> <span class="nx">HTML</span>
-</span></span></pre>
-                    <p class="q-p">
-                        Fmt generates HTML from a quiki-encoded formatted string.
-                    </p>
-                </div>
-                <div class="q-sec">
-                    <h4 class="q-sec-title" id="qa-func-map-fmtopts">
-                        func (Map) FmtOpts
-                    </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">FmtOpts</span><span class="p">(</span><span class="nx">text</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pos</span> <span class="nx">Position</span><span class="p">,</span> <span class="nx">o</span> <span class="nx">FmtOpt</span><span class="p">)</span> <span class="nx">HTML</span>
-</span></span></pre>
-                    <p class="q-p">
-                        FmtOpts is like Fmt except you can specify additional options with the FmtOpt
-                        argument.
-                    </p>
-                </div>
-                <div class="q-sec">
                     <h4 class="q-sec-title" id="qa-func-map-get">
                         func (Map) Get
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Get fetches a a value regardless of type.
@@ -940,7 +1036,7 @@
                     <h4 class="q-sec-title" id="qa-func-map-map">
                         func (*Map) Map
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">Map</span><span class="p">)</span> <span class="nf">Map</span><span class="p">()</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">any</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">Map</span><span class="p">)</span> <span class="nf">Map</span><span class="p">()</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
 </span></span></pre>
                     <p class="q-p">
                         Map returns the actual underlying Go map.
@@ -961,7 +1057,7 @@
                     <h4 class="q-sec-title" id="qa-func-map-set">
                         func (Map) Set
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="nx">any</span><span class="p">)</span> <span class="kt">error</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Map</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">any</span><span class="p">)</span> <span class="kt">error</span>
 </span></span></pre>
                     <p class="q-p">
                         Set sets a value at the given key.
@@ -1005,15 +1101,15 @@
                         type ModelInfo
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">ModelInfo</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Title</span>       <span class="kt">string</span>     <span class="s">`json:&#34;title&#34;`</span>            <span class="c1">// @model.title
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Author</span>      <span class="kt">string</span>     <span class="s">`json:&#34;author,omitempty&#34;`</span> <span class="c1">// @model.author
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Description</span> <span class="kt">string</span>     <span class="s">`json:&#34;desc,omitempty&#34;`</span>   <span class="c1">// @model.desc
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span>        <span class="kt">string</span>     <span class="s">`json:&#34;file&#34;`</span>             <span class="c1">// filename
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FileNE</span>      <span class="kt">string</span>     <span class="s">`json:&#34;file_ne&#34;`</span>          <span class="c1">// filename with no extension
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Path</span>        <span class="kt">string</span>     <span class="s">`json:&#34;path&#34;`</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>  <span class="c1">// creation time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span> <span class="c1">// modify time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Title</span>       <span class="kt">string</span>     <span class="s">`json:&#34;title&#34;`</span>            <span class="c1">// @model.title</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Author</span>      <span class="kt">string</span>     <span class="s">`json:&#34;author,omitempty&#34;`</span> <span class="c1">// @model.author</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Description</span> <span class="kt">string</span>     <span class="s">`json:&#34;desc,omitempty&#34;`</span>   <span class="c1">// @model.desc</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span>        <span class="kt">string</span>     <span class="s">`json:&#34;file&#34;`</span>             <span class="c1">// filename</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FileNE</span>      <span class="kt">string</span>     <span class="s">`json:&#34;file_ne&#34;`</span>          <span class="c1">// filename with no extension</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span>        <span class="kt">string</span>     <span class="s">`json:&#34;path&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>  <span class="c1">// creation time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span> <span class="c1">// modify time</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         ModelInfo represents metadata associated with a model.
@@ -1024,21 +1120,21 @@
                         type Page
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Page</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Source</span>   <span class="kt">string</span>   <span class="c1">// source content
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FilePath</span> <span class="kt">string</span>   <span class="c1">// Path to the .page file
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">VarsOnly</span> <span class="kt">bool</span>     <span class="c1">// True if Parse() should only extract variables
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Opt</span>      <span class="o">*</span><span class="nx">PageOpt</span> <span class="c1">// page options
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Images</span>    <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][][]</span><span class="kt">int</span>   <span class="c1">// references to images
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Models</span>    <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">ModelInfo</span> <span class="c1">// references to models
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">PageLinks</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">int</span>     <span class="c1">// references to other pages
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="nx">any</span>  <span class="c1">// only available during Parse() and HTML()
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Markdown</span> <span class="kt">bool</span> <span class="c1">// true if this is a markdown source
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">Warning</span> <span class="c1">// parser warnings
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Error</span>    <span class="o">*</span><span class="nx">Warning</span>  <span class="c1">// parser error, as an encodable Warning
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Source</span>   <span class="kt">string</span>   <span class="c1">// source content</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FilePath</span> <span class="kt">string</span>   <span class="c1">// Path to the .page file</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">VarsOnly</span> <span class="kt">bool</span>     <span class="c1">// True if Parse() should only extract variables</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Opt</span>      <span class="o">*</span><span class="nx">PageOpt</span> <span class="c1">// page options</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">Images</span>    <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][][]</span><span class="kt">int</span>   <span class="c1">// references to images</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Models</span>    <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">ModelInfo</span> <span class="c1">// references to models</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">PageLinks</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">int</span>     <span class="c1">// references to other pages</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="kt">any</span>  <span class="c1">// only available during Parse() and HTML()</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Markdown</span> <span class="kt">bool</span> <span class="c1">// true if this is a markdown source</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">Warnings</span> <span class="p">[]</span><span class="nx">Warning</span> <span class="c1">// parser warnings</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Error</span>    <span class="o">*</span><span class="nx">Warning</span>  <span class="c1">// parser error, as an encodable Warning</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         Page represents a single page or article, generally associated with a .page
@@ -1216,7 +1312,7 @@
                     <h4 class="q-sec-title" id="qa-func-page-get">
                         func (Page) Get
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Page</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Page</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">any</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 </span></span></pre>
                     <p class="q-p">
                         Get fetches a a value regardless of type.
@@ -1500,7 +1596,7 @@
                     <h4 class="q-sec-title" id="qa-func-page-set">
                         func (Page) Set
                     </h4>
-<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Page</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="nx">any</span><span class="p">)</span> <span class="kt">error</span>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">scope</span> <span class="nx">Page</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">any</span><span class="p">)</span> <span class="kt">error</span>
 </span></span></pre>
                     <p class="q-p">
                         Set sets a value at the given key.
@@ -1575,24 +1671,24 @@
                         type PageInfo
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageInfo</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Path</span>        <span class="kt">string</span>     <span class="s">`json:&#34;-&#34;`</span>                   <span class="c1">// absolute filepath
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span>        <span class="kt">string</span>     <span class="s">`json:&#34;file,omitempty&#34;`</span>      <span class="c1">// name with extension, always with forward slashes
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FileNE</span>      <span class="kt">string</span>     <span class="s">`json:&#34;file_ne,omitempty&#34;`</span>   <span class="c1">// name without extension, always with forward slashes
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>   <span class="c1">// creation time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Modified</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>  <span class="c1">// modify time
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Draft</span>       <span class="kt">bool</span>       <span class="s">`json:&#34;draft,omitempty&#34;`</span>     <span class="c1">// true if page is marked as draft
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Generated</span>   <span class="kt">bool</span>       <span class="s">`json:&#34;generated,omitempty&#34;`</span> <span class="c1">// true if page was generated from another source
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">External</span>    <span class="kt">bool</span>       <span class="s">`json:&#34;external,omitempty&#34;`</span>  <span class="c1">// true if page is outside the page directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Redirect</span>    <span class="kt">string</span>     <span class="s">`json:&#34;redirect,omitempty&#34;`</span>  <span class="c1">// path page is to redirect to
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">FmtTitle</span>    <span class="nx">HTML</span>       <span class="s">`json:&#34;fmt_title,omitempty&#34;`</span> <span class="c1">// title with formatting tags
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Title</span>       <span class="kt">string</span>     <span class="s">`json:&#34;title,omitempty&#34;`</span>     <span class="c1">// title without tags
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Author</span>      <span class="kt">string</span>     <span class="s">`json:&#34;author,omitempty&#34;`</span>    <span class="c1">// author&#39;s name
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Description</span> <span class="kt">string</span>     <span class="s">`json:&#34;desc,omitempty&#34;`</span>      <span class="c1">// description
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Keywords</span>    <span class="p">[]</span><span class="kt">string</span>   <span class="s">`json:&#34;keywords,omitempty&#34;`</span>  <span class="c1">// keywords
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Preview</span>     <span class="kt">string</span>     <span class="s">`json:&#34;preview,omitempty&#34;`</span>   <span class="c1">// first 25 words or 150 chars. empty w/ description
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Warnings</span>    <span class="p">[]</span><span class="nx">Warning</span>  <span class="s">`json:&#34;warnings,omitempty&#34;`</span>  <span class="c1">// parser warnings
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Error</span>       <span class="o">*</span><span class="nx">Warning</span>   <span class="s">`json:&#34;error,omitempty&#34;`</span>     <span class="c1">// parser error, as an encodable warning
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Path</span>        <span class="kt">string</span>     <span class="s">`json:&#34;-&#34;`</span>                   <span class="c1">// absolute filepath</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span>        <span class="kt">string</span>     <span class="s">`json:&#34;file,omitempty&#34;`</span>      <span class="c1">// name with extension, always with forward slashes</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FileNE</span>      <span class="kt">string</span>     <span class="s">`json:&#34;file_ne,omitempty&#34;`</span>   <span class="c1">// name without extension, always with forward slashes</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Created</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;created,omitempty&#34;`</span>   <span class="c1">// creation time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Modified</span>    <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;modified,omitempty&#34;`</span>  <span class="c1">// modify time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Draft</span>       <span class="kt">bool</span>       <span class="s">`json:&#34;draft,omitempty&#34;`</span>     <span class="c1">// true if page is marked as draft</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Generated</span>   <span class="kt">bool</span>       <span class="s">`json:&#34;generated,omitempty&#34;`</span> <span class="c1">// true if page was generated from another source</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">External</span>    <span class="kt">bool</span>       <span class="s">`json:&#34;external,omitempty&#34;`</span>  <span class="c1">// true if page is outside the page directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Redirect</span>    <span class="kt">string</span>     <span class="s">`json:&#34;redirect,omitempty&#34;`</span>  <span class="c1">// path page is to redirect to</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">FmtTitle</span>    <span class="nx">HTML</span>       <span class="s">`json:&#34;fmt_title,omitempty&#34;`</span> <span class="c1">// title with formatting tags</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Title</span>       <span class="kt">string</span>     <span class="s">`json:&#34;title,omitempty&#34;`</span>     <span class="c1">// title without tags</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Author</span>      <span class="kt">string</span>     <span class="s">`json:&#34;author,omitempty&#34;`</span>    <span class="c1">// author&#39;s name</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Description</span> <span class="kt">string</span>     <span class="s">`json:&#34;desc,omitempty&#34;`</span>      <span class="c1">// description</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Keywords</span>    <span class="p">[]</span><span class="kt">string</span>   <span class="s">`json:&#34;keywords,omitempty&#34;`</span>  <span class="c1">// keywords</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Preview</span>     <span class="kt">string</span>     <span class="s">`json:&#34;preview,omitempty&#34;`</span>   <span class="c1">// first 25 words or 150 chars. empty w/ description</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Warnings</span>    <span class="p">[]</span><span class="nx">Warning</span>  <span class="s">`json:&#34;warnings,omitempty&#34;`</span>  <span class="c1">// parser warnings</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Error</span>       <span class="o">*</span><span class="nx">Warning</span>   <span class="s">`json:&#34;error,omitempty&#34;`</span>     <span class="c1">// parser error, as an encodable warning</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageInfo represents metadata associated with a page.
@@ -1603,13 +1699,13 @@
                         type PageOpt
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOpt</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Name</span>         <span class="kt">string</span> <span class="c1">// wiki name
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Logo</span>         <span class="kt">string</span> <span class="c1">// logo filename, relative to image dir
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">MainPage</span>     <span class="kt">string</span> <span class="c1">// name of main page
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ErrorPage</span>    <span class="kt">string</span> <span class="c1">// name of error page
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Template</span>     <span class="kt">string</span> <span class="c1">// name of template
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">MainRedirect</span> <span class="kt">bool</span>   <span class="c1">// redirect on main page rather than serve root
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Page</span>         <span class="nx">PageOptPage</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Name</span>         <span class="kt">string</span> <span class="c1">// wiki name</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Logo</span>         <span class="kt">string</span> <span class="c1">// logo filename, relative to image dir</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">MainPage</span>     <span class="kt">string</span> <span class="c1">// name of main page</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ErrorPage</span>    <span class="kt">string</span> <span class="c1">// name of error page</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Template</span>     <span class="kt">string</span> <span class="c1">// name of template</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">MainRedirect</span> <span class="kt">bool</span>   <span class="c1">// redirect on main page rather than serve root</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Page</span>         <span class="nx">PageOptPage</span>
 </span></span><span class="line"><span class="cl">	<span class="nx">Host</span>         <span class="nx">PageOptHost</span>
 </span></span><span class="line"><span class="cl">	<span class="nx">Dir</span>          <span class="nx">PageOptDir</span>
 </span></span><span class="line"><span class="cl">	<span class="nx">Root</span>         <span class="nx">PageOptRoot</span>
@@ -1655,14 +1751,14 @@
                         type PageOptDir
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptDir</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="kt">string</span> <span class="c1">// path to wiki root directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Image</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to image directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Category</span> <span class="kt">string</span> <span class="c1">// Deprecated: path to category directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Page</span>     <span class="kt">string</span> <span class="c1">// Deprecated: path to page directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Model</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to model directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Markdown</span> <span class="kt">string</span> <span class="c1">// Deprecated: path to markdown directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Cache</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to cache directory
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="kt">string</span> <span class="c1">// path to wiki root directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Image</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to image directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Category</span> <span class="kt">string</span> <span class="c1">// Deprecated: path to category directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Page</span>     <span class="kt">string</span> <span class="c1">// Deprecated: path to page directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Model</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to model directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Markdown</span> <span class="kt">string</span> <span class="c1">// Deprecated: path to markdown directory</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Cache</span>    <span class="kt">string</span> <span class="c1">// Deprecated: path to cache directory</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptDir describes actual filepaths to wiki resources.
@@ -1673,10 +1769,10 @@
                         type PageOptExternal
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptExternal</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Name</span> <span class="kt">string</span>              <span class="c1">// long name (e.g. Wikipedia)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Root</span> <span class="kt">string</span>              <span class="c1">// wiki page root (no trailing slash)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Type</span> <span class="nx">PageOptExternalType</span> <span class="c1">// wiki type
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Name</span> <span class="kt">string</span>              <span class="c1">// long name (e.g. Wikipedia)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Root</span> <span class="kt">string</span>              <span class="c1">// wiki page root (no trailing slash)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Type</span> <span class="nx">PageOptExternalType</span> <span class="c1">// wiki type</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptExternal describes an external wiki that we can use for link targets.
@@ -1697,8 +1793,8 @@
                         type PageOptHost
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptHost</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span> <span class="kt">string</span> <span class="c1">// HTTP host for the wiki
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span> <span class="kt">string</span> <span class="c1">// HTTP host for the wiki</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptHost describes HTTP hosts for a wiki.
@@ -1724,10 +1820,10 @@
                         type PageOptLink
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptLink</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">ParseInternal</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// internal page links
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ParseExternal</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// external wiki page links
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ParseCategory</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// category links
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ParseInternal</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// internal page links</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ParseExternal</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// external wiki page links</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ParseCategory</span> <span class="nx">PageOptLinkFunction</span> <span class="c1">// category links</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptLink describes functions to assist with link targets.
@@ -1748,12 +1844,12 @@
                         type PageOptLinkOpts
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptLinkOpts</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Ok</span>             <span class="o">*</span><span class="kt">bool</span>   <span class="c1">// func sets to true if the link is valid
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Target</span>         <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets to overwrite the link target
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Tooltip</span>        <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets tooltip to display
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">DisplayDefault</span> <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets default text to display (if no pipe)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="o">*</span><span class="nx">FmtOpt</span>                <span class="c1">// formatter options available to func
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Ok</span>             <span class="o">*</span><span class="kt">bool</span>   <span class="c1">// func sets to true if the link is valid</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Target</span>         <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets to overwrite the link target</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Tooltip</span>        <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets tooltip to display</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">DisplayDefault</span> <span class="o">*</span><span class="kt">string</span> <span class="c1">// func sets default text to display (if no pipe)</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">FmtOpt</span>                <span class="c1">// formatter options available to func</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptLinkOpts contains options passed to a PageOptLinkFunction.
@@ -1764,9 +1860,9 @@
                         type PageOptNavigation
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptNavigation</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Link</span>    <span class="kt">string</span> <span class="c1">// link
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Display</span> <span class="kt">string</span> <span class="c1">// text to display
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Link</span>    <span class="kt">string</span> <span class="c1">// link</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Display</span> <span class="kt">string</span> <span class="c1">// text to display</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptNavigation represents an ordered navigation item.
@@ -1777,11 +1873,11 @@
                         type PageOptPage
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptPage</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">EnableTitle</span> <span class="kt">bool</span>        <span class="c1">// enable page title headings
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">EnableCache</span> <span class="kt">bool</span>        <span class="c1">// enable page caching
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ForceGen</span>    <span class="kt">bool</span>        <span class="c1">// force generation of page even if unchanged
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Code</span>        <span class="nx">PageOptCode</span> <span class="c1">// `code{}` block options
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">EnableTitle</span> <span class="kt">bool</span>        <span class="c1">// enable page title headings</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">EnableCache</span> <span class="kt">bool</span>        <span class="c1">// enable page caching</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ForceGen</span>    <span class="kt">bool</span>        <span class="c1">// force generation of page even if unchanged</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Code</span>        <span class="nx">PageOptCode</span> <span class="c1">// `code{}` block options</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptPage describes option relating to a page.
@@ -1792,12 +1888,12 @@
                         type PageOptRoot
                     </h4>
 <pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PageOptRoot</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="kt">string</span> <span class="c1">// wiki root path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Image</span>    <span class="kt">string</span> <span class="c1">// image root path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Category</span> <span class="kt">string</span> <span class="c1">// category root path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Page</span>     <span class="kt">string</span> <span class="c1">// page root path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">File</span>     <span class="kt">string</span> <span class="c1">// file index path
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Wiki</span>     <span class="kt">string</span> <span class="c1">// wiki root path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Image</span>    <span class="kt">string</span> <span class="c1">// image root path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Category</span> <span class="kt">string</span> <span class="c1">// category root path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Page</span>     <span class="kt">string</span> <span class="c1">// page root path</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">File</span>     <span class="kt">string</span> <span class="c1">// file index path</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
                     <p class="q-p">
                         PageOptRoot describes HTTP paths to wiki resources.

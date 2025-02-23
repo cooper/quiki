@@ -53,6 +53,7 @@ func prepareForHTML(value any, b block, pos Position) any {
 	case string:
 		value = format(b, v, pos)
 	case block:
+		// copied because it might be iterated over in for{} blocks
 		copied := v.el().copy()
 		v.html(b.page(), copied)
 		value = copied

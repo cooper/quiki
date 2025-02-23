@@ -14,7 +14,8 @@ func handleGenericContent(sec block, page *Page, el element) {
 			createParagraph(sec, page, el, contentToAdd)
 			contentToAdd = nil
 
-			// adopt this block as my own
+			// adopt a copy of this element as my own
+			// copied because it might be iterated over in for{} blocks
 			copy := item.el().copy()
 			item.html(page, copy)
 			el.addChild(copy)
