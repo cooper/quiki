@@ -80,6 +80,9 @@ func (pos *Position) UnmarshalJSON(data []byte) error {
 	if !ok {
 		return errors.New("(Position).UnmarshalJSON: expected column number to be integer")
 	}
+	if line < 0 || col < 0 {
+		return errors.New("(Position).UnmarshalJSON: line and column numbers must be non-negative")
+	}
 	pos.Line, pos.Column = int(line), int(col)
 	return nil
 }
@@ -239,6 +242,7 @@ func (p *parser) parseRune(r rune, page *Page) error {
 
 		// this is escaped
 		if p.escape {
+			p.escape = false // Reset escape flag immediately after processing
 			return p.handleRune(r)
 		}
 
@@ -383,6 +387,7 @@ func (p *parser) parseRune(r rune, page *Page) error {
 
 		// this is escaped
 		if p.escape {
+			p.escape = false // Reset escape flag immediately after processing
 			return p.handleRune(r)
 		}
 
@@ -485,8 +490,10 @@ func (p *parser) parseRune(r rune, page *Page) error {
 	if r == '\\' {
 		// the escape will be handled later
 		if p.escape {
+			p.escape = false // Reset escape flag immediately after processing
 			return p.handleRune(r)
 		}
+		p.escape = true
 		return p.nextRune(r)
 	}
 
@@ -645,6 +652,7 @@ func (p *parser) handleRune(r rune) error {
 	add := string(r)
 	if p.escape && !p.parserChar {
 		add = string([]rune{p.last, r})
+		p.escape = false // Reset escape flag immediately after processing
 	}
 
 	// terminate the catch if the catch says to skip this rune
