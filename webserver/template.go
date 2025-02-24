@@ -141,10 +141,14 @@ func loadTemplate(walkPath, name string, fses []fs.FS) (wikiTemplate, error) {
 			if d.IsDir() && d.Name() == "static" {
 				t.staticPath = filePath
 				t.staticRoot = "/tmpl/" + name
-				fileServer := http.FileServer(http.FS(templateFs))
-				pfx := t.staticRoot + "/"
-				Mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
-				log.Printf("[%s] template registered: %s", name, pfx)
+				if subFs, err := fs.Sub(templateFs, filePath); err == nil {
+					fileServer := http.FileServer(http.FS(subFs))
+					pfx := t.staticRoot + "/"
+					Mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
+					log.Printf("[%s] template registered: %s", name, pfx)
+				} else {
+					log.Printf("[%s] error registering static content: %s", name, err)
+				}
 			}
 
 			// found manifest

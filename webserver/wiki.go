@@ -184,11 +184,6 @@ func setupWiki(wi *WikiInfo) error {
 
 	wikiRoots := []wikiHandler{
 		{
-			rootType: "wiki",
-			root:     wi.Opt.Root.Wiki,
-			handler:  handleWiki,
-		},
-		{
 			rootType: "page",
 			root:     wi.Opt.Root.Page,
 			handler:  handlePage,
@@ -238,7 +233,7 @@ func setupWiki(wi *WikiInfo) error {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
-			if relPath == "" && rootType != "wiki" {
+			if relPath == "" {
 				http.NotFound(w, r)
 				return
 			}

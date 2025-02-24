@@ -49,7 +49,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		// show the main page for the delayed wiki
 		wikiRoot := delayedWiki.Opt.Root.Wiki
 		if r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/" {
-			handleWiki(delayedWiki, wikiRoot, w, r)
+			handleWiki(delayedWiki, "", w, r)
 			return
 		}
 
