@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cooper/quiki/wikifier"
@@ -98,7 +99,8 @@ func findTemplate(name string) (wikiTemplate, error) {
 
 // load a template from its known path
 func loadTemplateAtPath(path string) (wikiTemplate, error) {
-	return loadTemplate(".", path, []fs.FS{os.DirFS(path)})
+	basename := filepath.Base(path)
+	return loadTemplate(".", basename, []fs.FS{os.DirFS(path)})
 }
 
 // load template given fses
