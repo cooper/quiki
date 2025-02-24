@@ -62,7 +62,6 @@ func (w *Wiki) readConfig(file string) error {
 	confPage.VarsOnly = true
 
 	// set this variable for use in the config
-	// consider: is this needed anymore?
 	confPage.Set("dir.wiki", w.Opt.Dir.Wiki)
 
 	// parse the config

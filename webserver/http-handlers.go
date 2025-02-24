@@ -224,6 +224,10 @@ func handleError(wi *WikiInfo, errMaybe any, w http.ResponseWriter, r *http.Requ
 }
 
 func renderTemplate(wi *WikiInfo, w http.ResponseWriter, templateName string, dot wikiPage) {
+	if wi.template.template == nil {
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
 	var buf bytes.Buffer
 	err := wi.template.template.ExecuteTemplate(&buf, templateName+".tpl", dot)
 	if err != nil {

@@ -98,7 +98,7 @@ func findTemplate(name string) (wikiTemplate, error) {
 
 // load a template from its known path
 func loadTemplateAtPath(path string) (wikiTemplate, error) {
-	return loadTemplate(path, []fs.FS{os.DirFS(path)})
+	return loadTemplate(".", []fs.FS{os.DirFS(path)})
 }
 
 // load template given fses
