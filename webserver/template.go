@@ -83,7 +83,7 @@ func findTemplate(name string) (wikiTemplate, error) {
 		return t, nil
 	}
 
-	t, err := loadTemplate(name, templateFses)
+	t, err := loadTemplate(name, name, templateFses)
 	if err != nil {
 		return t, err
 	}
@@ -98,11 +98,11 @@ func findTemplate(name string) (wikiTemplate, error) {
 
 // load a template from its known path
 func loadTemplateAtPath(path string) (wikiTemplate, error) {
-	return loadTemplate(".", []fs.FS{os.DirFS(path)})
+	return loadTemplate(".", path, []fs.FS{os.DirFS(path)})
 }
 
 // load template given fses
-func loadTemplate(name string, fses []fs.FS) (wikiTemplate, error) {
+func loadTemplate(walkPath, name string, fses []fs.FS) (wikiTemplate, error) {
 	var t wikiTemplate
 
 	// template is already cached
@@ -114,7 +114,7 @@ func loadTemplate(name string, fses []fs.FS) (wikiTemplate, error) {
 	tmpl := template.New("")
 	for _, templateFs := range fses {
 		var tryNextDirectory bool
-		err := fs.WalkDir(templateFs, name, func(filePath string, d fs.DirEntry, err error) error {
+		err := fs.WalkDir(templateFs, walkPath, func(filePath string, d fs.DirEntry, err error) error {
 
 			// walk error, probably missing template
 			if err != nil {
