@@ -8,7 +8,6 @@ import (
 	"maps"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -21,7 +20,6 @@ import (
 )
 
 var javascriptTemplates string
-var helpWiki *wiki.Wiki
 
 var frameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
@@ -34,8 +32,8 @@ var frameHandlers = map[string]func(*wikiRequest){
 	"edit-category": handleEditCategoryFrame,
 	"edit-model":    handleEditModelFrame,
 	"switch-branch": handleSwitchBranchFrame,
-	"help":          handleHelpFrame,
-	"help/":         handleHelpFrame,
+	"help":          handleWikiHelpFrame,
+	"help/":         handleWikiHelpFrame,
 }
 
 var wikiFuncHandlers = map[string]func(*wikiRequest){
@@ -193,7 +191,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
-				wikiRoot:  root + shortcode,
+				wikiRoot:  root + shortcode + "/",
 				w:         w,
 				r:         r,
 			}
@@ -432,6 +430,10 @@ func handleEditCategoryFrame(wr *wikiRequest) {
 	handleEditor(wr, metaPath, info.File, info.Title, editorOpts{cat: true, info: info})
 }
 
+func handleWikiHelpFrame(wr *wikiRequest) {
+	wr.dot, wr.err = handleHelpFrame(wr.wikiRoot, wr.w, wr.r)
+}
+
 func handleEditor(wr *wikiRequest, path, file, title string, o editorOpts) {
 	wr.tmplName = "frame-editor.tpl"
 
@@ -513,7 +515,7 @@ func handleSwitchBranchFrame(wr *wikiRequest) {
 }
 
 func handleSwitchBranch(wr *wikiRequest) {
-	branchName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/switch-branch/")
+	branchName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"func/switch-branch/")
 	if branchName == "" {
 		wr.err = errors.New("no branch selected")
 		return
@@ -538,7 +540,7 @@ func handleSwitchBranch(wr *wikiRequest) {
 	// the current frame so the user stays on the same page, just in new branch
 
 	// redirect back to dashboard
-	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"dashboard", http.StatusTemporaryRedirect)
 }
 
 func handleCreateBranch(wr *wikiRequest) {
@@ -564,72 +566,7 @@ func handleCreateBranch(wr *wikiRequest) {
 	sessMgr.Put(wr.r.Context(), "branch", branchName)
 
 	// redirect back to dashboard
-	http.Redirect(wr.w, wr.r, wr.wikiRoot+"/dashboard", http.StatusTemporaryRedirect)
-}
-
-func handleHelpFrame(wr *wikiRequest) {
-
-	var dot struct {
-		Title   string
-		Content template.HTML
-	}
-	wr.dot = &dot
-
-	// create the help wiki if not already loaded
-	if helpWiki == nil {
-
-		// find dir of config file
-		helpDir := filepath.Join(filepath.Dir(webserver.Conf.Path()), "help")
-
-		// check if help dir exists already
-		if _, err := os.Stat(helpDir); err != nil {
-
-			// copy help resources
-			subFs, err := fs.Sub(resources.Adminifier, "help")
-			if err != nil {
-				wr.err = errors.Wrap(err, "reading help resource")
-				return
-			}
-			err = os.CopyFS(helpDir, subFs)
-			if err != nil {
-				wr.err = errors.Wrap(err, "copying help resource")
-				return
-			}
-		}
-
-		var err error
-		helpWiki, err = wiki.NewWiki(helpDir)
-		if err != nil {
-			wr.err = err
-			return
-		}
-	}
-
-	// determine page
-	helpPage := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/frame/help"), "/")
-	if helpPage == "" {
-		helpPage = helpWiki.Opt.MainPage
-	}
-
-	// display the page
-	res := helpWiki.DisplayPage(helpPage)
-	switch res := res.(type) {
-
-	// page content
-	case wiki.DisplayPage:
-		dot.Title = res.Title
-		content := string(res.Content)
-		content = strings.ReplaceAll(content, `"/pagereplace/`, `"`+wr.wikiRoot+"/help/")
-		dot.Content = template.HTML(content)
-
-	// error
-	case wiki.DisplayError:
-		wr.err = errors.New(res.Error)
-
-	// something else
-	default:
-		wr.err = errors.New("unknown response")
-	}
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"dashboard", http.StatusTemporaryRedirect)
 }
 
 func handleWritePage(wr *wikiRequest) {
@@ -705,7 +642,7 @@ func handleWriteFile(wr *wikiRequest, writeFunc func() error) map[string]any {
 }
 
 func handleImage(wr *wikiRequest) {
-	imageName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"/func/image/")
+	imageName := strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"func/image/")
 	si := wiki.SizedImageFromName(imageName)
 
 	// get dimensions from query params

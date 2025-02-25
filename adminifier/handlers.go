@@ -24,6 +24,8 @@ var adminUnauthenticatedFuncHandlers = map[string]func(w http.ResponseWriter, r 
 
 var adminFrameHandlers = map[string]func(*adminRequest){
 	"sites": handleSitesFrame,
+	"help":  handleAdminHelpFrame,
+	"help/": handleAdminHelpFrame,
 }
 
 type adminTemplate struct {
@@ -282,6 +284,10 @@ func handleSitesFrame(ar *adminRequest) {
 		Templates:     webserver.TemplateNames(),
 		adminTemplate: createAdminTemplate(ar.r),
 	}
+}
+
+func handleAdminHelpFrame(ar *adminRequest) {
+	ar.dot, ar.err = handleHelpFrame(root, ar.w, ar.r)
 }
 
 // parsePost confirms POST requests are well-formed and parameters satisfied
