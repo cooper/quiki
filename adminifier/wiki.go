@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/fs"
 	"log"
+	"maps"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -42,6 +43,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"create-branch":  handleCreateBranch,
 	"write-page":     handleWritePage,
 	"write-model":    handleWriteModel,
+	"write-config":   handleWriteWikiConfig,
 	"image/":         handleImage,
 }
 
@@ -634,24 +636,12 @@ func handleWritePage(wr *wikiRequest) {
 		return
 	}
 
-	// TODO: double check the path is OK
 	pageName, content, message := wr.r.Form.Get("name"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
 
-	// write the file & commit
-	jsonEncoder := json.NewEncoder(wr.w)
-	if err := wr.wi.WritePage(pageName, []byte(content), true, getCommitOpts(wr, message)); err != nil {
-		jsonEncoder.Encode(map[string]any{
-			"success":  false,
-			"revError": err.Error(),
-		})
-		return
-	}
-
-	// fetch latest commit hash
-	hash, err := wr.wi.GetLatestCommitHash()
-	if err != nil {
-		log.Printf("error getting latest commit hash: %v", err)
-	}
+	// write the page
+	res := handleWriteFile(wr, func() error {
+		return wr.wi.WritePage(pageName, []byte(content), true, getCommitOpts(wr, message))
+	})
 
 	// display the page
 	var warnings []wikifier.Warning
@@ -664,29 +654,41 @@ func handleWritePage(wr *wikiRequest) {
 		warnings = res.Warnings
 	}
 
-	jsonEncoder.Encode(map[string]any{
-		"success":       true,
-		"revLatestHash": hash,
-		"warnings":      warnings,
-		"displayError":  pageErr,
+	maps.Copy(res, map[string]any{
+		"warnings":     warnings,
+		"displayError": pageErr,
 	})
+	json.NewEncoder(wr.w).Encode(res)
 }
 
 func handleWriteModel(wr *wikiRequest) {
 	if !parsePost(wr.w, wr.r, "name", "content") {
 		return
 	}
-
 	modelName, content, message := wr.r.Form.Get("name"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
+	res := handleWriteFile(wr, func() error {
+		return wr.wi.WriteModel(modelName, []byte(content), true, getCommitOpts(wr, message))
+	})
+	json.NewEncoder(wr.w).Encode(res)
+}
 
-	// write the file & commit
-	jsonEncoder := json.NewEncoder(wr.w)
-	if err := wr.wi.WriteModel(modelName, []byte(content), true, getCommitOpts(wr, message)); err != nil {
-		jsonEncoder.Encode(map[string]any{
-			"success":  false,
-			"revError": err.Error(),
-		})
+func handleWriteWikiConfig(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "content") {
 		return
+	}
+	content, message := wr.r.Form.Get("content"), wr.r.Form.Get("message")
+	res := handleWriteFile(wr, func() error {
+		return wr.wi.WriteConfig([]byte(content), getCommitOpts(wr, message))
+	})
+	json.NewEncoder(wr.w).Encode(res)
+}
+
+func handleWriteFile(wr *wikiRequest, writeFunc func() error) map[string]any {
+	if err := writeFunc(); err != nil {
+		return map[string]any{
+			"success": false,
+			"error":   err.Error(),
+		}
 	}
 
 	// fetch latest commit hash
@@ -695,10 +697,10 @@ func handleWriteModel(wr *wikiRequest) {
 		log.Printf("error getting latest commit hash: %v", err)
 	}
 
-	jsonEncoder.Encode(map[string]any{
+	return map[string]any{
 		"success":       true,
 		"revLatestHash": hash,
-	})
+	}
 }
 
 func handleImage(wr *wikiRequest) {

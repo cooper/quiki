@@ -13,6 +13,9 @@ function loadedHandler () {
         delete:     displayDeleteConfirmation
     });
 
+    if (ae.isConfig())
+        ae.liForAction('delete').addClass('disabled');
+
     // add keyboard shortcut
     ae.addKeyboardShortcuts([
         [ 'Ctrl-S', 'Command-S', 'save']
@@ -271,7 +274,7 @@ function saveRequest (saveData, message, success, fail) {
 
     // do the request
     new Request.JSON({
-        url: 'func/write-' + (ae.isModel() ? 'model' : 'page'),
+        url: 'func/write-' + (ae.isConfig() ? 'config' : ae.isModel() ? 'model' : 'page'),
         secure: true,
         onSuccess: function (data) {
 
