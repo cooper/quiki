@@ -639,7 +639,7 @@ func handleWritePage(wr *wikiRequest) {
 
 	// write the file & commit
 	jsonEncoder := json.NewEncoder(wr.w)
-	if err := wr.wi.WriteFile(filepath.Join("pages", pageName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
+	if err := wr.wi.WritePage(pageName, []byte(content), true, getCommitOpts(wr, message)); err != nil {
 		jsonEncoder.Encode(map[string]any{
 			"success":  false,
 			"revError": err.Error(),
@@ -681,7 +681,7 @@ func handleWriteModel(wr *wikiRequest) {
 
 	// write the file & commit
 	jsonEncoder := json.NewEncoder(wr.w)
-	if err := wr.wi.WriteFile(filepath.Join("models", modelName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
+	if err := wr.wi.WriteModel(modelName, []byte(content), true, getCommitOpts(wr, message)); err != nil {
 		jsonEncoder.Encode(map[string]any{
 			"success":  false,
 			"revError": err.Error(),

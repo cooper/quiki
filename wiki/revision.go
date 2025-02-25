@@ -366,21 +366,23 @@ func ValidBranchName(name string) bool {
 
 // WritePage writes a page file.
 
-// WriteFile writes a file in the wiki.
+// writeFile writes a file in the wiki.
 //
-// The filename must be relative to the wiki directory.
+// The path must be absolute within the wiki directory.
+//
 // If the file does not exist and createOK is false, an error is returned.
 // If the file exists and is a symbolic link, an error is returned.
 //
 // This is a low-level API that allows writing any file within the wiki
 // directory, so it should not be utilized directly by frontends.
 // Use WritePage, WriteModel, WriteImage, or WriteConfig instead.
-//
-// TODO: implement WritePage, WriteModel, WriteImage, WriteConfig then make this private
-func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error {
-	path := w.UnresolvedAbsFilePath(name)
-	fi, err := os.Lstat(path)
+func (w *Wiki) writeFile(path string, content []byte, createOK bool, commit CommitOpts) error {
+	relPath, err := filepath.Rel(w.Dir(), path)
+	if err != nil {
+		return errors.Wrap(err, "filepath:Rel")
+	}
 
+	fi, err := os.Lstat(path)
 	if err != nil {
 		// some error occurred
 
@@ -396,7 +398,7 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 	} else if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
 		// no errors occurred, so file exists
 		// check if it's a symlink
-		return errors.New("symlink cannot be written with WriteFile")
+		return errors.New("refusing to write to symlinked file")
 	}
 
 	// write file all at once
@@ -405,7 +407,27 @@ func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit Comm
 	}
 
 	// commit the change
-	return w.addAndCommit(name, commit)
+	return w.addAndCommit(relPath, commit)
+}
+
+// WritePage writes a page file.
+func (w *Wiki) WritePage(name string, content []byte, createOK bool, commit CommitOpts) error {
+	return w.writeFile(w.PathForPage(name), content, createOK, commit)
+}
+
+// WriteModel writes a model file.
+func (w *Wiki) WriteModel(name string, content []byte, createOK bool, commit CommitOpts) error {
+	return w.writeFile(w.PathForModel(name), content, createOK, commit)
+}
+
+// WriteImage writes an image file.
+func (w *Wiki) WriteImage(name string, content []byte, createOK bool, commit CommitOpts) error {
+	return w.writeFile(w.PathForImage(name), content, createOK, commit)
+}
+
+// WriteConfig writes the wiki configuration file.
+func (w *Wiki) WriteConfig(content []byte, commit CommitOpts) error {
+	return w.writeFile(w.ConfigFile, content, true, commit)
 }
 
 // DeleteFile deletes a file in the wiki.
