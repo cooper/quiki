@@ -254,6 +254,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		panic(err)
 	}
 }
 

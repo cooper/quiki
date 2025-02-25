@@ -5,7 +5,7 @@ var adminifier = {
     staticRoot:     '{{.Static}}',
     wikiRoot:       '{{.Root}}',
     wikiShortName:  '{{.Shortcode}}',
-    wikiName:       '{{.WikiTitle}}',
+    wikiName:       '{{.Title}}',
     wikiPageRoot:   null,
     themeName:      null,
     autosave:       3000000,
@@ -20,7 +20,7 @@ var adminifier = {
     <span class="top-title account-title"><a href="#"><i class="fa fa-user"></i> {{.User.DisplayName}}</a></span>
     <span class="top-title top-button"><a class="frame-click" href="{{.Root}}/switch-branch"><i class="fab fa-git-alt"></i> {{.Branch}}</a></span>
     <input id="top-search" type="text" placeholder="Quick Search..." />
-    <span class="top-title wiki-title">{{.WikiTitle}}</span>
+    <span class="top-title wiki-title">{{.Title}}</span>
     <span id="page-title" class="top-title page-title"><i class="fa fa-home"></i> <span></span></span>
 </div>
 
