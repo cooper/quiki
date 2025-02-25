@@ -67,17 +67,16 @@ func Configure() {
 	log.Println("registered adminifier root: " + host + root)
 
 	// template handlers
+	// FIXME: I think this is unused and can be removed
 	for _, tmplName := range tmplHandlers {
 		mux.HandleFunc(host+root+tmplName, handleTemplate)
 	}
 
-	// function handlers
-	for name, function := range funcHandlers {
-		mux.HandleFunc(host+root+name, function)
-	}
+	// admin handlers
+	setupAdminHandlers()
 
 	// handlers for each site at shortcode/
-	InitWikis()
+	initWikis()
 
 	// if there are no users yet, let them know token
 	if tok, _ := conf.Get("adminifier.token"); tok != nil && len(webserver.Auth.Users) == 0 {

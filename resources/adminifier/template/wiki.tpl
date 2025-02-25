@@ -1,16 +1,5 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>{{.WikiTitle}}</title>
-<link type="text/css" rel="stylesheet" href="{{.Static}}/style/adminifier.css" />
-<link type="text/css" rel="stylesheet" href="{{.Static}}/style/navigation.css" />
-<link type="text/css" rel="stylesheet" href="{{.Static}}/style/notifications.css" />
-<link type="text/css" rel="stylesheet" href="{{.Static}}/ext/font-awesome/css/all.min.css" />
-<link type="text/css" rel="stylesheet" href="{{.QStatic}}/quiki.css" />
-<link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" type="text/css" />
+{{ template "header.tpl" . }}
 <script>
-
 var adminifier = {
     adminRoot:      '{{.AdminRoot}}',
     staticRoot:     '{{.Static}}',
@@ -22,15 +11,7 @@ var adminifier = {
     autosave:       3000000
 
 };
-
 </script>
-<script src="{{.Static}}/ext/mootools.js"></script>
-<script src="{{.Static}}/ext/tmpl.min.js"></script>
-<script src="{{.Static}}/script/adminifier.js"></script>
-<script src="{{.Static}}/script/notifications.js"></script>
-<script src="{{.Static}}/script/modal-window.js"></script>
-<script src="{{.QStatic}}/quiki.js"></script>
-
 </head>
 <body>
 
@@ -53,9 +34,8 @@ var adminifier = {
         <li data-nav="help"><a class="frame-click" href="{{.Root}}/help"><i class="fa fa-question-circle"></i> <span>Help</a></li>
         {{if .ServerPanelAccess}}
             <li><a href="{{.AdminRoot}}/"><i class="fa fa-globe-americas"></i> <span>Sites</span></a></li>
-        {{else}}
-            <li><a href="{{.AdminRoot}}/logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
         {{end}}
+        <li><a href="{{.AdminRoot}}/logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
     </ul>
 </div>
 

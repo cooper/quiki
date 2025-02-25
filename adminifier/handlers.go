@@ -10,22 +10,117 @@ import (
 )
 
 // handlers that call functions
-var funcHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
-	"login":            handleLoginPage,
-	"func/login":       handleLogin,
-	"create-user":      handleCreateUserPage,
-	"func/create-user": handleCreateUser,
-	"logout":           handleLogout,
-	"func/create-wiki": handleCreateWiki,
+var adminUnauthenticatedHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
+	"login":       handleLoginPage,
+	"create-user": handleCreateUserPage,
+	"logout":      handleLogout,
+}
+
+var adminUnauthenticatedFuncHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
+	"login":       handleLogin,
+	"create-user": handleCreateUser,
+	"create-wiki": handleCreateWiki,
+}
+
+var adminFrameHandlers = map[string]func(*adminRequest){
+	"sites": handleSitesFrame,
+}
+
+type adminTemplate struct {
+	User        *authenticator.User
+	Wikis       map[string]*webserver.WikiInfo
+	Templates   []string
+	Title       string // server title
+	Static      string // adminifier static root
+	QStatic     string // webserver static root
+	AdminRoot   string // adminifier root'
+	JSTemplates string
+}
+
+type adminRequest struct {
+	w        http.ResponseWriter
+	r        *http.Request
+	tmplName string
+	dot      any
+	err      error
+}
+
+func setupAdminHandlers() {
+	for name, function := range adminUnauthenticatedHandlers {
+		mux.HandleFunc(host+root+name, function)
+	}
+	for name, function := range adminUnauthenticatedFuncHandlers {
+		mux.HandleFunc(host+root+"func/"+name, function)
+	}
+
+	// authenticated handlers
+
+	// each of these generates admin.tpl
+	for which := range adminFrameHandlers {
+		mux.HandleFunc(host+root+"/"+which, handleAdmin)
+	}
+
+	// frames to load via ajax
+	frameRoot := root + "/frame/"
+	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
+
+		// check logged in
+		if !sessMgr.GetBool(r.Context(), "loggedIn") {
+			http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+			return
+		}
+
+		frameNameFull := strings.TrimPrefix(r.URL.Path, frameRoot)
+		frameName := frameNameFull
+		if i := strings.IndexByte(frameNameFull, '/'); i != -1 {
+			frameNameFull = frameName[:i+1]
+			frameName = frameNameFull[:i]
+		}
+		tmplName := "frame-" + frameName + ".tpl"
+
+		// call func to create template params
+		var dot any = nil
+
+		if handler, exist := adminFrameHandlers[frameNameFull]; exist {
+			// create wiki request
+			ar := &adminRequest{w: w, r: r}
+			dot = ar
+
+			// call handler
+			handler(ar)
+
+			// handler returned an error
+			if ar.err != nil {
+				http.Error(w, ar.err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// handler was successful
+			if ar.dot != nil {
+				dot = ar.dot
+			}
+			if ar.tmplName != "" {
+				tmplName = ar.tmplName
+			}
+		}
+
+		// frame template does not exist
+		if exist := tmpl.Lookup(tmplName); exist == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		// execute frame template with dot
+		err := tmpl.ExecuteTemplate(w, tmplName, dot)
+
+		// error occurred in template execution
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-
-	// if not logged in, temp redirect to login page
-	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
-		return
-	}
 
 	// make sure that this is admin root
 	if strings.TrimPrefix(r.URL.Path, root) != "" {
@@ -33,15 +128,29 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "server.tpl", struct {
-		User      *authenticator.User
-		Wikis     map[string]*webserver.WikiInfo
-		Templates []string
-	}{
-		User:      sessMgr.Get(r.Context(), "user").(*authenticator.User),
-		Wikis:     webserver.Wikis,
-		Templates: webserver.TemplateNames(),
+	handleAdmin(w, r)
+}
+
+func handleAdmin(w http.ResponseWriter, r *http.Request) {
+	// if not logged in, temp redirect to login page
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	err := tmpl.ExecuteTemplate(w, "admin.tpl", adminTemplate{
+		User:        sessMgr.Get(r.Context(), "user").(*authenticator.User),
+		Title:       "quiki",
+		AdminRoot:   strings.TrimRight(root, "/"),
+		Static:      root + "static",
+		QStatic:     root + "qstatic",
+		JSTemplates: "",
 	})
+
+	if err != nil {
+		panic(err)
+	}
+
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
 	// and deny access to the server admin panel
 }
@@ -155,7 +264,17 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	sessMgr.Destroy(r.Context())
 
 	// redirect to login
-	handleRoot(w, r)
+	http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+}
+
+func handleSitesFrame(ar *adminRequest) {
+	ar.dot = struct {
+		Wikis     map[string]*webserver.WikiInfo
+		Templates []string
+	}{
+		Wikis:     webserver.Wikis,
+		Templates: webserver.TemplateNames(),
+	}
 }
 
 // parsePost confirms POST requests are well-formed and parameters satisfied

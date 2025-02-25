@@ -80,7 +80,7 @@ func handleCreateWiki(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// scan wikis on adminifier
-	InitWikis()
+	initWikis()
 
 	// redirect to the root
 	http.Redirect(w, r, "../", http.StatusSeeOther)

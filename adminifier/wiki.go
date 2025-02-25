@@ -52,7 +52,7 @@ type wikiTemplate struct {
 	User              *authenticator.User // user
 	ServerPanelAccess bool                // whether user can access main panel
 	Shortcode         string              // wiki shortcode
-	WikiTitle         string              // wiki title
+	Title             string              // wiki title
 	Branch            string              // selected branch
 	Static            string              // adminifier static root
 	QStatic           string              // webserver static root
@@ -83,7 +83,7 @@ var loadedWikiShortcodes = make(map[string]bool)
 
 // TODO: verify session on ALL wiki handlers
 
-func InitWikis() {
+func initWikis() {
 	for shortcode, wi := range webserver.Wikis {
 		if loadedWikiShortcodes[shortcode] {
 			continue
@@ -755,7 +755,7 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		ServerPanelAccess: true, // TODO
 		Branch:            sessMgr.GetString(wr.r.Context(), "branch"),
 		Shortcode:         wr.shortcode,
-		WikiTitle:         wr.wi.Title,
+		Title:             wr.wi.Title,
 		AdminRoot:         strings.TrimRight(root, "/"),
 		Static:            root + "static",
 		QStatic:           root + "qstatic",
