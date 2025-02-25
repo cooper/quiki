@@ -637,10 +637,38 @@ func handleWritePage(wr *wikiRequest) {
 	pageName, content, message := wr.r.Form.Get("page"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
 
 	// write the file & commit
+	jsonEncoder := json.NewEncoder(wr.w)
 	if err := wr.wi.WriteFile(filepath.Join("pages", pageName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
-		wr.err = err
+		jsonEncoder.Encode(map[string]any{
+			"success":  false,
+			"revError": err.Error(),
+		})
 		return
 	}
+
+	// fetch latest commit hash
+	hash, err := wr.wi.GetLatestCommitHash()
+	if err != nil {
+		log.Printf("error getting latest commit hash: %v", err)
+	}
+
+	// display the page
+	var warnings []wikifier.Warning
+	var pageErr *wikifier.Warning
+	switch res := wr.wi.DisplayPage(pageName).(type) {
+	case wiki.DisplayError:
+		err := res.ErrorAsWarning()
+		pageErr = &err
+	case wiki.DisplayPage:
+		warnings = res.Warnings
+	}
+
+	jsonEncoder.Encode(map[string]any{
+		"success":       true,
+		"revLatestHash": hash,
+		"warnings":      warnings,
+		"displayError":  pageErr,
+	})
 }
 
 func handleImage(wr *wikiRequest) {

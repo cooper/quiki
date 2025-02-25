@@ -375,6 +375,8 @@ func ValidBranchName(name string) bool {
 // This is a low-level API that allows writing any file within the wiki
 // directory, so it should not be utilized directly by frontends.
 // Use WritePage, WriteModel, WriteImage, or WriteConfig instead.
+//
+// TODO: implement WritePage, WriteModel, WriteImage, WriteConfig then make this private
 func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error {
 	path := w.UnresolvedAbsFilePath(name)
 	fi, err := os.Lstat(path)
@@ -427,4 +429,24 @@ func (w *Wiki) DeleteFile(name string, commit CommitOpts) error {
 
 	// delete the file and commit the change
 	return w.removeAndCommit(path, commit)
+}
+
+// GetLatestCommitHash returns the most recent commit hash.
+func (w *Wiki) GetLatestCommitHash() (string, error) {
+	repo, err := w.repo()
+	if err != nil {
+		return "", err
+	}
+
+	ref, err := repo.Head()
+	if err != nil {
+		return "", errors.Wrap(err, "git:repo:Head")
+	}
+
+	commit, err := repo.CommitObject(ref.Hash())
+	if err != nil {
+		return "", errors.Wrap(err, "git:repo:CommitObject")
+	}
+
+	return commit.Hash.String(), nil
 }

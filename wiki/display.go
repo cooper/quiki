@@ -32,3 +32,10 @@ type DisplayRedirect struct {
 	// suitable for use in a Location header
 	Redirect string
 }
+
+func (e DisplayError) ErrorAsWarning() wikifier.Warning {
+	return wikifier.Warning{
+		Message: e.Error,
+		Pos:     e.Pos,
+	}
+}

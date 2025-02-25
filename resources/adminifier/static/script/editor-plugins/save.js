@@ -202,11 +202,6 @@ function _saveHelper () {
             console.log(data);
             ae.lastSavedData = saveData;
 
-            // something went wrong in the page display
-            var displayBad = false, res = data.result;
-            if (!res || res.type == 'not found' && !res.draft)
-                displayBad = true;
-
             // switch to checkmark
             var i = btn.parentElement.getElement('i');
             i.removeClass('fa-spinner');
@@ -215,15 +210,15 @@ function _saveHelper () {
 
             // update button
             btn.removeClass('progress');
-            btn.addClass(displayBad ? 'warning' : 'success');
+            btn.addClass(data.displayError ? 'warning' : 'success');
             var text = data.unchanged ?
-                'File unchanged' : 'Saved ' + data.rev_latest.id.substr(0, 7);
-            if (displayBad)
+                'File unchanged' : 'Saved ' + (data.revLatestHash || '').substr(0, 7);
+            if (data.displayError)
                 text += ' with errors';
             btn.innerHTML = text;
 
             // show the page display error
-            ae.handlePageDisplayResult(res);
+            ae.handleWarningsAndError(data.warnings, data.displayError);
 
             closeBoxSoon();
         };
@@ -287,14 +282,14 @@ function saveRequest (saveData, message, success, fail) {
             // revision error
 
             // nothing changed
-            else if (data.rev_error && data.rev_error.match(/no changes|nothing to commit/)) {
+            else if (data.revError && data.revError.match(/no changes|nothing to commit/)) {
                 data.unchanged = true;
                 success(data);
             }
 
             // git error
-            else if (data.rev_error)
-                fail(data.rev_error);
+            else if (data.revError)
+                fail(data.revError);
 
             // other error
             else if (data.reason)
