@@ -41,6 +41,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"switch-branch/": handleSwitchBranch,
 	"create-branch":  handleCreateBranch,
 	"write-page":     handleWritePage,
+	"write-model":    handleWriteModel,
 	"image/":         handleImage,
 }
 
@@ -629,12 +630,12 @@ func handleHelpFrame(wr *wikiRequest) {
 }
 
 func handleWritePage(wr *wikiRequest) {
-	if !parsePost(wr.w, wr.r, "page", "content") {
+	if !parsePost(wr.w, wr.r, "name", "content") {
 		return
 	}
 
 	// TODO: double check the path is OK
-	pageName, content, message := wr.r.Form.Get("page"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
+	pageName, content, message := wr.r.Form.Get("name"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
 
 	// write the file & commit
 	jsonEncoder := json.NewEncoder(wr.w)
@@ -668,6 +669,35 @@ func handleWritePage(wr *wikiRequest) {
 		"revLatestHash": hash,
 		"warnings":      warnings,
 		"displayError":  pageErr,
+	})
+}
+
+func handleWriteModel(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "name", "content") {
+		return
+	}
+
+	modelName, content, message := wr.r.Form.Get("name"), wr.r.Form.Get("content"), wr.r.Form.Get("message")
+
+	// write the file & commit
+	jsonEncoder := json.NewEncoder(wr.w)
+	if err := wr.wi.WriteFile(filepath.Join("models", modelName), []byte(content), true, getCommitOpts(wr, message)); err != nil {
+		jsonEncoder.Encode(map[string]any{
+			"success":  false,
+			"revError": err.Error(),
+		})
+		return
+	}
+
+	// fetch latest commit hash
+	hash, err := wr.wi.GetLatestCommitHash()
+	if err != nil {
+		log.Printf("error getting latest commit hash: %v", err)
+	}
+
+	jsonEncoder.Encode(map[string]any{
+		"success":       true,
+		"revLatestHash": hash,
 	})
 }
 
