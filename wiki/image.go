@@ -209,7 +209,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 	w.Debug("display image:", logName)
 
 	// check if the file exists
-	bigPath := w.pathForImage(img.FullSizeName())
+	bigPath := w.PathForImage(img.FullSizeName())
 	fi, err := os.Lstat(bigPath)
 	if err != nil {
 		return DisplayError{
@@ -423,7 +423,7 @@ func (w *Wiki) ImageMap() map[string]ImageInfo {
 func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 	// the image does not exist
-	path := w.pathForImage(name)
+	path := w.PathForImage(name)
 	imgFi, err := os.Stat(path)
 	if err != nil {
 		return

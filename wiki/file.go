@@ -170,8 +170,8 @@ func (w *Wiki) allImageFiles() []string {
 	return files
 }
 
-// pathForPage returns the absolute path for a page.
-func (w *Wiki) pathForPage(pageName string) string {
+// PathForPage returns the absolute path for a page.
+func (w *Wiki) PathForPage(pageName string) string {
 
 	// try lowercased version first (quiki style)
 	lcPageName := filepath.FromSlash(wikifier.PageName(pageName))
@@ -189,9 +189,17 @@ func (w *Wiki) pathForPage(pageName string) string {
 	return path
 }
 
-// pathForCategory returns the absolute path for a category. If necessary, it
+// PathForCategory returns the absolute path for a category. If createOK is true, it
 // creates directories for the path components that do not exist.
-func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bool) string {
+func (w *Wiki) PathForCategory(catName string, createOK bool) string {
+	return w.PathForMetaCategory(catName, "", createOK)
+}
+
+// PathForMetaCategory returns the absolute path for a meta category.
+// Meta categories are used for internal categorization and not exposed in the wiki.
+//
+// If createOK is true, it creates directories for the path components that do not exist.
+func (w *Wiki) PathForMetaCategory(catName string, catType CategoryType, createOK bool) string {
 	catName = wikifier.CategoryName(catName)
 
 	// determine base dir
@@ -211,14 +219,14 @@ func (w *Wiki) pathForCategory(catName string, catType CategoryType, createOK bo
 	return path
 }
 
-// pathForImage returns the absolute path for an image.
-func (w *Wiki) pathForImage(imageName string) string {
+// PathForImage returns the absolute path for an image.
+func (w *Wiki) PathForImage(imageName string) string {
 	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Image, filepath.FromSlash(imageName)))
 	return path
 }
 
-// pathForModel returns the absolute path for a model.
-func (w *Wiki) pathForModel(modelName string) string {
+// PathForModel returns the absolute path for a model.
+func (w *Wiki) PathForModel(modelName string) string {
 	modelName = wikifier.PageNameExt(modelName, ".model")
 	path, _ := filepath.Abs(filepath.Join(w.Opt.Dir.Model, filepath.FromSlash(modelName)))
 	return path

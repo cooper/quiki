@@ -133,7 +133,7 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 	} else {
 
 		// didn't find anything, so create one
-		p = wikifier.NewPagePath(w.pathForPage(wikifier.PageName(name)), name)
+		p = wikifier.NewPagePath(w.PathForPage(wikifier.PageName(name)), name)
 	}
 
 	// these are available to all pages
@@ -354,7 +354,7 @@ func (w *Wiki) PageMap() map[string]wikifier.PageInfo {
 func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 
 	// the page does not exist
-	path := w.pathForPage(name)
+	path := w.PathForPage(name)
 	pgFi, err := os.Stat(path)
 	if err != nil {
 		return

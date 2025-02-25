@@ -138,7 +138,7 @@ func (w *Wiki) GetCategory(name string) *Category {
 // GetSpecialCategory loads or creates a special category given the type.
 func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	name = wikifier.CategoryNameNE(name)
-	path := w.pathForCategory(name, typ, true)
+	path := w.PathForMetaCategory(name, typ, true)
 	metaPath := w.Dir("topics", name+".cat")
 
 	// load the category if it exists
@@ -352,7 +352,7 @@ func (cat *Category) update(w *Wiki) {
 	for pageName, entry := range cat.Pages {
 
 		// page no longer exists
-		path := w.pathForPage(pageName)
+		path := w.PathForPage(pageName)
 		pageFi, err := os.Lstat(path)
 		if err != nil {
 			changed = true
@@ -463,12 +463,12 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 
 	// for images, check if the image still exists
 	case CategoryTypeImage:
-		_, err := os.Lstat(w.pathForImage(nameNE))
+		_, err := os.Lstat(w.PathForImage(nameNE))
 		preserve = err != nil
 
 	// for models, check if the model still exists
 	case CategoryTypeModel:
-		_, err := os.Lstat(w.pathForModel(nameNE))
+		_, err := os.Lstat(w.PathForModel(nameNE))
 		preserve = err != nil
 
 	// for normal categories, check if it's being manually preserved
@@ -491,7 +491,7 @@ func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Pag
 
 	// find the image dimensions if not present
 	if cat.ImageInfo == nil {
-		path := w.pathForImage(imageName)
+		path := w.PathForImage(imageName)
 		width, height := getImageDimensions(path)
 		if width != 0 && height != 0 {
 			cat.ImageInfo = &struct {

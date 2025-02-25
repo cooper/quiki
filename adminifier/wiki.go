@@ -418,7 +418,7 @@ func handleEditCategoryFrame(wr *wikiRequest) {
 	}
 
 	// find the category
-	metaPath := wr.wi.Dir("topics", name)
+	metaPath := wr.wi.PathForCategory(name, false)
 	info := wr.wi.CategoryInfo(name)
 	if !info.Exists() {
 		wr.err = errors.New("category does not exist")

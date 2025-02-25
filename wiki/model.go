@@ -77,7 +77,7 @@ func (w *Wiki) ModelMap() map[string]wikifier.ModelInfo {
 func (w *Wiki) ModelInfo(name string) (info wikifier.ModelInfo) {
 
 	// the model does not exist
-	path := w.pathForModel(name)
+	path := w.PathForModel(name)
 	mdFi, err := os.Stat(path)
 	if err != nil {
 		return
