@@ -8,10 +8,11 @@ var adminifier = {
     wikiName:       '{{.WikiTitle}}',
     wikiPageRoot:   null,
     themeName:      null,
-    autosave:       3000000
-
+    autosave:       3000000,
+    homePage:       'dashboard'
 };
 </script>
+{{ template "scripts.tpl" . }}
 </head>
 <body>
 

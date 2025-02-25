@@ -57,11 +57,11 @@ func setupAdminHandlers() {
 
 	// each of these generates admin.tpl
 	for which := range adminFrameHandlers {
-		mux.HandleFunc(host+root+"/"+which, handleAdmin)
+		mux.HandleFunc(host+root+which, handleAdmin)
 	}
 
 	// frames to load via ajax
-	frameRoot := root + "/frame/"
+	frameRoot := root + "frame/"
 	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
@@ -76,7 +76,7 @@ func setupAdminHandlers() {
 			frameNameFull = frameName[:i+1]
 			frameName = frameNameFull[:i]
 		}
-		tmplName := "frame-" + frameName + ".tpl"
+		tmplName := "admin-frame-" + frameName + ".tpl"
 
 		// call func to create template params
 		var dot any = nil
@@ -106,6 +106,7 @@ func setupAdminHandlers() {
 
 		// frame template does not exist
 		if exist := tmpl.Lookup(tmplName); exist == nil {
+			log.Printf("frame template not found: %s", tmplName)
 			http.NotFound(w, r)
 			return
 		}
@@ -132,20 +133,14 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
+
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
 		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
 		return
 	}
 
-	err := tmpl.ExecuteTemplate(w, "admin.tpl", adminTemplate{
-		User:        sessMgr.Get(r.Context(), "user").(*authenticator.User),
-		Title:       "quiki",
-		AdminRoot:   strings.TrimRight(root, "/"),
-		Static:      root + "static",
-		QStatic:     root + "qstatic",
-		JSTemplates: "",
-	})
+	err := tmpl.ExecuteTemplate(w, "admin.tpl", createAdminTemplate(r))
 
 	if err != nil {
 		panic(err)
@@ -153,6 +148,17 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: if user has only one site and no admin privs, go straight to site dashboard
 	// and deny access to the server admin panel
+}
+
+func createAdminTemplate(r *http.Request) adminTemplate {
+	return adminTemplate{
+		User:        sessMgr.Get(r.Context(), "user").(*authenticator.User),
+		Title:       "quiki",
+		AdminRoot:   strings.TrimRight(root, "/"),
+		Static:      root + "static",
+		QStatic:     root + "qstatic",
+		JSTemplates: "",
+	}
 }
 
 func handleLoginPage(w http.ResponseWriter, r *http.Request) {
@@ -224,7 +230,6 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Form.Get("token") != expectedToken {
-		log.Printf("expected token: %s, got: %s", expectedToken, r.Form.Get("token"))
 		http.Error(w, "invalid token", http.StatusUnauthorized)
 		return
 	}
@@ -271,9 +276,11 @@ func handleSitesFrame(ar *adminRequest) {
 	ar.dot = struct {
 		Wikis     map[string]*webserver.WikiInfo
 		Templates []string
+		adminTemplate
 	}{
-		Wikis:     webserver.Wikis,
-		Templates: webserver.TemplateNames(),
+		Wikis:         webserver.Wikis,
+		Templates:     webserver.TemplateNames(),
+		adminTemplate: createAdminTemplate(ar.r),
 	}
 }
 

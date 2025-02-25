@@ -1,4 +1,13 @@
 {{ template "header.tpl" . }}
+<script>
+var adminifier = {
+    adminRoot:      '{{.AdminRoot}}',
+    staticRoot:     '{{.Static}}',
+    wikiRoot:       '{{.AdminRoot}}',
+    homePage:       'sites'
+};
+</script>
+{{ template "scripts.tpl" . }}
 </head>
 <body>
 

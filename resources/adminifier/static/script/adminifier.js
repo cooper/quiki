@@ -188,6 +188,8 @@ function addFrameClickHandler (where) {
 
 // load a page
 function frameLoad (page) {
+    if (!page)
+        page = adminifier.homePage;
 
 	// same page
     if (a.currentPage == page)

@@ -1,3 +1,9 @@
+<meta
+    data-nav="sites"
+    data-title="Sites"
+    data-icon="globe-americas"
+/>
+
 <h1>Welcome, {{.User.DisplayName}}!</h1>
 
 <h2>Available Sites</h2>

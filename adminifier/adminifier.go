@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/resources"
@@ -42,7 +43,9 @@ func Configure() {
 		*ptr = str
 	}
 
-	root += "/"
+	if !strings.HasSuffix(root, "/") {
+		root += "/"
+	}
 
 	// configure session manager
 	sessMgr = webserver.SessMgr
