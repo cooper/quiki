@@ -4,6 +4,36 @@ The `quiki` executable can be used for several different functions.
 
 Please note: it is intended to be run as a non-super user.
 
+Cheat Sheet
+```
+
+# First Run Wizard
+quiki -w            # Run wizard with defaults of *:8080 and data directory at ~/quiki 
+quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com -config=/var/www/quiki.conf
+
+# Run Webserver
+quiki                                   # using server config at ~/quiki/quiki.conf
+quiki -config=/path/to/quiki.conf       # using config in another location
+quiki -host=sites.example.com           # override default http host
+quiki -bind=1.2.3.4 -port=8090          # override host and port in config
+
+# Generate Pages to STDOUT
+quiki /path/to/my_page.page             # generate a standalone page, any .page or .md file
+quiki -wiki=/path/to/wiki my_page       # generate a page within a wiki
+
+# Wiki Operations
+quiki -wiki=/path/to/wiki               # pregenerate all pages in a wiki
+quiki -create-wiki=/path/to/wiki        # create a new wiki at the path
+
+# Server Config Operations
+# (use with -config otherwise assumes ~/quiki/quiki.conf)
+quiki -enable-wiki=shortcode            # start serving a wiki within the server wikis directory
+quiki -enable-wiki=/path/to/wiki        # start serving a wiki outside the server wikis directory
+quiki -disable-wiki=shortcode           # stop serving a wiki
+quiki -import-wiki=/path/to/wiki        # import a wiki to the server wikis directory
+quiki -import-wiki=/path/to/wiki -enable-wiki=shortcode # these commands can be combined
+```
+
 # Wizard
 
 To set up quiki webserver for the first time, run the setup wizard with
@@ -24,7 +54,7 @@ By default, the wizard creates a directory at `~/quiki` to store your quiki
 configuration and sites. It will write the configuration file to `~/quiki/quiki.conf`.
 If you want to store the config elsewhere, you can specify like so:
 ```
-quki -w -config=/path/to/quiki.conf
+quiki -w -config=/path/to/quiki.conf
 ```
 
 See the [configuration spec](doc/configuration.md) for all options.
