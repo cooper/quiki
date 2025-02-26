@@ -122,7 +122,7 @@ func runPageAndExit(page *wikifier.Page) {
 		json.NewEncoder(os.Stdout).Encode(page)
 		os.Exit(0)
 	}
-	fmt.Println(page.HTML())
+	fmt.Println(page.HTMLAndCSS())
 	os.Exit(0)
 }
 
@@ -135,6 +135,11 @@ func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
 	}
 	switch r := res.(type) {
 	case wiki.DisplayPage:
+		if r.CSS != "" {
+			fmt.Println(`<style type="text/css">`)
+			fmt.Println(r.CSS)
+			fmt.Println(`</style>`)
+		}
 		fmt.Println(r.Content)
 	case wiki.DisplayError:
 		log.Fatal(r.Error)

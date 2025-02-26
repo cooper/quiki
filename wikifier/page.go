@@ -201,6 +201,15 @@ func (p *Page) HTML() HTML {
 	return p._html
 }
 
+// HTMLAndCSS generates and returns the HTML code for the page, including CSS.
+func (p *Page) HTMLAndCSS() HTML {
+	css := p.CSS()
+	if css != "" {
+		return HTML("<style>\n" + css + "\n</style>\n" + string(p.HTML()))
+	}
+	return p.HTML()
+}
+
 // Text generates and returns the rendered plain text for the page.
 // The page must be parsed with Parse before attempting this method.
 func (p *Page) Text() string {
