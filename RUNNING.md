@@ -23,6 +23,7 @@ quiki -bind=1.2.3.4 -port=8090          # override host and port in config
 
 quiki /path/to/my_page.page             # generate a standalone page, any .page or .md file
 quiki -wiki=/path/to/wiki my_page       # generate a page within a wiki
+quiki -i                                # interactive mode - read from STDIN
 
 # Wiki Operations
 

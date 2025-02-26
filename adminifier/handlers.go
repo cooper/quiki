@@ -68,8 +68,7 @@ func setupAdminHandlers() {
 	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
-		if !sessMgr.GetBool(r.Context(), "loggedIn") {
-			http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		if redirectIfNotLoggedIn(w, r) {
 			return
 		}
 
@@ -136,10 +135,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
-
-	// if not logged in, temp redirect to login page
-	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+	if redirectIfNotLoggedIn(w, r) {
 		return
 	}
 
@@ -325,4 +321,13 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 	}
 
 	return true
+}
+
+func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
+	// if not logged in, temp redirect to login page
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		return true
+	}
+	return false
 }

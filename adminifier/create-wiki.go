@@ -1,18 +1,21 @@
 package adminifier
 
 import (
-	"io/fs"
 	"net/http"
-	"os"
 	"path/filepath"
 	"slices"
 
-	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
+	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 )
 
 func handleCreateWiki(w http.ResponseWriter, r *http.Request) {
+	// ensure user is authenticated
+	if redirectIfNotLoggedIn(w, r) {
+		return
+	}
+
 	// missing parameters or malformed request
 	if !parsePost(w, r, "template") {
 		return
@@ -25,43 +28,26 @@ func handleCreateWiki(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wikiDir, err := webserver.Conf.GetStr("server.dir.wiki")
-	if err != nil || wikiDir == "" {
+	// ensure server.dir.wiki is set
+	wikisDir, err := webserver.Conf.GetStr("server.dir.wiki")
+	if err != nil || wikisDir == "" {
 		http.Error(w, "server.dir.wiki is not set, nowhere to create", http.StatusInternalServerError)
 		return
 	}
 
-	normalizedName := wikifier.PageNameLink(r.Form.Get("name"))
-	wikiPath := filepath.Join(wikiDir, normalizedName)
+	wikiName := r.Form.Get("name")
+	normalizedName := wikifier.PageNameLink(wikiName)
+	wikiPath := filepath.Join(wikisDir, normalizedName)
 
-	// copy blank wiki from resources
-	newWikiFs, err := fs.Sub(resources.Adminifier, "new-wiki")
+	// create the wiki
+	err = wiki.CreateWikiFromResource(wikiPath, r.Form.Get("base"), wiki.CreateWikiOpts{
+		WikiName:     wikiName,
+		TemplateName: templateName,
+		MainPage:     "main",
+		ErrorPage:    "error",
+	})
 	if err != nil {
-		http.Error(w, "get new wiki fs: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := os.CopyFS(wikiPath, newWikiFs); err != nil {
-		http.Error(w, "copy new wiki: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// create config page
-	conf := wikifier.NewPage(filepath.Join(wikiPath, "wiki.conf"))
-	vars := map[string]any{
-		"name":       r.Form.Get("name"),
-		"root.wiki":  normalizedName,
-		"template":   templateName,
-		"main_page":  "main",
-		"error_page": "error",
-	}
-	for k, v := range vars {
-		conf.Set(k, v)
-	}
-
-	// write wiki config
-	conf.VarsOnly = true
-	if err := conf.Write(); err != nil {
-		http.Error(w, "write wiki config: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "create wiki: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
