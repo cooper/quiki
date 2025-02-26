@@ -10,8 +10,9 @@
     data-search="fileSearch"
     data-sort="{{.Order}}"
 
-    data-buttons="create filter"
-    data-button-create="{'title': 'New page', 'icon': 'plus-circle', 'func': 'createPage'}"
+    data-buttons="create-page create-folder filter"
+    data-button-create-page="{'title': 'New Page', 'icon': 'plus-circle', 'func': 'createPage'}"
+    data-button-create-folder="{'title': 'New Folder', 'icon': 'folder', 'func': 'createFolder'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"

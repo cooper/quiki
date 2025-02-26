@@ -34,16 +34,29 @@ a.json.results.each(function (pageData) {
 pageList.draw($('content'));
 
 exports.createPage = function () {
-    var createWindow = new ModalWindow({
+    var modal = new ModalWindow({
         icon:           'plus-circle',
-        title:          'Create page',
+        title:          'New Page',
         html:           'Coming soon',
         padded:         true,
         id:             'create-page-window',
         autoDestroy:    true,
         onDone:         null
     });
-    createWindow.show();
+    modal.show();
+}
+
+exports.createFolder = function () {
+    var modal = new ModalWindow({
+        icon:           'folder',
+        title:          'New Folder',
+        html:           'Coming soon',
+        padded:         true,
+        id:             'create-folder-window',
+        autoDestroy:    true,
+        onDone:         null
+    });
+    modal.show();
 }
 
 })(adminifier, window);

@@ -16,7 +16,15 @@
     <h2>Available Sites</h2>
     <ul>
     {{range $shortcode, $wi := .Wikis}}
-        <li><a href="sites/{{$shortcode}}/dashboard">{{$wi.Title}}</a></li>
+        <li>
+            {{$wi.Title}} -
+            <a href="sites/{{$shortcode}}/dashboard">
+                <i class="fa fa-edit"></i>
+            </a>
+            <a href="{{$wi.Opt.Root.Ext}}" target="_blank">
+                <i class="fa fa-globe-americas"></i>
+            </a>
+        </li>
     {{end}}
     </ul>
 {{end}}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -162,7 +163,7 @@ func setupWiki(wi *WikiInfo) error {
 		if Opts.Port != "80" {
 			port = ":" + Opts.Port
 		}
-		wi.Opt.Root.Ext = "http://" + host + port + "/" + wi.Opt.Root.Wiki
+		wi.Opt.Root.Ext = "http://" + path.Join(host+port, wi.Opt.Root.Wiki)
 	}
 
 	// if not configured, use default template
