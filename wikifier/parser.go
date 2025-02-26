@@ -47,6 +47,7 @@ type Position struct {
 	Line, Column int
 }
 
+// none returns true if the position is the default value.
 func (pos Position) none() bool {
 	return pos.Line == 0 && pos.Column == 0
 }

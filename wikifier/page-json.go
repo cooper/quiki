@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 )
 
+// MarshalJSON returns a JSON representation of the page.
+// It includes the PageInfo, HTML, and CSS.
 func (p *Page) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Title string `json:"title"`
-		HTML  HTML   `json:"html"`
-		CSS   string `json:"css"`
+		HTML HTML   `json:"html"`
+		CSS  string `json:"css"`
 		PageInfo
 	}{
 		HTML:     p.HTML(),

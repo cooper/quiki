@@ -147,6 +147,7 @@ func (p *Page) _parse() error {
 	} else if p.Source != "" {
 		reader = strings.NewReader(p.Source)
 	} else if p.Markdown && p.FilePath != "" {
+		// TODO: parse markdown as it's read instead of reading whole file to memory
 		md, err := os.ReadFile(p.FilePath)
 		if err != nil {
 			return err
