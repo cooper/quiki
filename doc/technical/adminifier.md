@@ -12,9 +12,3 @@ Package adminifier provides an administrative panel with a web-based editor.
 func Configure()
 ```
 Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
-
-#### func  InitWikis
-
-```go
-func InitWikis()
-```

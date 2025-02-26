@@ -998,6 +998,7 @@ type PageOptRoot struct {
 	Category string // category root path
 	Page     string // page root path
 	File     string // file index path
+	Ext      string // full external wiki prefix
 }
 ```
 

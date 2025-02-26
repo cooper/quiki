@@ -38,6 +38,11 @@
                         
                         
                             
+                                root.ext
+                            
+                        
+                        
+                            
                                 external
                             
                         
@@ -190,6 +195,11 @@
                         
                             
                                 server.http.bind
+                            
+                        
+                        
+                            
+                                server.http.host
                             
                         
                         
@@ -377,6 +387,24 @@
                     If you specify root.file, the entire wiki directory (as specified by
                     dir.wiki) will be indexed by the web server at this path. Note
                     that this will likely expose your wiki configuration.
+                
+            
+            
+                
+                    root.ext
+                
+                
+                    Optional. The full external prefix of the wiki.
+                
+                
+                    It is used by adminifier to link to the wiki. It may also be used by frontends.
+                    You should configure this if serving quiki through a reverse proxy. Otherwise, the
+                    default should probably suffice. Do not include trailing slash.
+                
+@root.ext: https://mywiki.example.com;
+
+                
+                    Default (webserver/adminifier): http://<host.wiki || server.http.host>:<server.http.port>/<root.wiki>
                 
             
             
@@ -903,6 +931,7 @@ server.http.port: 8080;
                 
                     Optional. Host to bind to.
                 
+@server.http.port: 8080;
 @server.http.bind: 127.0.0.1;
 
                 
@@ -913,6 +942,25 @@ server.http.port: 8080;
 
                 
                     Default: none (bind to all available hosts)
+                
+            
+            
+                
+                    server.http.host
+                
+                
+                    Optional. The default host to serve wikis on if they don't specify host.wiki.
+                
+                
+                    Note this helps inform the value of root.ext for wikis that do not specify an
+                    external root in their configuration. It is recommended you configure it to the
+                    public host of your server.
+                
+                
+                    Should be a hostname only or IP only, e.g. server.example.com.
+                
+                
+                    Default: None (serve wikis with no host configured on all hosts)
                 
             
             

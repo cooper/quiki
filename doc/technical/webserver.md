@@ -12,13 +12,6 @@ var Auth *authenticator.Authenticator
 Auth is the server authentication service.
 
 ```go
-var Bind string
-```
-Bind is the string to bind to, as extracted from the configuration file.
-
-It is available only after Configure is called.
-
-```go
 var Conf *wikifier.Page
 ```
 Conf is the webserver configuration page.
@@ -29,14 +22,6 @@ It is available only after Configure is called.
 var Mux *http.ServeMux
 ```
 Mux is the *http.ServeMux.
-
-It is available only after Configure is called.
-
-```go
-var Port string
-```
-Port is the port to bind to or "unix" for a UNIX socket, as extracted from the
-configuration file.
 
 It is available only after Configure is called.
 
@@ -60,7 +45,7 @@ Wikis is all wikis served by this webserver.
 #### func  Configure
 
 ```go
-func Configure(opts Options)
+func Configure(_initial_options Options)
 ```
 Configure parses a configuration file and initializes webserver.
 
@@ -102,11 +87,17 @@ type Options struct {
 	Config string
 	Bind   string
 	Port   string
+	Host   string
 	Pregen bool
 }
 ```
 
 Options is the webserver command line options.
+
+```go
+var Opts Options
+```
+Opts is the webserver options.
 
 #### type WikiInfo
 

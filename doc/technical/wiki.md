@@ -262,6 +262,12 @@ type DisplayError struct {
 
 DisplayError represents an error result to display.
 
+#### func (DisplayError) ErrorAsWarning
+
+```go
+func (e DisplayError) ErrorAsWarning() wikifier.Warning
+```
+
 #### type DisplayFile
 
 ```go
@@ -739,6 +745,13 @@ func (w *Wiki) GetCategory(name string) *Category
 ```
 GetCategory loads or creates a category.
 
+#### func (*Wiki) GetLatestCommitHash
+
+```go
+func (w *Wiki) GetLatestCommitHash() (string, error)
+```
+GetLatestCommitHash returns the most recent commit hash.
+
 #### func (*Wiki) GetSpecialCategory
 
 ```go
@@ -862,6 +875,46 @@ PagesSorted returns info about all the pages in the wiki, sorted as specified.
 Accepted sort functions are SortTitle, SortAuthor, SortCreated, and
 SortModified.
 
+#### func (*Wiki) PathForCategory
+
+```go
+func (w *Wiki) PathForCategory(catName string, createOK bool) string
+```
+PathForCategory returns the absolute path for a category. If createOK is true,
+it creates directories for the path components that do not exist.
+
+#### func (*Wiki) PathForImage
+
+```go
+func (w *Wiki) PathForImage(imageName string) string
+```
+PathForImage returns the absolute path for an image.
+
+#### func (*Wiki) PathForMetaCategory
+
+```go
+func (w *Wiki) PathForMetaCategory(catName string, catType CategoryType, createOK bool) string
+```
+PathForMetaCategory returns the absolute path for a meta category. Meta
+categories are used for internal categorization and not exposed in the wiki.
+
+If createOK is true, it creates directories for the path components that do not
+exist.
+
+#### func (*Wiki) PathForModel
+
+```go
+func (w *Wiki) PathForModel(modelName string) string
+```
+PathForModel returns the absolute path for a model.
+
+#### func (*Wiki) PathForPage
+
+```go
+func (w *Wiki) PathForPage(pageName string) string
+```
+PathForPage returns the absolute path for a page.
+
 #### func (*Wiki) Pregenerate
 
 ```go
@@ -895,17 +948,30 @@ The result is an absolute path which may or may not exist.
 
 Symlinks are not followed. If that is desired, use absoluteFilePath instead.
 
-#### func (*Wiki) WriteFile
+#### func (*Wiki) WriteConfig
 
 ```go
-func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error
+func (w *Wiki) WriteConfig(content []byte, commit CommitOpts) error
 ```
-WriteFile writes a file in the wiki.
+WriteConfig writes the wiki configuration file.
 
-The filename must be relative to the wiki directory. If the file does not exist
-and createOK is false, an error is returned. If the file exists and is a
-symbolic link, an error is returned.
+#### func (*Wiki) WriteImage
 
-This is a low-level API that allows writing any file within the wiki directory,
-so it should not be utilized directly by frontends. Use WritePage, WriteModel,
-WriteImage, or WriteConfig instead.
+```go
+func (w *Wiki) WriteImage(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WriteImage writes an image file.
+
+#### func (*Wiki) WriteModel
+
+```go
+func (w *Wiki) WriteModel(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WriteModel writes a model file.
+
+#### func (*Wiki) WritePage
+
+```go
+func (w *Wiki) WritePage(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WritePage writes a page file.

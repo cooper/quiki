@@ -81,6 +81,20 @@ If you specify `root.file`, the entire wiki directory (as specified by
 [`dir.wiki`](#dirwiki)) will be indexed by the web server at this path. Note
 that this will likely expose your wiki configuration.
 
+### root.ext
+
+_Optional_. The full external prefix of the wiki.
+
+It is used by adminifier to link to the wiki. It may also be used by frontends.
+You should configure this if serving quiki through a reverse proxy. Otherwise, the
+default should probably suffice. Do not include trailing slash.
+
+```
+@root.ext: https://mywiki.example.com;
+```
+
+__Default__ (webserver/adminifier): `http://<host.wiki || server.http.host>:<server.http.port>/<root.wiki>`
+
 ### external
 
 _Optional_. External wiki information.
@@ -413,6 +427,7 @@ You can also say `unix` to listen on a UNIX socket.
 _Optional_. Host to bind to.
 
 ```
+@server.http.port: 8080;
 @server.http.bind: 127.0.0.1;
 ```
 
@@ -423,6 +438,18 @@ Or, you can listen on a UNIX socket:
 ```
 
 __Default__: none (bind to all available hosts)
+
+### server.http.host
+
+_Optional_. The default host to serve wikis on if they don't specify `host.wiki`.
+
+Note this helps inform the value of `root.ext` for wikis that do not specify an
+external root in their configuration. It is recommended you configure it to the
+public host of your server.
+
+Should be a hostname only or IP only, e.g. `server.example.com`.
+
+__Default__: None (serve wikis with no host configured on all hosts)
 
 ### server.dir.template
 

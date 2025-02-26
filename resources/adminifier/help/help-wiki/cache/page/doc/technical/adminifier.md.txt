@@ -16,11 +16,6 @@
                                 func  Configure
                             
                         
-                        
-                            
-                                func  InitWikis
-                            
-                        
                     
                 
             
@@ -52,13 +47,6 @@ func Configure()
                     
                         Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
                     
-                
-                
-                    
-                        func  InitWikis
-                    
-func InitWikis()
-
                 
             
         
