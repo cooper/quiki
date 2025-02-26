@@ -8,6 +8,7 @@ import (
 	"maps"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -47,15 +48,16 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 
 // wikiTemplate members are available to all wiki templates
 type wikiTemplate struct {
-	User              *authenticator.User // user
-	ServerPanelAccess bool                // whether user can access main panel
-	Shortcode         string              // wiki shortcode
-	Title             string              // wiki title
-	Branch            string              // selected branch
-	Static            string              // adminifier static root
-	QStatic           string              // webserver static root
-	AdminRoot         string              // adminifier root
-	Root              string              // wiki root
+	User              *authenticator.User  // user
+	ServerPanelAccess bool                 // whether user can access main panel
+	Shortcode         string               // wiki shortcode
+	Title             string               // wiki title
+	Branch            string               // selected branch
+	Static            string               // adminifier static root
+	QStatic           string               // webserver static root
+	AdminRoot         string               // adminifier root
+	Root              string               // wiki root
+	WikiRoots         wikifier.PageOptRoot // wiki roots
 }
 
 type wikiRequest struct {
@@ -92,16 +94,17 @@ func initWikis() {
 }
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
+	wikiRoot := root + "sites/" + shortcode + "/"
 
 	// each of these URLs generates wiki.tpl
 	for which := range frameHandlers {
-		mux.HandleFunc(host+root+shortcode+"/"+which, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(host+wikiRoot+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
 	}
 
 	// frames to load via ajax
-	frameRoot := root + shortcode + "/frame/"
+	frameRoot := wikiRoot + "frame/"
 	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
@@ -125,7 +128,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
-				wikiRoot:  root + shortcode,
+				wikiRoot:  wikiRoot,
 				w:         w,
 				r:         r,
 			}
@@ -172,7 +175,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	})
 
 	// functions
-	funcRoot := root + shortcode + "/func/"
+	funcRoot := wikiRoot + "func/"
 	for funcName, thisHandler := range wikiFuncHandlers {
 		handler := thisHandler
 		mux.HandleFunc(host+funcRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
@@ -191,7 +194,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
-				wikiRoot:  root + shortcode + "/",
+				wikiRoot:  wikiRoot,
 				w:         w,
 				r:         r,
 			}
@@ -688,6 +691,18 @@ func switchUserWiki(wr *wikiRequest, wi *webserver.WikiInfo) {
 }
 
 func getGenericTemplate(wr *wikiRequest) wikiTemplate {
+
+	// prepend external root to all wiki roots
+	roots := wr.wi.Opt.Root
+	roots = wikifier.PageOptRoot{
+		Wiki:     path.Join(roots.Ext, roots.Wiki),
+		Image:    path.Join(roots.Ext, roots.Image),
+		Category: path.Join(roots.Ext, roots.Category),
+		Page:     path.Join(roots.Ext, roots.Page),
+		File:     path.Join(roots.Ext, roots.File),
+		Ext:      roots.Ext,
+	}
+
 	return wikiTemplate{
 		User:              sessMgr.Get(wr.r.Context(), "user").(*authenticator.User),
 		ServerPanelAccess: true, // TODO
@@ -697,7 +712,8 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		AdminRoot:         strings.TrimRight(root, "/"),
 		Static:            root + "static",
 		QStatic:           root + "qstatic",
-		Root:              root + wr.shortcode,
+		Root:              root + "sites/" + wr.shortcode,
+		WikiRoots:         roots,
 	}
 }
 

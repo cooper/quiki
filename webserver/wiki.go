@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -132,8 +133,37 @@ func InitWikis() error {
 	return nil
 }
 
+var warnedHostnameUsed bool
+
 // initialize a wiki
 func setupWiki(wi *WikiInfo) error {
+
+	// derive root.ext if not configured
+	if wi.Opt.Root.Ext == "" {
+		host := wi.Opt.Host.Wiki
+		if host == "" {
+			host = Opts.Host
+		}
+		if host == "" {
+			host, _ = os.Hostname()
+			if host != "" && !warnedHostnameUsed {
+				log.Printf("[%s] @server.http.host not configured, using system "+
+					"hostname to configure external root: %s", wi.Name, host)
+				warnedHostnameUsed = true
+			}
+		}
+		if host == "" {
+			host = "localhost"
+			log.Printf("[%s] warning: no host configured for wiki nor default "+
+				"host on server. either set a default host in quiki.conf with "+
+				"@server.http.host, or set @host.wiki in wiki.conf", wi.Name)
+		}
+		port := ""
+		if Opts.Port != "80" {
+			port = ":" + Opts.Port
+		}
+		wi.Opt.Root.Ext = "http://" + host + port + "/" + wi.Opt.Root.Wiki
+	}
 
 	// if not configured, use default template
 	templateNameOrPath := wi.Opt.Template

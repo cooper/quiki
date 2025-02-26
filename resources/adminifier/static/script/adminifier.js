@@ -6,6 +6,10 @@ var wikiRootRgx = new RegExp((adminifier.wikiRoot + '/').replace(/[-\/\\^$*+?.()
 // whether this page's scripts have been loaded yet
 var pageScriptsDone = false;
 
+// workaround for html/template bug where http:// becomes http:/
+if (a.wikiPageRoot && !a.wikiPageRoot.match(/:\/\//) && a.wikiPageRoot.match(/:\//))
+    a.wikiPageRoot = a.wikiPageRoot.replace(/:\//, '://');
+
 // this is for if pageScriptsDone event is added
 // and the page scripts are already done
 Element.Events.pageScriptsLoaded = {

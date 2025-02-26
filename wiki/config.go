@@ -30,6 +30,7 @@ var defaultWikiOpt = wikifier.PageOpt{
 		Image:    "/images",
 		Category: "/topic",
 		File:     "", // (i.e., disabled)
+		Ext:      "", // (i.e., not configured)
 	},
 	Image: wikifier.PageOptImage{
 		Retina:     []int{2, 3},

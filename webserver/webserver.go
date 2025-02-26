@@ -26,6 +26,7 @@ type Options struct {
 	Config string
 	Bind   string
 	Port   string
+	Host   string
 	Pregen bool
 }
 
@@ -44,15 +45,8 @@ var Mux *http.ServeMux
 // It is available only after Configure is called.
 var Server *http.Server
 
-// Bind is the string to bind to, as extracted from the configuration file.
-//
-// It is available only after Configure is called.
-var Bind string
-
-// Port is the port to bind to or "unix" for a UNIX socket, as extracted from the configuration file.
-//
-// It is available only after Configure is called.
-var Port string
+// Opts is the webserver options.
+var Opts Options
 
 // Auth is the server authentication service.
 var Auth *authenticator.Authenticator
@@ -63,26 +57,25 @@ var SessMgr *scs.SessionManager
 // Configure parses a configuration file and initializes webserver.
 //
 // If any errors occur, the program is terminated.
-func Configure(opts Options) {
+func Configure(_initial_options Options) {
 	var err error
+	Opts = _initial_options
 	Mux = http.NewServeMux()
 	gob.Register(&authenticator.User{})
 
 	// parse configuration
-	Conf = wikifier.NewPage(opts.Config)
+	Conf = wikifier.NewPage(Opts.Config)
 	Conf.VarsOnly = true
 	if err = Conf.Parse(); err != nil {
 		log.Fatal(errors.Wrap(err, "parse config"))
 	}
 
-	Bind = opts.Bind
-	Port = opts.Port
-
 	// extract strings
 	var templateDirs string
 	for key, ptr := range map[string]*string{
-		"server.http.port":    &Port,
-		"server.http.bind":    &Bind,
+		"server.http.port":    &Opts.Port,
+		"server.http.bind":    &Opts.Bind,
+		"server.http.host":    &Opts.Host,
 		"server.dir.template": &templateDirs,
 	} {
 		if *ptr != "" {
@@ -130,7 +123,7 @@ func Configure(opts Options) {
 	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
-	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(opts.Config), "quiki-auth.json"))
+	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(Opts.Config), "quiki-auth.json"))
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "init server authenticator"))
 	}
@@ -141,16 +134,16 @@ func Configure(opts Options) {
 // Configure must be called first.
 // If any errors occur, the program is terminated.
 func Listen() {
-	if Port == "unix" {
-		listener, err := net.Listen("unix", Bind)
-		log.Println("quiki ready: " + Bind)
+	if Opts.Port == "unix" {
+		listener, err := net.Listen("unix", Opts.Bind)
+		log.Println("quiki ready: " + Opts.Bind)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "listen"))
 		}
 		Server.Serve(listener)
 	} else {
-		Server.Addr = Bind + ":" + Port
-		log.Println("quiki ready on port " + Port)
+		Server.Addr = Opts.Bind + ":" + Opts.Port
+		log.Println("quiki ready on port " + Opts.Port)
 		log.Fatal(errors.Wrap(Server.ListenAndServe(), "listen"))
 	}
 }

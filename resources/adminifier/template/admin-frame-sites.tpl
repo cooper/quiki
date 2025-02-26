@@ -12,7 +12,7 @@
 {{else}}
     <ul>
     {{range $shortcode, $wi := .Wikis}}
-        <li><a href="{{$shortcode}}/dashboard">{{$wi.Title}}</a></li>
+        <li><a href="sites/{{$shortcode}}/dashboard">{{$wi.Title}}</a></li>
     {{end}}
     </ul>
 {{end}}

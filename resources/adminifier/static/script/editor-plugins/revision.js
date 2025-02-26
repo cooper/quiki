@@ -33,7 +33,7 @@ function openPageInNewTab () {
         return;
     var root = a.wikiPageRoot;
     var pageName = ae.getFilename().replace(/\.page$/, '');
-    window.open(root + pageName);
+    window.open(root + '/' + pageName);
 }
 
 // REVISION VIEWER

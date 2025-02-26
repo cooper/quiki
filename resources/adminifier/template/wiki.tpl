@@ -6,7 +6,7 @@ var adminifier = {
     wikiRoot:       '{{.Root}}',
     wikiShortName:  '{{.Shortcode}}',
     wikiName:       '{{.Title}}',
-    wikiPageRoot:   null,
+    wikiPageRoot:   '{{.WikiRoots.Page}}',
     themeName:      null,
     autosave:       3000000,
     homePage:       'dashboard'

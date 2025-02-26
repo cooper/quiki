@@ -31,6 +31,7 @@ func main() {
 	flag.BoolVar(&forceGen, "force-gen", false, "regenerate pages even if unchanged")
 	flag.StringVar(&opts.Bind, "bind", "", "address to bind to")
 	flag.StringVar(&opts.Port, "port", "", "port to listen on")
+	flag.StringVar(&opts.Host, "host", "", "default HTTP host")
 	flag.Parse()
 
 	// run interactive mode and exit

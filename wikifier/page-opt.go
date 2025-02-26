@@ -74,6 +74,7 @@ type PageOptRoot struct {
 	Category string // category root path
 	Page     string // page root path
 	File     string // file index path
+	Ext      string // full external wiki prefix
 }
 
 // PageOptImage describes wiki imaging options.
@@ -167,7 +168,8 @@ var defaultPageOpt = PageOpt{
 		Page:     "", // aka /
 		Image:    "/images",
 		Category: "/topic",
-		File:     "",
+		File:     "", // (i.e., disabled)
+		Ext:      "", // (i.e., not configured)
 	},
 	Image: PageOptImage{
 		Retina:     []int{2, 3},
@@ -209,6 +211,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		"root.category":   &opt.Root.Category,   // http path to categories
 		"root.page":       &opt.Root.Page,       // http path to pages
 		"root.file":       &opt.Root.File,       // http path to file index
+		"root.ext":        &opt.Root.Ext,        // full external wiki prefix
 		"page.code.lang":  &opt.Page.Code.Lang,  // code{} language
 		"page.code.style": &opt.Page.Code.Style, // code{} style
 	}
