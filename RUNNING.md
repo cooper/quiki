@@ -9,8 +9,9 @@ Please note: it is intended to be run as a non-super user.
 
 # First Run Wizard
 
-quiki -w            # Run wizard with defaults of *:8080 and data directory at ~/quiki 
-quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com -config=/var/www/quiki.conf
+quiki -w        # Run wizard with defaults of *:8080 and data directory at ~/quiki 
+quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com   # custom server params
+quiki -w -config=/etc/quiki.conf -wikis-dir=/var/www/wikis  # custom paths
 
 # Run Webserver
 
@@ -55,12 +56,14 @@ to do something different, you can specify them to the wizard like:
 quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com
 ```
 
-### Alternate config location
+### Alternate config and sites locations
 By default, the wizard creates a directory at `~/quiki` to store your quiki
-configuration and sites. It will write the configuration file to `~/quiki/quiki.conf`.
-If you want to store the config elsewhere, you can specify like so:
+configuration and sites. It will write the configuration file to `~/quiki/quiki.conf` and
+create a sites root directory at `~/quiki/wikis`.
+
+If you want to store the config and sites elsewhere, you can specify like so:
 ```
-quiki -w -config=/path/to/quiki.conf
+quiki -w -config=/etc/quiki.conf -wikis-dir=/var/www/wikis
 ```
 
 See the [configuration spec](doc/configuration.md) for all options.

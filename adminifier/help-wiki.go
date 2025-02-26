@@ -3,7 +3,6 @@ package adminifier
 import (
 	"html/template"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -52,7 +51,6 @@ func handleHelpFrame(helpRoot string, w http.ResponseWriter, r *http.Request) (a
 	}
 
 	// determine page
-	log.Printf("trimming prefix[%s] from URL.Path[%s]", helpRoot+"frame/help", r.URL.Path)
 	helpPage := strings.TrimPrefix(strings.TrimPrefix(r.URL.Path, helpRoot+"frame/help"), "/")
 	if helpPage == "" {
 		helpPage = helpWiki.Opt.MainPage

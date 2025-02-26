@@ -27,11 +27,12 @@ func main() {
 	flag.StringVar(&opts.Config, "config", "", "path to quiki.conf")
 	flag.BoolVar(&interactive, "i", false, "interactive mode, read from stdin")
 	flag.BoolVar(&wizard, "w", false, "run setup wizard")
-	flag.StringVar(&wikiPath, "wiki", "", "path to a wiki to run standalone")
+	flag.StringVar(&wikiPath, "wiki", "", "path to a wiki for wiki operations")
 	flag.BoolVar(&forceGen, "force-gen", false, "regenerate pages even if unchanged")
 	flag.StringVar(&opts.Bind, "bind", "", "address to bind to")
 	flag.StringVar(&opts.Port, "port", "", "port to listen on")
 	flag.StringVar(&opts.Host, "host", "", "default HTTP host")
+	flag.StringVar(&opts.WikisDir, "wikis-dir", "", "directory to store wikis in")
 	flag.Parse()
 
 	// run interactive mode and exit

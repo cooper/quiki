@@ -345,7 +345,7 @@ var flagOptions = {
 		init: function () {           
             SSV(a.data.buttons).each(function (btn) {
                 var but = makeButton(btn);
-                but.inject($$('.top-button').getLast(), 'after');
+                but.inject($$('.top-title').getLast(), 'after');
             });
             SSV(a.data.selectionButtons).each(function (btn) {
                 var but = makeButton(btn);

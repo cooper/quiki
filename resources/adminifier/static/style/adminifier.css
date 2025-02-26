@@ -19,6 +19,10 @@ i.fa {
     width: 1.35em;
 }
 
+.display-none {
+    display: none;
+}
+
 /* MODAL WINDOWS */
 
 .modal-container {
@@ -42,7 +46,7 @@ i.fa {
 }
 
 .modal-content.padded {
-    padding: 0.4em 1em;
+    padding: 1em 1.3em;
 }
 
 .modal-done-button {

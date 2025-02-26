@@ -1,11 +1,14 @@
 package adminifier
 
 import (
+	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 )
@@ -23,6 +26,8 @@ var adminUnauthenticatedFuncHandlers = map[string]func(w http.ResponseWriter, r 
 	"create-wiki": handleCreateWiki,
 }
 
+// todo: separate authenticated func handlers
+
 var adminFrameHandlers = map[string]func(*adminRequest){
 	"sites":  handleSitesFrame,
 	"routes": handleRoutesFrame,
@@ -31,14 +36,13 @@ var adminFrameHandlers = map[string]func(*adminRequest){
 }
 
 type adminTemplate struct {
-	User        *authenticator.User
-	Wikis       map[string]*webserver.WikiInfo
-	Templates   []string
-	Title       string // server title
-	Static      string // adminifier static root
-	QStatic     string // webserver static root
-	AdminRoot   string // adminifier root'
-	JSTemplates string
+	User      *authenticator.User
+	Wikis     map[string]*webserver.WikiInfo
+	Templates []string
+	Title     string // server title
+	Static    string // adminifier static root
+	QStatic   string // webserver static root
+	AdminRoot string // adminifier root'
 }
 
 type adminRequest struct {
@@ -140,7 +144,29 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := tmpl.ExecuteTemplate(w, "admin.tpl", createAdminTemplate(r))
+	// load javascript templates
+	if javascriptTemplates == "" {
+		jsTmplRoot := "js-tmpl/admin"
+		files, err := fs.ReadDir(resources.Adminifier, jsTmplRoot)
+		if err != nil {
+			log.Printf("error reading js-tmpl templates: %v", err)
+		}
+		for _, file := range files {
+			data, err := fs.ReadFile(resources.Adminifier, jsTmplRoot+"/"+file.Name())
+			if err != nil {
+				log.Printf("error reading js-tmpl template %s: %v", file.Name(), err)
+			}
+			javascriptTemplates += string(data)
+		}
+	}
+
+	err := tmpl.ExecuteTemplate(w, "admin.tpl", struct {
+		JSTemplates template.HTML
+		adminTemplate
+	}{
+		template.HTML(javascriptTemplates),
+		createAdminTemplate(r)},
+	)
 
 	if err != nil {
 		panic(err)
@@ -152,12 +178,11 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 func createAdminTemplate(r *http.Request) adminTemplate {
 	return adminTemplate{
-		User:        sessMgr.Get(r.Context(), "user").(*authenticator.User),
-		Title:       "quiki",
-		AdminRoot:   strings.TrimRight(root, "/"),
-		Static:      root + "static",
-		QStatic:     root + "qstatic",
-		JSTemplates: "",
+		User:      sessMgr.Get(r.Context(), "user").(*authenticator.User),
+		Title:     "quiki",
+		AdminRoot: strings.TrimRight(root, "/"),
+		Static:    root + "static",
+		QStatic:   root + "qstatic",
 	}
 }
 

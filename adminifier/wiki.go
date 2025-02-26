@@ -108,8 +108,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
-		if !sessMgr.GetBool(r.Context(), "loggedIn") {
-			http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		if redirectIfNotLoggedIn(w, r) {
 			return
 		}
 
@@ -186,8 +185,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			// so return a "not logged in" error to present login popup
 			// rather than redirecting
 			//
-			if !sessMgr.GetBool(r.Context(), "loggedIn") {
-				http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+			if redirectIfNotLoggedIn(w, r) {
 				return
 			}
 
@@ -219,10 +217,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 }
 
 func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
-
-	// check logged in
-	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+	if redirectIfNotLoggedIn(w, r) {
 		return
 	}
 

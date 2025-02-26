@@ -23,11 +23,12 @@ import (
 
 // Options is the webserver command line options.
 type Options struct {
-	Config string
-	Bind   string
-	Port   string
-	Host   string
-	Pregen bool
+	Config   string
+	Bind     string
+	Port     string
+	Host     string
+	WikisDir string
+	Pregen   bool
 }
 
 // Conf is the webserver configuration page.
