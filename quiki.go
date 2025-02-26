@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -20,6 +21,7 @@ var (
 	wizard      bool
 	wikiPath    string
 	forceGen    bool
+	jsonOutput  bool
 	opts        webserver.Options
 )
 
@@ -29,6 +31,7 @@ func main() {
 	flag.BoolVar(&wizard, "w", false, "run setup wizard")
 	flag.StringVar(&wikiPath, "wiki", "", "path to a wiki for wiki operations")
 	flag.BoolVar(&forceGen, "force-gen", false, "regenerate pages even if unchanged")
+	flag.BoolVar(&jsonOutput, "json", false, "output JSON instead of HTML")
 	flag.StringVar(&opts.Bind, "bind", "", "address to bind to")
 	flag.StringVar(&opts.Port, "port", "", "port to listen on")
 	flag.StringVar(&opts.Host, "host", "", "default HTTP host")
@@ -115,6 +118,10 @@ func runPageAndExit(page *wikifier.Page) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if jsonOutput {
+		json.NewEncoder(os.Stdout).Encode(page)
+		os.Exit(0)
+	}
 	fmt.Println(page.HTML())
 	os.Exit(0)
 }
@@ -122,6 +129,10 @@ func runPageAndExit(page *wikifier.Page) {
 // runs a wiki page
 func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
 	res := w.DisplayPage(pagePath)
+	if jsonOutput {
+		json.NewEncoder(os.Stdout).Encode(res)
+		os.Exit(0)
+	}
 	switch r := res.(type) {
 	case wiki.DisplayPage:
 		fmt.Println(r.Content)
