@@ -144,7 +144,7 @@ func loadTemplate(walkPath, name string, fses []fs.FS) (wikiTemplate, error) {
 				if subFs, err := fs.Sub(templateFs, filePath); err == nil {
 					fileServer := http.FileServer(http.FS(subFs))
 					pfx := t.staticRoot + "/"
-					Mux.Handle(pfx, http.StripPrefix(pfx, fileServer))
+					Mux.Register(pfx, "template static files", http.StripPrefix(pfx, fileServer))
 					log.Printf("[%s] template registered: %s", name, pfx)
 				} else {
 					log.Printf("[%s] error registering static content: %s", name, err)

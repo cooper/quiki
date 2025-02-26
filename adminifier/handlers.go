@@ -23,9 +23,10 @@ var adminUnauthenticatedFuncHandlers = map[string]func(w http.ResponseWriter, r 
 }
 
 var adminFrameHandlers = map[string]func(*adminRequest){
-	"sites": handleSitesFrame,
-	"help":  handleAdminHelpFrame,
-	"help/": handleAdminHelpFrame,
+	"sites":  handleSitesFrame,
+	"routes": handleRoutesFrame,
+	"help":   handleAdminHelpFrame,
+	"help/":  handleAdminHelpFrame,
 }
 
 type adminTemplate struct {
@@ -282,6 +283,16 @@ func handleSitesFrame(ar *adminRequest) {
 	}{
 		Wikis:         webserver.Wikis,
 		Templates:     webserver.TemplateNames(),
+		adminTemplate: createAdminTemplate(ar.r),
+	}
+}
+
+func handleRoutesFrame(ar *adminRequest) {
+	ar.dot = struct {
+		Routes []webserver.Route
+		adminTemplate
+	}{
+		Routes:        webserver.Mux.GetRoutes(),
 		adminTemplate: createAdminTemplate(ar.r),
 	}
 }

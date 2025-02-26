@@ -280,7 +280,7 @@ func setupWiki(wi *WikiInfo) error {
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		Mux.Handle(wi.Host+rootFile, http.StripPrefix(rootFile, fileServer))
+		Mux.Register(wi.Host+rootFile, "site file directory index", http.StripPrefix(rootFile, fileServer))
 		log.Printf("[%s] registered file root: %s (%s)", wi.Name, wi.Host+rootFile, dirWiki)
 	}
 

@@ -4,6 +4,7 @@ var adminifier = {
     adminRoot:      '{{.AdminRoot}}',
     staticRoot:     '{{.Static}}',
     wikiRoot:       '{{.AdminRoot}}',
+    wikiName:       '{{.Title}}',
     homePage:       'sites'
 };
 </script>
@@ -21,6 +22,7 @@ var adminifier = {
 <div id="navigation-sidebar">
     <ul id="navigation">
         <li data-nav="sites"><a class="frame-click" href="{{.AdminRoot}}/sites"><i class="fa fa-globe-americas"></i> <span>Sites</span></a></li>
+        <li data-nav="routes"><a class="frame-click" href="{{.AdminRoot}}/routes"><i class="fa fa-route"></i> <span>Routes</span></a></li>
         <li data-nav="help"><a class="frame-click" href="{{.AdminRoot}}/help"><i class="fa fa-question-circle"></i> <span>Help</a></li>
         <li><a href="{{.AdminRoot}}/logout"><i class="fa fa-arrow-circle-left"></i> <span>Logout</span></a></li>
     </ul>

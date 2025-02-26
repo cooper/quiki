@@ -11,11 +11,12 @@ To set up quiki webserver for the first time, run the setup wizard with
 quiki -w
 ```
 
-### Alternate host or port
-The server by default binds to all available hosts on port 8080. If you need to do
-something different, you can specify them to the wizard like:
+### Alternate bind, port, and default host
+The server by default binds to all available hosts on port 8080 and
+serves sites that do not specify a host on all HTTP hosts. If you need
+to do something different, you can specify them to the wizard like:
 ```
-quiki -w -bind=1.2.3.4 -port=9091
+quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com
 ```
 
 ### Alternate config location
@@ -61,11 +62,19 @@ quiki -config=/path/to/quiki.conf
 
 See the [configuration spec](doc/configuration.md) for all options.
 
-### Override host or port
-The host and port typically are specified in the webserver config file.
-If desired, you can explicitly override them via the command line args:
+### Override bind, port, and default host
+The server by default binds to all available hosts on port 8080 and
+serves sites that do not specify a host on all HTTP hosts. If you need
+to do something different, you can specify them to the wizard like:
+
+If you specify any of the these via flags, they override the
+following options in the server configuration:
+* **-bind** overrides `server.http.bind`
+* **-port** overrides `server.http.port`
+* **-host** overrides `server.http.host`
+
 ```
-quiki -bind=1.2.3.4 -port=9091
+quiki -bind=1.2.3.4 -port=9091 -host=sites.example.com
 ```
 
 # Standalone page
@@ -77,7 +86,7 @@ no wiki context.
 quiki path/to/my.page
 ```
 
-### Standalone wiki
+# Standalone wiki
 
 Standalone wiki mode allows you to perform wiki operations without
 running the webserver.

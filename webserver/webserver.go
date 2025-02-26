@@ -38,7 +38,7 @@ var Conf *wikifier.Page
 // Mux is the *http.ServeMux.
 //
 // It is available only after Configure is called.
-var Mux *http.ServeMux
+var Mux *ServeMux
 
 // Server is the *http.Server.
 //
@@ -60,7 +60,7 @@ var SessMgr *scs.SessionManager
 func Configure(_initial_options Options) {
 	var err error
 	Opts = _initial_options
-	Mux = http.NewServeMux()
+	Mux = NewServeMux()
 	gob.Register(&authenticator.User{})
 
 	// parse configuration
@@ -119,7 +119,7 @@ func Configure(_initial_options Options) {
 	SessMgr = scs.New()
 
 	// create server with main handler
-	Mux.HandleFunc("/", handleRoot)
+	Mux.RegisterFunc("/", "webserver root", handleRoot)
 	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
@@ -154,6 +154,6 @@ func setupStatic() error {
 		return errors.Wrap(err, "creating static sub filesystem")
 	}
 	fileServer := http.FileServer(http.FS(subFS))
-	Mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	Mux.Register("/static/", "webserver static files", http.StripPrefix("/static/", fileServer))
 	return nil
 }

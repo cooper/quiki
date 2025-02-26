@@ -16,7 +16,7 @@ import (
 )
 
 var tmpl *template.Template
-var mux *http.ServeMux
+var mux *webserver.ServeMux
 var conf *wikifier.Page
 var sessMgr *scs.SessionManager
 var host, root string
@@ -66,13 +66,13 @@ func Configure() {
 	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
 
 	// main handler
-	mux.HandleFunc(host+root, handleRoot)
+	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
 	log.Println("registered adminifier root: " + host + root)
 
 	// template handlers
 	// FIXME: I think this is unused and can be removed
 	for _, tmplName := range tmplHandlers {
-		mux.HandleFunc(host+root+tmplName, handleTemplate)
+		mux.RegisterFunc(host+root+tmplName, "standalone template", handleTemplate)
 	}
 
 	// admin handlers
@@ -93,6 +93,6 @@ func setupStatic(efs fs.FS, staticRoot string) error {
 		return errors.Wrap(err, "creating static sub filesystem")
 	}
 	fileServer := http.FileServer(http.FS(subFS))
-	mux.Handle(host+staticRoot, http.StripPrefix(staticRoot, fileServer))
+	mux.Register(host+staticRoot, "adminifier static files", http.StripPrefix(staticRoot, fileServer))
 	return nil
 }
