@@ -22,6 +22,12 @@
     <label for="name">Site Name:</label>
     <input type="text" name="name" />
     <label for="template">Select Template:</label>
+    <select name="base" id="base">
+        {{range .BaseWikis}}
+            <option value="{{.}}">{{.}}</option>
+        {{end}}
+    </select>
+    <label for="template">Select Theme:</label>
     <select name="template" id="template">
         {{range .Templates}}
             <option value="{{.}}">{{.}}</option>

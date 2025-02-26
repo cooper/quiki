@@ -7,6 +7,7 @@ import (
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
+	"github.com/cooper/quiki/wiki"
 )
 
 // handlers that call functions
@@ -275,10 +276,12 @@ func handleSitesFrame(ar *adminRequest) {
 	ar.dot = struct {
 		Wikis     map[string]*webserver.WikiInfo
 		Templates []string
+		BaseWikis []string
 		adminTemplate
 	}{
 		Wikis:         webserver.Wikis,
 		Templates:     webserver.TemplateNames(),
+		BaseWikis:     wiki.AvailableBaseWikis(),
 		adminTemplate: createAdminTemplate(ar.r),
 	}
 }

@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -99,4 +100,22 @@ func CreateWikiFS(path string, fsys fs.FS, opts CreateWikiOpts) error {
 	}
 
 	return nil
+}
+
+// AvailableBaseWikis returns a list of available embedded base wikis.
+func AvailableBaseWikis() []string {
+	var wikis []string
+	err := fs.WalkDir(resources.Wikis, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if path != "." && d.IsDir() && filepath.Dir(path) == "." {
+			wikis = append(wikis, path)
+		}
+		return nil
+	})
+	if err != nil {
+		log.Println("AvailableBaseWikis():", err)
+	}
+	return wikis
 }
