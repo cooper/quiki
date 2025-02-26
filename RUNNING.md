@@ -5,40 +5,52 @@ The `quiki` executable can be used for several different functions.
 Please note: it is intended to be run as a non-super user.
 
 ## Cheat Sheet
+
+#### First Run Wizard
+
 ```
-
-# First Run Wizard
-
 quiki -w        # Run wizard with defaults of *:8080 and data directory at ~/quiki 
 quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com   # custom server params
 quiki -w -config=/etc/quiki.conf -wikis-dir=/var/www/wikis  # custom paths
+```
 
-# Run Webserver
+#### Run Webserver
 
+```
 quiki                                   # using server config at ~/quiki/quiki.conf
 quiki -config=/path/to/quiki.conf       # using config in another location
 quiki -host=sites.example.com           # override default http host
 quiki -bind=1.2.3.4 -port=8090          # override host and port in config
+```
 
-# Generate Pages to STDOUT
+#### Generate Pages to STDOUT
 
+```
 quiki /path/to/my_page.page             # generate a standalone page, any .page or .md file
 quiki -wiki=/path/to/wiki my_page       # generate a page within a wiki
 quiki -i                                # interactive mode - read from STDIN
+```
 
-# Wiki Operations
+#### Wiki Operations
 
+```
 quiki -wiki=/path/to/wiki               # pregenerate all pages in a wiki
 quiki -create-wiki=/path/to/wiki        # create a new wiki at the path
+```
 
-# Server Config Operations
-# (use with -config otherwise assumes ~/quiki/quiki.conf)
+#### Server Operations
 
+Use with `-config=/path/to/quiki.conf`, otherwise assumes `~/quiki/quiki.conf`.
+
+```
 quiki -enable-wiki=shortcode            # start serving a wiki within the server wikis directory
 quiki -wiki=/path/to/wiki -enable-wiki=shortcode  # ...outside the server wikis directory
 quiki -disable-wiki=shortcode           # stop serving a wiki
 quiki -import-wiki=/path/to/wiki        # import a wiki to the server wikis directory
-quiki -import-wiki=/path/to/wiki -enable-wiki=shortcode # these commands can be combined
+quiki -reload                           # reload the server configuration
+
+# these commands can be combined, e.g.
+quiki -import-wiki=/path/to/wiki -enable-wiki=shortcode -reload
 ```
 
 # Wizard
