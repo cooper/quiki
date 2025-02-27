@@ -1,0 +1,12 @@
+.login {
+    width: 400px;
+    padding: 30px;
+    border: 1px solid #999;
+    background-color: white;
+    margin: 50px auto;
+}
+
+.h1 {
+    font-size: 30px;
+    font-weight: bold;
+}

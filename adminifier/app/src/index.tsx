@@ -6,7 +6,7 @@ import NotFound from './errors/404';
 import './index.css';
 import About from './pages/about';
 import Home from './pages/home';
-import Login from './pages/login';
+import Login from './pages/login/login';
 
 render(
   () => (
