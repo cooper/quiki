@@ -52,31 +52,17 @@ func Configure() {
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
 	sessMgr.Cookie.Path = root
 
-	// setup adminifier static files server
-	if err := setupStatic(resources.Adminifier, root+"static/"); err != nil {
-		log.Fatal(errors.Wrap(err, "setup adminifier static"))
-	}
-
-	// setup webserver static files server
-	if err := setupStatic(resources.Webserver, root+"qstatic/"); err != nil {
-		log.Fatal(errors.Wrap(err, "setup adminifier qstatic"))
-	}
-
 	// create template
 	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
 
 	// main handler
-	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
-	log.Println("registered adminifier root: " + host + root)
-
-	// template handlers
-	// FIXME: I think this is unused and can be removed
-	for _, tmplName := range tmplHandlers {
-		mux.RegisterFunc(host+root+tmplName, "standalone template", handleTemplate)
+	subFS, err := fs.Sub(resources.Adminifier, "app")
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "failed to get app filesystem"))
 	}
-
-	// admin handlers
-	setupAdminHandlers()
+	fileServer := http.FileServer(http.FS(subFS))
+	mux.Register(host+root, "adminifier root", http.StripPrefix(root, fileServer))
+	log.Println("registered adminifier root: " + host + root)
 
 	// handlers for each site at shortcode/
 	initWikis()
@@ -86,13 +72,4 @@ func Configure() {
 		log.Printf("no admin users exist yet, visit %screate-user to create one", host+root)
 		log.Printf("your setup token: %s", tok)
 	}
-}
-func setupStatic(efs fs.FS, staticRoot string) error {
-	subFS, err := fs.Sub(efs, "static")
-	if err != nil {
-		return errors.Wrap(err, "creating static sub filesystem")
-	}
-	fileServer := http.FileServer(http.FS(subFS))
-	mux.Register(host+staticRoot, "adminifier static files", http.StripPrefix(staticRoot, fileServer))
-	return nil
 }

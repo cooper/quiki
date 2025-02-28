@@ -19,7 +19,7 @@ var Wikis fs.FS
 
 // PRIVATE
 
-//go:embed adminifier/*
+//go:embed all:adminifier/*
 var adminifierFs embed.FS
 
 //go:embed webserver/*
