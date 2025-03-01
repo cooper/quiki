@@ -12,7 +12,7 @@
     data-sort="{{.Order}}"
 
     data-buttons="create filter"
-    data-button-create="{'title': 'New model', 'icon': 'plus-circle', 'href': '{{.Root}}/create-model'}"
+    data-button-create="{'title': 'New Model', 'icon': 'plus-circle', 'href': '{{.Root}}/create-model'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"

@@ -26,7 +26,7 @@ a.json.results.each(function (imageData) {
     container.appendChild(div);
 });
 else
-    container.innerHTML = '<p>No images found.</p>';
+    container.innerHTML = '<p style="padding: 20px;">No images found.</p>';
 
 function retinaDensity() {
     if (!window.matchMedia) return;

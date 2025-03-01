@@ -21,7 +21,7 @@ var FileList = exports.FileList = new Class({
         selection: true,    // allow rows to be selected
         columns: [],        // ordered list of column names
         columnData: {},     // object of column data, column names as keys
-        // root         relative url for the list
+        root: 'files'       // type of files being listed
         // isTitle      true for the widest column
         // sort         sort letter
         // fixer        transformation to apply to text before displaying it
@@ -190,6 +190,16 @@ var FileList = exports.FileList = new Class({
 
         var tbody = new Element('tbody');
         table.appendChild(tbody);
+        
+        // Render message if no entries found
+        if (visibleEntries.length === 0) {
+            var noEntriesMessage = new Element('p', {
+                style: 'padding: 20px;',
+                text: 'No ' + self.options.root + ' found.'
+            });
+            container.appendChild(noEntriesMessage);
+            return;
+        }
         
         // checkbox column for table body
         var checkTd = new Element('td', { 'class': 'checkbox' });
