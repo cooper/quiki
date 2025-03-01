@@ -1,33 +1,33 @@
-{{.JSON}}
+[[.JSON]]
 
 <meta
-{{if .Model}}
+[[if .Model]]
       data-nav="models"
       data-icon="cube"
-{{else if .Config}}
+[[else if .Config]]
       data-nav="settings"
       data-icon="cog"
-{{else if .Category}}
+[[else if .Category]]
     data-nav="categories"
     data-icon="list"
-{{else}}
+[[else]]
       data-nav="pages"
       data-icon="edit"
-{{end}}
-      data-title="{{or .Title .File}}"
+[[end]]
+      data-title="[[or .Title .File]]"
       data-scripts="ace jquery editor"
       data-styles="editor colorpicker diff2html"
       data-flags="no-margin compact-sidebar"
 />
 
-{{if not .Found}}
+[[if not .Found]]
     Not found.
-{{else}}
+[[else]]
 <div class="editor-toolbar-wrapper">
     <ul class="editor-toolbar">
-        {{if and .Page .Info}}{{if .Info.External}}
+        [[if and .Page .Info]][[if .Info.External]]
             <li class="readonly">READ ONLY</li>
-        {{end}}{{end}}
+        [[end]][[end]]
         <li data-action="save" class="right"><i class="fa right fa-save"></i> <span>Save</span></li>
         <li data-action="delete" class="right"><i class="fa right fa-trash"></i> Delete</li>
         <li data-action="revisions" class="right"><i class="fa right fa-history"></i> Revisions</li>
@@ -61,7 +61,7 @@
 
     </ul>
 </div>
-<div id="editor" data-file="{{.File}}">
-{{- .Content -}}
+<div id="editor" data-file="[[.File]]">
+[[- .Content -]]
 </div>
-{{end}}
+[[end]]

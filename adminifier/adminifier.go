@@ -66,7 +66,8 @@ func Configure() {
 	}
 
 	// create template
-	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
+	t := template.New("").Delims("[[", "]]")
+	tmpl = template.Must(t.ParseFS(resources.Adminifier, "template/*.tpl"))
 
 	// main handler
 	mux.RegisterFunc(host+root, "adminifier root", handleRoot)

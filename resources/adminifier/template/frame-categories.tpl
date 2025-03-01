@@ -1,4 +1,4 @@
-{{.JSON}}
+[[.JSON]]
 
 <meta
     data-nav="categories"
@@ -9,7 +9,7 @@
     data-styles="file-list pikaday"
     data-flags="no-margin search buttons"
     data-search="fileSearch"
-    data-sort="{{.Order}}"
+    data-sort="[[.Order]]"
 
     data-buttons="filter"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"

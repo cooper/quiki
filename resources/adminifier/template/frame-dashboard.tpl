@@ -12,35 +12,35 @@
 -->
 
 
-{{if .Errors}}
+[[if .Errors]]
 <h2>Pages with Errors</h2>
-{{len .Errors}} page{{if gt (len .Errors) 1}}s are{{else}} is{{end}} not being served due to errors.
+[[len .Errors]] page[[if gt (len .Errors) 1]]s are[[else]] is[[end]] not being served due to errors.
 
 <pre class="info">
-{{- range .Errors -}}
-<a href="edit-page?page={{.File}}">{{.File}}</a>:
-{{- .Error.Pos.Line}}:{{.Error.Pos.Column}}: {{.Error.Message}}
-{{end -}}
+[[- range .Errors -]]
+<a href="edit-page?page=[[.File]]">[[.File]]</a>:
+[[- .Error.Pos.Line]]:[[.Error.Pos.Column]]: [[.Error.Message]]
+[[end -]]
 </pre>
-{{end}}
+[[end]]
 
-{{if .Warnings}}
+[[if .Warnings]]
 <h2>Pages with Warnings</h2>
-{{len .Warnings}} page{{if gt (len .Warnings) 1}}s have{{else}} has{{end}} warnings.
+[[len .Warnings]] page[[if gt (len .Warnings) 1]]s have[[else]] has[[end]] warnings.
 
 <pre class="info">
-{{- range .Warnings -}}
-{{- $file := .File -}}
-{{- range .Warnings -}}
-<a href="edit-page?page={{$file}}">{{$file}}</a>:
-{{- .Pos.Line}}:{{.Pos.Column}}: {{.Message}}
-{{end -}}
-{{end -}}
+[[- range .Warnings -]]
+[[- $file := .File -]]
+[[- range .Warnings -]]
+<a href="edit-page?page=[[$file]]">[[$file]]</a>:
+[[- .Pos.Line]]:[[.Pos.Column]]: [[.Message]]
+[[end -]]
+[[end -]]
 </pre>
-{{end}}
+[[end]]
 
 
 <h2>Logs</h2>
 <pre class="info">
-{{.Logs}}
+[[.Logs]]
 </pre>
