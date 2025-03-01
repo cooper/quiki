@@ -21,6 +21,8 @@
     data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
 />
 
+[[ template "common-file-list.tpl" . ]]
+
 <template id="tmpl-create-page">
     <form action="func/create-page" method="post">
         <label for="name">Page Title:</label>

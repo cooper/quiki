@@ -19,3 +19,5 @@
     data-button-rename="{'title': 'Rename', 'icon': 'file-signature', 'func': 'renameSelected', 'hide': true}"
     data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
 />
+
+[[ template "common-file-list.tpl" . ]]

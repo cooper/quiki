@@ -1,4 +1,4 @@
-<script type="text/x-tmpl" id="tmpl-login-window">
+<template id="tmpl-login-window">
     <table>
         <tr>
             <td class="left">Username</td>
@@ -12,4 +12,4 @@
             <td><input type="submit" name="submit" value="Login" /></td>
         </tr>
     </table>
-</script>
+</template>

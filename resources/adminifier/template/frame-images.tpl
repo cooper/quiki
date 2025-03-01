@@ -26,3 +26,5 @@
     data-styles="image-grid pikaday"
 [[end]]
 />
+
+[[ template "common-file-list.tpl" . ]]
