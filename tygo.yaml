@@ -1,0 +1,3 @@
+packages:
+  - path: "github.com/cooper/quiki/adminifier/api"
+    output_path: "adminifier/app/src/lib/api.types.ts"

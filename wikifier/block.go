@@ -20,7 +20,7 @@ type block interface {
 	hierarchy() string                 // human-readable hierarchy
 	blockContent() []block             // block children
 	textContent() []string             // text children
-	variables() *variableScope         // block variables or the page by default
+	variables() *variableScope         // block variable scope
 	openPosition() Position            // position opened at
 	warn(pos Position, warning string) // produce parser warning
 	page() *Page                       // page
