@@ -1,3 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source '../node_modules/svelte-ux/**/*.{svelte,js}';
+
+@theme {
+  --color-primary: hsl(257.4075 100% 50%);
+  --color-secondary: hsl(310.4453 100% 50%);
+  --color-accent: hsl(173.4835 100% 42.1865%);
+  --color-neutral: hsl(214.2857 19.6262% 20.9804%);
+  --color-surface-100: hsl(180 100% 100%);
+  --color-surface-200: hsl(0 0% 94.902%);
+  --color-surface-300: hsl(180 1.9608% 90%);
+}
+
+html.dark {
+  color-scheme: dark;
+  --color-primary: hsl(235, 52%, 58%);
+  --color-secondary: hsl(313.3209 100% 66.1653%);
+  --color-accent: hsl(173.7346 100% 40.1728%);
+  --color-neutral: hsl(213.3333 17.6471% 20%);
+  --color-surface-100: hsl(212.3077 18.3099% 13.9216%);
+  --color-surface-200: hsl(212.7273 18.0328% 11.9608%);
+  --color-surface-300: hsl(213.3333 17.6471% 10%);
+}

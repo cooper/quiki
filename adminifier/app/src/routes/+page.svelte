@@ -1,13 +1,10 @@
 <script lang="ts">
-    import {AppBar, Button} from 'svelte-ux'
+	import { Button } from "svelte-ux";
     let count = 0;
-    function handleClick() {
-        count += 1;
-    }
 </script>
 
-<h1>Welcome to adminifier</h1>
+<h1 class="text-3xl font-bold underline">
+    Hello world!
+</h1>
 
-<AppBar title="Example" />
-
-<Button on:click={handleClick} variant="fill">Click me {count}</Button>
+<Button on:click={() => count += 1} variant="fill-outline">Click me {count}</Button>
