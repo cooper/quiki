@@ -389,7 +389,7 @@ function makeButton (buttonID, where) {
     
     // title
     var anchor = new Element('a', {
-        href: buttonStuff.href || '#'
+        href: buttonStuff.href || buttonStuff.frameHref || '#'
     });
     anchor.set('text', buttonStuff.title);
     but.appendChild(anchor);
@@ -403,6 +403,9 @@ function makeButton (buttonID, where) {
         i.inject(anchor, 'top');
     }
     
+    if (buttonStuff.frameHref)
+        addFrameClickHandler(anchor);
+
     // click click event if callback func is provided
     if (buttonStuff.func) anchor.addEvent('click', function (e) {
         e.preventDefault();

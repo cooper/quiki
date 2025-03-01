@@ -690,6 +690,9 @@ func handlePageRevisions(wr *wikiRequest) {
 	})
 }
 
+func handlePageDiff(wr *wikiRequest) {
+}
+
 // possibly switch wiki branches
 func switchUserWiki(wr *wikiRequest, wi *webserver.WikiInfo) {
 	userWiki := wi
