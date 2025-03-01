@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -277,16 +278,16 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 	case blackfriday.Text:
 		s := string(node.Literal)
 		if node.Parent.Type == blackfriday.Link {
-			r.addText(w, quikiEscLink(s))
+			r.addText(w, utils.EscLink(s))
 		} else if node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
-			r.addText(w, quikiEscListMapValue(s))
+			r.addText(w, utils.EscListMapValue(s))
 		} else if node.Parent.Type == blackfriday.Item {
-			r.addText(w, quikiEscListMapValue(s))
+			r.addText(w, utils.EscListMapValue(s))
 		} else if node.Parent.Type == blackfriday.Heading {
 			r.heading += s
-			r.addText(w, quikiEscFmt(s))
+			r.addText(w, utils.EscFmt(s))
 		} else {
-			r.addText(w, quikiEscFmt(s))
+			r.addText(w, utils.EscFmt(s))
 		}
 
 	// newline
@@ -328,7 +329,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		if r.Flags&SkipHTML != 0 {
 			break
 		}
-		html := quikiEscFmt(string(node.Literal))
+		html := utils.EscFmt(string(node.Literal))
 		r.addText(w, "[html:"+html+"]")
 
 	// link
@@ -344,7 +345,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		} else {
 			if entering {
 				link := string(r.addAbsPrefix(dest))
-				link = quikiEscLink(link)
+				link = utils.EscLink(link)
 				if hashIdx := strings.IndexByte(link, '#'); hashIdx != -1 {
 					r.linkDest = strings.TrimSuffix(link[:hashIdx], ".md") + link[hashIdx:]
 				} else {
@@ -374,7 +375,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			dest := node.LinkData.Destination
 			dest = r.addAbsPrefix(dest)
 			// FIXME: if dest is not relative, we can't display this image
-			r.addText(w, "~image {\n    file: "+quikiEsc(string(dest))+";\n    alt: ")
+			r.addText(w, "~image {\n    file: "+utils.Esc(string(dest))+";\n    alt: ")
 		} else {
 			// FIXME: can we do anything with node.LinkData.Title?
 			r.out(w, []byte(";\n}"))
@@ -385,9 +386,9 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		var code string
 		if node.Parent != nil && node.Parent.Parent != nil &&
 			node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
-			code = quikiEscListMapValue(string(node.Literal))
+			code = utils.EscListMapValue(string(node.Literal))
 		} else {
-			code = quikiEscFmt(string(node.Literal))
+			code = utils.EscFmt(string(node.Literal))
 		}
 		r.addText(w, "[c]"+code+"[/c]")
 
@@ -448,7 +449,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		r.cr(w)
 		r.addText(w, "~html {\n")
 		r.indent++
-		r.addText(w, quikiEsc(string(node.Literal)))
+		r.addText(w, utils.Esc(string(node.Literal)))
 		r.indent--
 		r.addText(w, "\n}")
 		r.cr(w)
@@ -581,14 +582,14 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		r.cr(w)
 
 		// TODO: count opening and closing brackets.
-		// if they match, use brace-escape rather than quikiEsc()
+		// if they match, use brace-escape rather than utils.Esc()
 		r.addText(w, "~code ")
 		if lang := codeLanguage(node.Info); lang != "" {
 			r.addText(w, "["+lang+"] ")
 		}
 		r.addText(w, "{\n")
 		r.indent++
-		r.addText(w, quikiEsc(string(node.Literal)))
+		r.addText(w, utils.Esc(string(node.Literal)))
 		r.indent--
 		r.addText(w, "}")
 
@@ -677,7 +678,7 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 func (r *QuikiRenderer) RenderFooter(w io.Writer, ast *blackfriday.Node) {
 	// title must be done after the heading is extracted
 	if r.Title != "" {
-		io.WriteString(w, "\n@page.title: "+quikiEscFmt(r.Title)+";\n")
+		io.WriteString(w, "\n@page.title: "+utils.EscFmt(r.Title)+";\n")
 	}
 }
 
@@ -692,45 +693,4 @@ func (r *QuikiRenderer) RenderHeader(w io.Writer, ast *blackfriday.Node) {
 	if r.Flags&TableOfContents != 0 {
 		io.WriteString(w, "toc{}\n\n")
 	}
-}
-
-func quikiEsc(s string) string {
-
-	// escape existing escapes
-	s = strings.Replace(s, "\\", "\\\\", -1)
-
-	// ecape curly brackets
-	s = strings.Replace(s, "{", "\\{", -1)
-	s = strings.Replace(s, "}", "\\}", -1)
-
-	// fix comments (see wikifier#62)
-	s = strings.Replace(s, "/*", "\\/*", -1)
-
-	return s
-}
-
-// like quikiEsc except also escapes formatting tags
-func quikiEscFmt(s string) string {
-	s = quikiEsc(s)
-	s = strings.Replace(s, "[", "\\[", -1)
-	s = strings.Replace(s, "]", "\\]", -1)
-	return s
-}
-
-// like quikiEscFmt except also escapes pipe for [[ links ]]
-func quikiEscLink(s string) string {
-	s = quikiEscFmt(s)
-	return strings.Replace(s, "|", "\\|", -1)
-}
-
-// like quikiEscFmt except also escapes semicolon
-func quikiEscListMapValue(s string) string {
-	s = quikiEscFmt(s)
-	return strings.Replace(s, ";", "\\;", -1)
-}
-
-// like quikiEscFmt except also escapes colon and semicolon
-func quikiEscMapKey(s string) string {
-	s = quikiEscListMapValue(s)
-	return strings.Replace(s, ":", "\\:", -1)
 }
