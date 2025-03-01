@@ -22,7 +22,7 @@ import (
 
 var wikiJavascriptTemplates string
 
-var frameHandlers = map[string]func(*wikiRequest){
+var wikiFrameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
 	"pages":         handlePagesFrame,
 	"categories":    handleCategoriesFrame,
@@ -98,7 +98,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	wikiRoot := root + "sites/" + shortcode + "/"
 
 	// each of these URLs generates wiki.tpl
-	for which := range frameHandlers {
+	for which := range wikiFrameHandlers {
 		mux.HandleFunc(host+wikiRoot+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
@@ -124,7 +124,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		// call func to create template params
 		var dot any = nil
 
-		if handler, exist := frameHandlers[frameNameFull]; exist {
+		if handler, exist := wikiFrameHandlers[frameNameFull]; exist {
 			// create wiki request
 			wr := &wikiRequest{
 				shortcode: shortcode,
