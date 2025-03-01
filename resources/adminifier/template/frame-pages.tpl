@@ -20,3 +20,11 @@
     data-button-rename="{'title': 'Rename', 'icon': 'file-signature', 'func': 'renameSelected', 'hide': true}"
     data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
 />
+
+<template id="tmpl-create-page">
+    <form action="func/create-page" method="post">
+        <label for="name">Page Title:</label>
+        <input type="text" name="title" />
+        <input type="submit" value="Create" />
+    </form>
+</template>

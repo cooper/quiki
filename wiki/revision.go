@@ -6,8 +6,10 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
+	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/cooper/quiki/wikifier"
 	"gopkg.in/src-d/go-billy.v4"
 
@@ -203,8 +205,10 @@ func (w *Wiki) checkoutBranch(name string) (string, error) {
 
 // the "and commit" portion of the *andCommit functions
 func (w *Wiki) andCommit(wt *git.Worktree, comment string, commit CommitOpts) error {
+
+	// comment overrides default
 	if commit.Comment != "" {
-		comment += ": " + commit.Comment
+		comment = commit.Comment
 	}
 
 	// time defaults to now
@@ -382,6 +386,13 @@ func (w *Wiki) writeFile(path string, content []byte, createOK bool, commit Comm
 		return errors.Wrap(err, "filepath:Rel")
 	}
 
+	if createOK {
+		// ensure parent directories exist
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			return err
+		}
+	}
+
 	fi, err := os.Lstat(path)
 	if err != nil {
 		// some error occurred
@@ -471,6 +482,19 @@ func (w *Wiki) GetLatestCommitHash() (string, error) {
 	}
 
 	return commit.Hash.String(), nil
+}
+
+// CreatePage creates a new page file.
+// If content is empty, a default page is created.
+func (w *Wiki) CreatePage(where string, title string, content []byte, commit CommitOpts) (string, error) {
+	if len(content) == 0 {
+		content = []byte("@page.title: " + utils.EscFmt(title) + ";\n")
+	}
+	name := wikifier.PageName(strings.Replace(title, "/", "_", -1))
+	if where != "" && !strings.HasSuffix(where, "/") {
+		where += "/"
+	}
+	return name, w.WritePage(where+name, content, true, commit)
 }
 
 // RevisionInfo contains information about a specific revision.

@@ -29,7 +29,7 @@
     </ul>
 {{end}}
 
-<div id="tmpl-create-site" class="display-none">
+<template id="tmpl-create-site">
     <form action="func/create-wiki" method="post">
         <label for="name">Site Name:</label>
         <input type="text" name="name" />
@@ -47,4 +47,4 @@
         </select>
         <input type="submit" value="Create" />
     </form>
-</div>
+</template>

@@ -45,6 +45,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"write-config":   handleWriteWikiConfig,
 	"image/":         handleImage,
 	"page-revisions": handlePageRevisions,
+	"create-page":    handleCreatePage,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -229,11 +230,13 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 			log.Printf("error reading js-tmpl directory: %v", err)
 		}
 		for _, file := range files {
-			data, err := fs.ReadFile(resources.Adminifier, "js-tmpl/"+file.Name())
-			if err != nil {
-				log.Printf("error reading js-tmpl file %s: %v", file.Name(), err)
+			if strings.HasSuffix(file.Name(), ".tpl") {
+				data, err := fs.ReadFile(resources.Adminifier, "js-tmpl/"+file.Name())
+				if err != nil {
+					log.Printf("error reading js-tmpl file %s: %v", file.Name(), err)
+				}
+				wikiJavascriptTemplates += string(data)
 			}
-			wikiJavascriptTemplates += string(data)
 		}
 	}
 
@@ -690,7 +693,20 @@ func handlePageRevisions(wr *wikiRequest) {
 	})
 }
 
-func handlePageDiff(wr *wikiRequest) {
+func handleCreatePage(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "title") {
+		return
+	}
+
+	title, dir := wr.r.Form.Get("title"), wr.r.Form.Get("dir")
+	var filename string
+	filename, wr.err = wr.wi.CreatePage(dir, title, nil, getCommitOpts(wr, "Create page: "+title))
+	if wr.err != nil {
+		return
+	}
+
+	// redirect to edit page
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"edit-page?page="+path.Join(dir, filename), http.StatusTemporaryRedirect)
 }
 
 // possibly switch wiki branches

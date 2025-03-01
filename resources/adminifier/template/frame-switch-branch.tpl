@@ -1,13 +1,12 @@
 <meta
-    data-title="Switch branch"
+    data-title="Switch Branch"
     data-icon="git-alt"
     data-icon-b="yes"
 />
 
-<h1>Switch Branch</h1>
-
 <p>Branching is experimental.</p>
 
+<p><b>Choose Branch</b></p>
 <ul>
 {{$root := .Root}}
 {{range .Branches}}
@@ -15,7 +14,7 @@
 {{end}}
 </ul>
 
-New Branch:
+<p><b>New Branch</b></p>
 <form action="{{.Root}}/func/create-branch" method="post">
     <input type="text" name="branch" />
     <input type="submit" name="submit" value="Create" />

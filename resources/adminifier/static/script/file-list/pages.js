@@ -37,7 +37,7 @@ exports.createPage = function () {
     var modal = new ModalWindow({
         icon:           'plus-circle',
         title:          'New Page',
-        html:           'Coming soon',
+        html:           tmpl('tmpl-create-page', {}),
         padded:         true,
         id:             'create-page-window',
         autoDestroy:    true,
@@ -50,7 +50,7 @@ exports.createFolder = function () {
     var modal = new ModalWindow({
         icon:           'folder',
         title:          'New Folder',
-        html:           'Coming soon',
+        html:           tmpl('tmpl-create-folder', {}),
         padded:         true,
         id:             'create-folder-window',
         autoDestroy:    true,
