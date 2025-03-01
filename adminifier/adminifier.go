@@ -43,6 +43,9 @@ func Configure() {
 		*ptr = str
 	}
 
+	if !strings.HasPrefix(root, "/") {
+		root = "/" + root
+	}
 	if !strings.HasSuffix(root, "/") {
 		root += "/"
 	}
@@ -68,12 +71,6 @@ func Configure() {
 	// main handler
 	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
 	log.Println("registered adminifier root: " + host + root)
-
-	// template handlers
-	// FIXME: I think this is unused and can be removed
-	for _, tmplName := range tmplHandlers {
-		mux.RegisterFunc(host+root+tmplName, "standalone template", handleTemplate)
-	}
 
 	// admin handlers
 	setupAdminHandlers()

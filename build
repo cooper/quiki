@@ -10,7 +10,8 @@ if [ "$1" == "doc" ]; then
     done
 elif [ "$1" == "help" ]; then
     ./quiki -wiki=help-wiki -force-gen
-    cp -r help-wiki resources/adminifier/help
+    mkdir -p resources/adminifier/help
+    cp -r help-wiki/* resources/adminifier/help/
 elif [ "$1" == "test" ]; then
     ./quiki -wiki=test -force-gen
 else

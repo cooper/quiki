@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
@@ -196,7 +197,8 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handleTemplate(w, r)
+	r.ParseForm()
+	handleTemplate(w, r, struct{ Redirect string }{r.Form.Get("redirect")})
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -219,10 +221,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	// start session and remember user info
 	sessMgr.Put(r.Context(), "user", &user)
 	sessMgr.Put(r.Context(), "loggedIn", true)
-	sessMgr.Put(r.Context(), "branch", "master")
+	sessMgr.Put(r.Context(), "branch", "master") // FIXME: derive default branch
 
 	// redirect to dashboard, which is now located at adminifier root
-	http.Redirect(w, r, "../", http.StatusTemporaryRedirect)
+	redirect := r.Form.Get("redirect")
+	http.Redirect(w, r, root+redirect, http.StatusTemporaryRedirect)
 }
 
 func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
@@ -233,7 +236,7 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handleTemplate(w, r)
+	handleTemplate(w, r, nil)
 }
 
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -356,7 +359,11 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
+		redirect := "?redirect=" + strings.TrimPrefix(r.URL.Path, root)
+		if r.URL.RawQuery != "" {
+			redirect += url.QueryEscape("?" + r.URL.RawQuery)
+		}
+		http.Redirect(w, r, root+"login"+redirect, http.StatusTemporaryRedirect)
 		return true
 	}
 	return false
