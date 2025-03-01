@@ -20,7 +20,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var javascriptTemplates string
+var wikiJavascriptTemplates string
 
 var frameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
@@ -222,7 +222,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 	}
 
 	// load javascript templates
-	if javascriptTemplates == "" {
+	if wikiJavascriptTemplates == "" {
 		files, err := fs.ReadDir(resources.Adminifier, "js-tmpl")
 		if err != nil {
 			log.Printf("error reading js-tmpl directory: %v", err)
@@ -232,7 +232,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 			if err != nil {
 				log.Printf("error reading js-tmpl file %s: %v", file.Name(), err)
 			}
-			javascriptTemplates += string(data)
+			wikiJavascriptTemplates += string(data)
 		}
 	}
 
@@ -240,7 +240,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 		JSTemplates template.HTML
 		wikiTemplate
 	}{
-		template.HTML(javascriptTemplates),
+		template.HTML(wikiJavascriptTemplates),
 		getGenericTemplate(&wikiRequest{
 			shortcode: shortcode,
 			wi:        wi,

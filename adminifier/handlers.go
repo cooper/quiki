@@ -35,6 +35,8 @@ var adminFrameHandlers = map[string]func(*adminRequest){
 	"help/":  handleAdminHelpFrame,
 }
 
+var adminJavascriptTemplates string
+
 type adminTemplate struct {
 	User      *authenticator.User
 	Wikis     map[string]*webserver.WikiInfo
@@ -145,7 +147,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// load javascript templates
-	if javascriptTemplates == "" {
+	if adminJavascriptTemplates == "" {
 		jsTmplRoot := "js-tmpl/admin"
 		files, err := fs.ReadDir(resources.Adminifier, jsTmplRoot)
 		if err != nil {
@@ -156,7 +158,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Printf("error reading js-tmpl template %s: %v", file.Name(), err)
 			}
-			javascriptTemplates += string(data)
+			adminJavascriptTemplates += string(data)
 		}
 	}
 
@@ -164,7 +166,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		JSTemplates template.HTML
 		adminTemplate
 	}{
-		template.HTML(javascriptTemplates),
+		template.HTML(adminJavascriptTemplates),
 		createAdminTemplate(r)},
 	)
 
