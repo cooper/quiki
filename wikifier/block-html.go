@@ -12,6 +12,11 @@ func (b *htmlBlock) html(page *Page, el element) {
 	el.setMeta("noIndent", true)
 	el.setMeta("noTags", true)
 	for _, item := range b.posContent() {
-		el.add(item.content)
+		content := item.content
+		if s, ok := content.(string); ok {
+			el.add(HTML(s))
+		} else {
+			el.add(content)
+		}
 	}
 }
