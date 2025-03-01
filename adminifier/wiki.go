@@ -44,6 +44,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"write-model":    handleWriteModel,
 	"write-config":   handleWriteWikiConfig,
 	"image/":         handleImage,
+	"page-revisions": handlePageRevisions,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -668,6 +669,25 @@ func handleImage(wr *wikiRequest) {
 	default:
 		http.NotFound(wr.w, wr.r)
 	}
+}
+
+func handlePageRevisions(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "page") {
+		return
+	}
+
+	pageName := wr.r.Form.Get("page")
+	revisions, err := wr.wi.RevisionsMatchingPage(pageName)
+	if err != nil {
+		wr.err = err
+		return
+	}
+
+	jsonWriter := json.NewEncoder(wr.w)
+	wr.err = jsonWriter.Encode(map[string]any{
+		"success": true,
+		"revs":    revisions,
+	})
 }
 
 // possibly switch wiki branches

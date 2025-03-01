@@ -57,7 +57,7 @@ function displayRevisionViewer () {
         if (!box)
             return;
         if (!data.success) {
-            alert(data.error);
+            alert(data.error || 'No data');
             return;
         }
         if (!data.revs) {

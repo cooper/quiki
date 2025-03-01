@@ -472,3 +472,49 @@ func (w *Wiki) GetLatestCommitHash() (string, error) {
 
 	return commit.Hash.String(), nil
 }
+
+// RevisionInfo contains information about a specific revision.
+type RevisionInfo struct {
+	Id      string    `json:"id"`
+	Author  string    `json:"author"`
+	Date    time.Time `json:"date"`
+	Message string    `json:"message"`
+}
+
+// RevisionsMatchingPage returns a list of commit infos matching a page file.
+func (w *Wiki) RevisionsMatchingPage(nameOrPath string) ([]RevisionInfo, error) {
+	return w._revisionsMatchingFile(w.RelPath(w.PathForPage(nameOrPath)))
+}
+
+// _revisionsMatchingFile returns a list of commit infos matching a file path.
+func (w *Wiki) _revisionsMatchingFile(path string) ([]RevisionInfo, error) {
+	repo, err := w.repo()
+	if err != nil {
+		return nil, err
+	}
+
+	logOptions := &git.LogOptions{
+		FileName: &path,
+	}
+
+	commitIter, err := repo.Log(logOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	var revisions []RevisionInfo
+	err = commitIter.ForEach(func(c *object.Commit) error {
+		revisions = append(revisions, RevisionInfo{
+			Id:      c.Hash.String(),
+			Author:  c.Author.Name,
+			Date:    c.Author.When,
+			Message: c.Message,
+		})
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return revisions, nil
+}
