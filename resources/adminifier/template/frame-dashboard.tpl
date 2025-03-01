@@ -4,9 +4,12 @@
     data-icon="home"
     data-styles="dashboard"
     data-flags="buttons"
+/>
+<!--
+    Unimplemented:
     data-buttons="date-selection"
     data-button-date-selection="{'title': 'Last 30 days', 'icon': 'calendar', 'func': 'displayDateSelector'}"
-/>
+-->
 
 
 {{if .Errors}}
