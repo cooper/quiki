@@ -1,15 +1,12 @@
 package adminifier
 
 import (
-	"html/template"
-	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
-	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 )
@@ -35,8 +32,6 @@ var adminFrameHandlers = map[string]func(*adminRequest){
 	"help":   handleAdminHelpFrame,
 	"help/":  handleAdminHelpFrame,
 }
-
-var adminJavascriptTemplates string
 
 type adminTemplate struct {
 	User      *authenticator.User
@@ -147,29 +142,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// load javascript templates
-	if adminJavascriptTemplates == "" {
-		jsTmplRoot := "js-tmpl/admin"
-		files, err := fs.ReadDir(resources.Adminifier, jsTmplRoot)
-		if err != nil {
-			log.Printf("error reading js-tmpl templates: %v", err)
-		}
-		for _, file := range files {
-			data, err := fs.ReadFile(resources.Adminifier, jsTmplRoot+"/"+file.Name())
-			if err != nil {
-				log.Printf("error reading js-tmpl template %s: %v", file.Name(), err)
-			}
-			adminJavascriptTemplates += string(data)
-		}
-	}
-
-	err := tmpl.ExecuteTemplate(w, "admin.tpl", struct {
-		JSTemplates template.HTML
-		adminTemplate
-	}{
-		template.HTML(adminJavascriptTemplates),
-		createAdminTemplate(r)},
-	)
+	err := tmpl.ExecuteTemplate(w, "admin.tpl", createAdminTemplate(r))
 
 	if err != nil {
 		panic(err)

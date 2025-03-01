@@ -3,7 +3,6 @@ package adminifier
 import (
 	"encoding/json"
 	"html/template"
-	"io/fs"
 	"log"
 	"maps"
 	"net/http"
@@ -13,14 +12,11 @@ import (
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
-	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
-
-var wikiJavascriptTemplates string
 
 var wikiFrameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
@@ -223,35 +219,12 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 		return
 	}
 
-	// load javascript templates
-	if wikiJavascriptTemplates == "" {
-		files, err := fs.ReadDir(resources.Adminifier, "js-tmpl")
-		if err != nil {
-			log.Printf("error reading js-tmpl directory: %v", err)
-		}
-		for _, file := range files {
-			if strings.HasSuffix(file.Name(), ".tpl") {
-				data, err := fs.ReadFile(resources.Adminifier, "js-tmpl/"+file.Name())
-				if err != nil {
-					log.Printf("error reading js-tmpl file %s: %v", file.Name(), err)
-				}
-				wikiJavascriptTemplates += string(data)
-			}
-		}
-	}
-
-	err := tmpl.ExecuteTemplate(w, "wiki.tpl", struct {
-		JSTemplates template.HTML
-		wikiTemplate
-	}{
-		template.HTML(wikiJavascriptTemplates),
-		getGenericTemplate(&wikiRequest{
-			shortcode: shortcode,
-			wi:        wi,
-			w:         w,
-			r:         r,
-		}),
-	})
+	err := tmpl.ExecuteTemplate(w, "wiki.tpl", getGenericTemplate(&wikiRequest{
+		shortcode: shortcode,
+		wi:        wi,
+		w:         w,
+		r:         r,
+	}))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		panic(err)
