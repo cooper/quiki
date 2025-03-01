@@ -608,6 +608,13 @@ func (p *Page) HTML() HTML
 HTML generates and returns the HTML code for the page. The page must be parsed
 with Parse before attempting this method.
 
+#### func (*Page) HTMLAndCSS
+
+```go
+func (p *Page) HTMLAndCSS() HTML
+```
+HTMLAndCSS generates and returns the HTML code for the page, including CSS.
+
 #### func (*Page) Info
 
 ```go
@@ -630,6 +637,14 @@ is treated as a normal page rather than a redirect.
 func (p *Page) Keywords() []string
 ```
 Keywords returns the list of page keywords.
+
+#### func (*Page) MarshalJSON
+
+```go
+func (p *Page) MarshalJSON() ([]byte, error)
+```
+MarshalJSON returns a JSON representation of the page. It includes the PageInfo,
+HTML, and CSS.
 
 #### func (*Page) Modified
 

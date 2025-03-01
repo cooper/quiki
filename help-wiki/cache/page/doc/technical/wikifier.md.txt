@@ -333,6 +333,11 @@
                         
                         
                             
+                                func (*Page) HTMLAndCSS
+                            
+                        
+                        
+                            
                                 func (*Page) Info
                             
                         
@@ -344,6 +349,11 @@
                         
                             
                                 func (*Page) Keywords
+                            
+                        
+                        
+                            
+                                func (*Page) MarshalJSON
                             
                         
                         
@@ -1402,6 +1412,16 @@ func (p *Page) HTML() HTML
                 
                 
                     
+                        func (*Page) HTMLAndCSS
+                    
+func (p *Page) HTMLAndCSS() HTML
+
+                    
+                        HTMLAndCSS generates and returns the HTML code for the page, including CSS.
+                    
+                
+                
+                    
                         func (*Page) Info
                     
 func (p *Page) Info() PageInfo
@@ -1430,6 +1450,17 @@ func (p *Page) Keywords() []string
 
                     
                         Keywords returns the list of page keywords.
+                    
+                
+                
+                    
+                        func (*Page) MarshalJSON
+                    
+func (p *Page) MarshalJSON() ([]byte, error)
+
+                    
+                        MarshalJSON returns a JSON representation of the page. It includes the PageInfo,
+                        HTML, and CSS.
                     
                 
                 

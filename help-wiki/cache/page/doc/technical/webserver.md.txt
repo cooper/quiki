@@ -43,6 +43,36 @@
                         
                         
                             
+                                type Route
+                            
+                        
+                        
+                            
+                                type ServeMux
+                            
+                        
+                        
+                            
+                                func  NewServeMux
+                            
+                        
+                        
+                            
+                                func (*ServeMux) GetRoutes
+                            
+                        
+                        
+                            
+                                func (*ServeMux) Register
+                            
+                        
+                        
+                            
+                                func (*ServeMux) RegisterFunc
+                            
+                        
+                        
+                            
                                 type WikiInfo
                             
                         
@@ -85,14 +115,6 @@ var Conf *wikifier.Page
             
                 It is available only after Configure is called.
             
-var Mux *http.ServeMux
-
-            
-                Mux is the *http.ServeMux.
-            
-            
-                It is available only after Configure is called.
-            
 var Server *http.Server
 
             
@@ -131,6 +153,9 @@ func Configure(_initial_options Options)
                     
 func CreateWizardConfig(opts Options)
 
+                    
+                        CreateWizardConfig creates a new server config file given the options.
+                    
                 
                 
                     
@@ -170,11 +195,12 @@ func TemplateNames() []string
                         type Options
                     
 type Options struct {
-	Config string
-	Bind   string
-	Port   string
-	Host   string
-	Pregen bool
+	Config   string
+	Bind     string
+	Port     string
+	Host     string
+	WikisDir string
+	Pregen   bool
 }
 
                     
@@ -184,6 +210,71 @@ var Opts Options
 
                     
                         Opts is the webserver options.
+                    
+                
+                
+                    
+                        type Route
+                    
+type Route struct {
+	Pattern     string
+	Description string
+}
+
+                
+                
+                    
+                        type ServeMux
+                    
+type ServeMux struct {
+	*http.ServeMux
+}
+
+var Mux *ServeMux
+
+                    
+                        Mux is the *http.ServeMux.
+                    
+                    
+                        It is available only after Configure is called.
+                    
+                
+                
+                    
+                        func  NewServeMux
+                    
+func NewServeMux() *ServeMux
+
+                
+                
+                    
+                        func (*ServeMux) GetRoutes
+                    
+func (m *ServeMux) GetRoutes() []Route
+
+                    
+                        GetRoutes returns the registered routes.
+                    
+                
+                
+                    
+                        func (*ServeMux) Register
+                    
+func (m *ServeMux) Register(pattern, description string, handler http.Handler)
+
+                    
+                        Register registers the handler for the given pattern and adds to routes.
+                    
+                
+                
+                    
+                        func (*ServeMux) RegisterFunc
+                    
+func (m *ServeMux) RegisterFunc(pattern, description string, handler func(http.ResponseWriter, *http.Request))
+
+                    
+                        RegisterFunc registers the handler function for the given pattern and adds to
+                        routes.
                     
                 
                 

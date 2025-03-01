@@ -27,15 +27,20 @@ import "."
             
                 Usage
             
-var Adminifier, _ = fs.Sub(adminifierFS, "adminifier")
+var Adminifier fs.FS
 
             
                 Adminifier provides access to the adminifier resource files.
             
-var Webserver, _ = fs.Sub(webserverFS, "webserver")
+var Webserver fs.FS
 
             
                 Webserver provides access to the webserver resource files.
+            
+var Wikis fs.FS
+
+            
+                Wikis provides embedded base wikis.
             
         
     

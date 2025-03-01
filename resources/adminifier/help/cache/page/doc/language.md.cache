@@ -1,5 +1,5 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/language.md","file_ne":"doc/language","created":"2020-05-04T17:06:31-04:00","modified":"2020-05-04T17:06:31-04:00","generated":true,"external":true,"fmt_title":"Language","title":"Language","author":"Markdown","preview":"Contents Language Syntax Comments Escapes Blocks Nameless blocks Named blocks Block type inference Model shorthand Data types Variables Assignment","warnings":[{"message":"No such code{} style 'monokailight' (from config)","position":[15,350]},{"message":"No such code{} style 'monokailight' (from config)","position":[59,1533]},{"message":"No such code{} style 'monokailight' (from config)","position":[67,1632]},{"message":"No such code{} style 'monokailight' (from config)","position":[174,3815]},{"message":"No such code{} style 'monokailight' (from config)","position":[203,4488]},{"message":"No such code{} style 'monokailight' (from config)","position":[228,5414]},{"message":"No such code{} style 'monokailight' (from config)","position":[238,5465]},{"message":"No such code{} style 'monokailight' (from config)","position":[258,6017]},{"message":"No such code{} style 'monokailight' (from config)","position":[268,6081]},{"message":"No such code{} style 'monokailight' (from config)","position":[286,6408]},{"message":"No such code{} style 'monokailight' (from config)","position":[298,6639]},{"message":"No such code{} style 'monokailight' (from config)","position":[330,7595]},{"message":"No such code{} style 'monokailight' (from config)","position":[346,7835]},{"message":"No such code{} style 'monokailight' (from config)","position":[381,8440]},{"message":"No such code{} style 'monokailight' (from config)","position":[390,8589]},{"message":"No such code{} style 'monokailight' (from config)","position":[399,8705]},{"message":"No such code{} style 'monokailight' (from config)","position":[415,9067]},{"message":"No such code{} style 'monokailight' (from config)","position":[425,9369]},{"message":"No such code{} style 'monokailight' (from config)","position":[436,9530]},{"message":"No such code{} style 'monokailight' (from config)","position":[448,9715]},{"message":"No such code{} style 'monokailight' (from config)","position":[467,10125]},{"message":"No such code{} style 'monokailight' (from config)","position":[483,10535]},{"message":"No such code{} style 'monokailight' (from config)","position":[507,11139]},{"message":"No such code{} style 'monokailight' (from config)","position":[531,11638]},{"message":"No such code{} style 'monokailight' (from config)","position":[553,12105]},{"message":"No such code{} style 'monokailight' (from config)","position":[567,12492]}]}
-<div class="q-main-10 q-main">
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/language.md","file_ne":"doc/language","created":"2025-02-23T09:41:58.234670181-05:00","modified":"2025-02-23T09:41:58.234670181-05:00","generated":true,"external":true,"fmt_title":"Language","title":"Language","author":"Markdown","preview":"Contents Language Syntax Comments Escapes Blocks Nameless blocks Named blocks Block type inference Model shorthand Data types Variables Assignment"}
+<div class="q-main-doc/language q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
         <li>
@@ -225,82 +225,82 @@
                 <p class="q-p">
                     <span style="font-weight: bold;">Anywhere</span> in a document, these characters MUST be escaped for literal use:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c]\\[/c]&lt;/td&gt;
-&lt;td&gt;Escape character&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c]\\[/c]</td>
+<td>Escape character</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]{[/c]&lt;/td&gt;
-&lt;td&gt;Starts a [[ block | #blocks ]]&lt;/td&gt;
-&lt;/tr&gt;
+<tr>
+<td>[c]{[/c]</td>
+<td>Starts a [[ block | #blocks ]]</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]}[/c]&lt;/td&gt;
-&lt;td&gt;Terminates a [[ block | #blocks ]]&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]}[/c]</td>
+<td>Terminates a [[ block | #blocks ]]</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     Within <a class="q-link-internal" href="#text-formatting" title="§ text-formatting"><span style="font-weight: bold;">formatted text</span></a>, the following characters must be
                     escaped in addition to those listed above:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c]\[[/c]&lt;/td&gt;
-&lt;td&gt;Starts a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c]\[[/c]</td>
+<td>Starts a [[ text formatting | #text-formatting ]] token</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]\][/c]&lt;/td&gt;
-&lt;td&gt;Terminates a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]\][/c]</td>
+<td>Terminates a [[ text formatting | #text-formatting ]] token</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     Within <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map"><span style="font-weight: bold;">maps</span></a> and <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list"><span style="font-weight: bold;">lists</span></a>, these
                     characters must also be escaped:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Must be escaped in&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Must be escaped in</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c];[/c]&lt;/td&gt;
-&lt;td&gt;Map keys and values, list values&lt;/td&gt;
-&lt;td&gt;Terminates a value&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c];[/c]</td>
+<td>Map keys and values, list values</td>
+<td>Terminates a value</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]:[/c]&lt;/td&gt;
-&lt;td&gt;Map keys&lt;/td&gt;
-&lt;td&gt;Terminates a key&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]:[/c]</td>
+<td>Map keys</td>
+<td>Terminates a key</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     <span style="font-weight: bold;">Brace-escape</span>. Sometimes it may be desirable to disable all parsing within a
                     particular block. This is especially useful for things like
@@ -418,27 +418,27 @@
                     The one exception to this is that if the immediate parent is <code>infobox{}</code>, an
                     <code>infosec{}</code> is assumed instead:
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">infobox [United States of America] {
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="n">infobox</span> <span class="p">[</span><span class="n">United</span> <span class="n">States</span> <span class="n">of</span> <span class="n">America</span><span class="p">]</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    Capital:        [! Washington, DC !];  
-</span></span><span class="line"><span class="cl">    Largest city:   [! New York City !];   
+</span></span><span class="line"><span class="cl">    <span class="n">Capital</span><span class="p">:</span>        <span class="p">[</span><span class="o">!</span> <span class="n">Washington</span><span class="p">,</span> <span class="n">DC</span> <span class="o">!</span><span class="p">];</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">Largest</span> <span class="n">city</span><span class="p">:</span>   <span class="p">[</span><span class="o">!</span> <span class="n">New</span> <span class="n">York</span> <span class="n">City</span> <span class="o">!</span><span class="p">];</span>   
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    [Goverment] {
-</span></span><span class="line"><span class="cl">        :[! Federal presidential constitutional republic | Republic !];   
-</span></span><span class="line"><span class="cl">        President:              [! Donald Trump !];
-</span></span><span class="line"><span class="cl">        Vice President:         [! Mike Pence !];
-</span></span><span class="line"><span class="cl">        Speaker of the House:   [! Paul Ryan !];
-</span></span><span class="line"><span class="cl">        Chief Justice:          [! John Roberts !];
-</span></span><span class="line"><span class="cl">    };
+</span></span><span class="line"><span class="cl">    <span class="p">[</span><span class="n">Goverment</span><span class="p">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">:[</span><span class="o">!</span> <span class="n">Federal</span> <span class="n">presidential</span> <span class="n">constitutional</span> <span class="n">republic</span> <span class="o">|</span> <span class="n">Republic</span> <span class="o">!</span><span class="p">];</span>   
+</span></span><span class="line"><span class="cl">        <span class="n">President</span><span class="p">:</span>              <span class="p">[</span><span class="o">!</span> <span class="n">Donald</span> <span class="n">Trump</span> <span class="o">!</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Vice</span> <span class="n">President</span><span class="p">:</span>         <span class="p">[</span><span class="o">!</span> <span class="n">Mike</span> <span class="n">Pence</span> <span class="o">!</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Speaker</span> <span class="n">of</span> <span class="n">the</span> <span class="n">House</span><span class="p">:</span>   <span class="p">[</span><span class="o">!</span> <span class="n">Paul</span> <span class="n">Ryan</span> <span class="o">!</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Chief</span> <span class="n">Justice</span><span class="p">:</span>          <span class="p">[</span><span class="o">!</span> <span class="n">John</span> <span class="n">Roberts</span> <span class="o">!</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
 </span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    [Independence[nl]from [! Great Britain !]] {
-</span></span><span class="line"><span class="cl">        Declaration:            July 4, 1776;
-</span></span><span class="line"><span class="cl">        Confederation:          March 1, 1781;
-</span></span><span class="line"><span class="cl">        Treaty of Paris:        September 3, 1783;
-</span></span><span class="line"><span class="cl">        Constitution:           June 21, 1788;
-</span></span><span class="line"><span class="cl">        Last polity admitted:   March 24, 1976;
-</span></span><span class="line"><span class="cl">    };
-</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">    <span class="p">[</span><span class="n">Independence</span><span class="p">[</span><span class="n">nl</span><span class="p">]</span><span class="n">from</span> <span class="p">[</span><span class="o">!</span> <span class="n">Great</span> <span class="n">Britain</span> <span class="o">!</span><span class="p">]]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Declaration</span><span class="p">:</span>            <span class="n">July</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1776</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Confederation</span><span class="p">:</span>          <span class="n">March</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1781</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Treaty</span> <span class="n">of</span> <span class="n">Paris</span><span class="p">:</span>        <span class="n">September</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1783</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Constitution</span><span class="p">:</span>           <span class="n">June</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">1788</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Last</span> <span class="n">polity</span> <span class="n">admitted</span><span class="p">:</span>   <span class="n">March</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">1976</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></pre>
             </div>
             <div class="q-sec">
@@ -496,8 +496,8 @@
                 <p class="q-p">
                     <span style="font-weight: bold;">String</span> variables look like this:
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">@some_variable:     The value;
-</span></span><span class="line"><span class="cl">@another_variable:  You can escape semicolons\\; I think;
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="err">@</span><span class="n">some_variable</span><span class="p">:</span>     <span class="n">The</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="n">another_variable</span><span class="p">:</span>  <span class="n">You</span> <span class="n">can</span> <span class="n">escape</span> <span class="n">semicolons</span>\\<span class="p">;</span> <span class="n">I</span> <span class="n">think</span><span class="p">;</span>
 </span></span></pre>
                 <p class="q-p">
                     <span style="font-weight: bold;">Boolean</span> variables look like this:
@@ -523,7 +523,7 @@
                     <a class="q-link-internal" href="#text-formatting" title="§ text-formatting">formatted text</a> or <a class="q-link-internal" href="#conditionals" title="§ conditionals">conditionals</a>. You can use
                     variables anywhere that formatted text is accepted like this:
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">I am allowed to use [b]bold text[/b], as well as [@variables].
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="n">I</span> <span class="n">am</span> <span class="n">allowed</span> <span class="n">to</span> <span class="n">use</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="n">bold</span> <span class="n">text</span><span class="p">[</span><span class="o">/</span><span class="n">b</span><span class="p">],</span> <span class="n">as</span> <span class="n">well</span> <span class="n">as</span> <span class="p">[</span><span class="err">@</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span>
 </span></span></pre>
                 <p class="q-p">
                     If the variable contains a block, you can display it using <code>{@var_name}</code>. This
@@ -578,21 +578,21 @@
                 <p class="q-p">
                     Some block types support attribute fetching and/or setting:
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">/* define the infobox in a variable so we can access attributes */
-</span></span><span class="line"><span class="cl">@person: infobox [Britney Spears] {
-</span></span><span class="line"><span class="cl">    First name:     Britney;
-</span></span><span class="line"><span class="cl">    Last name:      Spears;
-</span></span><span class="line"><span class="cl">    Age:            35;
-</span></span><span class="line"><span class="cl">};
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="o">/*</span> <span class="n">define</span> <span class="n">the</span> <span class="n">infobox</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">variable</span> <span class="n">so</span> <span class="n">we</span> <span class="n">can</span> <span class="n">access</span> <span class="n">attributes</span> <span class="o">*/</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="n">person</span><span class="p">:</span> <span class="n">infobox</span> <span class="p">[</span><span class="n">Britney</span> <span class="n">Spears</span><span class="p">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">First</span> <span class="n">name</span><span class="p">:</span>     <span class="n">Britney</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Last</span> <span class="n">name</span><span class="p">:</span>      <span class="n">Spears</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Age</span><span class="p">:</span>            <span class="mi">35</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">/* display the infobox */
-</span></span><span class="line"><span class="cl">{@person}
+</span></span><span class="line"><span class="cl"><span class="o">/*</span> <span class="n">display</span> <span class="n">the</span> <span class="n">infobox</span> <span class="o">*/</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="err">@</span><span class="n">person</span><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">/* access attributes from it elsewhere
-</span></span><span class="line"><span class="cl">   btw this works for all map-based block types */
+</span></span><span class="line"><span class="cl"><span class="o">/*</span> <span class="n">access</span> <span class="n">attributes</span> <span class="n">from</span> <span class="n">it</span> <span class="n">elsewhere</span>
+</span></span><span class="line"><span class="cl">   <span class="n">btw</span> <span class="n">this</span> <span class="n">works</span> <span class="k">for</span> <span class="n">all</span> <span class="n">map</span><span class="o">-</span><span class="n">based</span> <span class="n">block</span> <span class="n">types</span> <span class="o">*/</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">Did you know that [@person.First_name] [@person.Last_name] is
-</span></span><span class="line"><span class="cl">[@person.Age] years old?
+</span></span><span class="line"><span class="cl"><span class="n">Did</span> <span class="n">you</span> <span class="n">know</span> <span class="n">that</span> <span class="p">[</span><span class="err">@</span><span class="n">person</span><span class="o">.</span><span class="n">First_name</span><span class="p">]</span> <span class="p">[</span><span class="err">@</span><span class="n">person</span><span class="o">.</span><span class="n">Last_name</span><span class="p">]</span> <span class="n">is</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="err">@</span><span class="n">person</span><span class="o">.</span><span class="n">Age</span><span class="p">]</span> <span class="n">years</span> <span class="n">old</span><span class="err">?</span>
 </span></span></pre>
                 <p class="q-p">
                     Some data types may not support attributes at all. Others might only support
@@ -642,22 +642,22 @@
                     Normally the formatting of string variables is evaluated immediately as the
                     variable is defined.
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">@another_variable: references other variables;
-</span></span><span class="line"><span class="cl">@my_text: This string variable has [b]bold text[/b] and [@another_variable];
-</span></span><span class="line"><span class="cl">/* ok, @my_text now is:
-</span></span><span class="line"><span class="cl">   This string variable has &lt;strong&gt;bold text&lt;/strong&gt; and references
-</span></span><span class="line"><span class="cl">   other variables
-</span></span><span class="line"><span class="cl">*/
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="err">@</span><span class="n">another_variable</span><span class="p">:</span> <span class="n">references</span> <span class="n">other</span> <span class="n">variables</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="n">my_text</span><span class="p">:</span> <span class="n">This</span> <span class="n">string</span> <span class="n">variable</span> <span class="n">has</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="n">bold</span> <span class="n">text</span><span class="p">[</span><span class="o">/</span><span class="n">b</span><span class="p">]</span> <span class="ow">and</span> <span class="p">[</span><span class="err">@</span><span class="n">another_variable</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="o">/*</span> <span class="n">ok</span><span class="p">,</span> <span class="err">@</span><span class="n">my_text</span> <span class="n">now</span> <span class="n">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">   <span class="n">This</span> <span class="n">string</span> <span class="n">variable</span> <span class="n">has</span> <span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="n">bold</span> <span class="n">text</span><span class="o">&lt;/</span><span class="n">strong</span><span class="o">&gt;</span> <span class="ow">and</span> <span class="n">references</span>
+</span></span><span class="line"><span class="cl">   <span class="n">other</span> <span class="n">variables</span>
+</span></span><span class="line"><span class="cl"><span class="o">*/</span>
 </span></span></pre>
                 <p class="q-p">
                     Interpolate variables are different in that their contents
                     are evaluated as they are accessed rather than as they are defined.
                 </p>
-<pre class="q-code chroma"><span class="line"><span class="cl">@another_variable: references other variables;
-</span></span><span class="line"><span class="cl">%my_text: This string variable has [b]bold text[/b] and [@another_variable];
-</span></span><span class="line"><span class="cl">/* ok, @my_text now is:
-</span></span><span class="line"><span class="cl">   This string variable has [b]bold text[/b] and [@another_variable];
-</span></span><span class="line"><span class="cl">*/
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="err">@</span><span class="n">another_variable</span><span class="p">:</span> <span class="n">references</span> <span class="n">other</span> <span class="n">variables</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">my_text</span><span class="p">:</span> <span class="n">This</span> <span class="n">string</span> <span class="n">variable</span> <span class="n">has</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="n">bold</span> <span class="n">text</span><span class="p">[</span><span class="o">/</span><span class="n">b</span><span class="p">]</span> <span class="ow">and</span> <span class="p">[</span><span class="err">@</span><span class="n">another_variable</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="o">/*</span> <span class="n">ok</span><span class="p">,</span> <span class="err">@</span><span class="n">my_text</span> <span class="n">now</span> <span class="n">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">   <span class="n">This</span> <span class="n">string</span> <span class="n">variable</span> <span class="n">has</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="n">bold</span> <span class="n">text</span><span class="p">[</span><span class="o">/</span><span class="n">b</span><span class="p">]</span> <span class="ow">and</span> <span class="p">[</span><span class="err">@</span><span class="n">another_variable</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="o">*/</span>
 </span></span></pre>
                 <p class="q-p">
                     Now the variable is defined with the formatting still unevaluated, so

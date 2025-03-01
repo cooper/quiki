@@ -18,7 +18,57 @@
                         
                         
                             
+                                func  CreateWizardConfig
+                            
+                        
+                        
+                            
+                                func  InitWikis
+                            
+                        
+                        
+                            
                                 func  Listen
+                            
+                        
+                        
+                            
+                                func  TemplateNames
+                            
+                        
+                        
+                            
+                                type Options
+                            
+                        
+                        
+                            
+                                type Route
+                            
+                        
+                        
+                            
+                                type ServeMux
+                            
+                        
+                        
+                            
+                                func  NewServeMux
+                            
+                        
+                        
+                            
+                                func (*ServeMux) GetRoutes
+                            
+                        
+                        
+                            
+                                func (*ServeMux) Register
+                            
+                        
+                        
+                            
+                                func (*ServeMux) RegisterFunc
                             
                         
                         
@@ -43,7 +93,7 @@
         
             --
         
-import "github.com/cooper/quiki/webserver"
+import "."
 
         
             Package webserver is the newest webserver.
@@ -57,35 +107,10 @@ var Auth *authenticator.Authenticator
             
                 Auth is the server authentication service.
             
-var Bind string
-
-            
-                Bind is the string to bind to, as extracted from the configuration file.
-            
-            
-                It is available only after Configure is called.
-            
 var Conf *wikifier.Page
 
             
                 Conf is the webserver configuration page.
-            
-            
-                It is available only after Configure is called.
-            
-var Mux *http.ServeMux
-
-            
-                Mux is the *http.ServeMux.
-            
-            
-                It is available only after Configure is called.
-            
-var Port string
-
-            
-                Port is the port to bind to or "unix" for a UNIX socket, as extracted from the
-                configuration file.
             
             
                 It is available only after Configure is called.
@@ -113,13 +138,33 @@ var Wikis map[string]*WikiInfo
                     
                         func  Configure
                     
-func Configure(confFile string)
+func Configure(_initial_options Options)
 
                     
                         Configure parses a configuration file and initializes webserver.
                     
                     
                         If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        func  CreateWizardConfig
+                    
+func CreateWizardConfig(opts Options)
+
+                    
+                        CreateWizardConfig creates a new server config file given the options.
+                    
+                
+                
+                    
+                        func  InitWikis
+                    
+func InitWikis() error
+
+                    
+                        initialize all the wikis in the configuration
                     
                 
                 
@@ -133,6 +178,103 @@ func Listen()
                     
                     
                         Configure must be called first. If any errors occur, the program is terminated.
+                    
+                
+                
+                    
+                        func  TemplateNames
+                    
+func TemplateNames() []string
+
+                    
+                        Returns the names of all available templates.
+                    
+                
+                
+                    
+                        type Options
+                    
+type Options struct {
+	Config   string
+	Bind     string
+	Port     string
+	Host     string
+	WikisDir string
+	Pregen   bool
+}
+
+                    
+                        Options is the webserver command line options.
+                    
+var Opts Options
+
+                    
+                        Opts is the webserver options.
+                    
+                
+                
+                    
+                        type Route
+                    
+type Route struct {
+	Pattern     string
+	Description string
+}
+
+                
+                
+                    
+                        type ServeMux
+                    
+type ServeMux struct {
+	*http.ServeMux
+}
+
+var Mux *ServeMux
+
+                    
+                        Mux is the *http.ServeMux.
+                    
+                    
+                        It is available only after Configure is called.
+                    
+                
+                
+                    
+                        func  NewServeMux
+                    
+func NewServeMux() *ServeMux
+
+                
+                
+                    
+                        func (*ServeMux) GetRoutes
+                    
+func (m *ServeMux) GetRoutes() []Route
+
+                    
+                        GetRoutes returns the registered routes.
+                    
+                
+                
+                    
+                        func (*ServeMux) Register
+                    
+func (m *ServeMux) Register(pattern, description string, handler http.Handler)
+
+                    
+                        Register registers the handler for the given pattern and adds to routes.
+                    
+                
+                
+                    
+                        func (*ServeMux) RegisterFunc
+                    
+func (m *ServeMux) RegisterFunc(pattern, description string, handler func(http.ResponseWriter, *http.Request))
+
+                    
+                        RegisterFunc registers the handler function for the given pattern and adds to
+                        routes.
                     
                 
                 

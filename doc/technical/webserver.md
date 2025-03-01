@@ -19,13 +19,6 @@ Conf is the webserver configuration page.
 It is available only after Configure is called.
 
 ```go
-var Mux *http.ServeMux
-```
-Mux is the *http.ServeMux.
-
-It is available only after Configure is called.
-
-```go
 var Server *http.Server
 ```
 Server is the *http.Server.
@@ -56,6 +49,7 @@ If any errors occur, the program is terminated.
 ```go
 func CreateWizardConfig(opts Options)
 ```
+CreateWizardConfig creates a new server config file given the options.
 
 #### func  InitWikis
 
@@ -84,11 +78,12 @@ Returns the names of all available templates.
 
 ```go
 type Options struct {
-	Config string
-	Bind   string
-	Port   string
-	Host   string
-	Pregen bool
+	Config   string
+	Bind     string
+	Port     string
+	Host     string
+	WikisDir string
+	Pregen   bool
 }
 ```
 
@@ -98,6 +93,60 @@ Options is the webserver command line options.
 var Opts Options
 ```
 Opts is the webserver options.
+
+#### type Route
+
+```go
+type Route struct {
+	Pattern     string
+	Description string
+}
+```
+
+
+#### type ServeMux
+
+```go
+type ServeMux struct {
+	*http.ServeMux
+}
+```
+
+
+```go
+var Mux *ServeMux
+```
+Mux is the *http.ServeMux.
+
+It is available only after Configure is called.
+
+#### func  NewServeMux
+
+```go
+func NewServeMux() *ServeMux
+```
+
+#### func (*ServeMux) GetRoutes
+
+```go
+func (m *ServeMux) GetRoutes() []Route
+```
+GetRoutes returns the registered routes.
+
+#### func (*ServeMux) Register
+
+```go
+func (m *ServeMux) Register(pattern, description string, handler http.Handler)
+```
+Register registers the handler for the given pattern and adds to routes.
+
+#### func (*ServeMux) RegisterFunc
+
+```go
+func (m *ServeMux) RegisterFunc(pattern, description string, handler func(http.ResponseWriter, *http.Request))
+```
+RegisterFunc registers the handler function for the given pattern and adds to
+routes.
 
 #### type WikiInfo
 

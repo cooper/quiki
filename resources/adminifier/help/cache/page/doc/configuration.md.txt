@@ -38,6 +38,11 @@
                         
                         
                             
+                                root.ext
+                            
+                        
+                        
+                            
                                 external
                             
                         
@@ -194,6 +199,11 @@
                         
                         
                             
+                                server.http.host
+                            
+                        
+                        
+                            
                                 server.dir.template
                             
                         
@@ -326,41 +336,41 @@
                 
                     root
                 
-<table class="q-table">
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
 
-<tbody>
-<tr>
-<td>[c]root.wiki[/c]</td>
-<td>Wiki root</td>
-<td>None (i.e. /)</td>
-</tr>
 
-<tr>
-<td>[c]root.page[/c]</td>
-<td>Page root</td>
-<td>[i]/page[/i]</td>
-</tr>
 
-<tr>
-<td>[c]root.image[/c]</td>
-<td>Image root</td>
-<td>[i]/images[/i]</td>
-</tr>
+Option
+Description
+Default
 
-<tr>
-<td>[c]root.file[/c]</td>
-<td>File root</td>
-<td>None</td>
-</tr>
-</tbody>
-</table>
+
+
+
+
+[c]root.wiki[/c]
+Wiki root
+None (i.e. /)
+
+
+
+[c]root.page[/c]
+Page root
+[i]/page[/i]
+
+
+
+[c]root.image[/c]
+Image root
+[i]/images[/i]
+
+
+
+[c]root.file[/c]
+File root
+None
+
+
+
                 
                     Optional. HTTP roots. These are relative to the server HTTP root, NOT the
                     wiki root. They are used for link targets and image URLs; they will never be
@@ -381,6 +391,24 @@
             
             
                 
+                    root.ext
+                
+                
+                    Optional. The full external prefix of the wiki.
+                
+                
+                    It is used by adminifier to link to the wiki. It may also be used by frontends.
+                    You should configure this if serving quiki through a reverse proxy. Otherwise, the
+                    default should probably suffice. Do not include trailing slash.
+                
+@root.ext: https://mywiki.example.com;
+
+                
+                    Default (webserver/adminifier): http://<host.wiki || server.http.host>:<server.http.port>/<root.wiki>
+                
+            
+            
+                
                     external
                 
                 
@@ -390,35 +418,35 @@
                     You can configure any number of external wikis, each referred to by a shorthand
                     identifier [wiki_id] consisting of word-like characters.
                 
-<table class="q-table">
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
 
-<tbody>
-<tr>
-<td>[c]external.\[wiki_id\].name[/c]</td>
-<td>External wiki name, displayed in link tooltips</td>
-<td></td>
-</tr>
 
-<tr>
-<td>[c]external.\[wiki_id\].root[/c]</td>
-<td>External wiki page root</td>
-<td></td>
-</tr>
 
-<tr>
-<td>[c]external.\[wiki_id\].type[/c]</td>
-<td>External wiki type</td>
-<td>[i]quiki[/i]</td>
-</tr>
-</tbody>
-</table>
+Option
+Description
+Default
+
+
+
+
+
+[c]external.\[wiki_id\].name[/c]
+External wiki name, displayed in link tooltips
+
+
+
+
+[c]external.\[wiki_id\].root[/c]
+External wiki page root
+
+
+
+
+[c]external.\[wiki_id\].type[/c]
+External wiki type
+[i]quiki[/i]
+
+
+
                 
                     Accepted values for type
                 
@@ -903,6 +931,7 @@ server.http.port: 8080;
                 
                     Optional. Host to bind to.
                 
+@server.http.port: 8080;
 @server.http.bind: 127.0.0.1;
 
                 
@@ -913,6 +942,25 @@ server.http.port: 8080;
 
                 
                     Default: none (bind to all available hosts)
+                
+            
+            
+                
+                    server.http.host
+                
+                
+                    Optional. The default host to serve wikis on if they don't specify host.wiki.
+                
+                
+                    Note this helps inform the value of root.ext for wikis that do not specify an
+                    external root in their configuration. It is recommended you configure it to the
+                    public host of your server.
+                
+                
+                    Should be a hostname only or IP only, e.g. server.example.com.
+                
+                
+                    Default: None (serve wikis with no host configured on all hosts)
                 
             
             

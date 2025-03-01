@@ -3,7 +3,7 @@
 var container = new Element('div', { class: 'image-grid' });
 $('content').appendChild(container);
 
-if (a.json.results)
+if (a.json.results && a.json.results.length)
 a.json.results.each(function (imageData) {
     imageData.root = adminifier.wikiRoot;
 
@@ -25,6 +25,8 @@ a.json.results.each(function (imageData) {
     });
     container.appendChild(div);
 });
+else
+    container.innerHTML = '<p>No images found.</p>';
 
 function retinaDensity() {
     if (!window.matchMedia) return;

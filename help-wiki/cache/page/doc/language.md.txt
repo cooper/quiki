@@ -224,82 +224,82 @@ quiki is a file-based wiki suite and standalone web server.
                 
                     Anywhere in a document, these characters MUST be escaped for literal use:
                 
-<table class="q-table">
-<thead>
-<tr>
-<th>Character</th>
-<th>Reason for escape</th>
-</tr>
-</thead>
 
-<tbody>
-<tr>
-<td>[c]\\[/c]</td>
-<td>Escape character</td>
-</tr>
 
-<tr>
-<td>[c]{[/c]</td>
-<td>Starts a [[ block | #blocks ]]</td>
-</tr>
 
-<tr>
-<td>[c]}[/c]</td>
-<td>Terminates a [[ block | #blocks ]]</td>
-</tr>
-</tbody>
-</table>
+Character
+Reason for escape
+
+
+
+
+
+[c]\\[/c]
+Escape character
+
+
+
+[c]{[/c]
+Starts a [[ block | #blocks ]]
+
+
+
+[c]}[/c]
+Terminates a [[ block | #blocks ]]
+
+
+
                 
                     Within formatted text, the following characters must be
                     escaped in addition to those listed above:
                 
-<table class="q-table">
-<thead>
-<tr>
-<th>Character</th>
-<th>Reason for escape</th>
-</tr>
-</thead>
 
-<tbody>
-<tr>
-<td>[c]\[[/c]</td>
-<td>Starts a [[ text formatting | #text-formatting ]] token</td>
-</tr>
 
-<tr>
-<td>[c]\][/c]</td>
-<td>Terminates a [[ text formatting | #text-formatting ]] token</td>
-</tr>
-</tbody>
-</table>
+
+Character
+Reason for escape
+
+
+
+
+
+[c]\[[/c]
+Starts a [[ text formatting | #text-formatting ]] token
+
+
+
+[c]\][/c]
+Terminates a [[ text formatting | #text-formatting ]] token
+
+
+
                 
                     Within maps and lists, these
                     characters must also be escaped:
                 
-<table class="q-table">
-<thead>
-<tr>
-<th>Character</th>
-<th>Must be escaped in</th>
-<th>Reason for escape</th>
-</tr>
-</thead>
 
-<tbody>
-<tr>
-<td>[c];[/c]</td>
-<td>Map keys and values, list values</td>
-<td>Terminates a value</td>
-</tr>
 
-<tr>
-<td>[c]:[/c]</td>
-<td>Map keys</td>
-<td>Terminates a key</td>
-</tr>
-</tbody>
-</table>
+
+Character
+Must be escaped in
+Reason for escape
+
+
+
+
+
+[c];[/c]
+Map keys and values, list values
+Terminates a value
+
+
+
+[c]:[/c]
+Map keys
+Terminates a key
+
+
+
                 
                     Brace-escape. Sometimes it may be desirable to disable all parsing within a
                     particular block. This is especially useful for things like

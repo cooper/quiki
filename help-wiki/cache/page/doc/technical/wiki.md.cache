@@ -1,4 +1,4 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wiki.md","file_ne":"doc/technical/wiki","created":"2025-02-25T21:09:26.398582403-05:00","modified":"2025-02-25T21:09:26.398582403-05:00","generated":true,"external":true,"fmt_title":"wiki","title":"wiki","author":"Markdown","preview":"Contents wiki Usage func  SortAuthor func  SortCreated func  SortDimensions func  SortModified func  SortTitle func  ValidBranchName type Category"}
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/technical/wiki.md","file_ne":"doc/technical/wiki","created":"2025-03-01T14:37:54.239510282-05:00","modified":"2025-03-01T14:37:54.239510282-05:00","generated":true,"external":true,"fmt_title":"wiki","title":"wiki","author":"Markdown","preview":"Contents wiki Usage func  AvailableBaseWikis func  CreateWiki func  CreateWikiFS func  CreateWikiFromResource func  SortAuthor func  SortCreated func"}
 <div class="q-main-doc/technical/wiki q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
@@ -12,6 +12,26 @@
                         Usage
                     </a>
                     <ul>
+                        <li>
+                            <a class="q-link-internal" href="#func--availablebasewikis">
+                                func  AvailableBaseWikis
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func--createwiki">
+                                func  CreateWiki
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func--createwikifs">
+                                func  CreateWikiFS
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#func--createwikifromresource">
+                                func  CreateWikiFromResource
+                            </a>
+                        </li>
                         <li>
                             <a class="q-link-internal" href="#func--sortauthor">
                                 func  SortAuthor
@@ -78,6 +98,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="q-link-internal" href="#type-createwikiopts">
+                                type CreateWikiOpts
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#type-displaycategoryposts">
                                 type DisplayCategoryPosts
                             </a>
@@ -115,6 +140,11 @@
                         <li>
                             <a class="q-link-internal" href="#type-imageinfo">
                                 type ImageInfo
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#type-revisioninfo">
+                                type RevisionInfo
                             </a>
                         </li>
                         <li>
@@ -403,6 +433,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="q-link-internal" href="#func-wiki-revisionsmatchingpage">
+                                func (*Wiki) RevisionsMatchingPage
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#func-wiki-unresolvedabsfilepath">
                                 func (*Wiki) UnresolvedAbsFilePath
                             </a>
@@ -457,6 +492,47 @@
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span></pre>
             <div class="q-sec">
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func--availablebasewikis">
+                        func  AvailableBaseWikis
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">AvailableBaseWikis</span><span class="p">()</span> <span class="p">[]</span><span class="kt">string</span>
+</span></span></pre>
+                    <p class="q-p">
+                        AvailableBaseWikis returns a list of available embedded base wikis.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func--createwiki">
+                        func  CreateWiki
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">CreateWiki</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">basePath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">opts</span> <span class="nx">CreateWikiOpts</span><span class="p">)</span> <span class="kt">error</span>
+</span></span></pre>
+                    <p class="q-p">
+                        CreateWiki creates a new wiki at the specified path using a base wiki directory.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func--createwikifs">
+                        func  CreateWikiFS
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">CreateWikiFS</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">fsys</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">FS</span><span class="p">,</span> <span class="nx">opts</span> <span class="nx">CreateWikiOpts</span><span class="p">)</span> <span class="kt">error</span>
+</span></span></pre>
+                    <p class="q-p">
+                        CreateWiki creates a new wiki at the specified path using a base wiki fs.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func--createwikifromresource">
+                        func  CreateWikiFromResource
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">CreateWikiFromResource</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">resourceName</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">opts</span> <span class="nx">CreateWikiOpts</span><span class="p">)</span> <span class="kt">error</span>
+</span></span></pre>
+                    <p class="q-p">
+                        CreateWikiFromResource creates a new wiki at the specified path using a base
+                        wiki resource.
+                    </p>
+                </div>
                 <div class="q-sec">
                     <h4 class="q-sec-title" id="qa-func--sortauthor">
                         func  SortAuthor
@@ -684,6 +760,18 @@
                     <p class="q-p">
                         CommitOpts describes the options for a wiki revision.
                     </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-type-createwikiopts">
+                        type CreateWikiOpts
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">CreateWikiOpts</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">WikiName</span>     <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">TemplateName</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">MainPage</span>     <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ErrorPage</span>    <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></pre>
                 </div>
                 <div class="q-sec">
                     <h4 class="q-sec-title" id="qa-type-displaycategoryposts">
@@ -946,6 +1034,21 @@
 </span></span></pre>
                     <p class="q-p">
                         ImageInfo represents a full-size image on the wiki.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-type-revisioninfo">
+                        type RevisionInfo
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">RevisionInfo</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Id</span>      <span class="kt">string</span>    <span class="s">`json:&#34;id&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Author</span>  <span class="kt">string</span>    <span class="s">`json:&#34;author&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Date</span>    <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;date&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Message</span> <span class="kt">string</span>    <span class="s">`json:&#34;message&#34;`</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></pre>
+                    <p class="q-p">
+                        RevisionInfo contains information about a specific revision.
                     </p>
                 </div>
                 <div class="q-sec">
@@ -1601,6 +1704,16 @@
                     <p class="q-p">
                         In any case the path cannot be made relative to the wiki directory, an empty
                         string is returned.
+                    </p>
+                </div>
+                <div class="q-sec">
+                    <h4 class="q-sec-title" id="qa-func-wiki-revisionsmatchingpage">
+                        func (*Wiki) RevisionsMatchingPage
+                    </h4>
+<pre class="q-code chroma"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Wiki</span><span class="p">)</span> <span class="nf">RevisionsMatchingPage</span><span class="p">(</span><span class="nx">nameOrPath</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="nx">RevisionInfo</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span></pre>
+                    <p class="q-p">
+                        RevisionsMatchingPage returns a list of commit infos matching a page file.
                     </p>
                 </div>
                 <div class="q-sec">

@@ -18,6 +18,35 @@ const (
 )
 ```
 
+#### func  AvailableBaseWikis
+
+```go
+func AvailableBaseWikis() []string
+```
+AvailableBaseWikis returns a list of available embedded base wikis.
+
+#### func  CreateWiki
+
+```go
+func CreateWiki(path, basePath string, opts CreateWikiOpts) error
+```
+CreateWiki creates a new wiki at the specified path using a base wiki directory.
+
+#### func  CreateWikiFS
+
+```go
+func CreateWikiFS(path string, fsys fs.FS, opts CreateWikiOpts) error
+```
+CreateWiki creates a new wiki at the specified path using a base wiki fs.
+
+#### func  CreateWikiFromResource
+
+```go
+func CreateWikiFromResource(path, resourceName string, opts CreateWikiOpts) error
+```
+CreateWikiFromResource creates a new wiki at the specified path using a base
+wiki resource.
+
 #### func  SortAuthor
 
 ```go
@@ -208,6 +237,18 @@ type CommitOpts struct {
 ```
 
 CommitOpts describes the options for a wiki revision.
+
+#### type CreateWikiOpts
+
+```go
+type CreateWikiOpts struct {
+	WikiName     string
+	TemplateName string
+	MainPage     string
+	ErrorPage    string
+}
+```
+
 
 #### type DisplayCategoryPosts
 
@@ -456,6 +497,19 @@ type ImageInfo struct {
 ```
 
 ImageInfo represents a full-size image on the wiki.
+
+#### type RevisionInfo
+
+```go
+type RevisionInfo struct {
+	Id      string    `json:"id"`
+	Author  string    `json:"author"`
+	Date    time.Time `json:"date"`
+	Message string    `json:"message"`
+}
+```
+
+RevisionInfo contains information about a specific revision.
 
 #### type SizedImage
 
@@ -936,6 +990,13 @@ If that fails, symlinks in absPath are followed and a second attempt is made.
 
 In any case the path cannot be made relative to the wiki directory, an empty
 string is returned.
+
+#### func (*Wiki) RevisionsMatchingPage
+
+```go
+func (w *Wiki) RevisionsMatchingPage(nameOrPath string) ([]RevisionInfo, error)
+```
+RevisionsMatchingPage returns a list of commit infos matching a page file.
 
 #### func (*Wiki) UnresolvedAbsFilePath
 

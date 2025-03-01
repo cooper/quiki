@@ -225,82 +225,82 @@
                 <p class="q-p">
                     <span style="font-weight: bold;">Anywhere</span> in a document, these characters MUST be escaped for literal use:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c]\\[/c]&lt;/td&gt;
-&lt;td&gt;Escape character&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c]\\[/c]</td>
+<td>Escape character</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]{[/c]&lt;/td&gt;
-&lt;td&gt;Starts a [[ block | #blocks ]]&lt;/td&gt;
-&lt;/tr&gt;
+<tr>
+<td>[c]{[/c]</td>
+<td>Starts a [[ block | #blocks ]]</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]}[/c]&lt;/td&gt;
-&lt;td&gt;Terminates a [[ block | #blocks ]]&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]}[/c]</td>
+<td>Terminates a [[ block | #blocks ]]</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     Within <a class="q-link-internal" href="#text-formatting" title="§ text-formatting"><span style="font-weight: bold;">formatted text</span></a>, the following characters must be
                     escaped in addition to those listed above:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c]\[[/c]&lt;/td&gt;
-&lt;td&gt;Starts a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c]\[[/c]</td>
+<td>Starts a [[ text formatting | #text-formatting ]] token</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]\][/c]&lt;/td&gt;
-&lt;td&gt;Terminates a [[ text formatting | #text-formatting ]] token&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]\][/c]</td>
+<td>Terminates a [[ text formatting | #text-formatting ]] token</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     Within <a class="q-link-internal" href="/pagereplace/doc/blocks#map" title="blocks § map"><span style="font-weight: bold;">maps</span></a> and <a class="q-link-internal" href="/pagereplace/doc/blocks#list" title="blocks § list"><span style="font-weight: bold;">lists</span></a>, these
                     characters must also be escaped:
                 </p>
-&lt;table class=&#34;q-table&#34;&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Character&lt;/th&gt;
-&lt;th&gt;Must be escaped in&lt;/th&gt;
-&lt;th&gt;Reason for escape&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+<table class="q-table">
+<thead>
+<tr>
+<th>Character</th>
+<th>Must be escaped in</th>
+<th>Reason for escape</th>
+</tr>
+</thead>
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;[c];[/c]&lt;/td&gt;
-&lt;td&gt;Map keys and values, list values&lt;/td&gt;
-&lt;td&gt;Terminates a value&lt;/td&gt;
-&lt;/tr&gt;
+<tbody>
+<tr>
+<td>[c];[/c]</td>
+<td>Map keys and values, list values</td>
+<td>Terminates a value</td>
+</tr>
 
-&lt;tr&gt;
-&lt;td&gt;[c]:[/c]&lt;/td&gt;
-&lt;td&gt;Map keys&lt;/td&gt;
-&lt;td&gt;Terminates a key&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<tr>
+<td>[c]:[/c]</td>
+<td>Map keys</td>
+<td>Terminates a key</td>
+</tr>
+</tbody>
+</table>
                 <p class="q-p">
                     <span style="font-weight: bold;">Brace-escape</span>. Sometimes it may be desirable to disable all parsing within a
                     particular block. This is especially useful for things like

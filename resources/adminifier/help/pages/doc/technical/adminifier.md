@@ -1,6 +1,6 @@
 # adminifier
 --
-    import "github.com/cooper/quiki/adminifier"
+    import "."
 
 Package adminifier provides an administrative panel with a web-based editor.
 

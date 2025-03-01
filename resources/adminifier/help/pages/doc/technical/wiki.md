@@ -1,6 +1,6 @@
 # wiki
 --
-    import "github.com/cooper/quiki/wiki"
+    import "."
 
 
 ## Usage
@@ -17,6 +17,35 @@ const (
 	CategoryTypePage = "page"
 )
 ```
+
+#### func  AvailableBaseWikis
+
+```go
+func AvailableBaseWikis() []string
+```
+AvailableBaseWikis returns a list of available embedded base wikis.
+
+#### func  CreateWiki
+
+```go
+func CreateWiki(path, basePath string, opts CreateWikiOpts) error
+```
+CreateWiki creates a new wiki at the specified path using a base wiki directory.
+
+#### func  CreateWikiFS
+
+```go
+func CreateWikiFS(path string, fsys fs.FS, opts CreateWikiOpts) error
+```
+CreateWiki creates a new wiki at the specified path using a base wiki fs.
+
+#### func  CreateWikiFromResource
+
+```go
+func CreateWikiFromResource(path, resourceName string, opts CreateWikiOpts) error
+```
+CreateWikiFromResource creates a new wiki at the specified path using a base
+wiki resource.
 
 #### func  SortAuthor
 
@@ -80,6 +109,10 @@ type Category struct {
 
 	// human-readable category title
 	Title string `json:"title,omitempty"`
+
+	// number of posts per page when displaying as posts
+	// (@category.per_page)
+	PerPage int `json:"per_page,omitempty"`
 
 	// time when the category was created
 	Created     *time.Time `json:"created,omitempty"`
@@ -205,6 +238,18 @@ type CommitOpts struct {
 
 CommitOpts describes the options for a wiki revision.
 
+#### type CreateWikiOpts
+
+```go
+type CreateWikiOpts struct {
+	WikiName     string
+	TemplateName string
+	MainPage     string
+	ErrorPage    string
+}
+```
+
+
 #### type DisplayCategoryPosts
 
 ```go
@@ -248,7 +293,7 @@ type DisplayError struct {
 
 	// if the error occurred during parsing, this is the position.
 	// for all non-parsing errors, this is 0:0
-	Position wikifier.Position
+	Pos wikifier.Position
 
 	// true if the content cannot be displayed because it has
 	// not yet been published for public access
@@ -257,6 +302,12 @@ type DisplayError struct {
 ```
 
 DisplayError represents an error result to display.
+
+#### func (DisplayError) ErrorAsWarning
+
+```go
+func (e DisplayError) ErrorAsWarning() wikifier.Warning
+```
 
 #### type DisplayFile
 
@@ -411,6 +462,9 @@ type DisplayPage struct {
 
 	// page keywords as extracted from the special @page.keywords variable
 	Keywords []string `json:"keywords,omitempty"`
+
+	// first formatting-stripped 25 words of page, up to 150 chars
+	Preview string `json:"preview,omitempty"`
 }
 ```
 
@@ -443,6 +497,19 @@ type ImageInfo struct {
 ```
 
 ImageInfo represents a full-size image on the wiki.
+
+#### type RevisionInfo
+
+```go
+type RevisionInfo struct {
+	Id      string    `json:"id"`
+	Author  string    `json:"author"`
+	Date    time.Time `json:"date"`
+	Message string    `json:"message"`
+}
+```
+
+RevisionInfo contains information about a specific revision.
 
 #### type SizedImage
 
@@ -561,15 +628,6 @@ func NewWiki(path string) (*Wiki, error)
 ```
 NewWiki creates a Wiki given its directory path.
 
-#### func  NewWikiConfig
-
-```go
-func NewWikiConfig(confPath string) (*Wiki, error)
-```
-NewWikiConfig creates a Wiki given the configuration file path.
-
-Deprecated: Use NewWiki instead.
-
 #### func (*Wiki) AbsFilePath
 
 ```go
@@ -631,16 +689,31 @@ wiki.
 #### func (*Wiki) Debug
 
 ```go
-func (w *Wiki) Debug(i ...interface{})
+func (w *Wiki) Debug(i ...any)
 ```
 Debug logs debug info for a wiki.
 
 #### func (*Wiki) Debugf
 
 ```go
-func (w *Wiki) Debugf(format string, i ...interface{})
+func (w *Wiki) Debugf(format string, i ...any)
 ```
 Debugf logs debug info for a wiki.
+
+#### func (*Wiki) DeleteFile
+
+```go
+func (w *Wiki) DeleteFile(name string, commit CommitOpts) error
+```
+DeleteFile deletes a file in the wiki.
+
+The filename must be relative to the wiki directory. If the file does not exist,
+an error is returned. If the file exists and is a symbolic link, the link itself
+is deleted, not the target file.
+
+This is a low-level API that allows deleting any file within the wiki directory,
+so it should not be utilized directly by frontends. Use DeletePage, DeleteModel,
+or DeleteImage instead.
 
 #### func (*Wiki) Dir
 
@@ -656,35 +729,35 @@ root by the path separator.
 #### func (*Wiki) DisplayCategoryPosts
 
 ```go
-func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) interface{}
+func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) any
 ```
 DisplayCategoryPosts returns the display result for a category.
 
 #### func (*Wiki) DisplayFile
 
 ```go
-func (w *Wiki) DisplayFile(path string) interface{}
+func (w *Wiki) DisplayFile(path string) any
 ```
 DisplayFile returns the display result for a plain text file.
 
 #### func (*Wiki) DisplayImage
 
 ```go
-func (w *Wiki) DisplayImage(name string) interface{}
+func (w *Wiki) DisplayImage(name string) any
 ```
 DisplayImage returns the display result for an image.
 
 #### func (*Wiki) DisplayPage
 
 ```go
-func (w *Wiki) DisplayPage(name string) interface{}
+func (w *Wiki) DisplayPage(name string) any
 ```
 DisplayPage returns the display result for a page.
 
 #### func (*Wiki) DisplayPageDraft
 
 ```go
-func (w *Wiki) DisplayPageDraft(name string, draftOK bool) interface{}
+func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any
 ```
 DisplayPageDraft returns the display result for a page.
 
@@ -694,7 +767,7 @@ marked as draft.
 #### func (*Wiki) DisplaySizedImage
 
 ```go
-func (w *Wiki) DisplaySizedImage(img SizedImage) interface{}
+func (w *Wiki) DisplaySizedImage(img SizedImage) any
 ```
 DisplaySizedImage returns the display result for an image in specific
 dimensions.
@@ -702,7 +775,7 @@ dimensions.
 #### func (*Wiki) DisplaySizedImageGenerate
 
 ```go
-func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) interface{}
+func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any
 ```
 DisplaySizedImageGenerate returns the display result for an image in specific
 dimensions and allows images to be generated in any dimension.
@@ -725,6 +798,13 @@ standard quiki filename format.
 func (w *Wiki) GetCategory(name string) *Category
 ```
 GetCategory loads or creates a category.
+
+#### func (*Wiki) GetLatestCommitHash
+
+```go
+func (w *Wiki) GetLatestCommitHash() (string, error)
+```
+GetLatestCommitHash returns the most recent commit hash.
 
 #### func (*Wiki) GetSpecialCategory
 
@@ -767,14 +847,14 @@ and SortDimensions.
 #### func (*Wiki) Log
 
 ```go
-func (w *Wiki) Log(i ...interface{})
+func (w *Wiki) Log(i ...any)
 ```
 Log logs info for a wiki.
 
 #### func (*Wiki) Logf
 
 ```go
-func (w *Wiki) Logf(format string, i ...interface{})
+func (w *Wiki) Logf(format string, i ...any)
 ```
 Logf logs info for a wiki.
 
@@ -849,10 +929,50 @@ PagesSorted returns info about all the pages in the wiki, sorted as specified.
 Accepted sort functions are SortTitle, SortAuthor, SortCreated, and
 SortModified.
 
+#### func (*Wiki) PathForCategory
+
+```go
+func (w *Wiki) PathForCategory(catName string, createOK bool) string
+```
+PathForCategory returns the absolute path for a category. If createOK is true,
+it creates directories for the path components that do not exist.
+
+#### func (*Wiki) PathForImage
+
+```go
+func (w *Wiki) PathForImage(imageName string) string
+```
+PathForImage returns the absolute path for an image.
+
+#### func (*Wiki) PathForMetaCategory
+
+```go
+func (w *Wiki) PathForMetaCategory(catName string, catType CategoryType, createOK bool) string
+```
+PathForMetaCategory returns the absolute path for a meta category. Meta
+categories are used for internal categorization and not exposed in the wiki.
+
+If createOK is true, it creates directories for the path components that do not
+exist.
+
+#### func (*Wiki) PathForModel
+
+```go
+func (w *Wiki) PathForModel(modelName string) string
+```
+PathForModel returns the absolute path for a model.
+
+#### func (*Wiki) PathForPage
+
+```go
+func (w *Wiki) PathForPage(pageName string) string
+```
+PathForPage returns the absolute path for a page.
+
 #### func (*Wiki) Pregenerate
 
 ```go
-func (w *Wiki) Pregenerate()
+func (w *Wiki) Pregenerate() (results []any)
 ```
 Pregenerate simulates requests for all wiki resources such that content caches
 can be pregenerated and stored.
@@ -871,6 +991,13 @@ If that fails, symlinks in absPath are followed and a second attempt is made.
 In any case the path cannot be made relative to the wiki directory, an empty
 string is returned.
 
+#### func (*Wiki) RevisionsMatchingPage
+
+```go
+func (w *Wiki) RevisionsMatchingPage(nameOrPath string) ([]RevisionInfo, error)
+```
+RevisionsMatchingPage returns a list of commit infos matching a page file.
+
 #### func (*Wiki) UnresolvedAbsFilePath
 
 ```go
@@ -882,18 +1009,30 @@ The result is an absolute path which may or may not exist.
 
 Symlinks are not followed. If that is desired, use absoluteFilePath instead.
 
-#### func (*Wiki) WriteFile
+#### func (*Wiki) WriteConfig
 
 ```go
-func (w *Wiki) WriteFile(name string, content []byte, createOK bool, commit CommitOpts) error
+func (w *Wiki) WriteConfig(content []byte, commit CommitOpts) error
 ```
-WriteFile writes a file in the wiki.
+WriteConfig writes the wiki configuration file.
 
-The filename must be relative to the wiki directory.
+#### func (*Wiki) WriteImage
 
-If the file does not exist and createOK is false, an error is returned. If the
-file exists and is a symbolic link, an error is returned.
+```go
+func (w *Wiki) WriteImage(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WriteImage writes an image file.
 
-This is a low-level API that allows writing any file within the wiki directory,
-so it should not be utilized directly by frontends. Use WritePage, WriteModel,
-WriteImage, or WriteConfig instead.
+#### func (*Wiki) WriteModel
+
+```go
+func (w *Wiki) WriteModel(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WriteModel writes a model file.
+
+#### func (*Wiki) WritePage
+
+```go
+func (w *Wiki) WritePage(name string, content []byte, createOK bool, commit CommitOpts) error
+```
+WritePage writes a page file.
