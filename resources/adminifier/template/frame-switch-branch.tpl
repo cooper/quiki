@@ -4,7 +4,10 @@
     data-icon-b="yes"
 />
 
-Switch Branch:
+<h1>Switch Branch</h1>
+
+<p>Branching is experimental.</p>
+
 <ul>
 {{$root := .Root}}
 {{range .Branches}}
