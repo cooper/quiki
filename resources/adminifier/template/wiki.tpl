@@ -43,6 +43,8 @@ var adminifier = {
 <div id="content">
 </div>
 
+[[ template "common-jstmpl.tpl" . ]]
+
 [[.JSTemplates]]
 
 </body>
