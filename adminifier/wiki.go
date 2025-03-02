@@ -596,7 +596,7 @@ func handleWritePage(wr *wikiRequest) {
 	// display the page
 	var warnings []wikifier.Warning
 	var pageErr *wikifier.Warning
-	switch res := wr.wi.DisplayPage(pageName).(type) {
+	switch res := wr.wi.DisplayPageDraft(pageName, true).(type) {
 	case wiki.DisplayError:
 		err := res.ErrorAsWarning()
 		pageErr = &err
@@ -607,6 +607,7 @@ func handleWritePage(wr *wikiRequest) {
 	maps.Copy(res, map[string]any{
 		"warnings":     warnings,
 		"displayError": pageErr,
+		// "res":          res,
 	})
 	json.NewEncoder(wr.w).Encode(res)
 }
