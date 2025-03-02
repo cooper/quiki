@@ -58,7 +58,8 @@ exports.createPage = function () {
         padded:         true,
         id:             'create-page-window',
         autoDestroy:    true,
-        onDone:         null
+        onDone:         null,
+        doneText:       'Cancel',
     });
     modal.show();
 }
@@ -71,7 +72,8 @@ exports.createFolder = function () {
         padded:         true,
         id:             'create-folder-window',
         autoDestroy:    true,
-        onDone:         null
+        onDone:         null,
+        doneText:       'Cancel',
     });
     modal.show();
 }

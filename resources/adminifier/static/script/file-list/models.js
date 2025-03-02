@@ -33,7 +33,8 @@ exports.createModel = function () {
         padded:         true,
         id:             'create-model-window',
         autoDestroy:    true,
-        onDone:         null
+        onDone:         null,
+        doneText:       'Cancel',
     });
     modal.show();
 }
