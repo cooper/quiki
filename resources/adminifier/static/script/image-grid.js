@@ -2,7 +2,6 @@
 
 var dirContainer = new Element('div', { class: 'image-grid' });
 var imageContainer = new Element('div', { class: 'image-grid' });
-$('content').appendChild(dirContainer);
 $('content').appendChild(imageContainer);
 
 var currentDir = a.json.results.cd;
@@ -25,6 +24,8 @@ a.json.results.dirs.each(function (dir) {
     });
     a.addFrameClickHandler(div.getElements('a'));
     dirContainer.appendChild(div);
+    if (!dirContainer.getParent())
+        dirContainer.inject(imageContainer, 'before');
 });
 
 a.json.results.images.each(function (imageData) {

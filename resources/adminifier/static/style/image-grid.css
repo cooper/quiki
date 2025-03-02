@@ -5,9 +5,9 @@
     padding: 5px;
     background-color: #eee;
     border: 1px solid #ddd;
-    margin: 15px;
+    margin: 15px 0 0 15px;
     display: inline-block;
-    width: 260px; /* 250px image width + 2 * 5px padding */
+    max-width: 260px; /* 250px image width + 2 * 5px padding */
     box-sizing: border-box;
 }
 
