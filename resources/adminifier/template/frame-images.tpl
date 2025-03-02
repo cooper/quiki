@@ -17,11 +17,11 @@
     data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
 
 {{if .List}}
-    data-button-image-mode="{'title': 'Grid view', 'icon': 'th', 'frameHref': '{{.Root}}/images'}"
+    data-button-image-mode="{'title': 'Grid', 'icon': 'th', 'frameHref': '{{.Root}}/images/{{.Cd}}'}"
     data-scripts="file-list file-list/images pikaday"
     data-styles="file-list pikaday"
 {{else}}
-    data-button-image-mode="{'title': 'List view', 'icon': 'list', 'frameHref': '{{.Root}}/images?mode=list'}"
+    data-button-image-mode="{'title': 'List', 'icon': 'list', 'frameHref': '{{.Root}}/images/{{.Cd}}?mode=list'}"
     data-scripts="image-grid pikaday"
     data-styles="image-grid pikaday"
 {{end}}

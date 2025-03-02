@@ -11,7 +11,7 @@ function nextDir(dir) {
     return currentDir + '/' + dir;
 }
 
-if (a.json.results) {
+if (a.json.results && (a.json.results.dirs.length || a.json.results.images.length)) {
 
 a.json.results.dirs.each(function (dir) {
     var div = new Element('div', {
