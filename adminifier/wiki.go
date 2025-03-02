@@ -21,6 +21,7 @@ import (
 var wikiFrameHandlers = map[string]func(*wikiRequest){
 	"dashboard":     handleDashboardFrame,
 	"pages":         handlePagesFrame,
+	"pages/":        handlePagesFrame,
 	"categories":    handleCategoriesFrame,
 	"images":        handleImagesFrame,
 	"models":        handleModelsFrame,
@@ -300,7 +301,7 @@ func getSortFunc(wr *wikiRequest) (bool, wiki.SortFunc) {
 
 func handlePagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
-	dir := wr.r.URL.Query().Get("dir")
+	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/pages"), "/")
 	pages, dirs := wr.wi.PagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, struct {
 		Pages []wikifier.PageInfo `json:"pages"`

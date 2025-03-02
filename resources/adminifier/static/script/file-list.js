@@ -274,6 +274,12 @@ var FileList = exports.FileList = new Class({
                 // set text if it has length
                 if (typeof text == 'string' && text.length)
                     textContainer.set('text', text);
+
+                // add folder icon if it is dir
+                if (entry.isDir && isTitle) {
+                    var icon = new Element('i', { 'class': 'fa fa-folder', style: 'margin-right: 5px;' });
+                    icon.inject(textContainer, 'top');
+                }
                     
                 // apply tooltip fixer
                 var tooltip = entry.tooltips[col];

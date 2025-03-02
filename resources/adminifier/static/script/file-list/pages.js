@@ -21,10 +21,10 @@ function nextDir(dir) {
 
 if (a.json.results) {
 
-
 a.json.results.dirs.each(function (dir) {
     var entry = new FileListEntry({ Title: dir });
-    entry.link = adminifier.wikiRoot + '/pages?dir=' + encodeURIComponent(nextDir(dir));
+    entry.isDir = true;
+    entry.link = adminifier.wikiRoot + '/pages/' + encodeURIComponent(nextDir(dir));
     pageList.addEntry(entry);
 });
 
