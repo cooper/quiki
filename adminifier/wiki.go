@@ -654,7 +654,7 @@ func handleImage(wr *wikiRequest) {
 		si.Width = w
 	}
 	if h != 0 {
-		si.Height = 0
+		si.Height = h
 	}
 
 	// display/generate image
