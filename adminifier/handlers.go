@@ -335,9 +335,14 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		redirect := "?redirect=/" + strings.TrimPrefix(r.URL.Path, root)
+		redirect := strings.TrimPrefix(r.URL.Path, root)
 		if r.URL.RawQuery != "" {
 			redirect += url.QueryEscape("?" + r.URL.RawQuery)
+		}
+		if redirect == "/" {
+			redirect = ""
+		} else if redirect != "" {
+			redirect = "?redirect=/" + redirect
 		}
 		http.Redirect(w, r, root+"login"+redirect, http.StatusTemporaryRedirect)
 		return true
