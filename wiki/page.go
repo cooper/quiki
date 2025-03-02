@@ -574,7 +574,7 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 	// that the page does not exist
 	if !draftOK && info.Draft {
 		return DisplayError{
-			Error: "Page has not yet been publised.",
+			Error: "Page has not yet been published.",
 			Draft: true,
 		}
 	}
