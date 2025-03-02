@@ -53,6 +53,8 @@ type PageInfo struct {
 	Path        string     `json:"-"`                   // absolute filepath
 	File        string     `json:"file,omitempty"`      // name with extension, always with forward slashes
 	FileNE      string     `json:"file_ne,omitempty"`   // name without extension, always with forward slashes
+	Base        string     `json:"base,omitempty"`      // base name with extension
+	BaseNE      string     `json:"base_ne,omitempty"`   // base name without extension
 	Created     *time.Time `json:"created,omitempty"`   // creation time
 	Modified    *time.Time `json:"modified,omitempty"`  // modify time
 	Draft       bool       `json:"draft,omitempty"`     // true if page is marked as draft
@@ -605,6 +607,8 @@ func (p *Page) Info() PageInfo {
 	info := PageInfo{
 		File:        p.Name(),
 		FileNE:      p.NameNE(),
+		Base:        filepath.Base(p.Name()),
+		BaseNE:      filepath.Base(p.NameNE()),
 		Draft:       p.Draft(),
 		Generated:   p.Generated(),
 		External:    p.External(),

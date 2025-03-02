@@ -300,8 +300,13 @@ func getSortFunc(wr *wikiRequest) (bool, wiki.SortFunc) {
 
 func handlePagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
-	pages := wr.wi.PagesSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, pages)
+	dir := wr.r.URL.Query().Get("dir")
+	pages, dirs := wr.wi.PagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, struct {
+		Pages []wikifier.PageInfo `json:"pages"`
+		Dirs  []string            `json:"dirs"`
+		Cd    string              `json:"cd"`
+	}{pages, dirs, dir})
 }
 
 func handleImagesFrame(wr *wikiRequest) {

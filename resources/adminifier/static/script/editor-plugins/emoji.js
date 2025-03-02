@@ -8,7 +8,8 @@
         ae = a.editor;
     
         // add toolbar functions
-        ae.addToolbarFunctions({ emoji: displayEmojiSelector });
+        // disabled until fully implemented
+        // ae.addToolbarFunctions({ emoji: displayEmojiSelector });
     }
 
     function unloadedHandler () {

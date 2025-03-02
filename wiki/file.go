@@ -146,8 +146,15 @@ func makeRelPath(absPath, base string) string {
 	return ""
 }
 
+var pageExtensions = []string{"page", "md"}
+
 func (w *Wiki) allPageFiles() []string {
-	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, []string{"page", "md"}, false)
+	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, pageExtensions, false)
+	return files
+}
+
+func (w *Wiki) pageFilesInDir(where string) []string {
+	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Page, where), pageExtensions, true)
 	return files
 }
 

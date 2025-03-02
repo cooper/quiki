@@ -487,6 +487,8 @@ function quickSearch (entry) {
 
 exports.dateToPreciseHR = dateToPreciseHR;
 function dateToPreciseHR (d) {
+    if (!d)
+        return '';
     if (typeof d == 'string' || typeof d == 'number')
         d = new Date(d);
     if (!d)
@@ -496,6 +498,8 @@ function dateToPreciseHR (d) {
 
 exports.dateToHRTimeAgo = dateToHRTimeAgo;
 function dateToHRTimeAgo (time) {
+    if (!time)
+        return '';
     switch (typeof time) {
         case 'number':
             break;

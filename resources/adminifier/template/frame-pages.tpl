@@ -30,3 +30,11 @@
         <input type="submit" value="Create" />
     </form>
 </template>
+
+<template id="tmpl-create-folder">
+    <form action="func/create-page-folder" method="post">
+        <label for="name">Folder Name:</label>
+        <input type="text" name="title" />
+        <input type="submit" value="Create" />
+    </form>
+</template>

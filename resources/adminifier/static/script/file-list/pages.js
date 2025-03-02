@@ -11,11 +11,27 @@ var pageList = new FileList({
     }
 });
 
-if (a.json.results)
-a.json.results.each(function (pageData) {
+var currentDir = a.json.results.cd;
+
+function nextDir(dir) {
+    if (!currentDir)
+        return dir;
+    return currentDir + '/' + dir;
+}
+
+if (a.json.results) {
+
+
+a.json.results.dirs.each(function (dir) {
+    var entry = new FileListEntry({ Title: dir });
+    entry.link = adminifier.wikiRoot + '/pages?dir=' + encodeURIComponent(nextDir(dir));
+    pageList.addEntry(entry);
+});
+
+a.json.results.pages.each(function (pageData) {
     var entry = new FileListEntry({
         data:       pageData,
-        Title:      pageData.title || pageData.file_ne || pageData.file,
+        Title:      pageData.title || pageData.base_ne || pageData.file_ne || pageData.file,
         Author:     pageData.author,
         Created:    pageData.created,
         Modified:   pageData.modified
@@ -30,6 +46,7 @@ a.json.results.each(function (pageData) {
     entry.link = adminifier.wikiRoot + '/edit-page?page=' + encodeURIComponent(pageData.file);
     pageList.addEntry(entry);
 });
+}
 
 pageList.draw($('content'));
 

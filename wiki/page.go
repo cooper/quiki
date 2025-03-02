@@ -287,12 +287,22 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 // Pages returns info about all the pages in the wiki.
 func (w *Wiki) Pages() []wikifier.PageInfo {
 	pageNames := w.allPageFiles()
+	return w.pagesIn("", pageNames)
+}
+
+// PagesInDir returns info about all the pages in the specified directory.
+func (w *Wiki) PagesInDir(where string) []wikifier.PageInfo {
+	pageNames := w.pageFilesInDir(where)
+	return w.pagesIn(where, pageNames)
+}
+
+func (w *Wiki) pagesIn(prefix string, pageNames []string) []wikifier.PageInfo {
 	pages := make([]wikifier.PageInfo, len(pageNames))
 
 	// pages individually
 	i := 0
 	for _, name := range pageNames {
-		pages[i] = w.PageInfo(name)
+		pages[i] = w.PageInfo(filepath.Join(prefix, name))
 		i++
 	}
 
@@ -313,11 +323,13 @@ func (pi sortablePageInfo) SortInfo() SortInfo {
 // PagesSorted returns info about all the pages in the wiki, sorted as specified.
 // Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
 func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInfo {
+	return _pagesSorted(w.Pages(), descend, sorters...)
+}
 
+func _pagesSorted(pages []wikifier.PageInfo, descend bool, sorters ...SortFunc) []wikifier.PageInfo {
 	// convert to []Sortable
-	pages := w.Pages()
 	sorted := make([]Sortable, len(pages))
-	for i, pi := range w.Pages() {
+	for i, pi := range pages {
 		sorted[i] = sortablePageInfo(pi)
 	}
 
@@ -334,6 +346,36 @@ func (w *Wiki) PagesSorted(descend bool, sorters ...SortFunc) []wikifier.PageInf
 	}
 
 	return pages
+}
+
+// PagesAndDirs returns info about all the pages and directories in a directory.
+func (w *Wiki) PagesAndDirs(where string) ([]wikifier.PageInfo, []string) {
+	pages := w.PagesInDir(where)
+
+	// find dirs
+	files, _ := os.ReadDir(filepath.Join(w.Opt.Dir.Page, where))
+	dirs := make([]string, 0, len(files))
+	for _, fi := range files {
+		if fi.IsDir() {
+			dirs = append(dirs, fi.Name())
+		}
+	}
+
+	return pages, dirs
+}
+
+// PagesAndDirsSorted returns info about all the pages and directories in a directory, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
+// Directories are always sorted alphabetically (but still respect the descend flag).
+func (w *Wiki) PagesAndDirsSorted(where string, descend bool, sorters ...SortFunc) ([]wikifier.PageInfo, []string) {
+	pages, dirs := w.PagesAndDirs(where)
+	pages = _pagesSorted(pages, descend, sorters...)
+	if descend {
+		sort.Sort(sort.Reverse(sort.StringSlice(dirs)))
+	} else {
+		sort.Strings(dirs)
+	}
+	return pages, dirs
 }
 
 // PageMap returns a map of page name to PageInfo for all pages in the wiki.
@@ -369,16 +411,14 @@ func (w *Wiki) PageInfo(name string) (info wikifier.PageInfo) {
 		info = *pageCat.PageInfo
 	}
 
-	// this stuff is available to all
+	// add info we can derive from the file
 	mod := pgFi.ModTime()
 	info.Path = path
 	info.File = filepath.ToSlash(name)
+	info.FileNE = filepath.ToSlash(nameNE)
+	info.Base = filepath.Base(name)
+	info.BaseNE = filepath.Base(nameNE)
 	info.Modified = &mod // actual page mod time
-
-	// fallback title to name
-	if info.Title == "" {
-		info.Title = nameNE
-	}
 
 	// fallback created to modified
 	if info.Created == nil {
