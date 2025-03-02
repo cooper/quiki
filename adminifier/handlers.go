@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
@@ -198,7 +199,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// redirect to dashboard, which is now located at adminifier root
 	redirect := r.Form.Get("redirect")
-	http.Redirect(w, r, root+redirect, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, path.Join(root, redirect), http.StatusTemporaryRedirect)
 }
 
 func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
@@ -334,7 +335,7 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		redirect := "?redirect=" + strings.TrimPrefix(r.URL.Path, root)
+		redirect := "?redirect=/" + strings.TrimPrefix(r.URL.Path, root)
 		if r.URL.RawQuery != "" {
 			redirect += url.QueryEscape("?" + r.URL.RawQuery)
 		}
