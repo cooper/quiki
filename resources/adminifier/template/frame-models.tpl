@@ -12,7 +12,7 @@
     data-sort="{{.Order}}"
 
     data-buttons="create filter"
-    data-button-create="{'title': 'New Model', 'icon': 'plus-circle', 'href': '{{.Root}}/create-model'}"
+    data-button-create="{'title': 'New Model', 'icon': 'plus-circle', 'func': 'createModel'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"
@@ -22,3 +22,11 @@
 />
 
 {{ template "common-file-list.tpl" . }}
+
+<template id="tmpl-create-model">
+    <form action="func/create-model" method="post">
+        <label for="name">Model Name:</label>
+        <input type="text" name="title" />
+        <input type="submit" value="Create" />
+    </form>
+</template>

@@ -25,4 +25,17 @@ a.json.results.each(function (modelData) {
 
 modelList.draw($('content'));
 
+exports.createModel = function () {
+    var modal = new ModalWindow({
+        icon:           'plus-circle',
+        title:          'New Model',
+        html:           tmpl('tmpl-create-model', {}),
+        padded:         true,
+        id:             'create-model-window',
+        autoDestroy:    true,
+        onDone:         null
+    });
+    modal.show();
+}
+
 })(adminifier, window);

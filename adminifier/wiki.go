@@ -42,6 +42,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"image/":         handleImage,
 	"page-revisions": handlePageRevisions,
 	"create-page":    handleCreatePage,
+	"create-model":   handleCreateModel,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -684,19 +685,31 @@ func handlePageRevisions(wr *wikiRequest) {
 }
 
 func handleCreatePage(wr *wikiRequest) {
+	handleCreate("page", wr, func(dir, title string) (string, error) {
+		return wr.wi.CreatePage(dir, title, nil, getCommitOpts(wr, "Create page: "+title))
+	})
+}
+
+func handleCreateModel(wr *wikiRequest) {
+	handleCreate("model", wr, func(dir, title string) (string, error) {
+		return wr.wi.CreateModel(title, nil, getCommitOpts(wr, "Create model: "+title))
+	})
+}
+
+func handleCreate(typ string, wr *wikiRequest, createFunc func(dir, title string) (string, error)) {
 	if !parsePost(wr.w, wr.r, "title") {
 		return
 	}
 
 	title, dir := wr.r.Form.Get("title"), wr.r.Form.Get("dir")
 	var filename string
-	filename, wr.err = wr.wi.CreatePage(dir, title, nil, getCommitOpts(wr, "Create page: "+title))
+	filename, wr.err = createFunc(dir, title)
 	if wr.err != nil {
 		return
 	}
 
 	// redirect to edit page
-	http.Redirect(wr.w, wr.r, wr.wikiRoot+"edit-page?page="+path.Join(dir, filename), http.StatusTemporaryRedirect)
+	http.Redirect(wr.w, wr.r, wr.wikiRoot+"edit-"+typ+"?page="+path.Join(dir, filename), http.StatusTemporaryRedirect)
 }
 
 // possibly switch wiki branches

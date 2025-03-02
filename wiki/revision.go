@@ -497,6 +497,12 @@ func (w *Wiki) CreatePage(where string, title string, content []byte, commit Com
 	return name, w.WritePage(where+name, content, true, commit)
 }
 
+// CreateModel creates a new model file.
+func (w *Wiki) CreateModel(title string, content []byte, commit CommitOpts) (string, error) {
+	name := wikifier.ModelName(title)
+	return name, w.WriteModel(name, content, true, commit)
+}
+
 // RevisionInfo contains information about a specific revision.
 type RevisionInfo struct {
 	Id      string    `json:"id"`
