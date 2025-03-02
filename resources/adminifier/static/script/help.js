@@ -20,5 +20,6 @@ function handleHelpHash (hash) {
         handleHelpHash(match[1]);
 })();
 
-if (window.retinajs)
-    retinajs();
+// retina is disabled in adminifier for performance
+// if (window.retinajs)
+//     retinajs();

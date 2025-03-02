@@ -16,8 +16,8 @@ a.json.results.each(function (imageData) {
     if (imageData.dimValue > 250)
         imageData.dimValue = 250;
 
-    // retina scaling
-    imageData.dimValue *= retinaDensity();
+    // retina scaling is disabled in adminifier for performance
+    // imageData.dimValue *= retinaDensity();
     
     var div = new Element('div', {
         class: 'image-grid-item',
@@ -28,21 +28,22 @@ a.json.results.each(function (imageData) {
 else
     container.innerHTML = '<p style="padding: 20px;">No images found.</p>';
 
-function retinaDensity() {
-    if (!window.matchMedia) return;
-    if (window.devicePixelRatio < 1) return;
+// retinaDensity is disabled in adminifier for performance
+// function retinaDensity() {
+//     if (!window.matchMedia) return;
+//     if (window.devicePixelRatio < 1) return;
     
-    // 3x
-    var mq = window.matchMedia('only screen and (min--moz-device-pixel-ratio: 2.25), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 2.25), only screen  and (min-device-pixel-ratio: 2.25), only screen and (min-resolution: 2.25dppx)');
-    if (mq && mq.matches)
-        return 3;
+//     // 3x
+//     var mq = window.matchMedia('only screen and (min--moz-device-pixel-ratio: 2.25), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 2.25), only screen  and (min-device-pixel-ratio: 2.25), only screen and (min-resolution: 2.25dppx)');
+//     if (mq && mq.matches)
+//         return 3;
         
-    // 2x
-    mq = window.matchMedia('only screen and (min--moz-device-pixel-ratio: 1.25), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.25), only screen  and (min-device-pixel-ratio: 1.25), only screen and (min-resolution: 1.25dppx)');
-    if (mq && mq.matches)
-        return 2;
+//     // 2x
+//     mq = window.matchMedia('only screen and (min--moz-device-pixel-ratio: 1.25), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.25), only screen  and (min-device-pixel-ratio: 1.25), only screen and (min-resolution: 1.25dppx)');
+//     if (mq && mq.matches)
+//         return 2;
         
-    return 1;
-}
+//     return 1;
+// }
 
 })(adminifier, window);
