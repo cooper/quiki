@@ -12,6 +12,7 @@ import (
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
+	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/cooper/quiki/wikifier"
 )
 
@@ -355,16 +356,7 @@ func _pagesSorted(pages []wikifier.PageInfo, descend bool, sorters ...SortFunc) 
 // PagesAndDirs returns info about all the pages and directories in a directory.
 func (w *Wiki) PagesAndDirs(where string) ([]wikifier.PageInfo, []string) {
 	pages := w.PagesInDir(where)
-
-	// find dirs
-	files, _ := os.ReadDir(filepath.Join(w.Opt.Dir.Page, where))
-	dirs := make([]string, 0, len(files))
-	for _, fi := range files {
-		if fi.IsDir() {
-			dirs = append(dirs, fi.Name())
-		}
-	}
-
+	dirs := utils.DirsInDir(filepath.Join(w.Opt.Dir.Page, where))
 	return pages, dirs
 }
 

@@ -16,6 +16,7 @@ import (
 
 	httpdate "github.com/Songmu/go-httpdate"
 	"github.com/cooper/imaging"
+	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/cooper/quiki/wikifier"
 )
 
@@ -419,16 +420,7 @@ func _imagesSorted(images []ImageInfo, descend bool, sorters ...SortFunc) []Imag
 // ImagesAndDirs returns info about all the images and directories in a directory.
 func (w *Wiki) ImagesAndDirs(where string) ([]ImageInfo, []string) {
 	images := w.ImagesInDir(where)
-
-	// find dirs
-	files, _ := os.ReadDir(filepath.Join(w.Opt.Dir.Image, where))
-	dirs := make([]string, 0, len(files))
-	for _, fi := range files {
-		if fi.IsDir() {
-			dirs = append(dirs, fi.Name())
-		}
-	}
-
+	dirs := utils.DirsInDir(filepath.Join(w.Opt.Dir.Image, where))
 	return images, dirs
 }
 
