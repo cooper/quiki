@@ -532,6 +532,7 @@ function handlePageData (data) {
                     href: '../'.repeat(i) + crumb,
                     text: crumb
                 });
+                addFrameClickHandler(a);
                 var icon = new Element('i', {
                     class: 'fa fa-angle-right'
                 });
