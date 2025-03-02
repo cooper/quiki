@@ -356,15 +356,22 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 // Images returns info about all the images in the wiki.
 func (w *Wiki) Images() []ImageInfo {
 	imageNames := w.allImageFiles()
-	images := make([]ImageInfo, len(imageNames))
+	return w.imagesIn("", imageNames)
+}
 
-	// images individually
+// ImagesInDir returns info about all the images in the specified directory.
+func (w *Wiki) ImagesInDir(where string) []ImageInfo {
+	imageNames := w.imageFilesInDir(where)
+	return w.imagesIn(where, imageNames)
+}
+
+func (w *Wiki) imagesIn(prefix string, imageNames []string) []ImageInfo {
+	images := make([]ImageInfo, len(imageNames))
 	i := 0
 	for _, name := range imageNames {
-		images[i] = w.ImageInfo(name)
+		images[i] = w.ImageInfo(filepath.Join(prefix, name))
 		i++
 	}
-
 	return images
 }
 
@@ -380,15 +387,17 @@ func (ii sortableImageInfo) SortInfo() SortInfo {
 	}
 }
 
-// ImagesSorted returns info about all the pages in the wiki, sorted as specified.
+// ImagesSorted returns info about all the images in the wiki, sorted as specified.
 // Accepted sort functions are SortTitle, SortAuthor, SortCreated, SortModified, and SortDimensions.
 func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo {
+	return _imagesSorted(w.Images(), descend, sorters...)
+}
 
+func _imagesSorted(images []ImageInfo, descend bool, sorters ...SortFunc) []ImageInfo {
 	// convert to []Sortable
-	pages := w.Images()
-	sorted := make([]Sortable, len(pages))
-	for i, ii := range w.Images() {
-		sorted[i] = sortableImageInfo(ii)
+	sorted := make([]Sortable, len(images))
+	for i, pi := range images {
+		sorted[i] = sortableImageInfo(pi)
 	}
 
 	// sort
@@ -400,10 +409,40 @@ func (w *Wiki) ImagesSorted(descend bool, sorters ...SortFunc) []ImageInfo {
 
 	// convert back to []ImageInfo
 	for i, si := range sorted {
-		pages[i] = ImageInfo(si.(sortableImageInfo))
+		images[i] = ImageInfo(si.(sortableImageInfo))
 	}
 
-	return pages
+	return images
+}
+
+// ImagesAndDirs returns info about all the images and directories in a directory.
+func (w *Wiki) ImagesAndDirs(where string) ([]ImageInfo, []string) {
+	images := w.ImagesInDir(where)
+
+	// find dirs
+	files, _ := os.ReadDir(filepath.Join(w.Opt.Dir.Image, where))
+	dirs := make([]string, 0, len(files))
+	for _, fi := range files {
+		if fi.IsDir() {
+			dirs = append(dirs, fi.Name())
+		}
+	}
+
+	return images, dirs
+}
+
+// ImagesAndDirsSorted returns info about all the images and directories in a directory, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, SortModified, and SortDimensions.
+// Directories are always sorted alphabetically (but still respect the descend flag).
+func (w *Wiki) ImagesAndDirsSorted(where string, descend bool, sorters ...SortFunc) ([]ImageInfo, []string) {
+	images, dirs := w.ImagesAndDirs(where)
+	images = _imagesSorted(images, descend, sorters...)
+	if descend {
+		sort.Sort(sort.Reverse(sort.StringSlice(dirs)))
+	} else {
+		sort.Strings(dirs)
+	}
+	return images, dirs
 }
 
 // ImageMap returns a map of image filename to ImageInfo for all images in the wiki.

@@ -24,6 +24,7 @@ var wikiFrameHandlers = map[string]func(*wikiRequest){
 	"pages/":        handlePagesFrame,
 	"categories":    handleCategoriesFrame,
 	"images":        handleImagesFrame,
+	"images/":       handleImagesFrame,
 	"models":        handleModelsFrame,
 	"settings":      handleSettingsFrame,
 	"edit-page":     handleEditPageFrame,
@@ -313,8 +314,13 @@ func handlePagesFrame(wr *wikiRequest) {
 
 func handleImagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
-	images := wr.wi.ImagesSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, "images", images, "d")
+	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/images"), "/")
+	images, dirs := wr.wi.ImagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, "images", struct {
+		Images []wiki.ImageInfo `json:"images"`
+		Dirs   []string         `json:"dirs"`
+		Cd     string           `json:"cd"`
+	}{images, dirs, dir}, "d")
 }
 
 func handleModelsFrame(wr *wikiRequest) {

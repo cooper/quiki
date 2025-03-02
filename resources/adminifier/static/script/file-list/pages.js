@@ -24,7 +24,7 @@ if (a.json.results) {
 a.json.results.dirs.each(function (dir) {
     var entry = new FileListEntry({ Title: dir });
     entry.isDir = true;
-    entry.link = adminifier.wikiRoot + '/pages/' + nextDir(dir);
+    entry.link = adminifier.wikiRoot + '/pages/' + nextDir(dir) + location.search;
     pageList.addEntry(entry);
 });
 

@@ -161,7 +161,7 @@ var FileList = exports.FileList = new Class({
                 var className = self.getColumnData(col, 'isTitle') ?
                     'title' : 'info';
                 var th = new Element('th', { 'class': className });
-                var anchor = a.addFrameClickHandler(new Element('a', { text: col, 'class': 'frame-click' }));
+                var anchor = a.addFrameClickHandler(new Element('a', { text: col }));
                 th.appendChild(anchor);
                 theadTr.appendChild(th);
                 
@@ -238,9 +238,14 @@ var FileList = exports.FileList = new Class({
                 
                 // anchor or span
                 var textContainer;
-                if (entry.link && isTitle)
-                    textContainer = a.addFrameClickHandler(new Element('a', {
-                        href: entry.link, 'class': 'frame-click' }));
+                if (entry.link && isTitle) {
+                    var link = new Element('a', { href: entry.link });
+                    if (entry.linkNewTab)
+                        link.set('target', '_blank');
+                    else
+                        a.addFrameClickHandler(link);
+                    textContainer = link;
+                }
                 else
                     textContainer = new Element('span');
                 td.appendChild(textContainer);

@@ -3,8 +3,29 @@
 var container = new Element('div', { class: 'image-grid' });
 $('content').appendChild(container);
 
-if (a.json.results && a.json.results.length)
-a.json.results.each(function (imageData) {
+var currentDir = a.json.results.cd;
+
+function nextDir(dir) {
+    if (!currentDir)
+        return dir;
+    return currentDir + '/' + dir;
+}
+
+if (a.json.results) {
+
+a.json.results.dirs.each(function (dir) {
+    var div = new Element('div', {
+        class: 'image-grid-item',
+        html: tmpl('tmpl-image-grid-dir', {
+            name: dir,
+            link: adminifier.wikiRoot + '/images/' + nextDir(dir) + location.search,
+        })
+    });
+    a.addFrameClickHandler(div.getElements('a'));
+    container.appendChild(div);
+});
+
+a.json.results.images.each(function (imageData) {
     imageData.root = adminifier.wikiRoot;
 
     // the larger dimension dictates the image size
@@ -21,12 +42,17 @@ a.json.results.each(function (imageData) {
     
     var div = new Element('div', {
         class: 'image-grid-item',
-        html:   tmpl('tmpl-image-grid-item', imageData)
+        html:   tmpl('tmpl-image-grid-item', {
+            ...imageData,
+            link: adminifier.wikiRoot + '/func/image/' + imageData.file,
+        })
     });
     container.appendChild(div);
 });
-else
+
+} else {
     container.innerHTML = '<p style="padding: 20px;">No images found.</p>';
+}
 
 // retinaDensity is disabled in adminifier for performance
 // function retinaDensity() {

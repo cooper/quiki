@@ -186,6 +186,7 @@ function addFrameClickHandler (where) {
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
             loadURL();
         });
+        a.addClass('frame-click');
     });
     return where[0];
 }

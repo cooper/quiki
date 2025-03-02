@@ -147,6 +147,7 @@ func makeRelPath(absPath, base string) string {
 }
 
 var pageExtensions = []string{"page", "md"}
+var imageExtensions = []string{"png", "jpg", "jpeg"}
 
 func (w *Wiki) allPageFiles() []string {
 	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Page, pageExtensions, false)
@@ -173,7 +174,12 @@ func (w *Wiki) allModelFiles() []string {
 }
 
 func (w *Wiki) allImageFiles() []string {
-	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Image, []string{"png", "jpg", "jpeg"}, false)
+	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Image, imageExtensions, false)
+	return files
+}
+
+func (w *Wiki) imageFilesInDir(where string) []string {
+	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Image, where), imageExtensions, true)
 	return files
 }
 
