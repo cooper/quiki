@@ -6,6 +6,7 @@
     data-flags="no-margin search buttons"
     data-search="fileSearch"
     data-sort="{{.Order}}"
+    data-cd="{{.Cd}}"
 
     data-buttons="upload image-mode filter"
     data-button-upload="{'title': 'Upload', 'icon': 'upload', 'href': '{{.Root}}/upload-images'}"
