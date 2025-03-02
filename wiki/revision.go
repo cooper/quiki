@@ -488,7 +488,7 @@ func (w *Wiki) GetLatestCommitHash() (string, error) {
 // If content is empty, a default page is created.
 func (w *Wiki) CreatePage(where string, title string, content []byte, commit CommitOpts) (string, error) {
 	if len(content) == 0 {
-		content = []byte("@page.title: " + utils.EscFmt(title) + ";\n")
+		content = []byte("@page.title: " + utils.EscFmt(title) + ";\n@page.draft;\n\n")
 	}
 	name := wikifier.PageName(strings.Replace(title, "/", "_", -1))
 	if where != "" && !strings.HasSuffix(where, "/") {
