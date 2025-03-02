@@ -97,8 +97,10 @@ var FileList = exports.FileList = new Class({
             return;
         }
         
-        // destroy previous table
-        this.container.getElement('.file-list').destroy();
+        // destroy previous injections
+        this.container.getElements('.file-list, .file-list-no-entries').each(function (el) {
+            el.destroy();
+        });
         
         // re-draw
         delete this.container;
@@ -194,6 +196,7 @@ var FileList = exports.FileList = new Class({
         // Render message if no entries found
         if (visibleEntries.length === 0) {
             var noEntriesMessage = new Element('p', {
+                class: 'file-list-no-entries',
                 style: 'padding: 20px;',
                 text: 'No ' + self.options.root + ' found.'
             });
