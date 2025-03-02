@@ -154,8 +154,9 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func createAdminTemplate(r *http.Request) adminTemplate {
+	user, _ := sessMgr.Get(r.Context(), "user").(*authenticator.User)
 	return adminTemplate{
-		User:      sessMgr.Get(r.Context(), "user").(*authenticator.User),
+		User:      user,
 		Title:     "quiki",
 		AdminRoot: strings.TrimRight(root, "/"),
 		Static:    root + "static",
@@ -172,7 +173,10 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
-	handleTemplate(w, r, struct{ Redirect string }{r.Form.Get("redirect")})
+	handleTemplate(w, r, struct {
+		Redirect string
+		adminTemplate
+	}{r.Form.Get("redirect"), createAdminTemplate(r)})
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {

@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8" data-wredirect="login" />
-    <title>quiki - create user</title>
-    <link rel="icon" type="image/png" href="/static/favicon.png" />
+    <title>quiki setup wizard</title>
+    <link rel="icon" type="image/png" href="{{.Static}}/image/favicon.png" />
     <style>
         body {
             background-color: #333;
@@ -17,19 +17,39 @@
             background-color: white;
             margin: 50px auto;
         }
-        input:not([type=submit]):not(:placeholder-shown) {
-            background-color: pink;
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        input:not([type=submit]):valid {
-            background-color: inherit;
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4f6079;
+            color: white;
+            padding: 12px 18px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #2096ce;
+        }
+        table {
+            width: 100%;
+        }
+        img {
+            width: 100px;
         }
     </style>
 </head>
 <body>
     <div id="login-window">
         <div style="text-align: center; margin-bottom: 20px;">
-            <h1>quiki</h1>
-            Create Initial User
+            <h1>Create Initial User</h1>
         </div>
         <form action="func/create-user" method="post">
             <table>
@@ -60,7 +80,7 @@
                 </tr>
                 {{end}}
                 <tr>
-                    <td><input type="submit" name="submit" value="Create" /></td>
+                    <td colspan="2"><input type="submit" name="submit" value="Create User and Login" /></td>
                 </tr>
             </table>
         </form>

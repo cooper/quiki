@@ -113,6 +113,8 @@ function displayDeleteConfirmation () {
                     success();
 
                 // delete error
+                else if (data.error)
+                    fail(data.error);
                 else
                     fail('Unknown error');
             },
@@ -295,8 +297,8 @@ function saveRequest (saveData, message, success, fail) {
                 fail(data.revError);
 
             // other error
-            else if (data.reason)
-                fail(data.reason);
+            else if (data.error)
+                fail(data.error);
 
             // not sure
             else
