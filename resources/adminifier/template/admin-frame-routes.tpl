@@ -4,8 +4,12 @@
     data-icon="route"
 />
 
-<h1>Routes</h1>
+<p>
+The following routes are registered on the quiki webserver.
+</p>
 
+<ul>
 {{range .Routes}}
     <li>{{.Pattern}} - {{.Description}}</li>
 {{end}}
+</ul>

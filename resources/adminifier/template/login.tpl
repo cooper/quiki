@@ -15,7 +15,7 @@
             padding: 30px;
             border: 1px solid #999;
             background-color: white;
-            margin: 50px auto;
+            margin: 15% auto;
         }
         input[type="text"], input[type="password"] {
             width: 100%;
