@@ -1,7 +1,9 @@
 (function (a, exports) {
-    
-var container = new Element('div', { class: 'image-grid' });
-$('content').appendChild(container);
+
+var dirContainer = new Element('div', { class: 'image-grid' });
+var imageContainer = new Element('div', { class: 'image-grid' });
+$('content').appendChild(dirContainer);
+$('content').appendChild(imageContainer);
 
 var currentDir = a.json.results.cd;
 
@@ -22,7 +24,7 @@ a.json.results.dirs.each(function (dir) {
         })
     });
     a.addFrameClickHandler(div.getElements('a'));
-    container.appendChild(div);
+    dirContainer.appendChild(div);
 });
 
 a.json.results.images.each(function (imageData) {
@@ -47,11 +49,11 @@ a.json.results.images.each(function (imageData) {
             link: adminifier.wikiRoot + '/func/image/' + imageData.file,
         })
     });
-    container.appendChild(div);
+    imageContainer.appendChild(div);
 });
 
 } else {
-    container.innerHTML = '<p style="padding: 20px;">No images found.</p>';
+    imageContainer.innerHTML = '<p style="padding: 20px;">No images found.</p>';
 }
 
 // retinaDensity is disabled in adminifier for performance

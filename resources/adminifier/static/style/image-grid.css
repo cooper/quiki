@@ -7,6 +7,8 @@
     border: 1px solid #ddd;
     margin: 15px;
     display: inline-block;
+    width: 260px; /* 250px image width + 2 * 5px padding */
+    box-sizing: border-box;
 }
 
 .image-grid-item img {
@@ -15,6 +17,14 @@
     margin-bottom: 5px;
     background: url(../image/image-alpha-grid.png) center repeat;
     display: block;
+}
+
+.image-grid-item span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
 }
 
 @media all and (-webkit-min-device-pixel-ratio : 1.5),

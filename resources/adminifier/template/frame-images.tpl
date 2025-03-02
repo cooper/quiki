@@ -31,7 +31,7 @@
 {{ template "common-file-list.tpl" . }}
 
 <template id="tmpl-image-grid-item">
-    <a href="func/image/{%= o.file %}">
+    <a href="{%= o.link %}" target="_blank">
         <img alt="{%= o.file %}" src="{%= o.link %}?{%= o.dimension %}={%= o.dimValue %}" />
         <span>{%= o.file %}</span>
     </a>
