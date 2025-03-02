@@ -92,9 +92,16 @@ func initWikis() {
 }
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
-	wikiRoot := root + "sites/" + shortcode + "/"
+	wikiRoot := root + wikiDelimeter + shortcode
 
 	// each of these URLs generates wiki.tpl
+	mux.RegisterFunc(host+wikiRoot, "adminifier site root", func(w http.ResponseWriter, r *http.Request) {
+		handleWikiRoot(shortcode, wi, w, r)
+	})
+	wikiRoot += "/"
+	mux.HandleFunc(host+wikiRoot, func(w http.ResponseWriter, r *http.Request) {
+		handleWikiRoot(shortcode, wi, w, r)
+	})
 	for which := range wikiFrameHandlers {
 		mux.HandleFunc(host+wikiRoot+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
@@ -212,6 +219,16 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			}
 		})
 	}
+}
+
+func handleWikiRoot(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
+	// ensure it is the root
+	wikiRoot := root + wikiDelimeter + shortcode
+	if r.URL.Path != wikiRoot && r.URL.Path != wikiRoot+"/" {
+		http.NotFound(w, r)
+		return
+	}
+	handleWiki(shortcode, wi, w, r)
 }
 
 func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
@@ -719,7 +736,7 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		AdminRoot:         strings.TrimRight(root, "/"),
 		Static:            root + "static",
 		QStatic:           root + "qstatic",
-		Root:              root + "sites/" + wr.shortcode,
+		Root:              root + wikiDelimeter + wr.shortcode,
 		WikiRoots:         roots,
 	}
 }

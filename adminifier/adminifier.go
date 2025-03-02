@@ -21,6 +21,8 @@ var conf *wikifier.Page
 var sessMgr *scs.SessionManager
 var host, root string
 
+const wikiDelimeter = "-/"
+
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
 func Configure() {
 	conf = webserver.Conf
@@ -66,8 +68,7 @@ func Configure() {
 	}
 
 	// create template
-	t := template.New("").Delims("[[", "]]")
-	tmpl = template.Must(t.ParseFS(resources.Adminifier, "template/*.tpl"))
+	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
 
 	// main handler
 	mux.RegisterFunc(host+root, "adminifier root", handleRoot)

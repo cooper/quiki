@@ -1,7 +1,7 @@
 (function (a) {
 
 // regex to remove the wiki root 
-var wikiRootRgx = new RegExp((adminifier.wikiRoot + '/').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+var wikiRootRgx = new RegExp(adminifier.wikiRoot.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
 
 // whether this page's scripts have been loaded yet
 var pageScriptsDone = false;
@@ -182,7 +182,7 @@ function addFrameClickHandler (where) {
     where.each(function (a) {
         a.addEvent('click', function (e) {
             e.preventDefault();
-            var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '');
+            var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '').replace(/^\//, '');
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
             loadURL();
         });
@@ -192,7 +192,7 @@ function addFrameClickHandler (where) {
 
 // load a page
 function frameLoad (page) {
-    if (!page)
+    if (!page || page == '/')
         page = adminifier.homePage;
 
 	// same page

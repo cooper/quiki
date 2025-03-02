@@ -24,7 +24,7 @@
         <div style="text-align: center; margin-bottom: 20px;">
             <h1>quiki</h1>
         </div>
-        <form action="func/login?redirect=[[.Redirect]]" method="post">
+        <form action="func/login?redirect={{.Redirect}}" method="post">
             <table>
                 <tr>
                     <td class="left">Username</td>

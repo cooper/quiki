@@ -277,14 +277,16 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 
 func handleSitesFrame(ar *adminRequest) {
 	ar.dot = struct {
-		Wikis     map[string]*webserver.WikiInfo
-		Templates []string
-		BaseWikis []string
+		Wikis         map[string]*webserver.WikiInfo
+		Templates     []string
+		BaseWikis     []string
+		WikiDelimeter string
 		adminTemplate
 	}{
 		Wikis:         webserver.Wikis,
 		Templates:     webserver.TemplateNames(),
 		BaseWikis:     wiki.AvailableBaseWikis(),
+		WikiDelimeter: wikiDelimeter,
 		adminTemplate: createAdminTemplate(ar.r),
 	}
 }

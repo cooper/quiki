@@ -1,4 +1,4 @@
-[[.JSON]]
+{{.JSON}}
 
 <meta
     data-nav="pages"
@@ -8,7 +8,7 @@
     data-styles="file-list pikaday"
     data-flags="no-margin search buttons"
     data-search="fileSearch"
-    data-sort="[[.Order]]"
+    data-sort="{{.Order}}"
 
     data-buttons="create-page create-folder filter"
     data-button-create-page="{'title': 'New Page', 'icon': 'plus-circle', 'func': 'createPage'}"
@@ -21,7 +21,7 @@
     data-button-delete="{'title': 'Delete', 'icon': 'trash', 'func': 'deleteSelected', 'hide': true}"
 />
 
-[[ template "common-file-list.tpl" . ]]
+{{ template "common-file-list.tpl" . }}
 
 <template id="tmpl-create-page">
     <form action="func/create-page" method="post">
