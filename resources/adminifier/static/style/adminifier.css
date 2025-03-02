@@ -19,8 +19,9 @@ i.fa {
     width: 1.35em;
 }
 
-.display-none {
-    display: none;
+h1:first-child, h2:first-child, h3:first-child, h4:first-child,
+meta + h1, meta + h2, meta + h3, meta + h4 {
+    margin-top: 0;
 }
 
 /* MODAL WINDOWS */
