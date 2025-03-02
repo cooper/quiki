@@ -710,18 +710,18 @@ func handleCreatePage(wr *wikiRequest) {
 }
 
 func handleCreatePageFolder(wr *wikiRequest) {
-	handleCreateFolder("page", wr, func(dir, name string) error {
+	handleCreateFolder("page", wr, func(dir, name string) (string, error) {
 		return wr.wi.CreatePageFolder(dir, name)
 	})
 }
 
-func handleCreateFolder(typ string, wr *wikiRequest, createFunc func(dir, name string) error) {
+func handleCreateFolder(typ string, wr *wikiRequest, createFunc func(dir, name string) (string, error)) {
 	if !parsePost(wr.w, wr.r, "name") {
 		return
 	}
 
 	name, dir := wr.r.Form.Get("name"), wr.r.Form.Get("dir")
-	wr.err = createFunc(dir, name)
+	_, wr.err = createFunc(dir, name)
 	if wr.err != nil {
 		return
 	}
