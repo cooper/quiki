@@ -97,18 +97,17 @@ var FileList = exports.FileList = new Class({
             return;
         }
         
-        // destroy previous injections
-        this.container.getElements('.file-list, .file-list-no-entries').each(function (el) {
-            el.destroy();
-        });
+        // destroy previous table
+        var outerContainer = container.getParent();
+        container.destroy();
         
         // re-draw
         delete this.container;
-        this.draw(container);
+        this.draw(outerContainer);
     },
     
     // draw the table in the specified place
-    draw: function (container) {
+    draw: function (outerContainer) {
         var self = this;
         
         // already drawn
@@ -117,6 +116,8 @@ var FileList = exports.FileList = new Class({
             return;
         }
         
+        var container = new Element('div', { 'class': 'file-list-container' });
+        container.store('file-list', self);
         self.container = container;
         
         // if a filter is applied, filter
@@ -196,11 +197,11 @@ var FileList = exports.FileList = new Class({
         // Render message if no entries found
         if (visibleEntries.length === 0) {
             var noEntriesMessage = new Element('p', {
-                class: 'file-list-no-entries',
                 style: 'padding: 20px;',
                 text: 'No ' + self.options.root + ' found.'
             });
             container.appendChild(noEntriesMessage);
+            outerContainer.appendChild(container);
             return;
         }
         
@@ -325,6 +326,7 @@ var FileList = exports.FileList = new Class({
         self.updateActions();
 
         container.appendChild(table);
+        outerContainer.appendChild(container);
     },
 
     // reflect the current sort method
@@ -440,7 +442,7 @@ var FileListEntry = exports.FileListEntry = new Class({
 });
 
 function getList () {
-    var list = document.getElement('.file-list');
+    var list = document.getElement('.file-list-container');
     if (!list)
         return;
     list = list.retrieve('file-list');
