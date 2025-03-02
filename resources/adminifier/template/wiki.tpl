@@ -22,6 +22,7 @@ var adminifier = {
     <input id="top-search" type="text" placeholder="Quick Search..." />
     <span class="top-title wiki-title">{{.Title}}</span>
     <span id="page-title" class="top-title page-title"><i class="fa fa-home"></i> <span></span></span>
+    <span id="breadcrumbs" class="top-title"></span>
 </div>
 
 <div id="navigation-sidebar">

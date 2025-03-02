@@ -248,6 +248,7 @@ function frameLoad (page) {
             // data-buttons                     buttons to display in top bar
             // data-selection-buttons           same but for bulk actions
             // data-button-*                    data to define a button
+            // data-cd                          current directory, for breadcrumbs
             //
             //////////////////////////////
             /// Used by specific pages ///
@@ -516,6 +517,29 @@ function handlePageData (data) {
         a.currentFlags.push(flag);
         flag.init();
     });
+
+    // derive breadcrumbs from cd
+    var bc = $('breadcrumbs');
+    if (bc) {
+        bc.empty();
+        var cd = data.cd;
+        if (cd) {
+            var crumbs = cd.split('/');
+            if (!bc)
+                return;
+            crumbs.reverse().each(function (crumb, i) {
+                var a = new Element('a', {
+                    href: '../'.repeat(i) + crumb,
+                    text: crumb
+                });
+                var icon = new Element('i', {
+                    class: 'fa fa-angle-right'
+                });
+                a.inject(bc, 'top');
+                icon.inject(bc, 'top');
+            });
+        }
+    }
 }
 
 // escape key pressed

@@ -9,6 +9,7 @@
     data-flags="no-margin search buttons"
     data-search="fileSearch"
     data-sort="{{.Order}}"
+    data-cd="{{.Cd}}"
 
     data-buttons="create-page create-folder filter"
     data-button-create-page="{'title': 'New Page', 'icon': 'plus-circle', 'func': 'createPage'}"
@@ -24,17 +25,19 @@
 {{ template "common-file-list.tpl" . }}
 
 <template id="tmpl-create-page">
-    <form action="func/create-page" method="post">
+    <form action="{{.Root}}/func/create-page" method="post">
         <label for="name">Page Title:</label>
         <input type="text" name="title" />
+        <input type="hidden" name="dir" value="{{.Cd}}" />
         <input type="submit" value="Create" />
     </form>
 </template>
 
 <template id="tmpl-create-folder">
-    <form action="func/create-page-folder" method="post">
+    <form action="{{.Root}}/func/create-page-folder" method="post">
         <label for="name">Folder Name:</label>
-        <input type="text" name="title" />
+        <input type="text" name="name" />
+        <input type="hidden" name="dir" value="{{.Cd}}" />
         <input type="submit" value="Create" />
     </form>
 </template>

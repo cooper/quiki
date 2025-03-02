@@ -497,6 +497,11 @@ func (w *Wiki) CreatePage(where string, title string, content []byte, commit Com
 	return name, w.WritePage(where+name, content, true, commit)
 }
 
+// CreatePageFolder creates a new page folder.
+func (w *Wiki) CreatePageFolder(where string, name string) error {
+	return os.MkdirAll(filepath.Join(w.Opt.Dir.Page, where, name), 0755)
+}
+
 // CreateModel creates a new model file.
 func (w *Wiki) CreateModel(title string, content []byte, commit CommitOpts) (string, error) {
 	name := wikifier.ModelName(title)

@@ -24,9 +24,10 @@
 {{ template "common-file-list.tpl" . }}
 
 <template id="tmpl-create-model">
-    <form action="func/create-model" method="post">
+    <form action="{{.Root}}/func/create-model" method="post">
         <label for="name">Model Name:</label>
         <input type="text" name="title" />
+        <input type="hidden" name="dir" value="{{.Cd}}" />
         <input type="submit" value="Create" />
     </form>
 </template>

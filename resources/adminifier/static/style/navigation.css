@@ -116,6 +116,9 @@ div.navigation-popover {
     display: inline-block;
     text-decoration: none;
     color: inherit;
+}
+
+#top-bar span.top-title:not(#breadcrumbs) a {
     padding: 0 10px;
 }
 
@@ -162,4 +165,9 @@ div.navigation-popover {
 
 #content.no-margin {
     padding: 0 !important;
+}
+
+#breadcrumbs i {
+    position: relative;
+    top: 2px;
 }

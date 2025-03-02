@@ -35,15 +35,16 @@ var wikiFrameHandlers = map[string]func(*wikiRequest){
 }
 
 var wikiFuncHandlers = map[string]func(*wikiRequest){
-	"switch-branch/": handleSwitchBranch,
-	"create-branch":  handleCreateBranch,
-	"write-page":     handleWritePage,
-	"write-model":    handleWriteModel,
-	"write-config":   handleWriteWikiConfig,
-	"image/":         handleImage,
-	"page-revisions": handlePageRevisions,
-	"create-page":    handleCreatePage,
-	"create-model":   handleCreateModel,
+	"switch-branch/":     handleSwitchBranch,
+	"create-branch":      handleCreateBranch,
+	"write-page":         handleWritePage,
+	"write-model":        handleWriteModel,
+	"write-config":       handleWriteWikiConfig,
+	"image/":             handleImage,
+	"page-revisions":     handlePageRevisions,
+	"create-page":        handleCreatePage,
+	"create-model":       handleCreateModel,
+	"create-page-folder": handleCreatePageFolder,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -303,7 +304,7 @@ func handlePagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
 	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/pages"), "/")
 	pages, dirs := wr.wi.PagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, struct {
+	handleFileFrames(wr, "pages", struct {
 		Pages []wikifier.PageInfo `json:"pages"`
 		Dirs  []string            `json:"dirs"`
 		Cd    string              `json:"cd"`
@@ -313,22 +314,22 @@ func handlePagesFrame(wr *wikiRequest) {
 func handleImagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
 	images := wr.wi.ImagesSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, images, "d")
+	handleFileFrames(wr, "images", images, "d")
 }
 
 func handleModelsFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
 	models := wr.wi.ModelsSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, models)
+	handleFileFrames(wr, "models", models)
 }
 
 func handleCategoriesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr)
 	cats := wr.wi.CategoriesSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, cats)
+	handleFileFrames(wr, "categories", cats)
 }
 
-func handleFileFrames(wr *wikiRequest, results any, extras ...string) {
+func handleFileFrames(wr *wikiRequest, typ string, results any, extras ...string) {
 
 	// json stuffs
 	res, err := json.Marshal(map[string]any{
@@ -351,11 +352,13 @@ func handleFileFrames(wr *wikiRequest, results any, extras ...string) {
 		JSON  template.HTML
 		Order string // sort
 		List  bool   // for images, show file list rather than grid
+		Cd    string
 		wikiTemplate
 	}{
 		JSON:         template.HTML("<!--JSON\n" + string(res) + "\n-->"),
 		Order:        s,
 		List:         wr.r.URL.Query().Get("mode") == "list",
+		Cd:           strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/"+typ), "/"),
 		wikiTemplate: getGenericTemplate(wr),
 	}
 }
@@ -694,6 +697,27 @@ func handleCreatePage(wr *wikiRequest) {
 	handleCreate("page", wr, func(dir, title string) (string, error) {
 		return wr.wi.CreatePage(dir, title, nil, getCommitOpts(wr, "Create page: "+title))
 	})
+}
+
+func handleCreatePageFolder(wr *wikiRequest) {
+	handleCreateFolder("page", wr, func(dir, name string) error {
+		return wr.wi.CreatePageFolder(dir, name)
+	})
+}
+
+func handleCreateFolder(typ string, wr *wikiRequest, createFunc func(dir, name string) error) {
+	if !parsePost(wr.w, wr.r, "name") {
+		return
+	}
+
+	name, dir := wr.r.Form.Get("name"), wr.r.Form.Get("dir")
+	wr.err = createFunc(dir, name)
+	if wr.err != nil {
+		return
+	}
+
+	// redirect to list
+	http.Redirect(wr.w, wr.r, path.Join(wr.wikiRoot+typ+"s", dir), http.StatusTemporaryRedirect)
 }
 
 func handleCreateModel(wr *wikiRequest) {
