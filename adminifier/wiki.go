@@ -289,9 +289,9 @@ var sorters map[string]wiki.SortFunc = map[string]wiki.SortFunc{
 }
 
 // find sort from query
-func getSortFunc(wr *wikiRequest) (bool, wiki.SortFunc) {
-	descending := true
-	sortFunc := wiki.SortModified
+func getSortFunc(wr *wikiRequest, defaultFunc wiki.SortFunc, defaultDescending bool) (bool, wiki.SortFunc) {
+	descending := defaultDescending
+	sortFunc := defaultFunc
 	s := wr.r.URL.Query().Get("sort")
 	if len(s) != 0 {
 		sortFunc = sorters[string(s[0])]
@@ -302,7 +302,7 @@ func getSortFunc(wr *wikiRequest) (bool, wiki.SortFunc) {
 }
 
 func handlePagesFrame(wr *wikiRequest) {
-	descending, sortFunc := getSortFunc(wr)
+	descending, sortFunc := getSortFunc(wr, wiki.SortModified, true)
 	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/pages"), "/")
 	pages, dirs := wr.wi.PagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, "pages", struct {
@@ -313,7 +313,7 @@ func handlePagesFrame(wr *wikiRequest) {
 }
 
 func handleImagesFrame(wr *wikiRequest) {
-	descending, sortFunc := getSortFunc(wr)
+	descending, sortFunc := getSortFunc(wr, wiki.SortTitle, false)
 	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/images"), "/")
 	images, dirs := wr.wi.ImagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, "images", struct {
@@ -324,13 +324,13 @@ func handleImagesFrame(wr *wikiRequest) {
 }
 
 func handleModelsFrame(wr *wikiRequest) {
-	descending, sortFunc := getSortFunc(wr)
+	descending, sortFunc := getSortFunc(wr, wiki.SortModified, true)
 	models := wr.wi.ModelsSorted(descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, "models", models)
 }
 
 func handleCategoriesFrame(wr *wikiRequest) {
-	descending, sortFunc := getSortFunc(wr)
+	descending, sortFunc := getSortFunc(wr, wiki.SortModified, true)
 	cats := wr.wi.CategoriesSorted(descending, sortFunc, wiki.SortTitle)
 	handleFileFrames(wr, "categories", cats)
 }
@@ -351,7 +351,11 @@ func handleFileFrames(wr *wikiRequest, typ string, results any, extras ...string
 	// consider: should we validate sort here also
 	s := wr.r.URL.Query().Get("sort")
 	if s == "" {
-		s = "m-"
+		if typ == "images" {
+			s = "t+"
+		} else {
+			s = "m-"
+		}
 	}
 
 	wr.dot = struct {

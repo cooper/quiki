@@ -312,8 +312,12 @@ func (w *Wiki) pagesIn(prefix string, pageNames []string) []wikifier.PageInfo {
 type sortablePageInfo wikifier.PageInfo
 
 func (pi sortablePageInfo) SortInfo() SortInfo {
+	title := pi.Title
+	if title == "" {
+		title = pi.BaseNE
+	}
 	return SortInfo{
-		Title:    pi.Title,
+		Title:    title,
 		Author:   pi.Author,
 		Created:  *pi.Created,
 		Modified: *pi.Modified,

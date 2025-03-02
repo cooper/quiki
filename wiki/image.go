@@ -27,6 +27,7 @@ var (
 // ImageInfo represents a full-size image on the wiki.
 type ImageInfo struct {
 	File       string     `json:"file"`               // filename
+	Base       string     `json:"base,omitempty"`     // base name
 	Width      int        `json:"width,omitempty"`    // full-size width
 	Height     int        `json:"height,omitempty"`   // full-size height
 	Created    *time.Time `json:"created,omitempty"`  // creation time
@@ -379,8 +380,8 @@ type sortableImageInfo ImageInfo
 
 func (ii sortableImageInfo) SortInfo() SortInfo {
 	return SortInfo{
-		Title: ii.File,
 		// TODO: Author
+		Title:      ii.Base,
 		Created:    *ii.Created,
 		Modified:   *ii.Modified,
 		Dimensions: []int{ii.Width, ii.Height},
@@ -470,6 +471,7 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 	mod := imgFi.ModTime()
 	info.File = name
+	info.Base = filepath.Base(name)
 	info.Modified = &mod // actual image mod time
 
 	// find image category
