@@ -686,6 +686,28 @@ func (w *Wiki) CategoryMap() map[string]CategoryInfo
 CategoryMap returns a map of model name to CategoryInfo for all models in the
 wiki.
 
+#### func (*Wiki) CreateModel
+
+```go
+func (w *Wiki) CreateModel(title string, content []byte, commit CommitOpts) (string, error)
+```
+CreateModel creates a new model file.
+
+#### func (*Wiki) CreatePage
+
+```go
+func (w *Wiki) CreatePage(where string, title string, content []byte, commit CommitOpts) (string, error)
+```
+CreatePage creates a new page file. If content is empty, a default page is
+created.
+
+#### func (*Wiki) CreatePageFolder
+
+```go
+func (w *Wiki) CreatePageFolder(where string, name string) error
+```
+CreatePageFolder creates a new page folder.
+
 #### func (*Wiki) Debug
 
 ```go
@@ -919,6 +941,30 @@ PageMap returns a map of page name to PageInfo for all pages in the wiki.
 func (w *Wiki) Pages() []wikifier.PageInfo
 ```
 Pages returns info about all the pages in the wiki.
+
+#### func (*Wiki) PagesAndDirs
+
+```go
+func (w *Wiki) PagesAndDirs(where string) ([]wikifier.PageInfo, []string)
+```
+PagesAndDirs returns info about all the pages and directories in a directory.
+
+#### func (*Wiki) PagesAndDirsSorted
+
+```go
+func (w *Wiki) PagesAndDirsSorted(where string, descend bool, sorters ...SortFunc) ([]wikifier.PageInfo, []string)
+```
+PagesAndDirsSorted returns info about all the pages and directories in a
+directory, sorted as specified. Accepted sort functions are SortTitle,
+SortAuthor, SortCreated, and SortModified. Directories are always sorted
+alphabetically (but still respect the descend flag).
+
+#### func (*Wiki) PagesInDir
+
+```go
+func (w *Wiki) PagesInDir(where string) []wikifier.PageInfo
+```
+PagesInDir returns info about all the pages in the specified directory.
 
 #### func (*Wiki) PagesSorted
 
