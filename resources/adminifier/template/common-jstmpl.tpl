@@ -23,3 +23,10 @@
         </tr>
     </table>
 </template>
+
+<template id="tmpl-user-actions">
+    <a class="popup-large-button" href="{{.AdminRoot}}/logout">
+        <i class="fa fa-arrow-circle-left"></i>
+        Logout
+    </a>
+</template>

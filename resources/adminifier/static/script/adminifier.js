@@ -162,6 +162,7 @@ window.addEvent('popstate',     loadURL);
 document.addEvent('domready', 	loadURL);
 document.addEvent('domready',	searchHandler);
 document.addEvent('domready',   addDocumentFrameClickHandler);
+document.addEvent('domready',   addUserActions);
 document.addEvent('keyup',		handleEscapeKey);
 
 
@@ -170,7 +171,7 @@ document.addEvent('keyup',		handleEscapeKey);
 // this adds the frame click handler to all .frame-click anchors in the DOM
 function addDocumentFrameClickHandler () {
     addFrameClickHandler($$('a.frame-click'));
-    document.body.addEvent('click', bodyClickPopoverCheck);
+    document.addEvent('click', bodyClickPopoverCheck);
 }
 
 // export addFrameClickHandler so that dynamically created anchors from other scripts
@@ -741,7 +742,7 @@ function adjustCurrentPopup () {
     // set left or right
     box.setStyle('left',
         box.hasClass('right') ?
-        rect.right - 300 :
+        rect.right - box.clientWidth : 
         rect.left
     );
 };
@@ -789,5 +790,23 @@ function closeCurrentBut () {
     a.currentBut.removeClass('active');
     delete a.currentBut;
 }
+
+// USER ACTIONS
+
+function addUserActions () {
+    var but = $$('.account-title')[0];
+    if (!but)
+        return;
+    but.addEvent('click', function (e) {
+        e.preventDefault();
+        if (!openBut(but))
+            return;
+        e.stopPropagation(); // don't let click out handler see this
+        var box = a.createPopupBox(but);
+        box.innerHTML = tmpl('tmpl-user-actions', {});
+        a.displayPopupBox(box, 40, but);
+    });
+}
+
 
 })(adminifier);

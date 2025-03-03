@@ -78,19 +78,25 @@ div.popup-box {
     overflow: hidden;
     background-color: #696969;
     color: #e2e2e2;
-    width: 200px;
+    width: 150px; /* default, usually changed dynamically */
     height: 0px;
     z-index: 300;
 }
 
-div.popup-large-button {
+.popup-large-button {
+    display: block;
     font-size: 14px;
     line-height: 40px;
     padding-left: 10px;
     background-color: #333;
+    color: #fff;
     height: 40px;
     cursor: pointer;
     user-select: none;
+}
+
+.popup-large-button:hover {
+    background-color: #444;
 }
 
 /* LOGIN MODAL WINDOW */

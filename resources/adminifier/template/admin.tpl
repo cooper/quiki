@@ -13,7 +13,7 @@ var adminifier = {
 <body>
 
 <div id="top-bar">
-    <span class="top-title account-title"><a href="#"><i class="fa fa-user"></i> {{.User.DisplayName}}</a></span>
+    <span class="top-title account-title right"><a href="#"><i class="fa fa-user"></i> {{.User.DisplayName}}</a></span>
     <input id="top-search" type="text" placeholder="Quick Search..." />
     <span class="top-title wiki-title">{{.Title}}</span>
     <span id="page-title" class="top-title page-title"><i class="fa fa-home"></i> <span></span></span>

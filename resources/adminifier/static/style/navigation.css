@@ -98,7 +98,7 @@ div.navigation-popover {
     font-size: 90%;
     font-weight: 400;
     float: right;
-    padding-right: 16px;
+    margin-right: 16px;
 }
 
 #top-bar span.top-button {
