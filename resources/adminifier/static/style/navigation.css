@@ -118,7 +118,7 @@ div.navigation-popover {
     color: inherit;
 }
 
-#top-bar span.top-title:not(#breadcrumbs) a {
+#top-bar span.top-title:not(.page-title) a {
     padding: 0 10px;
 }
 
@@ -167,7 +167,22 @@ div.navigation-popover {
     padding: 0 !important;
 }
 
-#breadcrumbs i {
+/* BREADCRUMBS */
+
+#breadcrumbs {
+    font-weight: 300;
+}
+
+#breadcrumbs i.fa {
+    width: auto;
     position: relative;
     top: 2px;
+}
+
+#top-bar #breadcrumbs a {
+    padding: 0 5px;
+}
+
+#top-bar span.top-title.page-title a {
+    padding-right: 5px;
 }

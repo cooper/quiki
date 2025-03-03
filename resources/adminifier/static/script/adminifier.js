@@ -263,7 +263,7 @@ function frameLoad (page) {
             //
             // data-sort                        sort option, used by file lists
 
-            handlePageData(attrs);
+            handlePageData(page, attrs);
         }
     };
 
@@ -441,7 +441,7 @@ function makeButton (buttonID, where) {
 }
 
 // handle page data on request completion
-function handlePageData (data) {
+function handlePageData (page, data) {
     pageScriptsDone = false;
 
     console.log(data);
@@ -531,7 +531,7 @@ function handlePageData (data) {
         bc.empty();
         var cd = data.cd;
         if (cd) {
-            var crumbs = cd.split('/');
+            var crumbs =  cd.split('/');
             if (!bc)
                 return;
             crumbs.reverse().each(function (crumb, i) {
@@ -546,6 +546,15 @@ function handlePageData (data) {
                 a.inject(bc, 'top');
                 icon.inject(bc, 'top');
             });
+
+            var pageTitle = $$('#page-title span')[0];
+            var titleA = new Element('a', {
+                href: '../'.repeat(crumbs.length) + page.replace(/^\/?([^\/]+).*/, '$1'),
+                html: pageTitle.innerHTML
+            });
+            addFrameClickHandler(titleA);
+            pageTitle.empty();
+            titleA.inject(pageTitle);
         }
     }
 }
