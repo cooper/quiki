@@ -202,6 +202,11 @@ function frameLoad (page) {
         return;
 		
 	// unload old page
+    $$('.popup-box, .editor-popup-box, #fake-parent').each(function (el) {
+        el.destroy();
+    });
+    delete a.currentPopup;
+    delete a.currentBut;
     document.fireEvent('pageUnloaded');
     a.currentPage = page;
     console.log("Loading " + page);
