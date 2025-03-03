@@ -19,10 +19,10 @@ import (
 // DisplayPage represents a page result to display.
 type DisplayPage struct {
 
-	// basename of the page, with the extension
+	// name of the page relative to the pages dir, with the extension; e.g. some/page.page
 	File string `json:"file,omitempty"`
 
-	// basename of the page, without the extension
+	// name of the page without the extension; e.g. some/page
 	Name string `json:"name,omitempty"`
 
 	// absolute file path of the page

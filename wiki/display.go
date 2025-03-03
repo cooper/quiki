@@ -39,3 +39,25 @@ func (e DisplayError) ErrorAsWarning() wikifier.Warning {
 		Pos:     e.Pos,
 	}
 }
+
+// DisplayType returns the type of display passed.
+// This is useful for JSON encoding, as Display interfaces have no member to indicate their type.
+// The return value is one of: "page", "file", "image", "cat_posts", "error", "redirect".
+func DisplayType(display any) string {
+	switch display.(type) {
+	case DisplayPage:
+		return "page"
+	case DisplayFile:
+		return "file"
+	case DisplayImage:
+		return "image"
+	case DisplayCategoryPosts:
+		return "cat_posts"
+	case DisplayError:
+		return "error"
+	case DisplayRedirect:
+		return "redirect"
+	default:
+		return ""
+	}
+}

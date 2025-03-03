@@ -204,8 +204,6 @@ function _saveHelper () {
 
         // successful save callback
         var success = function (data) {
-            console.log(data);
-            ae.lastSavedData = saveData;
 
             // switch to checkmark
             var i = btn.parentElement.getElement('i');
@@ -221,9 +219,6 @@ function _saveHelper () {
             if (data.displayError)
                 text += ' with errors';
             btn.innerHTML = text;
-
-            // show the page display error
-            ae.handleWarningsAndError(data.warnings, data.displayError);
 
             closeBoxSoon();
         };
@@ -261,14 +256,9 @@ function autosave () {
     };
     
     // attempt to save
-    var saveData = editor.getValue();
-    saveRequest(saveData, 'Autosave', function (data) { // success
+    saveRequest(editor.getValue(), 'Autosave', done, function (msg) { // failure
         done();
-        ae.lastSavedData = saveData;
-        ae.handlePageDisplayResult(data.result);
-    }, function (msg) { // failure
-        done();
-        alert('Save failed: ' + msg);
+        alert('Autosave failed: ' + msg);
     });
 }
 
@@ -279,12 +269,13 @@ function saveRequest (saveData, message, success, fail) {
         url: 'func/write-' + (ae.isConfig() ? 'config' : ae.isModel() ? 'model' : 'page'),
         secure: true,
         onSuccess: function (data) {
+            ae.handleWarningsAndError(data.warnings, data.displayError);
 
-            // updated without error
-            if (data.success)
+            // saved file
+            if (data.success) {
+                ae.lastSavedData = saveData;
                 success(data);
-
-            // revision error
+            }
 
             // nothing changed
             else if (data.revError && data.revError.match(/no changes|nothing to commit/)) {
@@ -307,7 +298,7 @@ function saveRequest (saveData, message, success, fail) {
         onError: function () {
             fail('Bad JSON reply');
         },
-        onFailure: function (data) {
+        onFailure: function () {
             fail('Request error');
         },
     }).post({
