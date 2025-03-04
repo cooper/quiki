@@ -4,7 +4,7 @@ var dirContainer = new Element('div', { class: 'image-grid' });
 var imageContainer = new Element('div', { class: 'image-grid' });
 $('content').appendChild(imageContainer);
 
-var currentDir = a.json.results.cd;
+var currentDir;
 
 function nextDir(dir) {
     if (!currentDir)
@@ -13,6 +13,8 @@ function nextDir(dir) {
 }
 
 if (a.json.results && (a.json.results.dirs.length || a.json.results.images.length)) {
+
+currentDir = a.json.results.cd;
 
 a.json.results.dirs.each(function (dir) {
     var div = new Element('div', {

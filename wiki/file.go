@@ -173,6 +173,11 @@ func (w *Wiki) allModelFiles() []string {
 	return files
 }
 
+func (w *Wiki) modelFilesInDir(where string) []string {
+	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Model, where), []string{"model"}, true)
+	return files
+}
+
 func (w *Wiki) allImageFiles() []string {
 	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Image, imageExtensions, false)
 	return files

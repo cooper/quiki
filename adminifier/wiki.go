@@ -26,6 +26,7 @@ var wikiFrameHandlers = map[string]func(*wikiRequest){
 	"images":        handleImagesFrame,
 	"images/":       handleImagesFrame,
 	"models":        handleModelsFrame,
+	"models/":       handleModelsFrame,
 	"settings":      handleSettingsFrame,
 	"edit-page":     handleEditPageFrame,
 	"edit-category": handleEditCategoryFrame,
@@ -36,16 +37,18 @@ var wikiFrameHandlers = map[string]func(*wikiRequest){
 }
 
 var wikiFuncHandlers = map[string]func(*wikiRequest){
-	"switch-branch/":     handleSwitchBranch,
-	"create-branch":      handleCreateBranch,
-	"write-page":         handleWritePage,
-	"write-model":        handleWriteModel,
-	"write-config":       handleWriteWikiConfig,
-	"image/":             handleImage,
-	"page-revisions":     handlePageRevisions,
-	"create-page":        handleCreatePage,
-	"create-model":       handleCreateModel,
-	"create-page-folder": handleCreatePageFolder,
+	"switch-branch/":      handleSwitchBranch,
+	"create-branch":       handleCreateBranch,
+	"write-page":          handleWritePage,
+	"write-model":         handleWriteModel,
+	"write-config":        handleWriteWikiConfig,
+	"image/":              handleImage,
+	"page-revisions":      handlePageRevisions,
+	"create-page":         handleCreatePage,
+	"create-model":        handleCreateModel,
+	"create-page-folder":  handleCreatePageFolder,
+	"create-model-folder": handleCreateModelFolder,
+	"create-image-folder": handleCreateImageFolder,
 }
 
 // wikiTemplate members are available to all wiki templates
@@ -325,8 +328,13 @@ func handleImagesFrame(wr *wikiRequest) {
 
 func handleModelsFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr, wiki.SortModified, true)
-	models := wr.wi.ModelsSorted(descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, "models", models)
+	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/models"), "/")
+	models, dirs := wr.wi.ModelsAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
+	handleFileFrames(wr, "models", struct {
+		Models []wikifier.ModelInfo `json:"models"`
+		Dirs   []string             `json:"dirs"`
+		Cd     string               `json:"cd"`
+	}{models, dirs, dir})
 }
 
 func handleCategoriesFrame(wr *wikiRequest) {
@@ -715,6 +723,18 @@ func handleCreatePage(wr *wikiRequest) {
 func handleCreatePageFolder(wr *wikiRequest) {
 	handleCreateFolder("page", wr, func(dir, name string) (string, error) {
 		return wr.wi.CreatePageFolder(dir, name)
+	})
+}
+
+func handleCreateImageFolder(wr *wikiRequest) {
+	handleCreateFolder("image", wr, func(dir, name string) (string, error) {
+		return wr.wi.CreateImageFolder(dir, name)
+	})
+}
+
+func handleCreateModelFolder(wr *wikiRequest) {
+	handleCreateFolder("model", wr, func(dir, name string) (string, error) {
+		return wr.wi.CreateModelFolder(dir, name)
 	})
 }
 

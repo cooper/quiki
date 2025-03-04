@@ -536,7 +536,7 @@ function handlePageData (page, data) {
                 return;
             crumbs.reverse().each(function (crumb, i) {
                 var a = new Element('a', {
-                    href: '../'.repeat(i) + crumb,
+                    href: '../'.repeat(i) + crumb + window.location.search,
                     text: crumb
                 });
                 addFrameClickHandler(a);
@@ -549,7 +549,7 @@ function handlePageData (page, data) {
 
             var pageTitle = $$('#page-title span')[0];
             var titleA = new Element('a', {
-                href: '../'.repeat(crumbs.length) + page.replace(/^\/?([^\/]+).*/, '$1') + location.search,
+                href: '../'.repeat(crumbs.length) + page.replace(/^\/?([^\/]+).*/, '$1') + window.location.search,
                 html: pageTitle.innerHTML
             });
             addFrameClickHandler(titleA);

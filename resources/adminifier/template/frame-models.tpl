@@ -5,14 +5,15 @@
     data-title="Models"
     data-icon="cube"
     data-scripts="file-list file-list/models pikaday"
-
     data-styles="file-list pikaday"
     data-flags="no-margin search buttons"
     data-search="fileSearch"
     data-sort="{{.Order}}"
+    data-cd="{{.Cd}}"
 
-    data-buttons="create filter"
+    data-buttons="create create-folder filter"
     data-button-create="{'title': 'New Model', 'icon': 'plus-circle', 'func': 'createModel'}"
+    data-button-create-folder="{'title': 'New Folder', 'icon': 'folder', 'func': 'createFolder'}"
     data-button-filter="{'title': 'Filter', 'icon': 'filter', 'func': 'displayFilter'}"
 
     data-selection-buttons="move rename delete"

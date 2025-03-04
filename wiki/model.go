@@ -2,23 +2,32 @@ package wiki
 
 import (
 	"os"
+	"path/filepath"
 	"sort"
 
+	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/cooper/quiki/wikifier"
 )
 
 // Models returns info about all the models in the wiki.
 func (w *Wiki) Models() []wikifier.ModelInfo {
 	modelNames := w.allModelFiles()
-	models := make([]wikifier.ModelInfo, len(modelNames))
+	return w.modelsIn("", modelNames)
+}
 
-	// models individually
+// ModelsInDir returns info about all the models in the specified directory.
+func (w *Wiki) ModelsInDir(where string) []wikifier.ModelInfo {
+	modelNames := w.modelFilesInDir(where)
+	return w.modelsIn(where, modelNames)
+}
+
+func (w *Wiki) modelsIn(prefix string, modelNames []string) []wikifier.ModelInfo {
+	models := make([]wikifier.ModelInfo, len(modelNames))
 	i := 0
 	for _, name := range modelNames {
-		models[i] = w.ModelInfo(name)
+		models[i] = w.ModelInfo(prefix + name)
 		i++
 	}
-
 	return models
 }
 
@@ -36,11 +45,14 @@ func (mi sortableModelInfo) SortInfo() SortInfo {
 // ModelsSorted returns info about all the models in the wiki, sorted as specified.
 // Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
 func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []wikifier.ModelInfo {
+	return _modelsSorted(w.Models(), descend, sorters...)
+}
+
+func _modelsSorted(models []wikifier.ModelInfo, descend bool, sorters ...SortFunc) []wikifier.ModelInfo {
 
 	// convert to []Sortable
-	models := w.Models()
 	sorted := make([]Sortable, len(models))
-	for i, pi := range w.Models() {
+	for i, pi := range models {
 		sorted[i] = sortableModelInfo(pi)
 	}
 
@@ -57,6 +69,27 @@ func (w *Wiki) ModelsSorted(descend bool, sorters ...SortFunc) []wikifier.ModelI
 	}
 
 	return models
+}
+
+// ModelsAndDirs returns info about all the models and directories in a directory.
+func (w *Wiki) ModelsAndDirs(where string) ([]wikifier.ModelInfo, []string) {
+	models := w.ModelsInDir(where)
+	dirs := utils.DirsInDir(filepath.Join(w.Opt.Dir.Model, where))
+	return models, dirs
+}
+
+// ModelsAndDirsSorted returns info about all the models and directories in a directory, sorted as specified.
+// Accepted sort functions are SortTitle, SortAuthor, SortCreated, and SortModified.
+// Directories are always sorted alphabetically (but still respect the descend flag).
+func (w *Wiki) ModelsAndDirsSorted(where string, descend bool, sorters ...SortFunc) ([]wikifier.ModelInfo, []string) {
+	models, dirs := w.ModelsAndDirs(where)
+	models = _modelsSorted(models, descend, sorters...)
+	if descend {
+		sort.Sort(sort.Reverse(sort.StringSlice(dirs)))
+	} else {
+		sort.Strings(dirs)
+	}
+	return models, dirs
 }
 
 // ModelMap returns a map of model name to wikifier.ModelInfo for all models in the wiki.

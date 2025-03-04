@@ -11,8 +11,26 @@ var modelList = new FileList({
     }
 });
 
-if (a.json.results)
-a.json.results.each(function (modelData) {
+var currentDir;
+
+function nextDir(dir) {
+    if (!currentDir)
+        return dir;
+    return currentDir + '/' + dir;
+}
+
+if (a.json.results) {
+
+currentDir = a.json.results.cd;
+
+a.json.results.dirs.each(function (dir) {
+    var entry = new FileListEntry({ Title: dir });
+    entry.isDir = true;
+    entry.link = adminifier.wikiRoot + '/models/' + nextDir(dir) + location.search;
+    modelList.addEntry(entry);
+});
+    
+a.json.results.models.each(function (modelData) {
     var entry = new FileListEntry({
         Title:      modelData.title || modelData.file_ne || modelData.file,
         Author:     modelData.author,
@@ -23,6 +41,8 @@ a.json.results.each(function (modelData) {
     modelList.addEntry(entry);
 });
 
+}
+
 modelList.draw($('content'));
 
 exports.createModel = function () {
@@ -32,6 +52,20 @@ exports.createModel = function () {
         html:           tmpl('tmpl-create-model', {}),
         padded:         true,
         id:             'create-model-window',
+        autoDestroy:    true,
+        onDone:         null,
+        doneText:       'Cancel',
+    });
+    modal.show();
+}
+
+exports.createFolder = function () {
+    var modal = new ModalWindow({
+        icon:           'folder',
+        title:          'New Folder',
+        html:           tmpl('tmpl-create-folder', { mode: 'model' }),
+        padded:         true,
+        id:             'create-folder-window',
         autoDestroy:    true,
         onDone:         null,
         doneText:       'Cancel',

@@ -39,3 +39,12 @@
     <i class="fa fa-minus-circle fa-lg" style="color: #FF7070;"></i>
     {%= o.mode %} &quot;{%= o.item %}&quot;
 </template>
+
+<template id="tmpl-create-folder">
+    <form action="{{.Root}}/func/create-{%= o.mode %}-folder" method="post">
+        <label for="name">Folder Name:</label>
+        <input type="text" name="name" />
+        <input type="hidden" name="dir" value="{{.Cd}}" />
+        <input type="submit" value="Create" />
+    </form>
+</template>

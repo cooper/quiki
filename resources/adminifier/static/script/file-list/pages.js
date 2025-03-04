@@ -11,7 +11,7 @@ var pageList = new FileList({
     }
 });
 
-var currentDir = a.json.results.cd;
+var currentDir;
 
 function nextDir(dir) {
     if (!currentDir)
@@ -20,6 +20,8 @@ function nextDir(dir) {
 }
 
 if (a.json.results) {
+
+currentDir = a.json.results.cd;
 
 a.json.results.dirs.each(function (dir) {
     var entry = new FileListEntry({ Title: dir });
@@ -68,7 +70,7 @@ exports.createFolder = function () {
     var modal = new ModalWindow({
         icon:           'folder',
         title:          'New Folder',
-        html:           tmpl('tmpl-create-folder', {}),
+        html:           tmpl('tmpl-create-folder', { mode: 'page' }),
         padded:         true,
         id:             'create-folder-window',
         autoDestroy:    true,

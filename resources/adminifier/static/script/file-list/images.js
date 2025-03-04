@@ -12,7 +12,7 @@ var imageList = new FileList({
     }
 });
 
-var currentDir = a.json.results.cd;
+var currentDir;
 
 function nextDir(dir) {
     if (!currentDir)
@@ -21,6 +21,8 @@ function nextDir(dir) {
 }
 
 if (a.json.results) {
+
+currentDir = a.json.results.cd;
 
 a.json.results.dirs.each(function (dir) {
     var entry = new FileListEntry({ Filename: dir });
@@ -48,5 +50,7 @@ a.json.results.images.each(function (imageData) {
 }
 
 imageList.draw($('content'));
+
+// common functions are in ../images.js
 
 })(adminifier, window);
