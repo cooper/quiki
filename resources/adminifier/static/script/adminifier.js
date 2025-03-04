@@ -549,7 +549,7 @@ function handlePageData (page, data) {
 
             var pageTitle = $$('#page-title span')[0];
             var titleA = new Element('a', {
-                href: '../'.repeat(crumbs.length) + page.replace(/^\/?([^\/]+).*/, '$1'),
+                href: '../'.repeat(crumbs.length) + page.replace(/^\/?([^\/]+).*/, '$1') + location.search,
                 html: pageTitle.innerHTML
             });
             addFrameClickHandler(titleA);
