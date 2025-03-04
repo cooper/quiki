@@ -7,9 +7,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/cooper/go-git/v4"
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/wikifier"
+	"github.com/go-git/go-git/v5"
 )
 
 // A Wiki represents a quiki website.
