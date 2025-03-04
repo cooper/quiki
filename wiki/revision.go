@@ -516,6 +516,42 @@ func (w *Wiki) RevisionsMatchingPage(nameOrPath string) ([]RevisionInfo, error) 
 	return w._revisionsMatchingFile(w.RelPath(w.PathForPage(nameOrPath)))
 }
 
+// Diff returns the diff between two revisions.
+// NOTE: For now, this includes all changes, not just those to a specific file.
+func (w *Wiki) Diff(from, to string) (*object.Patch, error) {
+	repo, err := w.repo()
+	if err != nil {
+		return nil, err
+	}
+
+	// get the latest commit
+	var toHash plumbing.Hash
+	if to == "" {
+		ref, err := repo.Head()
+		if err != nil {
+			return nil, err
+		}
+		toHash = ref.Hash()
+	} else {
+		toHash = plumbing.NewHash(to)
+	}
+
+	// get the commits
+	fromCommit, err := repo.CommitObject(plumbing.NewHash(from))
+	if err != nil {
+		return nil, err
+	}
+	toCommit, err := repo.CommitObject(toHash)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: create a utility that generates a diff string from the
+	// []Chunk returned by Patch.FilePatches()[n].Files()[n].Chunks().
+	// unfortunately go-git does not publicize this utility.
+	return fromCommit.Patch(toCommit)
+}
+
 // _revisionsMatchingFile returns a list of commit infos matching a file path.
 func (w *Wiki) _revisionsMatchingFile(path string) ([]RevisionInfo, error) {
 	repo, err := w.repo()

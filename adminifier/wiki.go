@@ -44,6 +44,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"write-config":        handleWriteWikiConfig,
 	"image/":              handleImage,
 	"page-revisions":      handlePageRevisions,
+	"page-diff":           handlePageDiff,
 	"create-page":         handleCreatePage,
 	"create-model":        handleCreateModel,
 	"create-page-folder":  handleCreatePageFolder,
@@ -711,6 +712,25 @@ func handlePageRevisions(wr *wikiRequest) {
 	wr.err = jsonWriter.Encode(map[string]any{
 		"success": true,
 		"revs":    revisions,
+	})
+}
+
+func handlePageDiff(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r, "page", "from") {
+		return
+	}
+
+	_, from, to := wr.r.Form.Get("page"), wr.r.Form.Get("from"), wr.r.Form.Get("to")
+	diff, err := wr.wi.Diff(from, to)
+	if err != nil {
+		wr.err = err
+		return
+	}
+
+	jsonWriter := json.NewEncoder(wr.w)
+	wr.err = jsonWriter.Encode(map[string]any{
+		"success": true,
+		"diff":    diff.String(),
 	})
 }
 
