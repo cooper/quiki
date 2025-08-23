@@ -114,11 +114,80 @@ func InitWikis() error {
 		// initialize git repsitory
 		log.Println(w.BranchNames())
 
-		// start pregeneration manager
-		wi.pregenerateManager = pregenerate.New(w).StartBackground()
+		// initialize pregeneration manager - always available in unified architecture
+		pregenerationEnabled, _ := Conf.GetBool("server.enable.pregeneration")
 
-		// monitor for changes with new monitoring system
-		if err := monitor.GetManager().AddWiki(w); err != nil {
+		// check for pregeneration mode setting
+		pregenerationMode, _ := Conf.GetStr("server.pregen.mode")
+		var opts pregenerate.Options
+		switch pregenerationMode {
+		case "fast":
+			opts = pregenerate.FastOptions()
+		case "slow":
+			opts = pregenerate.SlowOptions()
+		default:
+			opts = pregenerate.DefaultOptions()
+		}
+
+		// allow individual option overrides
+		if rateLimit, err := Conf.GetDuration("server.pregen.rate_limit"); err == nil {
+			opts.RateLimit = rateLimit
+		}
+		if progressInterval, err := Conf.GetInt("server.pregen.progress_interval"); err == nil {
+			opts.ProgressInterval = progressInterval
+		}
+		if priorityQueueSize, err := Conf.GetInt("server.pregen.page_priority"); err == nil {
+			opts.PriorityQueueSize = priorityQueueSize
+		}
+		if backgroundQueueSize, err := Conf.GetInt("server.pregen.page_background"); err == nil {
+			opts.BackgroundQueueSize = backgroundQueueSize
+		}
+		if imagePriorityQueueSize, err := Conf.GetInt("server.pregen.img_priority"); err == nil {
+			opts.ImagePriorityQueueSize = imagePriorityQueueSize
+		}
+		if imageBackgroundQueueSize, err := Conf.GetInt("server.pregen.img_background"); err == nil {
+			opts.ImageBackgroundQueueSize = imageBackgroundQueueSize
+		}
+		if priorityWorkers, err := Conf.GetInt("server.pregen.page_workers"); err == nil {
+			opts.PriorityWorkers = priorityWorkers
+		}
+		if backgroundWorkers, err := Conf.GetInt("server.pregen.page_bg_workers"); err == nil {
+			opts.BackgroundWorkers = backgroundWorkers
+		}
+		if imagePriorityWorkers, err := Conf.GetInt("server.pregen.img_workers"); err == nil {
+			opts.ImagePriorityWorkers = imagePriorityWorkers
+		}
+		if imageBackgroundWorkers, err := Conf.GetInt("server.pregen.img_bg_workers"); err == nil {
+			opts.ImageBackgroundWorkers = imageBackgroundWorkers
+		}
+		if requestTimeout, err := Conf.GetDuration("server.pregen.timeout"); err == nil {
+			opts.RequestTimeout = requestTimeout
+		}
+		if forceGen, err := Conf.GetBool("server.pregen.force"); err == nil {
+			opts.ForceGen = forceGen
+		}
+		if logVerbose, err := Conf.GetBool("server.pregen.verbose"); err == nil {
+			opts.LogVerbose = logVerbose
+		}
+		if enableImages, err := Conf.GetBool("server.pregen.images"); err == nil {
+			opts.EnableImages = enableImages
+		}
+		if cleanupInterval, err := Conf.GetDuration("server.pregen.cleanup"); err == nil {
+			opts.CleanupInterval = cleanupInterval
+		}
+		if maxTrackingEntries, err := Conf.GetInt("server.pregen.max_tracking"); err == nil {
+			opts.MaxTrackingEntries = maxTrackingEntries
+		}
+
+		// always create and start the manager for unified queue system
+		if pregenerationEnabled {
+			wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartBackground()
+		} else {
+			wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartWorkers()
+		}
+
+		// monitor for changes with pregeneration integration
+		if err := monitor.GetManager().AddWikiWithPregeneration(w, wi.pregenerateManager); err != nil {
 			return err
 		}
 

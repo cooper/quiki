@@ -13,6 +13,11 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// PregenerateManager defines the interface we need for page generation
+type PregenerateManager interface {
+	GeneratePageSync(string, bool) any
+}
+
 // Manager coordinates file system monitoring across all wikis.
 type Manager struct {
 	mu       sync.RWMutex
@@ -23,11 +28,12 @@ type Manager struct {
 
 // wikiWatcher represents monitoring for a single wiki.
 type wikiWatcher struct {
-	wiki           *wiki.Wiki
-	watcher        *fsnotify.Watcher
-	ctx            context.Context
-	cancel         context.CancelFunc
-	symlinkTargets sync.Map // maps target file paths to slice of symlink relative paths
+	wiki               *wiki.Wiki
+	pregenerateManager PregenerateManager // pregeneration manager for unified queue system
+	watcher            *fsnotify.Watcher
+	ctx                context.Context
+	cancel             context.CancelFunc
+	symlinkTargets     sync.Map // maps target file paths to slice of symlink relative paths
 }
 
 // Global manager instance
@@ -47,8 +53,8 @@ func GetManager() *Manager {
 	return globalManager
 }
 
-// AddWiki starts monitoring a wiki for file changes.
-func (m *Manager) AddWiki(w *wiki.Wiki) error {
+// AddWikiWithPregeneration starts monitoring a wiki for file changes with pregeneration manager.
+func (m *Manager) AddWikiWithPregeneration(w *wiki.Wiki, pregenerateManager PregenerateManager) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -68,10 +74,11 @@ func (m *Manager) AddWiki(w *wiki.Wiki) error {
 
 	ctx, cancel := context.WithCancel(m.ctx)
 	ww := &wikiWatcher{
-		wiki:    w,
-		watcher: watcher,
-		ctx:     ctx,
-		cancel:  cancel,
+		wiki:               w,
+		pregenerateManager: pregenerateManager,
+		watcher:            watcher,
+		ctx:                ctx,
+		cancel:             cancel,
 	}
 
 	// add directories to watch
@@ -376,12 +383,5 @@ func (ww *wikiWatcher) handlePotentialSymlinkChange(relPath string) {
 // regenerates a single page with proper locking
 func (ww *wikiWatcher) regeneratePage(relPath string) {
 	log.Printf("Page changed, regenerating: %s", relPath)
-
-	// use page locking to coordinate with other operations
-	pageLock := ww.wiki.GetPageLock(relPath)
-	pageLock.Lock()
-	defer pageLock.Unlock()
-
-	// force regeneration
-	ww.wiki.DisplayPageDraft(relPath, true)
+	ww.pregenerateManager.GeneratePageSync(relPath, true)
 }

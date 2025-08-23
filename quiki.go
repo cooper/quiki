@@ -153,7 +153,10 @@ func runPageAndExit(page *wikifier.Page) {
 
 // runs a wiki page
 func runWikiPageAndExit(w *wiki.Wiki, pagePath string) {
-	res := w.DisplayPage(pagePath)
+	pregen := pregenerate.New(w)
+	defer pregen.Stop()
+
+	res := pregen.GeneratePageSync(pagePath, true)
 	if jsonOutput {
 		json.NewEncoder(os.Stdout).Encode(res)
 		os.Exit(0)

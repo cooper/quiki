@@ -48,6 +48,7 @@ func CreateWizardConfig(opts Options) {
 		"server.http.port":            opts.Port,
 		"server.dir.wiki":             opts.WikisDir,
 		"server.enable.pregeneration": true,
+		"server.pregen.mode":          "default", // options: default, fast, slow
 		"adminifier.enable":           true,
 		"adminifier.host":             "",
 		"adminifier.root":             "/admin",

@@ -80,7 +80,7 @@ func Rehash() error {
 		// restore old wikis and their monitors on failure
 		Wikis = oldWikis
 		for _, wi := range oldWikis {
-			monitorMgr.AddWiki(wi.Wiki)
+			monitorMgr.AddWikiWithPregeneration(wi.Wiki, wi.pregenerateManager)
 		}
 		return errors.Wrap(err, "rehash: init wikis")
 	}

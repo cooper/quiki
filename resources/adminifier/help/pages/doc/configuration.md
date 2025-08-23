@@ -180,6 +180,51 @@ using quiki's wikifier engine API directly.
 
 __Default__: (webserver) built-in function
 
+### image.max_concurrent
+
+_Optional_. Maximum number of concurrent image processing operations.
+
+Limits how many images can be processed simultaneously to prevent system
+overload. Set to 0 for automatic detection based on CPU cores.
+
+__Default__: 2
+
+### image.max_memory_mb
+
+_Optional_. Maximum memory usage per image in megabytes.
+
+Prevents crashes from loading extremely large images by checking dimensions
+before processing. An image requiring more memory will be rejected.
+
+__Default__: 256
+
+### image.timeout_seconds
+
+_Optional_. Maximum processing time per image operation in seconds.
+
+Prevents hanging on slow image operations. Processing will be aborted if
+it takes longer than this limit.
+
+__Default__: 20
+
+### image.pregen_thumbs
+
+_Optional_. Comma-separated list of thumbnail sizes to pregenerate automatically.
+
+This setting controls which thumbnail sizes are generated in the background
+when images are first processed, improving performance for common sizes.
+
+Each entry can be either:
+* A single number (e.g., "250") - constrains the larger dimension to this size
+* Exact dimensions (e.g., "400x300") - generates exactly this size
+
+The default value of "250" ensures adminifier gallery previews load quickly.
+Additional sizes can be added for custom interfaces or common usage patterns.
+
+__Example__: `@image.pregen_thumbs: 250,150,400x300,800;`
+
+__Default__: 250 (for adminifier thumbnail preloading)
+
 ### image.sizer
 
 _Optional_. A function reference that returns the URL to a sized version of an image. After
@@ -225,6 +270,17 @@ For instance, to support both @2x and @3x scaling:
     @image.retina: 2, 3;
 
 __Default__: *2, 3*
+
+### image.arbitrary_sizes
+
+_Optional_. When enabled, users can request any image size, even those not referenced 
+in the wiki content. When disabled (default), users can only access image sizes that 
+are explicitly referenced somewhere in the wiki content.
+
+    @image.arbitrary_sizes;     /* enabled (not recommended for public wikis) */
+    -@image.arbitrary_sizes;    /* disabled (recommended) */
+
+__Default__: Disabled
 
 ### page.enable.cache
 
@@ -399,9 +455,151 @@ options.
 
 _Optional_. If enabled, webserver pre-generates all pages and images upon start.
 
+When disabled, the unified queue-only generation system is still used for all requests,
+but startup background queuing is skipped.
+
 __Requires__: [`page.enable.cache`](#pageenablecache)
 
 __Default__: Enabled
+
+### server.pregen.mode
+
+_Optional_. Controls the performance characteristics of the pregeneration system.
+
+Available modes:
+- `default`: Balanced performance with intelligent worker scaling
+- `fast`: High-performance mode with more workers and aggressive timeouts  
+- `slow`: Resource-conservative mode with fewer workers and longer intervals
+
+__Example__:
+```
+@server.pregen.mode: fast;
+```
+
+__Default__: `default`
+
+## Advanced Pregeneration Options
+
+The following options allow fine-tuning of individual pregeneration parameters, 
+overriding the preset modes. All are optional.
+
+### server.pregen.rate_limit
+
+Time between background generation operations. Affects both pages and images (images are automatically 2x slower). Does not affect HTTP requests, only background pregeneration.
+
+__Example__: `@server.pregen.rate_limit: 5ms;`
+
+### server.pregen.page_priority
+
+Buffer size for high-priority requests (HTTP requests). Larger = less blocking.
+
+__Example__: `@server.pregen.page_priority: 1000;`
+
+### server.pregen.page_background
+
+Buffer size for background pregeneration. Larger = more content can be queued.
+
+__Example__: `@server.pregen.page_background: 5000;`
+
+### server.pregen.img_priority
+
+Buffer size for high-priority image generation requests.
+
+__Example__: `@server.pregen.img_priority: 200;`
+
+### server.pregen.img_background
+
+Buffer size for background image pregeneration.
+
+__Example__: `@server.pregen.img_background: 500;`
+
+### server.pregen.page_workers
+
+Number of workers handling high-priority requests. More = better concurrency.
+
+__Example__: `@server.pregen.page_workers: 8;`
+
+### server.pregen.page_bg_workers
+
+Number of workers handling background pregeneration. More = faster startup.
+
+__Example__: `@server.pregen.page_bg_workers: 4;`
+
+### server.pregen.img_workers
+
+Number of workers handling high-priority image requests.
+
+__Example__: `@server.pregen.img_workers: 6;`
+
+### server.pregen.img_bg_workers
+
+Number of workers handling background image pregeneration.
+
+__Example__: `@server.pregen.img_bg_workers: 2;`
+
+### server.pregen.timeout
+
+Maximum time to wait for synchronous generation requests.
+
+__Example__: `@server.pregen.timeout: 45s;`
+
+### server.pregen.force
+
+Force regeneration even if cache is fresh. Useful for debugging.
+
+__Example__: `@server.pregen.force: true;`
+
+### server.pregen.verbose
+
+Enable detailed logging of pregeneration operations.
+
+__Example__: `@server.pregen.verbose: true;`
+
+### server.pregen.images
+
+Enable pregeneration of image thumbnails.
+
+__Example__: `@server.pregen.images: false;`
+
+### server.pregen.cleanup
+
+How often to clean up tracking maps. Set to 0 to disable.
+
+__Example__: `@server.pregen.cleanup: 15m;`
+
+### server.pregen.max_tracking
+
+Maximum entries in tracking maps before forced cleanup.
+
+__Example__: `@server.pregen.max_tracking: 50000;`
+
+## Pregeneration Configuration Examples
+
+### High-Performance Setup
+```
+@server.pregeneration.mode: fast;
+@server.pregen.page_workers: 16;
+@server.pregen.page_priority: 2000;
+@server.pregeneration.rate_limit: 1ms;
+@server.pregen.timeout: 15s;
+```
+
+### Resource-Conservative Setup  
+```
+@server.pregeneration.mode: slow;
+@server.pregen.page_bg_workers: 1;
+@server.pregeneration.rate_limit: 100ms;
+@server.pregen.cleanup: 1h;
+```
+
+### Custom Balanced Setup
+```
+@server.pregeneration.mode: default;
+@server.pregen.page_workers: 8;
+@server.pregen.page_bg_workers: 3;
+@server.pregen.img_workers: 4;
+@server.pregen.verbose: true;
+```
 
 ### server.enable.monitor
 

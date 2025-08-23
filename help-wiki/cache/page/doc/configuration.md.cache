@@ -1,4 +1,4 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/configuration.md","file_ne":"doc/configuration","base":"configuration.md","base_ne":"configuration","created":"2025-02-26T17:52:44.068575239-05:00","modified":"2025-02-26T17:52:44.068575239-05:00","generated":true,"external":true,"fmt_title":"Configuration","title":"Configuration","author":"Markdown","preview":"Contents Configuration Configuration files wikifier options name host.wiki dir.wiki root root.ext external page.enable.title page.code.lang"}
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/configuration.md","file_ne":"doc/configuration","base":"configuration.md","base_ne":"configuration","created":"2025-08-23T12:34:49.545311322-04:00","modified":"2025-08-23T12:34:49.545311322-04:00","generated":true,"external":true,"fmt_title":"Configuration","title":"Configuration","author":"Markdown","preview":"Contents Configuration Configuration files wikifier options name host.wiki dir.wiki root root.ext external page.enable.title page.code.lang"}
 <div class="q-main-doc/configuration q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
@@ -73,6 +73,26 @@
                             </a>
                         </li>
                         <li>
+                            <a class="q-link-internal" href="#imagemax_concurrent">
+                                image.max_concurrent
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagemax_memory_mb">
+                                image.max_memory_mb
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagetimeout_seconds">
+                                image.timeout_seconds
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagepregen_thumbs">
+                                image.pregen_thumbs
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#imagesizer">
                                 image.sizer
                             </a>
@@ -97,6 +117,11 @@
                         <li>
                             <a class="q-link-internal" href="#imageretina">
                                 image.retina
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagearbitrary_sizes">
+                                image.arbitrary_sizes
                             </a>
                         </li>
                         <li>
@@ -181,6 +206,115 @@
                         <li>
                             <a class="q-link-internal" href="#serverenablepregeneration">
                                 server.enable.pregeneration
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenmode">
+                                server.pregen.mode
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#advanced-pregeneration-options">
+                        Advanced Pregeneration Options
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenrate_limit">
+                                server.pregen.rate_limit
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenpage_priority">
+                                server.pregen.page_priority
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenpage_background">
+                                server.pregen.page_background
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenimg_priority">
+                                server.pregen.img_priority
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenimg_background">
+                                server.pregen.img_background
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenpage_workers">
+                                server.pregen.page_workers
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenpage_bg_workers">
+                                server.pregen.page_bg_workers
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenimg_workers">
+                                server.pregen.img_workers
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenimg_bg_workers">
+                                server.pregen.img_bg_workers
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregentimeout">
+                                server.pregen.timeout
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenforce">
+                                server.pregen.force
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenverbose">
+                                server.pregen.verbose
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenimages">
+                                server.pregen.images
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregencleanup">
+                                server.pregen.cleanup
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#serverpregenmax_tracking">
+                                server.pregen.max_tracking
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="q-link-internal" href="#pregeneration-configuration-examples">
+                        Pregeneration Configuration Examples
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="q-link-internal" href="#high-performance-setup">
+                                High-Performance Setup
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#resource-conservative-setup">
+                                Resource-Conservative Setup
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#custom-balanced-setup">
+                                Custom Balanced Setup
                             </a>
                         </li>
                         <li>
@@ -568,6 +702,84 @@
                 </p>
             </div>
             <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagemax_concurrent">
+                    image.max_concurrent
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Maximum number of concurrent image processing operations.
+                </p>
+                <p class="q-p">
+                    Limits how many images can be processed simultaneously to prevent system
+                    overload. Set to 0 for automatic detection based on CPU cores.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: 2
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagemax_memory_mb">
+                    image.max_memory_mb
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Maximum memory usage per image in megabytes.
+                </p>
+                <p class="q-p">
+                    Prevents crashes from loading extremely large images by checking dimensions
+                    before processing. An image requiring more memory will be rejected.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: 256
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagetimeout_seconds">
+                    image.timeout_seconds
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Maximum processing time per image operation in seconds.
+                </p>
+                <p class="q-p">
+                    Prevents hanging on slow image operations. Processing will be aborted if
+                    it takes longer than this limit.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: 20
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagepregen_thumbs">
+                    image.pregen_thumbs
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Comma-separated list of thumbnail sizes to pregenerate automatically.
+                </p>
+                <p class="q-p">
+                    This setting controls which thumbnail sizes are generated in the background
+                    when images are first processed, improving performance for common sizes.
+                </p>
+                <p class="q-p">
+                    Each entry can be either:
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        A single number (e.g., &#34;250&#34;) - constrains the larger dimension to this size
+                    </li>
+                    <li class="q-list-item">
+                        Exact dimensions (e.g., &#34;400x300&#34;) - generates exactly this size
+                    </li>
+                </ul>
+                <p class="q-p">
+                    The default value of &#34;250&#34; ensures adminifier gallery previews load quickly.
+                    Additional sizes can be added for custom interfaces or common usage patterns.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@image.pregen_thumbs: 250,150,400x300,800;</code>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: 250 (for adminifier thumbnail preloading)
+                </p>
+            </div>
+            <div class="q-sec">
                 <h3 class="q-sec-title" id="qa-imagesizer">
                     image.sizer
                 </h3>
@@ -645,6 +857,22 @@
 </span></span></pre>
                 <p class="q-p">
                     <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">2, 3</span>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagearbitrary_sizes">
+                    image.arbitrary_sizes
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. When enabled, users can request any image size, even those not referenced
+                    in the wiki content. When disabled (default), users can only access image sizes that
+                    are explicitly referenced somewhere in the wiki content.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@image.arbitrary_sizes;     /* enabled (not recommended for public wikis) */
+</span></span><span class="line"><span class="cl">-@image.arbitrary_sizes;    /* disabled (recommended) */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Disabled
                 </p>
             </div>
             <div class="q-sec">
@@ -891,11 +1119,256 @@
                     <span style="font-style: italic;">Optional</span>. If enabled, webserver pre-generates all pages and images upon start.
                 </p>
                 <p class="q-p">
+                    When disabled, the unified queue-only generation system is still used for all requests,
+                    but startup background queuing is skipped.
+                </p>
+                <p class="q-p">
                     <span style="font-weight: bold;">Requires</span>: <a class="q-link-internal" href="#pageenablecache" title="§ pageenablecache"><code>page.enable.cache</code></a>
                 </p>
                 <p class="q-p">
                     <span style="font-weight: bold;">Default</span>: Enabled
                 </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenmode">
+                    server.pregen.mode
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Controls the performance characteristics of the pregeneration system.
+                </p>
+                <p class="q-p">
+                    Available modes:
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <code>default</code>: Balanced performance with intelligent worker scaling
+                    </li>
+                    <li class="q-list-item">
+                        <code>fast</code>: High-performance mode with more workers and aggressive timeouts<br />
+                    </li>
+                    <li class="q-list-item">
+                        <code>slow</code>: Resource-conservative mode with fewer workers and longer intervals
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>:
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.pregen.mode: fast;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <code>default</code>
+                </p>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-advanced-pregeneration-options">
+                Advanced Pregeneration Options
+            </h2>
+            <p class="q-p">
+                The following options allow fine-tuning of individual pregeneration parameters,
+                overriding the preset modes. All are optional.
+            </p>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenrate_limit">
+                    server.pregen.rate_limit
+                </h3>
+                <p class="q-p">
+                    Time between background generation operations. Affects both pages and images (images are automatically 2x slower). Does not affect HTTP requests, only background pregeneration.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.rate_limit: 5ms;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenpage_priority">
+                    server.pregen.page_priority
+                </h3>
+                <p class="q-p">
+                    Buffer size for high-priority requests (HTTP requests). Larger = less blocking.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.page_priority: 1000;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenpage_background">
+                    server.pregen.page_background
+                </h3>
+                <p class="q-p">
+                    Buffer size for background pregeneration. Larger = more content can be queued.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.page_background: 5000;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenimg_priority">
+                    server.pregen.img_priority
+                </h3>
+                <p class="q-p">
+                    Buffer size for high-priority image generation requests.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_priority: 200;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenimg_background">
+                    server.pregen.img_background
+                </h3>
+                <p class="q-p">
+                    Buffer size for background image pregeneration.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_background: 500;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenpage_workers">
+                    server.pregen.page_workers
+                </h3>
+                <p class="q-p">
+                    Number of workers handling high-priority requests. More = better concurrency.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.page_workers: 8;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenpage_bg_workers">
+                    server.pregen.page_bg_workers
+                </h3>
+                <p class="q-p">
+                    Number of workers handling background pregeneration. More = faster startup.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.page_bg_workers: 4;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenimg_workers">
+                    server.pregen.img_workers
+                </h3>
+                <p class="q-p">
+                    Number of workers handling high-priority image requests.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_workers: 6;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenimg_bg_workers">
+                    server.pregen.img_bg_workers
+                </h3>
+                <p class="q-p">
+                    Number of workers handling background image pregeneration.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_bg_workers: 2;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregentimeout">
+                    server.pregen.timeout
+                </h3>
+                <p class="q-p">
+                    Maximum time to wait for synchronous generation requests.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.timeout: 45s;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenforce">
+                    server.pregen.force
+                </h3>
+                <p class="q-p">
+                    Force regeneration even if cache is fresh. Useful for debugging.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.force: true;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenverbose">
+                    server.pregen.verbose
+                </h3>
+                <p class="q-p">
+                    Enable detailed logging of pregeneration operations.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.verbose: true;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenimages">
+                    server.pregen.images
+                </h3>
+                <p class="q-p">
+                    Enable pregeneration of image thumbnails.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.images: false;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregencleanup">
+                    server.pregen.cleanup
+                </h3>
+                <p class="q-p">
+                    How often to clean up tracking maps. Set to 0 to disable.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.cleanup: 15m;</code>
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverpregenmax_tracking">
+                    server.pregen.max_tracking
+                </h3>
+                <p class="q-p">
+                    Maximum entries in tracking maps before forced cleanup.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@server.pregen.max_tracking: 50000;</code>
+                </p>
+            </div>
+        </div>
+        <div class="q-sec">
+            <h2 class="q-sec-title" id="qa-pregeneration-configuration-examples">
+                Pregeneration Configuration Examples
+            </h2>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-high-performance-setup">
+                    High-Performance Setup
+                </h3>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.pregeneration.mode: fast;
+</span></span><span class="line"><span class="cl">@server.pregen.page_workers: 16;
+</span></span><span class="line"><span class="cl">@server.pregen.page_priority: 2000;
+</span></span><span class="line"><span class="cl">@server.pregeneration.rate_limit: 1ms;
+</span></span><span class="line"><span class="cl">@server.pregen.timeout: 15s;
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-resource-conservative-setup">
+                    Resource-Conservative Setup
+                </h3>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.pregeneration.mode: slow;
+</span></span><span class="line"><span class="cl">@server.pregen.page_bg_workers: 1;
+</span></span><span class="line"><span class="cl">@server.pregeneration.rate_limit: 100ms;
+</span></span><span class="line"><span class="cl">@server.pregen.cleanup: 1h;
+</span></span></pre>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-custom-balanced-setup">
+                    Custom Balanced Setup
+                </h3>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.pregeneration.mode: default;
+</span></span><span class="line"><span class="cl">@server.pregen.page_workers: 8;
+</span></span><span class="line"><span class="cl">@server.pregen.page_bg_workers: 3;
+</span></span><span class="line"><span class="cl">@server.pregen.img_workers: 4;
+</span></span><span class="line"><span class="cl">@server.pregen.verbose: true;
+</span></span></pre>
             </div>
             <div class="q-sec">
                 <h3 class="q-sec-title" id="qa-serverenablemonitor">

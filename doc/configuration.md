@@ -455,9 +455,151 @@ options.
 
 _Optional_. If enabled, webserver pre-generates all pages and images upon start.
 
+When disabled, the unified queue-only generation system is still used for all requests,
+but startup background queuing is skipped.
+
 __Requires__: [`page.enable.cache`](#pageenablecache)
 
 __Default__: Enabled
+
+### server.pregen.mode
+
+_Optional_. Controls the performance characteristics of the pregeneration system.
+
+Available modes:
+- `default`: Balanced performance with intelligent worker scaling
+- `fast`: High-performance mode with more workers and aggressive timeouts  
+- `slow`: Resource-conservative mode with fewer workers and longer intervals
+
+__Example__:
+```
+@server.pregen.mode: fast;
+```
+
+__Default__: `default`
+
+## Advanced Pregeneration Options
+
+The following options allow fine-tuning of individual pregeneration parameters, 
+overriding the preset modes. All are optional.
+
+### server.pregen.rate_limit
+
+Time between background generation operations. Affects both pages and images (images are automatically 2x slower). Does not affect HTTP requests, only background pregeneration.
+
+__Example__: `@server.pregen.rate_limit: 5ms;`
+
+### server.pregen.page_priority
+
+Buffer size for high-priority requests (HTTP requests). Larger = less blocking.
+
+__Example__: `@server.pregen.page_priority: 1000;`
+
+### server.pregen.page_background
+
+Buffer size for background pregeneration. Larger = more content can be queued.
+
+__Example__: `@server.pregen.page_background: 5000;`
+
+### server.pregen.img_priority
+
+Buffer size for high-priority image generation requests.
+
+__Example__: `@server.pregen.img_priority: 200;`
+
+### server.pregen.img_background
+
+Buffer size for background image pregeneration.
+
+__Example__: `@server.pregen.img_background: 500;`
+
+### server.pregen.page_workers
+
+Number of workers handling high-priority requests. More = better concurrency.
+
+__Example__: `@server.pregen.page_workers: 8;`
+
+### server.pregen.page_bg_workers
+
+Number of workers handling background pregeneration. More = faster startup.
+
+__Example__: `@server.pregen.page_bg_workers: 4;`
+
+### server.pregen.img_workers
+
+Number of workers handling high-priority image requests.
+
+__Example__: `@server.pregen.img_workers: 6;`
+
+### server.pregen.img_bg_workers
+
+Number of workers handling background image pregeneration.
+
+__Example__: `@server.pregen.img_bg_workers: 2;`
+
+### server.pregen.timeout
+
+Maximum time to wait for synchronous generation requests.
+
+__Example__: `@server.pregen.timeout: 45s;`
+
+### server.pregen.force
+
+Force regeneration even if cache is fresh. Useful for debugging.
+
+__Example__: `@server.pregen.force: true;`
+
+### server.pregen.verbose
+
+Enable detailed logging of pregeneration operations.
+
+__Example__: `@server.pregen.verbose: true;`
+
+### server.pregen.images
+
+Enable pregeneration of image thumbnails.
+
+__Example__: `@server.pregen.images: false;`
+
+### server.pregen.cleanup
+
+How often to clean up tracking maps. Set to 0 to disable.
+
+__Example__: `@server.pregen.cleanup: 15m;`
+
+### server.pregen.max_tracking
+
+Maximum entries in tracking maps before forced cleanup.
+
+__Example__: `@server.pregen.max_tracking: 50000;`
+
+## Pregeneration Configuration Examples
+
+### High-Performance Setup
+```
+@server.pregeneration.mode: fast;
+@server.pregen.page_workers: 16;
+@server.pregen.page_priority: 2000;
+@server.pregeneration.rate_limit: 1ms;
+@server.pregen.timeout: 15s;
+```
+
+### Resource-Conservative Setup  
+```
+@server.pregeneration.mode: slow;
+@server.pregen.page_bg_workers: 1;
+@server.pregeneration.rate_limit: 100ms;
+@server.pregen.cleanup: 1h;
+```
+
+### Custom Balanced Setup
+```
+@server.pregeneration.mode: default;
+@server.pregen.page_workers: 8;
+@server.pregen.page_bg_workers: 3;
+@server.pregen.img_workers: 4;
+@server.pregen.verbose: true;
+```
 
 ### server.enable.monitor
 

@@ -93,12 +93,14 @@ func handleWiki(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 
 // page request
 func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	handleResponse(wi, wi.DisplayPage(relPath), w, r)
+	result := wi.pregenerateManager.GeneratePageSync(relPath, true)
+	handleResponse(wi, result, w, r)
 }
 
 // image request
 func handleImage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	handleResponse(wi, wi.DisplayImage(relPath), w, r)
+	result := wi.pregenerateManager.GenerateImageSync(relPath, true)
+	handleResponse(wi, result, w, r)
 }
 
 // topic request
