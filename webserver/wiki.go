@@ -237,9 +237,11 @@ func setupWiki(wi *WikiInfo) error {
 
 	// setup handlers
 	wikiRoot := wi.Opt.Root.Wiki
-	if !strings.HasPrefix(wikiRoot, "/") {
+	// simple rule: if wikiRoot is not empty, ensure it starts with /
+	if wikiRoot != "" && !strings.HasPrefix(wikiRoot, "/") {
 		wikiRoot = "/" + wikiRoot
 	}
+
 	for _, item := range wikiRoots {
 		rootType, root, handler := item.rootType, item.root, item.handler
 
@@ -253,21 +255,25 @@ func setupWiki(wi *WikiInfo) error {
 			continue
 		}
 
-		// if it doesn't already have the wiki root as the prefix, add it
-		if !strings.HasPrefix(root, wikiRoot) {
-			root = wikiRoot + root
+		// build the full root path
+		fullRoot := root
+		if wikiRoot != "" {
+			// if wiki has a root path, prepend it (unless root already has it)
+			if !strings.HasPrefix(root, wikiRoot) {
+				fullRoot = wikiRoot + root
+			}
 		}
 
-		if !strings.HasSuffix(root, "/") {
-			root += "/"
+		if !strings.HasSuffix(fullRoot, "/") {
+			fullRoot += "/"
 		}
 
 		// add the real handler
 		wi := wi // copy pointer so the handler below always refer to this one
-		Mux.HandleFunc(wi.Host+root, func(w http.ResponseWriter, r *http.Request) {
+		Mux.HandleFunc(wi.Host+fullRoot, func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root
-			relPath := strings.TrimPrefix(r.URL.Path, root)
+			relPath := strings.TrimPrefix(r.URL.Path, fullRoot)
 			if relPath == "" {
 				http.NotFound(w, r)
 				return
@@ -276,7 +282,7 @@ func setupWiki(wi *WikiInfo) error {
 			handler(wi, relPath, w, r)
 		})
 
-		log.Printf("[%s] registered %s root: %s", wi.Name, rootType, wi.Host+root)
+		log.Printf("[%s] registered %s root: %s", wi.Name, rootType, wi.Host+fullRoot)
 	}
 
 	// file server

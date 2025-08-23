@@ -3,7 +3,6 @@ package adminifier
 import (
 	"log"
 	"net/http"
-	"net/url"
 	"path"
 	"strings"
 
@@ -129,8 +128,18 @@ func setupAdminHandlers() {
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 
-	// make sure that this is admin root
-	if strings.TrimPrefix(r.URL.Path, root) != "" {
+	// this handler should only handle the exact adminifier root path
+	// other paths under adminifier are handled by specific handlers
+	var expectedPath string
+	if root == "" {
+		expectedPath = "/"
+	} else {
+		expectedPath = root
+	}
+
+	if r.URL.Path != expectedPath {
+		// this shouldn't happen if routing is set up correctly
+		// but if it does, it means no specific handler was found
 		http.NotFound(w, r)
 		return
 	}
@@ -155,12 +164,25 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 func createAdminTemplate(r *http.Request) adminTemplate {
 	user, _ := sessMgr.Get(r.Context(), "user").(*authenticator.User)
+
+	// for templates, use empty string if root is empty, otherwise remove trailing slash
+	adminRoot := root
+	if adminRoot != "" {
+		adminRoot = strings.TrimRight(adminRoot, "/")
+	}
+
+	// for static paths, ensure we have a proper prefix
+	staticPrefix := root
+	if staticPrefix == "" {
+		staticPrefix = "/"
+	}
+
 	return adminTemplate{
 		User:      user,
 		Title:     "quiki",
-		AdminRoot: strings.TrimRight(root, "/"),
-		Static:    root + "static",
-		QStatic:   root + "qstatic",
+		AdminRoot: adminRoot,
+		Static:    staticPrefix + "static",
+		QStatic:   staticPrefix + "qstatic",
 	}
 }
 
@@ -346,16 +368,16 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		redirect := strings.TrimPrefix(r.URL.Path, root)
-		if r.URL.RawQuery != "" {
-			redirect += url.QueryEscape("?" + r.URL.RawQuery)
+		// simple redirect calculation
+		var loginURL string
+		if root == "" {
+			loginURL = "/login"
+		} else {
+			loginURL = root + "login"
 		}
-		if redirect == "/" {
-			redirect = ""
-		} else if redirect != "" {
-			redirect = "?redirect=/" + redirect
-		}
-		http.Redirect(w, r, root+"login"+redirect, http.StatusTemporaryRedirect)
+
+		// TODO: handle redirect parameter if needed
+		http.Redirect(w, r, loginURL, http.StatusTemporaryRedirect)
 		return true
 	}
 	return false

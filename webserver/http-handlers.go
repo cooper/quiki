@@ -20,9 +20,20 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	// try each wiki
 	for _, w := range Wikis {
 
-		// wrong root
+		// check if path matches this wiki root
 		wikiRoot := w.Opt.Root.Wiki
-		if r.URL.Path != wikiRoot && !strings.HasPrefix(r.URL.Path, wikiRoot+"/") {
+		requestPath := r.URL.Path
+
+		var pathMatches bool
+		if wikiRoot == "" {
+			// empty root means this wiki handles the entire domain
+			pathMatches = true
+		} else {
+			// non-empty root must match as prefix
+			pathMatches = (requestPath == wikiRoot || strings.HasPrefix(requestPath, wikiRoot+"/"))
+		}
+
+		if !pathMatches {
 			continue
 		}
 
@@ -46,16 +57,33 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	// a wiki matches this
 	if delayedWiki != nil {
 
-		// show the main page for the delayed wiki
+		// check if this is the wiki root (main page)
 		wikiRoot := delayedWiki.Opt.Root.Wiki
-		if r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/" {
+		var isWikiRoot bool
+		if wikiRoot == "" {
+			// empty root: main page is at "/"
+			isWikiRoot = (r.URL.Path == "/")
+		} else {
+			// non-empty root: main page is at the root path
+			isWikiRoot = (r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/")
+		}
+
+		if isWikiRoot {
 			handleWiki(delayedWiki, "", w, r)
 			return
 		}
 
 		// if the page root is blank, this may be a page
 		if delayedWiki.Opt.Root.Page == "" {
-			relPath := strings.TrimLeft(strings.TrimPrefix(r.URL.Path, wikiRoot), "/")
+			// calculate relative path from wiki root
+			var relPath string
+			if wikiRoot == "" {
+				// empty root: trim leading slash
+				relPath = strings.TrimLeft(r.URL.Path, "/")
+			} else {
+				// non-empty root: trim the wiki root prefix
+				relPath = strings.TrimLeft(strings.TrimPrefix(r.URL.Path, wikiRoot), "/")
+			}
 			handlePage(delayedWiki, relPath, w, r)
 			return
 		}
