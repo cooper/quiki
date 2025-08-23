@@ -1101,11 +1101,16 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	m.debug("debug: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName)
 	imageCat := m.wiki.GetSpecialCategory(baseImageName, wiki.CategoryTypeImage)
 
-	// no category means no references exist, so nothing to pregenerate
+	// no category means no references exist, but we should still check if this is a valid request
 	if imageCat == nil || !imageCat.Exists() {
-		m.debug("no references found for image: %s", imageName)
+		m.debug("no references found for image: %s, checking if full-size or valid", imageName)
 		m.debug("debug: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists())
-		return nil // no error, just nothing to generate
+		
+		// let DisplaySizedImageGenerateInternal handle the security check
+		// it will allow full-size images and reject arbitrary sizes
+		finalResult := m.wiki.DisplaySizedImageGenerateInternal(sizedImg, false, false) // generateOK=false to enforce security
+		m.debug("pregenerateImage completed for: %s", imageName)
+		return finalResult
 	}
 
 	// collect all unique dimensions that are actually used

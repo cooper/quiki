@@ -163,15 +163,27 @@ func InitWikis() error {
 		if requestTimeout, ok, _ := Conf.GetDuration("server.pregen.timeout"); ok {
 			opts.RequestTimeout = requestTimeout
 		}
-		if forceGen, err := Conf.GetBool("server.pregen.force"); err == nil {
-			opts.ForceGen = forceGen
-		}
-		if logVerbose, err := Conf.GetBool("server.pregen.verbose"); err == nil {
-			opts.LogVerbose = logVerbose
-		}
-		if enableImages, err := Conf.GetBool("server.pregen.images"); err == nil {
-			opts.EnableImages = enableImages
-		}
+		// for boolean options, check if the key exists; if not, use default (true)
+		// only explicit -@server.pregen.force; should disable it
+		if val, err := Conf.Get("server.pregen.force"); err == nil {
+			if forceGen, ok := val.(bool); ok {
+				opts.ForceGen = forceGen
+			}
+		} // if key doesn't exist, keep default (true)
+		// for boolean options, check if the key exists; if not, use default (true)
+		// only explicit -@server.pregen.verbose; should disable it
+		if val, err := Conf.Get("server.pregen.verbose"); err == nil {
+			if logVerbose, ok := val.(bool); ok {
+				opts.LogVerbose = logVerbose
+			}
+		} // if key doesn't exist, keep default (true)
+		// for boolean options, check if the key exists; if not, use default (true)
+		// only explicit -@server.pregen.images; should disable it
+		if val, err := Conf.Get("server.pregen.images"); err == nil {
+			if enableImages, ok := val.(bool); ok {
+				opts.EnableImages = enableImages
+			}
+		} // if key doesn't exist, keep default (true)
 		if cleanupInterval, ok, _ := Conf.GetDuration("server.pregen.cleanup"); ok {
 			opts.CleanupInterval = cleanupInterval
 		}
