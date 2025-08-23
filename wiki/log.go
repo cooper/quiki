@@ -4,6 +4,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
+	"time"
 )
 
 // Log logs info for a wiki.
@@ -46,4 +48,22 @@ func (w *Wiki) logger() *log.Logger {
 	}
 	w._logger = log.New(f, "", log.LstdFlags)
 	return w._logger
+}
+
+// track occasional warning logging to avoid spam
+var (
+	occasionalWarningLastLogged = make(map[string]time.Time)
+	occasionalWarningMu         sync.Mutex
+)
+
+// warnOccasionally logs a warning message at most once per 5 minutes to avoid spam
+func (w *Wiki) warnOccasionally(message string) {
+	occasionalWarningMu.Lock()
+	defer occasionalWarningMu.Unlock()
+	
+	now := time.Now()
+	if lastLogged, exists := occasionalWarningLastLogged[message]; !exists || now.Sub(lastLogged) >= 5*time.Minute {
+		log.Println(message)
+		occasionalWarningLastLogged[message] = now
+	}
 }

@@ -106,7 +106,6 @@ func (c *AutoImageProcessor) ResizeImageDirect(inputPath, outputPath string, wid
 			c.mu.Lock()
 			c.stats.VipsSuccess++
 			c.mu.Unlock()
-			log.Printf("image processor: vips successfully resized %s", inputPath)
 			return nil
 		}
 
@@ -123,7 +122,6 @@ func (c *AutoImageProcessor) ResizeImageDirect(inputPath, outputPath string, wid
 			c.mu.Lock()
 			c.stats.ImageMagickSuccess++
 			c.mu.Unlock()
-			log.Printf("image processor: imagemagick successfully resized %s", inputPath)
 			return nil
 		}
 
@@ -189,7 +187,7 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 
 	switch processor {
 	case "go":
-		w.Log("image processor: using pure go implementation; consider installing libvips or imagemagick for better performance")
+		w.warnOccasionally("image processor: using pure go implementation; consider installing libvips or imagemagick for better performance")
 		return NewImageProcessor(opts)
 
 	case "vips":
@@ -202,11 +200,11 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 			}
 
 			if processor, err := NewVipsProcessor(vipsOpts); err == nil {
-				w.Log("image processor: using libvips for highest performance")
+				w.warnOccasionally("image processor: using libvips for highest performance")
 				return processor
 			} else {
-				w.Log(fmt.Sprintf("image processor: libvips failed: %v, falling back to pure go", err))
-				w.Log("image processor: ensure libvips is properly installed: 'brew install vips' or 'apt-get install libvips-tools'")
+				w.warnOccasionally(fmt.Sprintf("image processor: libvips failed: %v, falling back to pure go", err))
+				w.warnOccasionally("image processor: ensure libvips is properly installed: 'brew install vips' or 'apt-get install libvips-tools'")
 				return NewImageProcessor(opts)
 			}
 		}
@@ -223,11 +221,11 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 			}
 
 			if processor, err := NewImageMagickProcessor(magickOpts); err == nil {
-				w.Log("image processor: using imagemagick for high performance")
+				w.warnOccasionally("image processor: using imagemagick for high performance")
 				return processor
 			} else {
-				w.Log(fmt.Sprintf("image processor: imagemagick failed: %v, falling back to pure go", err))
-				w.Log("image processor: ensure imagemagick is properly installed: 'brew install imagemagick' or 'apt-get install imagemagick'")
+				w.warnOccasionally(fmt.Sprintf("image processor: imagemagick failed: %v, falling back to pure go", err))
+				w.warnOccasionally("image processor: ensure imagemagick is properly installed: 'brew install imagemagick' or 'apt-get install imagemagick'")
 				return NewImageProcessor(opts)
 			}
 		}
@@ -237,7 +235,7 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 	case "auto":
 		fallthrough
 	default:
-		w.Log("image processor: using auto selection (libvips -> imagemagick -> pure go)")
+		w.warnOccasionally("image processor: using auto selection (libvips -> imagemagick -> pure go)")
 		return NewAutoImageProcessor(opts)
 	}
 }
