@@ -45,51 +45,36 @@ func Configure() {
 		*ptr = str
 	}
 
-	// simple rule: if root is empty, it means domain root ("/")
-	// if root is non-empty, it must start with "/"
-	if root != "" && !strings.HasPrefix(root, "/") {
+	if !strings.HasPrefix(root, "/") {
 		root = "/" + root
 	}
-	if root != "" && !strings.HasSuffix(root, "/") {
+	if !strings.HasSuffix(root, "/") {
 		root += "/"
-	}
-
-	// for session cookie path: use "/" if root is empty, otherwise use root
-	cookiePath := root
-	if cookiePath == "" {
-		cookiePath = "/"
 	}
 
 	// configure session manager
 	sessMgr = webserver.SessMgr
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
-	sessMgr.Cookie.Path = cookiePath
+	sessMgr.Cookie.Path = root
 
-	// setup static files
-	staticRoot := root
-	if staticRoot == "" {
-		staticRoot = "/"
-	}
-
-	staticPattern := staticRoot + "static/"
-	qstaticPattern := staticRoot + "qstatic/"
-
-	if err := setupStatic(resources.Adminifier, host+staticPattern, staticPattern); err != nil {
+	// setup adminifier static files server
+	if err := setupStatic(resources.Adminifier, root+"static/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier static"))
 	}
 
-	if err := setupStatic(resources.Webserver, host+qstaticPattern, qstaticPattern); err != nil {
+	// setup webserver static files server
+	if err := setupStatic(resources.Webserver, root+"qstatic/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier qstatic"))
-	} // create template
+	}
+
+	// create template
 	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
 
-	// register main handler - simple approach
-	pattern := host + root
-	if root == "" {
-		pattern = host + "/"
-	}
-	mux.RegisterFunc(pattern, "adminifier root", handleRoot)
-	log.Println("registered adminifier root: " + pattern) // admin handlers
+	// main handler
+	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
+	log.Println("registered adminifier root: " + host + root)
+
+	// admin handlers
 	setupAdminHandlers()
 
 	// handlers for each site at shortcode/
@@ -101,12 +86,12 @@ func Configure() {
 		log.Printf("your setup token: %s", tok)
 	}
 }
-func setupStatic(efs fs.FS, pattern, stripPrefix string) error {
+func setupStatic(efs fs.FS, staticRoot string) error {
 	subFS, err := fs.Sub(efs, "static")
 	if err != nil {
 		return errors.Wrap(err, "creating static sub filesystem")
 	}
 	fileServer := http.FileServer(http.FS(subFS))
-	mux.Register(pattern, "adminifier static files", http.StripPrefix(stripPrefix, fileServer))
+	mux.Register(host+staticRoot, "adminifier static files", http.StripPrefix(staticRoot, fileServer))
 	return nil
 }
