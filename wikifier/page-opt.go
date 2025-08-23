@@ -79,10 +79,14 @@ type PageOptRoot struct {
 
 // PageOptImage describes wiki imaging options.
 type PageOptImage struct {
-	Retina     []int
-	SizeMethod string
-	Calc       func(file string, width, height int, page *Page) (w, h int, fullSize bool)
-	Sizer      func(file string, width, height int, page *Page) (path string)
+	Retina         []int
+	SizeMethod     string
+	MaxConcurrent  int   // max concurrent image operations (0 = auto)
+	MaxMemoryMB    int64 // max memory per image in MB (0 = default 512MB)
+	TimeoutSeconds int   // max processing time per image (0 = default 30s)
+	ArbitrarySizes bool  // allow arbitrary image sizes not referenced in wiki content (default false)
+	Calc           func(file string, width, height int, page *Page) (w, h int, fullSize bool)
+	Sizer          func(file string, width, height int, page *Page) (path string)
 }
 
 // PageOptCategory describes wiki category options.
@@ -172,10 +176,11 @@ var defaultPageOpt = PageOpt{
 		Ext:      "", // (i.e., not configured)
 	},
 	Image: PageOptImage{
-		Retina:     []int{2, 3},
-		SizeMethod: "javascript",
-		Calc:       nil,
-		Sizer:      nil,
+		Retina:         []int{2, 3},
+		SizeMethod:     "javascript",
+		ArbitrarySizes: false, // disabled by default for security
+		Calc:           nil,
+		Sizer:          nil,
 	},
 	Category: PageOptCategory{
 		PerPage: 5,
@@ -258,10 +263,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy bool options
 	pageOptBool := map[string]*bool{
-		"main_redirect":     &opt.MainRedirect,     // redirect root to main page
-		"page.enable.title": &opt.Page.EnableTitle, // enable page title headings
-		"page.enable.cache": &opt.Page.EnableCache, // enable page caching
-		"search.enable":     &opt.Search.Enable,    // enable search optimization
+		"main_redirect":         &opt.MainRedirect,         // redirect root to main page
+		"page.enable.title":     &opt.Page.EnableTitle,     // enable page title headings
+		"page.enable.cache":     &opt.Page.EnableCache,     // enable page caching
+		"search.enable":         &opt.Search.Enable,        // enable search optimization
+		"image.arbitrary_sizes": &opt.Image.ArbitrarySizes, // allow arbitrary image sizes
 	}
 	for name, ptr := range pageOptBool {
 		val, err := page.Get(name)

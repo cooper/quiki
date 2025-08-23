@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"fmt"
-	"image"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
 	"math"
@@ -335,15 +334,37 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 	// so if we made it all the way down to here, we need to
 	// generate the image in specific dimensions
 
-	// we're not allowed to do this if this is a legit (non-pregeneration)
-	// request. because like, we would've served a cached image if it were
-	// actually used somewhere on the wiki
+	// use image-specific locking to prevent duplicate generation
+	imageLock := w.GetImageLock(trueName)
+	imageLock.Lock()
+	defer imageLock.Unlock()
 
-	// FIXME: disabled for now
-	// if !generateOK {
-	// 	dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
-	// 	return DisplayError{Error: "Image does not exist at " + dimensions + "."}
-	// }
+	// check cache again after acquiring lock (another process might have generated it)
+	cacheFi, err = os.Lstat(cachePath)
+	if err == nil && cacheFi.ModTime().After(fi.ModTime()) {
+		w.Debugf("display image: %s: using cached version (generated while waiting for lock)", logName)
+		mod := cacheFi.ModTime()
+		r.Path = cachePath
+		r.File = filepath.Base(cachePath)
+		r.FromCache = true
+		r.Modified = &mod
+		r.ModifiedHTTP = httpdate.Time2Str(mod)
+		r.Length = cacheFi.Size()
+		w.symlinkScaledImage(img, trueName)
+		return r
+	}
+
+	// after acquiring lock and checking cache, verify this is an allowed size
+	// for non-pregeneration requests when arbitrary sizes are disabled
+	if !generateOK && !w.Opt.Image.ArbitrarySizes {
+		if !w.isImageSizeReferenced(img) {
+			dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
+			return DisplayError{
+				Error:         "Image size not allowed.",
+				DetailedError: "Image '" + img.TrueName() + "' at " + dimensions + " is not referenced in wiki content.",
+			}
+		}
+	}
 
 	// generate the image
 	// note: bigW and bigH might still be empty
@@ -497,12 +518,15 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) any {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
-	// open the full-size image
-	bigImage, err := imaging.Open(bigPath)
+	// use wiki-specific image processor to prevent crashes
+	processor := GetImageProcessorForWiki(w)
+
+	// open the full-size image safely
+	bigImage, err := processor.safeImageOpen(bigPath)
 	if err != nil {
 		return DisplayError{
-			Error:         "Image does not exist.",
-			DetailedError: "Decode image '" + bigPath + "' error: " + err.Error(),
+			Error:         "Failed to process image.",
+			DetailedError: "Process image '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
@@ -527,8 +551,14 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 	w.Debug("generate image:", img.TrueName())
 
-	// create resized image
-	newImage := imaging.Resize(bigImage, width, height, imaging.Lanczos)
+	// create resized image safely
+	newImage, err := processor.safeImageResize(bigImage, width, height)
+	if err != nil {
+		return DisplayError{
+			Error:         "Failed to resize image.",
+			DetailedError: "Resize image '" + bigPath + "' error: " + err.Error(),
+		}
+	}
 
 	// generate the image in the source format and write
 	newImagePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.TrueName())
@@ -581,15 +611,48 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 }
 
 func getImageDimensions(path string) (w, h int) {
-	file, err := os.Open(path)
+	// use safe processor for dimension checking
+	processor := GetImageProcessor()
+	width, height, err := processor.GetImageDimensionsSafe(path)
 	if err != nil {
-		return
+		return 0, 0
 	}
-	defer file.Close()
-	c, _, _ := image.DecodeConfig(file)
-	w = c.Width
-	h = c.Height
-	return
+	return width, height
+}
+
+// isImageSizeReferenced checks if the given image size is referenced in wiki content.
+// This prevents arbitrary image size generation by checking the image category tracking.
+func (w *Wiki) isImageSizeReferenced(img SizedImage) bool {
+	// Full-size images (0x0) are always allowed
+	if img.Width == 0 && img.Height == 0 {
+		return true
+	}
+
+	// Get the image category that tracks all references to this image
+	imageCat := w.GetSpecialCategory(img.FullSizeName(), CategoryTypeImage)
+
+	// No category means no references exist
+	if imageCat == nil || !imageCat.Exists() {
+		return false
+	}
+
+	// Check if any page references this specific size
+	targetW, targetH := img.TrueWidth(), img.TrueHeight()
+
+	// Look through all pages that reference this image
+	for _, pageEntry := range imageCat.Pages {
+		// pageEntry.Dimensions contains the dimensions as [][]int
+		for _, dimensionPair := range pageEntry.Dimensions {
+			if len(dimensionPair) >= 2 {
+				refW, refH := dimensionPair[0], dimensionPair[1]
+				if refW == targetW && refH == targetH {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 // determine missing dimensions

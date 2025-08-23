@@ -33,10 +33,14 @@ var defaultWikiOpt = wikifier.PageOpt{
 		Ext:      "", // (i.e., not configured)
 	},
 	Image: wikifier.PageOptImage{
-		Retina:     []int{2, 3},
-		SizeMethod: "server",
-		Calc:       defaultImageCalc,
-		Sizer:      defaultImageSizer,
+		Retina:         []int{2, 3},
+		SizeMethod:     "server",
+		MaxConcurrent:  2,
+		MaxMemoryMB:    256,
+		TimeoutSeconds: 20,
+		ArbitrarySizes: false, // disabled by default for security
+		Calc:           defaultImageCalc,
+		Sizer:          defaultImageSizer,
 	},
 	Category: wikifier.PageOptCategory{
 		PerPage: 5,

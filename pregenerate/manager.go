@@ -9,7 +9,7 @@ import (
 	"github.com/cooper/quiki/wiki"
 )
 
-// Manager handles intelligent, background pregeneration of pages
+// Manager handles intelligent, background pregeneration of pages and images
 type Manager struct {
 	wiki         *wiki.Wiki
 	ctx          context.Context
@@ -17,6 +17,7 @@ type Manager struct {
 	wg           sync.WaitGroup
 	priorityCh   chan string // high priority pages - recently accessed
 	backgroundCh chan string // low priority - background pregeneration
+	imageCh      chan string // image pregeneration queue
 	stats        Stats
 	mu           sync.RWMutex
 	options      Options
@@ -28,8 +29,10 @@ type Options struct {
 	ProgressInterval    int           // show progress every N pages
 	PriorityQueueSize   int           // size of priority queue
 	BackgroundQueueSize int           // size of background queue
+	ImageQueueSize      int           // size of image queue
 	ForceGen            bool          // whether to force regeneration bypassing cache
 	LogVerbose          bool          // enable verbose logging
+	EnableImages        bool          // whether to pregenerate common image sizes
 }
 
 // DefaultOptions returns sensible defaults
@@ -39,6 +42,8 @@ func DefaultOptions() Options {
 		ProgressInterval:    10,
 		PriorityQueueSize:   50,
 		BackgroundQueueSize: 200,
+		ImageQueueSize:      100,
+		EnableImages:        true, // pregenerate common image sizes
 	}
 }
 
@@ -88,6 +93,7 @@ func NewWithOptions(w *wiki.Wiki, opts Options) *Manager {
 		cancel:       cancel,
 		priorityCh:   make(chan string, opts.PriorityQueueSize),
 		backgroundCh: make(chan string, opts.BackgroundQueueSize),
+		imageCh:      make(chan string, opts.ImageQueueSize),
 		options:      opts,
 	}
 
@@ -95,6 +101,11 @@ func NewWithOptions(w *wiki.Wiki, opts Options) *Manager {
 	m.wg.Add(2)
 	go m.priorityWorker()
 	go m.backgroundWorker()
+
+	if opts.EnableImages {
+		m.wg.Add(1)
+		go m.imageWorker()
+	}
 
 	return m
 }
@@ -105,6 +116,9 @@ func (m *Manager) Stop() {
 	m.wg.Wait()
 	close(m.priorityCh)
 	close(m.backgroundCh)
+	if m.imageCh != nil {
+		close(m.imageCh)
+	}
 }
 
 // RequestPregeneration requests pregeneration of a specific page (with high priority)
@@ -115,6 +129,23 @@ func (m *Manager) RequestPregeneration(pageName string) {
 	default:
 		// priority queue is full, skip
 		m.wiki.Log("priority queue full, skipping: " + pageName)
+	}
+}
+
+// RequestImagePregeneration requests pregeneration of a specific image
+func (m *Manager) RequestImagePregeneration(imageName string) {
+	if !m.options.EnableImages || m.imageCh == nil {
+		return
+	}
+
+	select {
+	case m.imageCh <- imageName:
+		// queued
+	default:
+		// image queue is full, skip
+		if m.options.LogVerbose {
+			m.wiki.Log("image queue full, skipping: " + imageName)
+		}
 	}
 }
 
@@ -257,4 +288,74 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) {
 		m.wiki.Log(fmt.Sprintf("failed to pregenerate %s: %v", pageName, result))
 	}
 	m.mu.Unlock()
+}
+
+// imageWorker handles background image pregeneration
+func (m *Manager) imageWorker() {
+	defer m.wg.Done()
+
+	ticker := time.NewTicker(m.options.RateLimit * 2) // slower rate for images
+	defer ticker.Stop()
+
+	for {
+		select {
+		case imageName := <-m.imageCh:
+			m.pregenerateImage(imageName)
+			<-ticker.C // rate limit
+		case <-m.ctx.Done():
+			return
+		}
+	}
+}
+
+// pregenerateImage generates an image in all sizes that are actually used in the wiki
+func (m *Manager) pregenerateImage(imageName string) {
+	if m.options.LogVerbose {
+		m.wiki.Log(fmt.Sprintf("pregenerating image: %s", imageName))
+	}
+
+	// Get the image category that tracks all references to this image
+	imageCat := m.wiki.GetSpecialCategory(imageName, wiki.CategoryTypeImage)
+
+	// No category means no references exist, so nothing to pregenerate
+	if imageCat == nil || !imageCat.Exists() {
+		if m.options.LogVerbose {
+			m.wiki.Log(fmt.Sprintf("no references found for image: %s", imageName))
+		}
+		return
+	}
+
+	// Collect all unique dimensions that are actually used
+	usedSizes := make(map[[2]int]bool)
+
+	// Look through all pages that reference this image
+	for _, pageEntry := range imageCat.Pages {
+		// pageEntry.Dimensions contains the dimensions as [][]int
+		for _, dimensionPair := range pageEntry.Dimensions {
+			if len(dimensionPair) >= 2 {
+				width, height := dimensionPair[0], dimensionPair[1]
+				usedSizes[[2]int{width, height}] = true
+			}
+		}
+	}
+
+	if m.options.LogVerbose {
+		m.wiki.Log(fmt.Sprintf("found %d unique sizes for image: %s", len(usedSizes), imageName))
+	}
+
+	// Generate images for each actually-used size
+	for size := range usedSizes {
+		img := wiki.SizedImageFromName(imageName)
+		img.Width = size[0]
+		img.Height = size[1]
+
+		// generate the image
+		result := m.wiki.DisplaySizedImageGenerate(img, true)
+
+		// check if generation was successful
+		if _, isError := result.(wiki.DisplayError); isError && m.options.LogVerbose {
+			m.wiki.Log(fmt.Sprintf("failed to pregenerate %s at %dx%d: %v",
+				imageName, size[0], size[1], result))
+		}
+	}
 }

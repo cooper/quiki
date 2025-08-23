@@ -19,6 +19,8 @@ type Wiki struct {
 	Auth          *authenticator.Authenticator
 	pageLocks     map[string]*sync.Mutex
 	pageLocksmu   sync.RWMutex
+	imageLocks    map[string]*sync.Mutex // locks for image generation
+	imageLocksmu  sync.RWMutex
 	pregenerating bool
 	_repo         *git.Repository
 	_logger       *log.Logger
@@ -36,6 +38,7 @@ func NewWiki(path string) (*Wiki, error) {
 		ConfigFile: confPath,
 		Opt:        defaultWikiOpt,
 		pageLocks:  make(map[string]*sync.Mutex),
+		imageLocks: make(map[string]*sync.Mutex),
 	}
 
 	w.Opt.Dir.Wiki = path
@@ -73,4 +76,15 @@ func (w *Wiki) GetPageLock(pageName string) *sync.Mutex {
 		w.pageLocks[pageName] = new(sync.Mutex)
 	}
 	return w.pageLocks[pageName]
+}
+
+// GetImageLock returns the mutex for a specific image, creating it if necessary.
+func (w *Wiki) GetImageLock(imageName string) *sync.Mutex {
+	w.imageLocksmu.Lock()
+	defer w.imageLocksmu.Unlock()
+
+	if _, exists := w.imageLocks[imageName]; !exists {
+		w.imageLocks[imageName] = new(sync.Mutex)
+	}
+	return w.imageLocks[imageName]
 }

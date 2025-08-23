@@ -180,6 +180,33 @@ using quiki's wikifier engine API directly.
 
 __Default__: (webserver) built-in function
 
+### image.max_concurrent
+
+_Optional_. Maximum number of concurrent image processing operations.
+
+Limits how many images can be processed simultaneously to prevent system
+overload. Set to 0 for automatic detection based on CPU cores.
+
+__Default__: 2
+
+### image.max_memory_mb
+
+_Optional_. Maximum memory usage per image in megabytes.
+
+Prevents crashes from loading extremely large images by checking dimensions
+before processing. An image requiring more memory will be rejected.
+
+__Default__: 256
+
+### image.timeout_seconds
+
+_Optional_. Maximum processing time per image operation in seconds.
+
+Prevents hanging on slow image operations. Processing will be aborted if
+it takes longer than this limit.
+
+__Default__: 20
+
 ### image.sizer
 
 _Optional_. A function reference that returns the URL to a sized version of an image. After
@@ -225,6 +252,17 @@ For instance, to support both @2x and @3x scaling:
     @image.retina: 2, 3;
 
 __Default__: *2, 3*
+
+### image.arbitrary_sizes
+
+_Optional_. When enabled, users can request any image size, even those not referenced 
+in the wiki content. When disabled (default), users can only access image sizes that 
+are explicitly referenced somewhere in the wiki content.
+
+    @image.arbitrary_sizes;     /* enabled (not recommended for public wikis) */
+    -@image.arbitrary_sizes;    /* disabled (recommended) */
+
+__Default__: Disabled
 
 ### page.enable.cache
 

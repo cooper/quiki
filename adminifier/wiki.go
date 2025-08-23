@@ -2,6 +2,7 @@ package adminifier
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"maps"
@@ -10,6 +11,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/webserver"
@@ -321,12 +323,29 @@ func handlePagesFrame(wr *wikiRequest) {
 func handleImagesFrame(wr *wikiRequest) {
 	descending, sortFunc := getSortFunc(wr, wiki.SortTitle, false)
 	dir := strings.TrimPrefix(strings.TrimPrefix(wr.r.URL.Path, wr.wikiRoot+"frame/images"), "/")
-	images, dirs := wr.wi.ImagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
-	handleFileFrames(wr, "images", struct {
-		Images []wiki.ImageInfo `json:"images"`
-		Dirs   []string         `json:"dirs"`
-		Cd     string           `json:"cd"`
-	}{images, dirs, dir}, "d")
+
+	// get images asynchronously to prevent blocking on large image operations
+	imagesCh := make(chan []wiki.ImageInfo, 1)
+	dirsCh := make(chan []string, 1)
+
+	go func() {
+		images, dirs := wr.wi.ImagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
+		imagesCh <- images
+		dirsCh <- dirs
+	}()
+
+	// wait for results with timeout
+	select {
+	case images := <-imagesCh:
+		dirs := <-dirsCh
+		handleFileFrames(wr, "images", struct {
+			Images []wiki.ImageInfo `json:"images"`
+			Dirs   []string         `json:"dirs"`
+			Cd     string           `json:"cd"`
+		}{images, dirs, dir}, "d")
+	case <-time.After(30 * time.Second):
+		wr.err = fmt.Errorf("timeout loading images in directory: %s", dir)
+	}
 }
 
 func handleModelsFrame(wr *wikiRequest) {
