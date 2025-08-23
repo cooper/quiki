@@ -1038,6 +1038,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	if m.options.LogVerbose {
 		m.wiki.Log(fmt.Sprintf("pregenerating image: %s", imageName))
 	}
+	m.wiki.Log(fmt.Sprintf("DEBUG: pregenerateImage called with imageName='%s'", imageName))
 
 	// use image-specific locking to coordinate with on-demand generation
 	imageLock := m.wiki.GetImageLock(imageName)
@@ -1052,6 +1053,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		if m.options.LogVerbose {
 			m.wiki.Log(fmt.Sprintf("no references found for image: %s", imageName))
 		}
+		m.wiki.Log(fmt.Sprintf("DEBUG: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists()))
 		return nil // no error, just nothing to generate
 	}
 

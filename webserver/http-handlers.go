@@ -15,7 +15,6 @@ import (
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	log.Printf("handleRoot: %s %s", r.Method, r.URL.Path)
 	var delayedWiki *WikiInfo
 
 	// try each wiki
@@ -101,9 +100,7 @@ func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 
 // image request
 func handleImage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	log.Printf("handleImage: relPath=%s", relPath)
 	result := wi.pregenerateManager.GenerateImageSync(relPath, true)
-	log.Printf("handleImage: result type=%T, value=%+v", result, result)
 	handleResponse(wi, result, w, r)
 }
 
@@ -125,7 +122,6 @@ func handleCategoryPosts(wi *WikiInfo, relPath string, w http.ResponseWriter, r 
 }
 
 func handleResponse(wi *WikiInfo, res any, w http.ResponseWriter, r *http.Request) {
-	log.Printf("DEBUG: handleResponse called with type=%T, value=%+v", res, res)
 	switch res := res.(type) {
 
 	// page content
@@ -167,7 +163,6 @@ func handleResponse(wi *WikiInfo, res any, w http.ResponseWriter, r *http.Reques
 
 	// anything else
 	default:
-		log.Printf("DEBUG: handleResponse falling through to 404 - unhandled type=%T, value=%+v", res, res)
 		http.NotFound(w, r)
 	}
 }
