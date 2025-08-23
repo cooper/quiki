@@ -256,13 +256,9 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 		p.mu.Unlock()
 	}()
 
-	// acquire semaphore to limit concurrent processing
-	select {
-	case p.semaphore <- struct{}{}:
-		defer func() { <-p.semaphore }()
-	default:
-		return fmt.Errorf("too many concurrent image operations")
-	}
+	// acquire semaphore to limit concurrent processing (blocking)
+	p.semaphore <- struct{}{}
+	defer func() { <-p.semaphore }()
 
 	return fn()
 }

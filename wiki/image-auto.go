@@ -106,6 +106,7 @@ func (c *AutoImageProcessor) ResizeImageDirect(inputPath, outputPath string, wid
 			c.mu.Lock()
 			c.stats.VipsSuccess++
 			c.mu.Unlock()
+			log.Printf("image processor: vips successfully resized %s", inputPath)
 			return nil
 		}
 
@@ -122,6 +123,7 @@ func (c *AutoImageProcessor) ResizeImageDirect(inputPath, outputPath string, wid
 			c.mu.Lock()
 			c.stats.ImageMagickSuccess++
 			c.mu.Unlock()
+			log.Printf("image processor: imagemagick successfully resized %s", inputPath)
 			return nil
 		}
 
