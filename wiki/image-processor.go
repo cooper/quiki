@@ -13,6 +13,22 @@ import (
 	"github.com/cooper/imaging"
 )
 
+// ImageProcessorInterface defines the common interface for all image processors
+type ImageProcessorInterface interface {
+	// direct file-to-file processing (avoids loading into memory)
+	ResizeImageDirect(inputPath, outputPath string, width, height, quality int) error
+}
+
+// ProcessorStats tracks which processor is being used
+type ProcessorStats struct {
+	VipsSuccess        int
+	VipsFailed         int
+	ImageMagickSuccess int
+	ImageMagickFailed  int
+	PureGoUsed         int
+	TotalProcessed     int
+}
+
 // ImageProcessor handles safe, concurrent image processing with resource limits
 type ImageProcessor struct {
 	semaphore   chan struct{} // limits concurrent processing
@@ -51,8 +67,8 @@ func GetImageProcessor() *ImageProcessor {
 	return globalImageProcessor
 }
 
-// GetImageProcessorForWiki returns an image processor configured for a specific wiki
-func GetImageProcessorForWiki(w *Wiki) *ImageProcessor {
+// GetPureGoImageProcessorForWiki returns an image processor configured for a specific wiki
+func GetPureGoImageProcessorForWiki(w *Wiki) *ImageProcessor {
 	opts := DefaultImageProcessorOptions()
 
 	// override with wiki-specific settings
@@ -186,11 +202,11 @@ func (p *ImageProcessor) safeImageResize(img image.Image, width, height int) (im
 	}
 }
 
-// GetImageDimensionsSafe safely gets image dimensions without loading the full image
-func (p *ImageProcessor) GetImageDimensionsSafe(path string) (width, height int, err error) {
+// GetImageDimensionsFromFile efficiently reads image dimensions from file header without loading the full image
+func GetImageDimensionsFromFile(path string) (width, height int, err error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("failed to open image file: %v", err)
 	}
 	defer file.Close()
 
@@ -200,6 +216,55 @@ func (p *ImageProcessor) GetImageDimensionsSafe(path string) (width, height int,
 	}
 
 	return config.Width, config.Height, nil
+}
+
+// GetImageDimensionsSafe safely gets image dimensions without loading the full image
+func (p *ImageProcessor) GetImageDimensionsSafe(path string) (width, height int, err error) {
+	return GetImageDimensionsFromFile(path)
+}
+
+// ResizeImageDirect implements ImageProcessorInterface - file-to-file resize using pure go
+func (p *ImageProcessor) ResizeImageDirect(inputPath, outputPath string, width, height, quality int) error {
+	// for pure go processor, we have to load into memory
+	img, err := p.safeImageOpen(inputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open image: %v", err)
+	}
+
+	resized, err := p.safeImageResize(img, width, height)
+	if err != nil {
+		return fmt.Errorf("failed to resize image: %v", err)
+	}
+
+	return imaging.Save(resized, outputPath)
+}
+
+// withConcurrencyControl executes a function with proper concurrency control
+func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() error) error {
+	// check if already processing this image
+	p.mu.Lock()
+	if p.processing[inputPath] {
+		p.mu.Unlock()
+		return fmt.Errorf("image already being processed: %s", inputPath)
+	}
+	p.processing[inputPath] = true
+	p.mu.Unlock()
+
+	defer func() {
+		p.mu.Lock()
+		delete(p.processing, inputPath)
+		p.mu.Unlock()
+	}()
+
+	// acquire semaphore to limit concurrent processing
+	select {
+	case p.semaphore <- struct{}{}:
+		defer func() { <-p.semaphore }()
+	default:
+		return fmt.Errorf("too many concurrent image operations")
+	}
+
+	return fn()
 }
 
 // min returns the minimum of two integers

@@ -35,11 +35,12 @@ var defaultWikiOpt = wikifier.PageOpt{
 	Image: wikifier.PageOptImage{
 		Retina:         []int{2, 3},
 		SizeMethod:     "server",
-		MaxConcurrent:  2,
+		Processor:      "auto",
 		MaxMemoryMB:    256,
 		TimeoutSeconds: 20,
 		ArbitrarySizes: false, // disabled by default for security
 		PregenThumbs:   "250", // default for adminifier thumbnails
+		Quality:        85,
 		Calc:           defaultImageCalc,
 		Sizer:          defaultImageSizer,
 	},

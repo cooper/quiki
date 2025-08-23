@@ -80,7 +80,8 @@ type Options struct {
 	BackgroundWorkers        int           // number of background workers
 	ImagePriorityWorkers     int           // number of priority image workers
 	ImageBackgroundWorkers   int           // number of background image workers
-	RequestTimeout           time.Duration // max time to wait for sync requests
+	RequestTimeout           time.Duration // max time to wait for sync page requests
+	ImageRequestTimeout      time.Duration // max time to wait for sync image requests
 	ForceGen                 bool          // whether to force regeneration bypassing cache
 	LogVerbose               bool          // enable verbose logging
 	EnableImages             bool          // whether to pregenerate common image sizes
@@ -98,14 +99,15 @@ func DefaultOptions() Options {
 		BackgroundQueueSize:      2000, // substantial background capacity
 		ImagePriorityQueueSize:   200,
 		ImageBackgroundQueueSize: 500,
-		PriorityWorkers:          max(2, numCPU/2), // minimum 2, scale with CPU
-		BackgroundWorkers:        max(1, numCPU/4), // background uses fewer resources
-		ImagePriorityWorkers:     max(2, numCPU/2), // images need good parallelism
-		ImageBackgroundWorkers:   max(1, numCPU/4), // background image processing
-		RequestTimeout:           30 * time.Second, // reasonable timeout for users
-		EnableImages:             true,             // pregenerate common image sizes
-		CleanupInterval:          30 * time.Minute, // clean up tracking maps every 30 minutes
-		MaxTrackingEntries:       10000,            // max 10k entries before forced cleanup
+		PriorityWorkers:          max(2, numCPU/2),  // minimum 2, scale with CPU
+		BackgroundWorkers:        max(1, numCPU/4),  // background uses fewer resources
+		ImagePriorityWorkers:     max(2, numCPU/2),  // images need good parallelism
+		ImageBackgroundWorkers:   max(1, numCPU/4),  // background image processing
+		RequestTimeout:           30 * time.Second,  // reasonable timeout for users
+		ImageRequestTimeout:      120 * time.Second, // longer timeout for large image processing
+		EnableImages:             true,              // pregenerate common image sizes
+		CleanupInterval:          30 * time.Minute,  // clean up tracking maps every 30 minutes
+		MaxTrackingEntries:       10000,             // max 10k entries before forced cleanup
 	}
 }
 
@@ -329,7 +331,7 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 		select {
 		case result := <-existingCh:
 			return result
-		case <-time.After(m.options.RequestTimeout):
+		case <-time.After(m.options.ImageRequestTimeout):
 			// timeout - return error
 			return wiki.DisplayError{Error: "Request timeout: image generation took too long"}
 		}
@@ -379,7 +381,7 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 	select {
 	case result := <-resultCh:
 		return result
-	case <-time.After(m.options.RequestTimeout):
+	case <-time.After(m.options.ImageRequestTimeout):
 		// timeout - clean up and return error
 		m.mu.Lock()
 		delete(m.imageResults, imageName)
@@ -953,9 +955,11 @@ func (m *Manager) backgroundImageWorker() {
 	for {
 		select {
 		case imageName := <-m.backgroundImageCh:
+			m.wiki.Log("pregenerate: background image worker received image: " + imageName)
 			// check if already being processed, completed, or promoted
 			m.mu.Lock()
 			if m.processingImages[imageName] || m.completedImages[imageName] || m.promotedImages[imageName] {
+				m.wiki.Log("pregenerate: background image worker skipping image (already processed/processing): " + imageName)
 				m.mu.Unlock()
 				<-ticker.C // rate limit even for skipped items to prevent queue flooding
 				continue
@@ -963,6 +967,7 @@ func (m *Manager) backgroundImageWorker() {
 			m.processingImages[imageName] = true
 			m.mu.Unlock()
 
+			m.wiki.Log("pregenerate: background image worker generating image: " + imageName)
 			result := m.pregenerateImage(imageName)
 
 			// notify any waiting result channels

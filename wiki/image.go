@@ -15,7 +15,6 @@ import (
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
-	"github.com/cooper/imaging"
 	"github.com/cooper/quiki/adminifier/utils"
 	"github.com/cooper/quiki/wikifier"
 )
@@ -527,24 +526,22 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *DisplayImage) any {
 	width, height := img.TrueWidth(), img.TrueHeight()
 
-	// use wiki-specific image processor to prevent crashes
-	processor := GetImageProcessorForWiki(w)
+	// use the auto processor for optimal performance
+	imageProc := GetImageProcessorForWiki(w)
 
-	// open the full-size image safely
-	bigImage, err := processor.safeImageOpen(bigPath)
+	// get dimensions efficiently without loading full image into memory
+	bigWidth, bigHeight, err := GetImageDimensionsFromFile(bigPath)
 	if err != nil {
 		return DisplayError{
-			Error:         "Failed to process image.",
-			DetailedError: "Process image '" + bigPath + "' error: " + err.Error(),
+			Error:         "Failed to get image dimensions.",
+			DetailedError: "Get dimensions for '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
 	// figure out full-size dimensions if we haven't already
-	// (imaging.Open calls Decode so the bounds are available by now)
 	if bigW == 0 || bigH == 0 {
-		b := bigImage.Bounds()
-		bigW = b.Max.X
-		bigH = b.Max.Y
+		bigW = bigWidth
+		bigH = bigHeight
 	}
 
 	// the request is to generate an image the same or larger than the original
@@ -560,22 +557,19 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 
 	w.Debug("generate image:", img.TrueName())
 
-	// create resized image safely
-	newImage, err := processor.safeImageResize(bigImage, width, height)
+	// create resized image directly from file to avoid loading into memory
+	newImagePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.TrueName())
+
+	// resize directly from file to file without loading into memory
+	quality := w.Opt.Image.Quality
+	if quality <= 0 {
+		quality = 85 // default quality
+	}
+	err = imageProc.ResizeImageDirect(bigPath, newImagePath, width, height, quality)
 	if err != nil {
 		return DisplayError{
 			Error:         "Failed to resize image.",
 			DetailedError: "Resize image '" + bigPath + "' error: " + err.Error(),
-		}
-	}
-
-	// generate the image in the source format and write
-	newImagePath := filepath.FromSlash(w.Opt.Dir.Cache + "/image/" + img.TrueName())
-	err = imaging.Save(newImage, newImagePath)
-	if err != nil {
-		return DisplayError{
-			Error:         "Failed to generate image.",
-			DetailedError: "Save image '" + bigPath + "' error: " + err.Error(),
 		}
 	}
 
@@ -626,9 +620,8 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 }
 
 func getImageDimensions(path string) (w, h int) {
-	// use safe processor for dimension checking
-	processor := GetImageProcessor()
-	width, height, err := processor.GetImageDimensionsSafe(path)
+	// use shared utility for dimension checking
+	width, height, err := GetImageDimensionsFromFile(path)
 	if err != nil {
 		return 0, 0
 	}

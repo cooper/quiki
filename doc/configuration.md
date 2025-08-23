@@ -189,6 +189,36 @@ overload. Set to 0 for automatic detection based on CPU cores.
 
 __Default__: 2
 
+### image.processor
+
+_Optional_. The image processing backend to use.
+
+Controls which image processing engine is used for resizing and manipulation. By default, we try processors in order of performance:
+
+**Accepted values**
+* _auto_ - Automatic selection: libvips -> imagemagick -> pure go (recommended)
+* _vips_ - Use libvips only (highest performance, 4-8x faster than ImageMagick)
+* _imagemagick_ - Use ImageMagick only (high performance as compared to Go)
+* _go_ - Use Pure Go only (most portable, worst performance, crashes with large images)
+
+**Installation**
+- _vips_: `brew install vips` or `apt-get install libvips-tools`
+- _imagemagick_: `brew install imagemagick` or `apt-get install imagemagick`
+
+__Example__: `@image.processor: vips;`
+
+__Default__: auto
+
+### image.quality
+
+_Optional_. JPEG quality setting for libvips/ImageMagick processors (1-100).
+
+Only used when `processor` is set to "vips", "imagemagick", or "auto" (when libvips/ImageMagick is available). Higher values mean better quality but larger file sizes to store and transfer.
+
+__Example__: `@image.quality: 85;`
+
+__Default__: 85
+
 ### image.max_memory_mb
 
 _Optional_. Maximum memory usage per image in megabytes.
