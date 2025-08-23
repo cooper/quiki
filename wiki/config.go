@@ -107,9 +107,10 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	// determine missing dimension
 	width, height = calculateImageDimensions(bigW, bigH, width, height)
 
-	// note: removed synchronous image generation here to prevent page timeouts
-	// the pregeneration manager handles all image generation through its queue system
-	// images will be generated on-demand when requested or in background
+	if w, ok := page.Wiki.(*Wiki); ok {
+		imageCat := w.GetSpecialCategory(name, CategoryTypeImage)
+		imageCat.addImage(w, name, nil, [][]int{{width, height}})
+	}
 
 	return width, height, false
 }
