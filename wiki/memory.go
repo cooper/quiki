@@ -1,13 +1,13 @@
 package wiki
 
 import (
+	"fmt"
 	"runtime"
 	"sync"
 	"time"
 )
 
-// MemoryMonitor tracks system memory and adjusts concurrency accordingly
-// this is application-wide protection against memory exhaustion from image processing
+// MemoryMonitor provides application-wide protection against memory exhaustion
 type MemoryMonitor struct {
 	mu                sync.RWMutex
 	lastCheck         time.Time
@@ -17,21 +17,17 @@ type MemoryMonitor struct {
 	activeMu          sync.Mutex
 }
 
-// global memory monitor instance
 var globalMemoryMonitor *MemoryMonitor
 var memoryMonitorOnce sync.Once
 
-// GetMemoryMonitor returns the global memory monitor instance
 func GetMemoryMonitor() *MemoryMonitor {
 	memoryMonitorOnce.Do(func() {
-		// default to reasonable concurrency based on CPU cores
-		maxConcurrency := max(4, runtime.NumCPU())
+		maxConcurrency := max(4, runtime.NumCPU()*2)
 		globalMemoryMonitor = NewMemoryMonitor(maxConcurrency)
 	})
 	return globalMemoryMonitor
 }
 
-// NewMemoryMonitor creates a memory monitor with intelligent concurrency control
 func NewMemoryMonitor(maxConcurrency int) *MemoryMonitor {
 	m := &MemoryMonitor{
 		maxConcurrency: maxConcurrency,
@@ -40,13 +36,10 @@ func NewMemoryMonitor(maxConcurrency int) *MemoryMonitor {
 	return m
 }
 
-// updateMemoryStats gets current system memory stats and calculates safe concurrency
 func (m *MemoryMonitor) updateMemoryStats() {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
 
-	// get total system memory (approximate based on heap limit)
-	// this is conservative - we assume we can use up to 70% of available memory
 	totalMemoryMB := int64(memStats.Sys) / (1024 * 1024)
 	usedMemoryMB := int64(memStats.Alloc) / (1024 * 1024)
 
@@ -57,17 +50,14 @@ func (m *MemoryMonitor) updateMemoryStats() {
 	m.lastCheck = time.Now()
 }
 
-// shouldAllowNewWorker checks if we can safely start another concurrent operation
 func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 	m.activeMu.Lock()
 	defer m.activeMu.Unlock()
 
-	// always allow at least one worker
 	if m.currentActive == 0 {
 		return true
 	}
 
-	// update memory stats if stale (every 3 seconds for more responsive adjustment)
 	if time.Since(m.lastCheck) > 3*time.Second {
 		m.updateMemoryStats()
 	}
@@ -76,43 +66,49 @@ func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 	availableMB := m.availableMemoryMB
 	m.mu.RUnlock()
 
-	// very conservative estimates for image processing memory usage per operation
-	// different processors can use 200-800MB per large image during processing
-	// we use worst-case scenario to prevent crashes
-	estimatedMemoryPerWorkerMB := int64(400) // conservative estimate for safety
+	// external processors (libvips/imagemagick) use minimal process memory
+	estimatedMemoryPerWorkerMB := int64(25)
 
-	// calculate safe concurrency based on available memory
 	safeConcurrency := max(1, int(availableMB/estimatedMemoryPerWorkerMB))
 
-	// never exceed configured maximum
 	if safeConcurrency > m.maxConcurrency {
 		safeConcurrency = m.maxConcurrency
 	}
 
-	// if we're low on memory, be very conservative
-	if availableMB < 1000 { // less than 1GB available
-		safeConcurrency = 1 // only one at a time
-	} else if availableMB < 2000 { // less than 2GB available
-		safeConcurrency = max(1, safeConcurrency/2)
+	originalSafe := safeConcurrency
+	if availableMB < 100 {
+		safeConcurrency = 1
+	} else if availableMB < 200 {
+		safeConcurrency = max(2, safeConcurrency/2)
+	}
+
+	if originalSafe != safeConcurrency {
+		fmt.Printf("memory: adjusted concurrency from %d to %d due to low memory (%dMB)\n",
+			originalSafe, safeConcurrency, availableMB)
 	}
 
 	return m.currentActive < safeConcurrency
 }
 
-// acquireWorker tries to acquire a worker slot, returns false if memory is too low
 func (m *MemoryMonitor) acquireWorker() bool {
 	if !m.shouldAllowNewWorker() {
-		// if memory is low, try forcing garbage collection and check again
 		m.mu.RLock()
 		availableMB := m.availableMemoryMB
 		m.mu.RUnlock()
 
-		if availableMB < 1000 { // less than 1GB available
-			runtime.GC()                      // force garbage collection to free up memory
-			time.Sleep(50 * time.Millisecond) // give GC time to work
-			m.updateMemoryStats()             // refresh stats after GC
+		m.activeMu.Lock()
+		currentActive := m.currentActive
+		m.activeMu.Unlock()
 
-			// try again after GC
+		fmt.Printf("memory: blocking worker - available: %dMB, active: %d, max: %d\n",
+			availableMB, currentActive, m.maxConcurrency)
+
+		if availableMB < 100 {
+			fmt.Printf("memory: forcing GC due to critically low memory (%dMB)\n", availableMB)
+			runtime.GC()
+			time.Sleep(50 * time.Millisecond)
+			m.updateMemoryStats()
+
 			if !m.shouldAllowNewWorker() {
 				return false
 			}
@@ -124,6 +120,8 @@ func (m *MemoryMonitor) acquireWorker() bool {
 	m.activeMu.Lock()
 	m.currentActive++
 	m.activeMu.Unlock()
+
+	fmt.Printf("memory: acquired worker - active: %d/%d\n", m.currentActive, m.maxConcurrency)
 	return true
 }
 
@@ -133,7 +131,10 @@ func (m *MemoryMonitor) releaseWorker() {
 	if m.currentActive > 0 {
 		m.currentActive--
 	}
+	released := m.currentActive
 	m.activeMu.Unlock()
+
+	fmt.Printf("memory: released worker - active: %d/%d\n", released, m.maxConcurrency)
 }
 
 // GetStats returns current memory statistics for monitoring
