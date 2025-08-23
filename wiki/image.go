@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "image/jpeg" // for jpegs
 	_ "image/png"  // for pngs
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -389,11 +390,19 @@ func (w *Wiki) ImagesInDir(where string) []ImageInfo {
 }
 
 func (w *Wiki) imagesIn(prefix string, imageNames []string) []ImageInfo {
-	images := make([]ImageInfo, len(imageNames))
-	i := 0
+	images := make([]ImageInfo, 0, len(imageNames))
 	for _, name := range imageNames {
-		images[i] = w.ImageInfo(filepath.Join(prefix, name))
-		i++
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Error processing image %s: %v", filepath.Join(prefix, name), r)
+				}
+			}()
+			info := w.ImageInfo(filepath.Join(prefix, name))
+			if info.File != "" { // only add if we got valid info
+				images = append(images, info)
+			}
+		}()
 	}
 	return images
 }

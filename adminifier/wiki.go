@@ -327,8 +327,15 @@ func handleImagesFrame(wr *wikiRequest) {
 	// get images asynchronously to prevent blocking on large image operations
 	imagesCh := make(chan []wiki.ImageInfo, 1)
 	dirsCh := make(chan []string, 1)
+	errCh := make(chan error, 1)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				errCh <- fmt.Errorf("panic while loading images: %v", r)
+			}
+		}()
+
 		images, dirs := wr.wi.ImagesAndDirsSorted(dir, descending, sortFunc, wiki.SortTitle)
 		imagesCh <- images
 		dirsCh <- dirs
@@ -343,6 +350,8 @@ func handleImagesFrame(wr *wikiRequest) {
 			Dirs   []string         `json:"dirs"`
 			Cd     string           `json:"cd"`
 		}{images, dirs, dir}, "d")
+	case err := <-errCh:
+		wr.err = err
 	case <-time.After(30 * time.Second):
 		wr.err = fmt.Errorf("timeout loading images in directory: %s", dir)
 	}
