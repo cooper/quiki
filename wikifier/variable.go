@@ -303,74 +303,76 @@ func (scope *variableScope) GetStrList(key string) ([]string, error) {
 
 // GetInt is like Get except it always returns an integer.
 // If the value is a string, it attempts to parse it as an integer.
-// Returns 0 and no error if the key doesn't exist.
-// Returns an error only if the value exists but cannot be parsed.
-func (scope *variableScope) GetInt(key string) (int, error) {
+// Returns (0, false, nil) if the key doesn't exist.
+// Returns (value, true, nil) if the key exists and can be parsed.
+// Returns (0, false, error) if the key exists but cannot be parsed.
+func (scope *variableScope) GetInt(key string) (int, bool, error) {
 	val, err := scope.Get(key)
 	if err != nil {
-		return 0, err
+		return 0, false, err
 	}
 
 	// there is nothing here
 	if val == nil {
-		return 0, nil
+		return 0, false, nil
 	}
 
 	// if it's already an int, return it
 	if i, ok := val.(int); ok {
-		return i, nil
+		return i, true, nil
 	}
 
 	// if it's a string, try to parse it
 	if str, ok := val.(string); ok {
 		if str == "" {
-			return 0, nil
+			return 0, true, nil
 		}
 		parsed, err := strconv.Atoi(str)
 		if err != nil {
-			return 0, errors.Wrap(err, "cannot parse as integer")
+			return 0, false, errors.Wrap(err, "cannot parse as integer")
 		}
-		return parsed, nil
+		return parsed, true, nil
 	}
 
 	// not what we asked for
-	return 0, errors.New("not an integer or parseable string")
+	return 0, false, errors.New("not an integer or parseable string")
 }
 
 // GetDuration is like Get except it always returns a time.Duration.
 // If the value is a string, it attempts to parse it as a duration (e.g., "30s", "5m", "1h").
-// Returns 0 and no error if the key doesn't exist.
-// Returns an error only if the value exists but cannot be parsed.
-func (scope *variableScope) GetDuration(key string) (time.Duration, error) {
+// Returns (0, false, nil) if the key doesn't exist.
+// Returns (value, true, nil) if the key exists and can be parsed.
+// Returns (0, false, error) if the key exists but cannot be parsed.
+func (scope *variableScope) GetDuration(key string) (time.Duration, bool, error) {
 	val, err := scope.Get(key)
 	if err != nil {
-		return 0, err
+		return 0, false, err
 	}
 
 	// there is nothing here
 	if val == nil {
-		return 0, nil
+		return 0, false, nil
 	}
 
 	// if it's already a duration, return it
 	if d, ok := val.(time.Duration); ok {
-		return d, nil
+		return d, true, nil
 	}
 
 	// if it's a string, try to parse it
 	if str, ok := val.(string); ok {
 		if str == "" {
-			return 0, nil
+			return 0, true, nil
 		}
 		parsed, err := time.ParseDuration(str)
 		if err != nil {
-			return 0, errors.Wrap(err, "cannot parse as duration (use format like '30s', '5m', '1h')")
+			return 0, false, errors.Wrap(err, "cannot parse as duration (use format like '30s', '5m', '1h')")
 		}
-		return parsed, nil
+		return parsed, true, nil
 	}
 
 	// not what we asked for
-	return 0, errors.New("not a duration or parseable string")
+	return 0, false, errors.New("not a duration or parseable string")
 }
 
 // INTERNAL

@@ -182,7 +182,7 @@ func NewWithOptions(w *wiki.Wiki, opts Options) *Manager {
 
 	// background page workers
 	m.wg.Add(opts.BackgroundWorkers)
-	m.wiki.Log(fmt.Sprintf("pregenerate: starting %d background workers, queue size: %d, rate limit: %v", 
+	m.wiki.Log(fmt.Sprintf("pregenerate: starting %d background workers, queue size: %d, rate limit: %v",
 		opts.BackgroundWorkers, opts.BackgroundQueueSize, opts.RateLimit))
 	for i := 0; i < opts.BackgroundWorkers; i++ {
 		go m.backgroundWorker()

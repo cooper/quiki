@@ -130,37 +130,37 @@ func InitWikis() error {
 		}
 
 		// allow individual option overrides
-		if rateLimit, err := Conf.GetDuration("server.pregen.rate_limit"); err == nil {
+		if rateLimit, ok, _ := Conf.GetDuration("server.pregen.rate_limit"); ok {
 			opts.RateLimit = rateLimit
 		}
-		if progressInterval, err := Conf.GetInt("server.pregen.progress_interval"); err == nil {
+		if progressInterval, ok, _ := Conf.GetInt("server.pregen.progress_interval"); ok {
 			opts.ProgressInterval = progressInterval
 		}
-		if priorityQueueSize, err := Conf.GetInt("server.pregen.page_priority"); err == nil {
+		if priorityQueueSize, ok, _ := Conf.GetInt("server.pregen.page_priority"); ok {
 			opts.PriorityQueueSize = priorityQueueSize
 		}
-		if backgroundQueueSize, err := Conf.GetInt("server.pregen.page_background"); err == nil {
+		if backgroundQueueSize, ok, _ := Conf.GetInt("server.pregen.page_background"); ok {
 			opts.BackgroundQueueSize = backgroundQueueSize
 		}
-		if imagePriorityQueueSize, err := Conf.GetInt("server.pregen.img_priority"); err == nil {
+		if imagePriorityQueueSize, ok, _ := Conf.GetInt("server.pregen.img_priority"); ok {
 			opts.ImagePriorityQueueSize = imagePriorityQueueSize
 		}
-		if imageBackgroundQueueSize, err := Conf.GetInt("server.pregen.img_background"); err == nil {
+		if imageBackgroundQueueSize, ok, _ := Conf.GetInt("server.pregen.img_background"); ok {
 			opts.ImageBackgroundQueueSize = imageBackgroundQueueSize
 		}
-		if priorityWorkers, err := Conf.GetInt("server.pregen.page_workers"); err == nil {
+		if priorityWorkers, ok, _ := Conf.GetInt("server.pregen.page_workers"); ok {
 			opts.PriorityWorkers = priorityWorkers
 		}
-		if backgroundWorkers, err := Conf.GetInt("server.pregen.page_bg_workers"); err == nil {
+		if backgroundWorkers, ok, _ := Conf.GetInt("server.pregen.page_bg_workers"); ok {
 			opts.BackgroundWorkers = backgroundWorkers
 		}
-		if imagePriorityWorkers, err := Conf.GetInt("server.pregen.img_workers"); err == nil {
+		if imagePriorityWorkers, ok, _ := Conf.GetInt("server.pregen.img_workers"); ok {
 			opts.ImagePriorityWorkers = imagePriorityWorkers
 		}
-		if imageBackgroundWorkers, err := Conf.GetInt("server.pregen.img_bg_workers"); err == nil {
+		if imageBackgroundWorkers, ok, _ := Conf.GetInt("server.pregen.img_bg_workers"); ok {
 			opts.ImageBackgroundWorkers = imageBackgroundWorkers
 		}
-		if requestTimeout, err := Conf.GetDuration("server.pregen.timeout"); err == nil {
+		if requestTimeout, ok, _ := Conf.GetDuration("server.pregen.timeout"); ok {
 			opts.RequestTimeout = requestTimeout
 		}
 		if forceGen, err := Conf.GetBool("server.pregen.force"); err == nil {
@@ -172,10 +172,10 @@ func InitWikis() error {
 		if enableImages, err := Conf.GetBool("server.pregen.images"); err == nil {
 			opts.EnableImages = enableImages
 		}
-		if cleanupInterval, err := Conf.GetDuration("server.pregen.cleanup"); err == nil {
+		if cleanupInterval, ok, _ := Conf.GetDuration("server.pregen.cleanup"); ok {
 			opts.CleanupInterval = cleanupInterval
 		}
-		if maxTrackingEntries, err := Conf.GetInt("server.pregen.max_tracking"); err == nil {
+		if maxTrackingEntries, ok, _ := Conf.GetInt("server.pregen.max_tracking"); ok {
 			opts.MaxTrackingEntries = maxTrackingEntries
 		}
 
