@@ -1102,5 +1102,6 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		}
 	}
 
-	return nil // successful completion
+	img := wiki.SizedImageFromName(imageName)
+	return m.wiki.DisplaySizedImageGenerate(img, true)
 }
