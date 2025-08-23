@@ -1,25 +1,25 @@
-// Package pregenerate provides a unified queue-only architecture for page and image generation.
+// package pregenerate provides a unified queue-only architecture for page and image generation.
 //
-// ARCHITECTURE OVERVIEW:
-// This package eliminates the complexity of dual on-demand/pregeneration systems by using
-// a single generation path through configurable worker pools. All requests (HTTP, background)
+// architecture overview:
+// this package eliminates the complexity of dual on-demand/pregeneration systems by using
+// a single generation path through configurable worker pools. all requests (http, background)
 // go through the same queuing system, providing:
 //
-// - Worker pools that scale with CPU cores for optimal concurrency
-// - Large buffered priority channels to prevent blocking on urgent requests
-// - Automatic failover to direct generation when queues are full
-// - Request timeouts to protect user experience
-// - Result channels for synchronous operations with deduplication
-// - Memory management with periodic cleanup of tracking maps
+// - worker pools that scale with cpu cores for optimal concurrency
+// - large buffered priority channels to prevent blocking on urgent requests
+// - automatic failover to direct generation when queues are full
+// - request timeouts to protect user experience
+// - result channels for synchronous operations with deduplication
+// - memory management with periodic cleanup of tracking maps
 //
-// QUEUE FLOW:
-// 1. HTTP requests use GeneratePageSync/GenerateImageSync with high priority
-// 2. Background scanning uses QueuePage/QueueImage with normal priority
-// 3. Workers pull from priority queues first, then background queues
-// 4. Full queues trigger direct generation to never block users
-// 5. Result channels eliminate duplicate work for concurrent requests
+// queue flow:
+// 1. http requests use generatepagesync/generateimagesync with high priority
+// 2. background scanning uses queuepage/queueimage with normal priority
+// 3. workers pull from priority queues first, then background queues
+// 4. full queues trigger direct generation to never block users
+// 5. result channels eliminate duplicate work for concurrent requests
 //
-// This design provides the concurrency benefits of per-request goroutines while
+// this design provides the concurrency benefits of per-request goroutines while
 // maintaining the architectural simplicity and deduplication of centralized generation.
 package pregenerate
 
@@ -33,7 +33,7 @@ import (
 	"github.com/cooper/quiki/wiki"
 )
 
-// max returns the larger of two integers (for Go versions < 1.21)
+// max returns the larger of two integers (for go < 1.21)
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -228,7 +228,7 @@ func (m *Manager) Stop() {
 }
 
 // GeneratePageSync generates a single page synchronously (blocks until complete)
-// This is the new unified entry point for all page generation
+// this is the new unified entry point for all page generation
 func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
 	// first check if already cached and fresh
 	page := m.wiki.FindPage(pageName)
@@ -313,7 +313,6 @@ func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
 }
 
 // GenerateImageSync generates image thumbnails synchronously (blocks until complete)
-// This is the new unified entry point for all image generation
 func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 	if !m.options.EnableImages {
 		// even with images disabled, use unified generation for consistency
@@ -392,13 +391,11 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 }
 
 // generatePageDirect generates a page directly without queuing (emergency fallback for full queues)
-// This still goes through the same generation logic, just bypasses the worker queue
 func (m *Manager) generatePageDirect(pageName string) any {
 	return m.pregeneratePage(pageName, true) // use the same core logic
 }
 
 // generateImageDirect generates image thumbnails directly without queuing (emergency fallback for full queues)
-// This still goes through the same generation logic, just bypasses the worker queue
 func (m *Manager) generateImageDirect(imageName string) any {
 	return m.pregenerateImage(imageName) // use the same core logic
 }
@@ -412,12 +409,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 	go func() {
 		allPages := m.wiki.AllPageFiles()
 		m.wiki.Log(fmt.Sprintf("pregenerate: found %d total pages, starting to queue them", len(allPages)))
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("queuing %d pages for background pregeneration", len(allPages)))
-		}
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("queuing %d pages for background pregeneration", len(allPages)))
-		}
+		m.debug("queuing %d pages for background pregeneration", len(allPages))
 
 		queuedCount := 0
 		skippedCount := 0
@@ -429,8 +421,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 			isPromoted := m.promotedPages[pageName]
 			if isProcessing || isPromoted {
 				skippedCount++
-				m.wiki.Log(fmt.Sprintf("pregenerate: skipping page %s - processing:%v promoted:%v",
-					pageName, isProcessing, isPromoted))
+				m.debug("pregenerate: skipping page %s - processing:%v promoted:%v", pageName, isProcessing, isPromoted)
 				m.mu.Unlock()
 				continue
 			}
@@ -439,14 +430,14 @@ func (m *Manager) QueueAllContentAtStartup() {
 			select {
 			case m.backgroundCh <- pageName:
 				queuedCount++
-				m.wiki.Log("pregenerate: queued page for background processing: " + pageName)
+				m.debug("pregenerate: queued page for background processing: %s", pageName)
 			case <-m.ctx.Done():
 				m.wiki.Log("pregenerate: context canceled while queueing pages")
 				return
 			default:
 				// background queue full, skip for now
 				skippedCount++
-				m.wiki.Log(fmt.Sprintf("pregenerate: background queue FULL, skipping: %s (queue size: %d)", pageName, cap(m.backgroundCh)))
+				m.debug("pregenerate: background queue FULL, skipping: %s (queue size: %d)", pageName, cap(m.backgroundCh))
 			}
 		}
 		m.wiki.Log(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
@@ -456,9 +447,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 	if m.options.EnableImages {
 		go func() {
 			allImages := m.wiki.AllImageFiles()
-			if m.options.LogVerbose {
-				m.wiki.Log(fmt.Sprintf("queuing %d images for background pregeneration", len(allImages)))
-			}
+			m.debug("queuing %d images for background pregeneration", len(allImages))
 
 			for _, imageName := range allImages {
 				// check if already processed or queued
@@ -476,9 +465,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 					return
 				default:
 					// background queue full, skip for now
-					if m.options.LogVerbose {
-						m.wiki.Log("background image queue full, skipping: " + imageName)
-					}
+					m.debug("background image queue full, skipping: %s", imageName)
 				}
 			}
 		}()
@@ -547,7 +534,6 @@ func (m *Manager) RequestPregeneration(pageName string) {
 }
 
 // RequestPagePregeneration requests high-priority pregeneration of a specific page
-// This is called when a user manually requests a page
 func (m *Manager) RequestPagePregeneration(pageName string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -568,9 +554,7 @@ func (m *Manager) RequestPagePregeneration(pageName string) {
 			// queued for background
 		default:
 			// both queues full, skip
-			if m.options.LogVerbose {
-				m.wiki.Log("all page queues full, skipping: " + pageName)
-			}
+			m.debug("all page queues full, skipping: %s", pageName)
 		}
 	}
 }
@@ -601,9 +585,7 @@ func (m *Manager) RequestImagePregeneration(imageName string) {
 			// queued for background
 		default:
 			// both queues full, skip
-			if m.options.LogVerbose {
-				m.wiki.Log("all image queues full, skipping: " + imageName)
-			}
+			m.debug("all image queues full, skipping: %s", imageName)
 		}
 	}
 }
@@ -618,6 +600,13 @@ func (m *Manager) StartBackground() *Manager {
 // StartWorkers starts the worker goroutines without queuing content at startup
 func (m *Manager) StartWorkers() *Manager {
 	return m
+}
+
+// debug logs a message only if verbose logging is enabled
+func (m *Manager) debug(format string, args ...interface{}) {
+	if m.options.LogVerbose {
+		m.wiki.Log(fmt.Sprintf(format, args...))
+	}
 }
 
 // pregenerateAllImages handles both synchronous and asynchronous image pregeneration
@@ -676,7 +665,7 @@ func (m *Manager) PregenerateSync() Stats {
 }
 
 func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
-	// Use wiki-level locking for cross-process coordination
+	// use wiki-level locking for cross-process coordination
 	err := m.wiki.WithWikiLock(func() error {
 		allPages := m.wiki.AllPageFiles()
 		m.mu.Lock()
@@ -798,11 +787,11 @@ func (m *Manager) backgroundWorker() {
 	for {
 		select {
 		case pageName := <-m.backgroundCh:
-			m.wiki.Log("pregenerate: background worker received page: " + pageName)
+			m.debug("pregenerate: background worker received page: %s", pageName)
 			// check if already being processed, completed, or promoted
 			m.mu.Lock()
 			if m.processingPages[pageName] || m.completedPages[pageName] || m.promotedPages[pageName] {
-				m.wiki.Log("pregenerate: background worker skipping page (already processed/processing): " + pageName)
+				m.debug("pregenerate: background worker skipping page (already processed/processing): %s", pageName)
 				m.mu.Unlock()
 				<-ticker.C // rate limit even for skipped items to prevent queue flooding
 				continue
@@ -810,7 +799,7 @@ func (m *Manager) backgroundWorker() {
 			m.processingPages[pageName] = true
 			m.mu.Unlock()
 
-			m.wiki.Log("pregenerate: background worker generating page: " + pageName)
+			m.debug("pregenerate: background worker generating page: %s", pageName)
 			result := m.pregeneratePage(pageName, false)
 
 			// notify any waiting result channels
@@ -838,7 +827,7 @@ func (m *Manager) backgroundWorker() {
 // pregeneratePage generates a single page and updates statistics
 func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	start := time.Now()
-	m.wiki.Log(fmt.Sprintf("pregenerate: starting generation for page: %s (priority: %v)", pageName, isHighPriority))
+	m.debug("pregenerate: starting generation for page: %s (priority: %v)", pageName, isHighPriority)
 
 	// check if page exists
 	page := m.wiki.FindPage(pageName)
@@ -852,16 +841,13 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		cacheModify := page.CacheModified()
 		pageModified := page.Modified()
 		if !pageModified.After(cacheModify) {
-			m.wiki.Log(fmt.Sprintf("pregenerate: page %s already cached and fresh", pageName))
-			if m.options.LogVerbose {
-				m.wiki.Log(fmt.Sprintf("page %s already cached and fresh", pageName))
-			}
+			m.debug("pregenerate: page %s already cached and fresh", pageName)
 			// return the cached result
 			return m.wiki.DisplayPageDraft(pageName, true)
 		}
 	}
 
-	m.wiki.Log("pregenerate: calling DisplayPageDraft for: " + pageName)
+	m.debug("pregenerate: calling DisplayPageDraft for: %s", pageName)
 	// temporarily modify ForceGen in a thread-safe way
 	var result any
 	originalForceGen := m.wiki.Opt.Page.ForceGen
@@ -877,7 +863,7 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		result = m.wiki.DisplayPageDraft(pageName, true)
 	}
 
-	m.wiki.Log("pregenerate: DisplayPageDraft completed for: " + pageName)
+	m.debug("pregenerate: DisplayPageDraft completed for: %s", pageName)
 
 	// update stats
 	m.mu.Lock()
@@ -891,10 +877,8 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		} else {
 			m.stats.AverageGenTime = (m.stats.AverageGenTime + duration) / 2
 		}
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("pregenerated %s (%.2fms, priority=%v)",
-				pageName, float64(duration.Nanoseconds())/1000000, isHighPriority))
-		}
+		// single log line for successful pregeneration
+		m.wiki.Log(fmt.Sprintf("pregenerated %s (%.2fms)", pageName, float64(duration.Nanoseconds())/1000000))
 	} else if _, isError := result.(wiki.DisplayError); isError {
 		m.stats.FailedPages++
 		m.wiki.Log(fmt.Sprintf("failed to pregenerate %s: %v", pageName, result))
@@ -955,11 +939,11 @@ func (m *Manager) backgroundImageWorker() {
 	for {
 		select {
 		case imageName := <-m.backgroundImageCh:
-			m.wiki.Log("pregenerate: background image worker received image: " + imageName)
+			m.debug("pregenerate: background image worker received image: %s", imageName)
 			// check if already being processed, completed, or promoted
 			m.mu.Lock()
 			if m.processingImages[imageName] || m.completedImages[imageName] || m.promotedImages[imageName] {
-				m.wiki.Log("pregenerate: background image worker skipping image (already processed/processing): " + imageName)
+				m.debug("pregenerate: background image worker skipping image (already processed/processing): %s", imageName)
 				m.mu.Unlock()
 				<-ticker.C // rate limit even for skipped items to prevent queue flooding
 				continue
@@ -967,7 +951,7 @@ func (m *Manager) backgroundImageWorker() {
 			m.processingImages[imageName] = true
 			m.mu.Unlock()
 
-			m.wiki.Log("pregenerate: background image worker generating image: " + imageName)
+			m.debug("pregenerate: background image worker generating image: %s", imageName)
 			result := m.pregenerateImage(imageName)
 
 			// notify any waiting result channels
@@ -1017,17 +1001,13 @@ func (m *Manager) cleanupTrackingMaps() {
 	// if tracking maps are getting too large, clear them entirely
 	// this is safe because they're just optimization to avoid duplicate work
 	if len(m.completedPages) > m.options.MaxTrackingEntries {
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("clearing page tracking maps (%d entries)", len(m.completedPages)))
-		}
+		m.debug("clearing page tracking maps (%d entries)", len(m.completedPages))
 		m.completedPages = make(map[string]bool)
 		m.promotedPages = make(map[string]bool)
 	}
 
 	if len(m.completedImages) > m.options.MaxTrackingEntries {
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("clearing image tracking maps (%d entries)", len(m.completedImages)))
-		}
+		m.debug("clearing image tracking maps (%d entries)", len(m.completedImages))
 		m.completedImages = make(map[string]bool)
 		m.promotedImages = make(map[string]bool)
 	}
@@ -1035,36 +1015,32 @@ func (m *Manager) cleanupTrackingMaps() {
 
 // pregenerateImage generates an image in all sizes that are actually used in the wiki
 func (m *Manager) pregenerateImage(imageName string) any {
-	if m.options.LogVerbose {
-		m.wiki.Log(fmt.Sprintf("pregenerating image: %s", imageName))
-	}
-	m.wiki.Log(fmt.Sprintf("DEBUG: pregenerateImage called with imageName='%s'", imageName))
+	m.debug("pregenerating image: %s", imageName)
+	m.debug("debug: pregenerateImage called with imageName='%s'", imageName)
 
 	// use image-specific locking to coordinate with on-demand generation
 	imageLock := m.wiki.GetImageLock(imageName)
 	imageLock.Lock()
 	defer imageLock.Unlock()
 
-	// Get the image category that tracks all references to this image
-	// Extract base image name (without dimensions) for category lookup
+	// get the image category that tracks all references to this image
+	// extract base image name (without dimensions) for category lookup
 	sizedImg := wiki.SizedImageFromName(imageName)
 	baseImageName := sizedImg.RelNameNE + "." + sizedImg.Ext // reconstruct full name with extension
-	m.wiki.Log(fmt.Sprintf("DEBUG: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName))
+	m.debug("debug: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName)
 	imageCat := m.wiki.GetSpecialCategory(baseImageName, wiki.CategoryTypeImage)
 
-	// No category means no references exist, so nothing to pregenerate
+	// no category means no references exist, so nothing to pregenerate
 	if imageCat == nil || !imageCat.Exists() {
-		if m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("no references found for image: %s", imageName))
-		}
-		m.wiki.Log(fmt.Sprintf("DEBUG: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists()))
+		m.debug("no references found for image: %s", imageName)
+		m.debug("debug: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists())
 		return nil // no error, just nothing to generate
 	}
 
-	// Collect all unique dimensions that are actually used
+	// collect all unique dimensions that are actually used
 	usedSizes := make(map[[2]int]bool)
 
-	// Look through all pages that reference this image
+	// look through all pages that reference this image
 	for _, pageEntry := range imageCat.Pages {
 		// pageEntry.Dimensions contains the dimensions as [][]int
 		for _, dimensionPair := range pageEntry.Dimensions {
@@ -1088,11 +1064,13 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		}
 	}
 
-	if m.options.LogVerbose {
-		m.wiki.Log(fmt.Sprintf("found %d unique sizes for image: %s", len(usedSizes), imageName))
-	}
+	m.debug("found %d unique sizes for image: %s", len(usedSizes), imageName)
 
-	// Generate images for each actually-used size
+	// generate images for each actually-used size
+	var requestedResult any
+	requestedImg := wiki.SizedImageFromName(imageName)
+	requestedSize := [2]int{requestedImg.Width, requestedImg.Height}
+
 	for size := range usedSizes {
 		loopImg := wiki.SizedImageFromName(imageName)
 		loopImg.Width = size[0]
@@ -1101,13 +1079,19 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		// generate the image
 		result := m.wiki.DisplaySizedImageGenerate(loopImg, true)
 
+		// if this is the exact size that was requested, save the result
+		if size == requestedSize {
+			requestedResult = result
+		}
+
 		// check if generation was successful
-		if _, isError := result.(wiki.DisplayError); isError && m.options.LogVerbose {
-			m.wiki.Log(fmt.Sprintf("failed to pregenerate %s at %dx%d: %v",
-				imageName, size[0], size[1], result))
+		if _, isError := result.(wiki.DisplayError); isError {
+			m.debug("failed to pregenerate %s at %dx%d: %v", imageName, size[0], size[1], result)
 		}
 	}
 
-	finalImg := wiki.SizedImageFromName(imageName)
-	return m.wiki.DisplaySizedImageGenerate(finalImg, true)
+	if requestedResult != nil {
+		return requestedResult
+	}
+	return m.wiki.DisplaySizedImageGenerate(requestedImg, true)
 }
