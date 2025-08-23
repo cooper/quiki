@@ -364,7 +364,16 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 	// after acquiring lock and checking cache, verify this is an allowed size
 	// for non-pregeneration requests when arbitrary sizes are disabled
 	if !generateOK && !w.Opt.Image.ArbitrarySizes {
-		if !w.isImageSizeReferenced(img) {
+		// get original image dimensions if not already known
+		if bigW == 0 || bigH == 0 {
+			bigW, bigH = getImageDimensions(bigPath)
+		}
+		
+		// allow full-size images (either 0x0 or matching original dimensions)
+		isFullSize := (img.Width == 0 && img.Height == 0) || 
+		             (img.TrueWidth() == bigW && img.TrueHeight() == bigH)
+		
+		if !isFullSize && !w.isImageSizeReferenced(img) {
 			dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
 			return DisplayError{
 				Error:         "Image size not allowed.",
@@ -641,6 +650,14 @@ func (w *Wiki) isImageSizeReferenced(img SizedImage) bool {
 	// Full-size images (0x0) are always allowed
 	if img.Width == 0 && img.Height == 0 {
 		return true
+	}
+
+	// Check if this matches the original image dimensions (also considered full-size)
+	bigPath := w.PathForImage(img.FullSizeName())
+	if bigW, bigH := getImageDimensions(bigPath); bigW > 0 && bigH > 0 {
+		if img.TrueWidth() == bigW && img.TrueHeight() == bigH {
+			return true // original dimensions are always allowed
+		}
 	}
 
 	// Get the image category that tracks all references to this image
