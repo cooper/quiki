@@ -58,14 +58,13 @@ func handleCreateWiki(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// scan wikis on webserver
-	err = webserver.InitWikis()
-	if err != nil {
-		http.Error(w, "init wikis: "+err.Error(), http.StatusInternalServerError)
+	// rehash server after config change
+	if err := webserver.Rehash(); err != nil {
+		http.Error(w, "rehash server: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// scan wikis on adminifier
+	// scan wikis on adminifier (webserver wikis are handled by Rehash())
 	initWikis()
 
 	// redirect to the root

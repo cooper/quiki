@@ -1,156 +1,225 @@
-// Package monitor provides a file monitor that pre-generates
-// wiki pages and images each time a change is detected on the filesystem.
+// Package monitor provides file system monitoring for wiki changes.
 package monitor
 
 import (
+	"context"
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/cooper/quiki/wiki"
 	"github.com/fsnotify/fsnotify"
 )
 
-type wikiMonitor struct {
-	w        *wiki.Wiki
-	watcher  *fsnotify.Watcher
-	watching map[string]bool
+// Manager coordinates file system monitoring across all wikis.
+type Manager struct {
+	mu       sync.RWMutex
+	watchers map[string]*wikiWatcher
+	ctx      context.Context
+	cancel   context.CancelFunc
 }
 
-// WatchWiki starts a file monitor loop for the provided wiki.
-func WatchWiki(w *wiki.Wiki) {
+// wikiWatcher represents monitoring for a single wiki.
+type wikiWatcher struct {
+	wiki    *wiki.Wiki
+	watcher *fsnotify.Watcher
+	ctx     context.Context
+	cancel  context.CancelFunc
+}
 
-	// creates a new file watcher
-	watcher, _ := fsnotify.NewWatcher()
-	defer watcher.Close()
+// Global manager instance
+var globalManager *Manager
+var managerOnce sync.Once
 
-	// create monitor
-	mon := wikiMonitor{w, watcher, make(map[string]bool)}
-
-	// find all the directories
-	walkDir := func(path string, fi os.FileInfo, err error) error {
-		if err != nil {
-			return nil
+// GetManager returns the global monitor manager instance.
+func GetManager() *Manager {
+	managerOnce.Do(func() {
+		ctx, cancel := context.WithCancel(context.Background())
+		globalManager = &Manager{
+			watchers: make(map[string]*wikiWatcher),
+			ctx:      ctx,
+			cancel:   cancel,
 		}
+	})
+	return globalManager
+}
 
-		// since fsnotify can watch all the files in a directory, watchers only need
-		// to be added to each nested directory
-		if fi.Mode().IsDir() {
-			abs, _ := filepath.Abs(path)
-			mon.watching[abs] = true
-			return watcher.Add(abs)
-		}
+// AddWiki starts monitoring a wiki for file changes.
+func (m *Manager) AddWiki(w *wiki.Wiki) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-		return nil
+	wikiName := w.Name()
+
+	// Stop existing watcher if present
+	if existing, exists := m.watchers[wikiName]; exists {
+		existing.stop()
+		delete(m.watchers, wikiName)
 	}
 
-	dirs := map[string]func(mon wikiMonitor, event fsnotify.Event, abs string){
-		w.Opt.Dir.Page:  handlePageEvent,
-		w.Opt.Dir.Image: handleImageEvent,
-		w.Opt.Dir.Model: handleModelEvent,
+	// Create new watcher
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return err
 	}
 
-	// watch each of the content dirs
-	for dir, handler := range dirs {
-		delete(dirs, dir)
-		dir, _ = filepath.Abs(dir)
+	ctx, cancel := context.WithCancel(m.ctx)
+	ww := &wikiWatcher{
+		wiki:    w,
+		watcher: watcher,
+		ctx:     ctx,
+		cancel:  cancel,
+	}
+
+	// Add directories to watch
+	dirs := []string{
+		w.Opt.Dir.Page,
+		w.Opt.Dir.Image,
+		w.Opt.Dir.Model,
+	}
+
+	for _, dir := range dirs {
 		if dir == "" {
 			continue
 		}
-		dirs[dir] = handler
-		if err := filepath.Walk(dir, walkDir); err != nil {
-			log.Println("ERROR", err)
+
+		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return nil // Continue walking
+			}
+			if info.IsDir() {
+				return watcher.Add(path)
+			}
+			return nil
+		})
+
+		if err != nil {
+			log.Printf("Warning: failed to watch directory %s: %v", dir, err)
 		}
 	}
 
-	//
-	done := make(chan bool)
+	m.watchers[wikiName] = ww
 
-	//
-	go func() {
-		for {
-			select {
-			// watch for events
-			case event := <-watcher.Events:
+	// Start monitoring in background
+	go ww.monitor()
 
-				// don't waste any time with these
-				if event.Op == fsnotify.Chmod {
-					continue
-				}
-
-				// find absolute path
-				abs, err := filepath.Abs(event.Name)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-
-				// new directory created -- add to monitor
-				fi, err := os.Lstat(abs)
-				if err == nil && fi.IsDir() && event.Op&fsnotify.Create == fsnotify.Create {
-					log.Println("adding dir", abs)
-					mon.watching[abs] = true
-					watcher.Add(abs)
-					continue
-				}
-
-				// a directory we were watching has been deleted
-				// note: this catches renames also
-				if mon.watching[abs] && event.Op&fsnotify.Remove == fsnotify.Remove {
-					log.Println("DELETE DIR", event)
-					delete(mon.watching, abs)
-					// watcher.Remove(abs) // nvm, it does this automatically
-					continue
-				}
-
-				// file change; pass it on to handlers
-				for dir, handler := range dirs {
-					if _, err := filepath.Rel(dir, abs); err == nil {
-						handler(mon, event, abs)
-						break
-					}
-				}
-
-				// watch for errors
-			case err := <-watcher.Errors:
-				log.Println("ERROR", err)
-			}
-		}
-	}()
-
-	<-done
+	log.Printf("Started monitoring wiki: %s", wikiName)
+	return nil
 }
 
-func handlePageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {
+// RemoveWiki stops monitoring a wiki.
+func (m *Manager) RemoveWiki(wikiName string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	// trim the page dir to get the actual name with prefix
-	osName := abs
-	dirPage, _ := filepath.Abs(mon.w.Opt.Dir.Page)
-	if relPath, err := filepath.Rel(dirPage, abs); err == nil {
-		osName = relPath
+	if ww, exists := m.watchers[wikiName]; exists {
+		ww.stop()
+		delete(m.watchers, wikiName)
+		log.Printf("Stopped monitoring wiki: %s", wikiName)
+	}
+}
+
+// Stop gracefully shuts down all monitoring.
+func (m *Manager) Stop() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	for name, ww := range m.watchers {
+		ww.stop()
+		delete(m.watchers, name)
 	}
 
+	m.cancel()
+	log.Println("Monitor manager stopped")
+}
+
+// stop gracefully stops this wiki watcher.
+func (ww *wikiWatcher) stop() {
+	ww.cancel()
+	if ww.watcher != nil {
+		ww.watcher.Close()
+	}
+}
+
+// monitor is the main monitoring loop for a wiki.
+func (ww *wikiWatcher) monitor() {
+	defer ww.stop()
+
+	for {
+		select {
+		case <-ww.ctx.Done():
+			return
+
+		case event := <-ww.watcher.Events:
+			ww.handleEvent(event)
+
+		case err := <-ww.watcher.Errors:
+			if err != nil {
+				log.Printf("Watcher error for wiki %s: %v", ww.wiki.Name(), err)
+			}
+		}
+	}
+}
+
+// handleEvent processes a file system event.
+func (ww *wikiWatcher) handleEvent(event fsnotify.Event) {
+	// Skip chmod events
+	if event.Op == fsnotify.Chmod {
+		return
+	}
+
+	// Small delay to debounce rapid changes
+	time.Sleep(50 * time.Millisecond)
+
+	abs, err := filepath.Abs(event.Name)
+	if err != nil {
+		return
+	}
+
+	// Handle directory creation
+	if fi, err := os.Stat(abs); err == nil && fi.IsDir() {
+		if event.Op&fsnotify.Create == fsnotify.Create {
+			ww.watcher.Add(abs)
+			log.Printf("Added directory to watch: %s", abs)
+		}
+		return
+	}
+
+	// Determine if this is a page file
+	pageDir, _ := filepath.Abs(ww.wiki.Opt.Dir.Page)
+	if relPath, err := filepath.Rel(pageDir, abs); err == nil && !filepath.IsAbs(relPath) {
+		ww.handlePageEvent(relPath, event)
+	}
+}
+
+// handlePageEvent processes page file changes.
+func (ww *wikiWatcher) handlePageEvent(relPath string, event fsnotify.Event) {
 	switch event.Op {
-
 	case fsnotify.Create, fsnotify.Write:
-
-		// this is a symlink; ignore it
-		// FIXME: only skip if the target is also in the page dir?
+		// Skip if it's a symlink
+		abs := filepath.Join(ww.wiki.Opt.Dir.Page, relPath)
 		if fi, err := os.Lstat(abs); err == nil && fi.Mode()&os.ModeSymlink != 0 {
 			return
 		}
 
-		// force page to generate even if marked as draft
-		// page name will be normalized including os-specific path separator
-		mon.w.DisplayPageDraft(osName, true)
+		log.Printf("Page changed, regenerating: %s", relPath)
+
+		// Use page locking to coordinate with other operations
+		pageLock := ww.wiki.GetPageLock(relPath)
+		pageLock.Lock()
+		defer pageLock.Unlock()
+
+		// Force regeneration
+		ww.wiki.DisplayPageDraft(relPath, true)
 
 	case fsnotify.Rename, fsnotify.Remove:
-		// TODO: w.PurgePage() or similar
-		os.Remove(filepath.Join(mon.w.Opt.Dir.Cache, "page", osName+".cache"))
-		os.Remove(filepath.Join(mon.w.Opt.Dir.Cache, "page", osName+".txt"))
+		log.Printf("Page removed: %s", relPath)
+
+		// Clean up cache
+		cacheDir := ww.wiki.Opt.Dir.Cache
+		os.Remove(filepath.Join(cacheDir, "page", relPath+".cache"))
+		os.Remove(filepath.Join(cacheDir, "page", relPath+".txt"))
 	}
 }
-
-func handleImageEvent(mon wikiMonitor, event fsnotify.Event, abs string) {}
-
-func handleModelEvent(mon wikiMonitor, event fsnotify.Event, abs string) {}

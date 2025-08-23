@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	httpdate "github.com/Songmu/go-httpdate"
@@ -141,10 +141,7 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 	p.Wiki = w
 	p.Opt = &w.Opt
 
-	// create page lock
-	if _, exist := w.pageLocks[p.Name()]; !exist {
-		w.pageLocks[p.Name()] = new(sync.Mutex)
-	}
+	// page lock will be created by GetPageLock if needed
 
 	return
 }
@@ -191,6 +188,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 		if r.FromCache {
 			return r
 		}
+	} else if w.Opt.Page.EnableCache {
+		// Cache doesn't exist - page will be generated
+		// Note: Pregeneration is now handled at the webserver level
 	}
 
 	// Safe point - we will be generating the page right now.
@@ -241,8 +241,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 	}
 
 	// only generate once at a time
-	w.pageLocks[r.File].Lock()
-	defer w.pageLocks[r.File].Unlock()
+	pageLock := w.GetPageLock(r.File)
+	pageLock.Lock()
+	defer pageLock.Unlock()
 
 	// generate HTML and metadata
 	create := page.Created()
@@ -617,4 +618,23 @@ func (w *Wiki) displayCachedPage(page *wikifier.Page, r *DisplayPage, draftOK bo
 func pageWarn(p *wikifier.Page, warning string, pos wikifier.Position) {
 	w := wikifier.Warning{Message: warning, Pos: pos}
 	p.Warnings = append(p.Warnings, w)
+}
+
+// RegeneratePage clears the cache for a page to force regeneration
+func (w *Wiki) RegeneratePage(pageName string) error {
+	page := w.FindPage(pageName)
+	if !page.Exists() {
+		return nil // Nothing to regenerate
+	}
+
+	// Clear the cache if it exists
+	if page.CacheExists() {
+		cachePath := page.CachePath()
+		if err := os.Remove(cachePath); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		w.Log(fmt.Sprintf("cleared cache for page: %s", pageName))
+	}
+
+	return nil
 }

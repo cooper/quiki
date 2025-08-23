@@ -261,7 +261,24 @@ func (w *Wiki) writeFile(path string, content []byte, createOK bool, commit Comm
 
 // WritePage writes a page file.
 func (w *Wiki) WritePage(name string, content []byte, createOK bool, commit CommitOpts) error {
-	return w.writeFile(w.PathForPage(name), content, createOK, commit)
+	// Coordinate with file monitor to prevent race conditions
+	return w.writeFileWithMonitorCoordination(w.PathForPage(name), content, createOK, commit, name)
+}
+
+// writeFileWithMonitorCoordination wraps writeFile with monitor coordination
+func (w *Wiki) writeFileWithMonitorCoordination(path string, content []byte, createOK bool, commit CommitOpts, resourceName string) error {
+	// Get page lock to coordinate with monitor
+	if resourceName != "" {
+		pageLock := w.GetPageLock(resourceName)
+		pageLock.Lock()
+		defer pageLock.Unlock()
+	}
+
+	// TODO: Pause monitor during write to prevent race conditions
+	// This would require importing the monitor package, which would create a cycle
+	// For now, the locking provides basic coordination
+
+	return w.writeFile(path, content, createOK, commit)
 }
 
 // WriteModel writes a model file.

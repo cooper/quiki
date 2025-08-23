@@ -5,6 +5,7 @@ package webserver
 // quiki - a standalone web server for wikifier
 
 import (
+	"context"
 	"encoding/gob"
 	"io/fs"
 	"log"
@@ -13,9 +14,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/monitor"
 	"github.com/cooper/quiki/resources"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
@@ -29,6 +32,62 @@ type Options struct {
 	Host     string
 	WikisDir string
 	Pregen   bool
+}
+
+// Rehash re-parses the server configuration and updates runtime settings.
+// It re-reads the config file, extracts HTTP and template settings, and gracefully updates wikis.
+func Rehash() error {
+	// re-parse configuration
+	if err := Conf.Parse(); err != nil {
+		return errors.Wrap(err, "rehash: parse config")
+	}
+
+	// extract updated HTTP and template settings (if not overridden)
+	var templateDirs string
+	for key, ptr := range map[string]*string{
+		"server.http.port":    &Opts.Port,
+		"server.http.bind":    &Opts.Bind,
+		"server.http.host":    &Opts.Host,
+		"server.dir.template": &templateDirs,
+	} {
+		if *ptr != "" {
+			continue
+		}
+		str, err := Conf.GetStr(key)
+		if err != nil {
+			return err
+		}
+		*ptr = str
+	}
+
+	// Get monitor manager for coordination
+	monitorMgr := monitor.GetManager()
+
+	// temporarily store current wikis for fallback
+	oldWikis := Wikis
+
+	// Stop monitoring and pregeneration for wikis that will be removed/replaced
+	for wikiName := range oldWikis {
+		if wi, exists := oldWikis[wikiName]; exists {
+			monitor.GetManager().RemoveWiki(wikiName)
+			wi.Shutdown() // Gracefully stop pregeneration
+		}
+	}
+
+	// reset wikis map to allow InitWikis to rebuild from config
+	Wikis = make(map[string]*WikiInfo) // re-initialize wikis based on updated config
+	if err := InitWikis(); err != nil {
+		// restore old wikis and their monitors on failure
+		Wikis = oldWikis
+		for _, wi := range oldWikis {
+			monitorMgr.AddWiki(wi.Wiki)
+		}
+		return errors.Wrap(err, "rehash: init wikis")
+	}
+
+	// old wikis are no longer needed, garbage collection will handle cleanup
+
+	return nil
 }
 
 // Conf is the webserver configuration page.
@@ -131,7 +190,17 @@ func Configure(_initial_options Options) {
 }
 
 // Listen runs the webserver indefinitely.
-//
+// Stop gracefully shuts down the server
+func Stop() error {
+	if Server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		return Server.Shutdown(ctx)
+	}
+	return nil
+}
+
+// start listening.
 // Configure must be called first.
 // If any errors occur, the program is terminated.
 func Listen() {
@@ -146,6 +215,28 @@ func Listen() {
 		Server.Addr = Opts.Bind + ":" + Opts.Port
 		log.Println("quiki ready on port " + Opts.Port)
 		log.Fatal(errors.Wrap(Server.ListenAndServe(), "listen"))
+	}
+}
+
+// Shutdown gracefully shuts down the webserver and all wikis
+func Shutdown() {
+	// Stop all pregeneration managers
+	for _, wi := range Wikis {
+		if wi != nil {
+			wi.Shutdown()
+		}
+	}
+
+	// Stop the monitor manager
+	monitor.GetManager().Stop()
+
+	// Shutdown the HTTP server with a timeout
+	if Server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := Server.Shutdown(ctx); err != nil {
+			log.Printf("Server forced to shutdown: %v", err)
+		}
 	}
 }
 

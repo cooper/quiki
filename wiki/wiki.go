@@ -18,6 +18,7 @@ type Wiki struct {
 	Opt           wikifier.PageOpt
 	Auth          *authenticator.Authenticator
 	pageLocks     map[string]*sync.Mutex
+	pageLocksmu   sync.RWMutex
 	pregenerating bool
 	_repo         *git.Repository
 	_logger       *log.Logger
@@ -56,4 +57,20 @@ func NewWiki(path string) (*Wiki, error) {
 
 	// no errors occurred
 	return w, nil
+}
+
+// Name returns the wiki's name based on its directory.
+func (w *Wiki) Name() string {
+	return filepath.Base(w.Opt.Dir.Wiki)
+}
+
+// GetPageLock returns the mutex for a specific page, creating it if necessary.
+func (w *Wiki) GetPageLock(pageName string) *sync.Mutex {
+	w.pageLocksmu.Lock()
+	defer w.pageLocksmu.Unlock()
+
+	if _, exists := w.pageLocks[pageName]; !exists {
+		w.pageLocks[pageName] = new(sync.Mutex)
+	}
+	return w.pageLocks[pageName]
 }

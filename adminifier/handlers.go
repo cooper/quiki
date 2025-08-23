@@ -254,6 +254,13 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// rehash server after config change
+	err = webserver.Rehash()
+	if err != nil {
+		http.Error(w, "rehash server: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	// create user
 	// TODO: validate things
 	err = webserver.Auth.NewUser(authenticator.User{

@@ -154,6 +154,11 @@ func (w *Wiki) allPageFiles() []string {
 	return files
 }
 
+// AllPageFiles returns all page files (public method for interfaces)
+func (w *Wiki) AllPageFiles() []string {
+	return w.allPageFiles()
+}
+
 func (w *Wiki) pageFilesInDir(where string) []string {
 	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Page, where), pageExtensions, true)
 	return files

@@ -7,9 +7,12 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"github.com/cooper/quiki/adminifier"
+	"github.com/cooper/quiki/pregenerate"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
@@ -71,9 +74,17 @@ func main() {
 		runPageAndExit(page)
 		return
 	} else if w != nil {
-		// -wiki with no page means pregnerate the wiki
-		w.Pregenerate()
-		log.Println("wiki pregenerated")
+		// -wiki with no page means pregenerate the wiki
+
+		log.Println("starting pregeneration...")
+
+		pregen := pregenerate.New(w)
+		stats := pregen.PregenerateSync()
+
+		log.Printf("pregeneration complete: %d total, %d generated, %d failed",
+			stats.TotalPages, stats.PregenedPages, stats.FailedPages)
+
+		pregen.Stop()
 		return
 	}
 
@@ -99,7 +110,21 @@ func main() {
 	// run webserver
 	webserver.Configure(opts)
 	adminifier.Configure()
+	// handle SIGHUP to rehash server config
+	go handleSignals()
 	webserver.Listen()
+}
+
+// handleSignals listens for SIGHUP and triggers a server config rehash.
+func handleSignals() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGHUP)
+	for range c {
+		log.Println("received SIGHUP: rehashing server config")
+		if err := webserver.Rehash(); err != nil {
+			log.Println("error rehashing server config:", err)
+		}
+	}
 }
 
 // reads from stdin

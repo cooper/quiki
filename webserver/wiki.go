@@ -12,17 +12,19 @@ import (
 	"strings"
 
 	"github.com/cooper/quiki/monitor"
+	"github.com/cooper/quiki/pregenerate"
 	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 )
 
 // WikiInfo represents a wiki hosted on this webserver.
 type WikiInfo struct {
-	Name     string // wiki shortname
-	Title    string // wiki title from @name in the wiki config
-	Logo     string
-	Host     string
-	template wikiTemplate
+	Name               string // wiki shortname
+	Title              string // wiki title from @name in the wiki config
+	Logo               string
+	Host               string
+	template           wikiTemplate
+	pregenerateManager *pregenerate.Manager
 	*wiki.Wiki
 }
 
@@ -112,11 +114,13 @@ func InitWikis() error {
 		// initialize git repsitory
 		log.Println(w.BranchNames())
 
-		// pregenerate
-		w.Pregenerate()
+		// start pregeneration manager
+		wi.pregenerateManager = pregenerate.New(w)
 
-		// monitor for changes
-		go monitor.WatchWiki(w)
+		// monitor for changes with new monitoring system
+		if err := monitor.GetManager().AddWiki(w); err != nil {
+			return err
+		}
 
 		// set up the wiki for webserver
 		if err := setupWiki(wi); err != nil {
@@ -300,5 +304,13 @@ func (wi *WikiInfo) Copy(w *wiki.Wiki) *WikiInfo {
 		Host:     wi.Host,
 		template: wi.template,
 		Wiki:     w,
+	}
+}
+
+// Shutdown gracefully shuts down the wiki and its services
+func (wi *WikiInfo) Shutdown() {
+	if wi.pregenerateManager != nil {
+		wi.pregenerateManager.Stop()
+		wi.pregenerateManager = nil
 	}
 }
