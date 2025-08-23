@@ -402,12 +402,12 @@ func (m *Manager) generateImageDirect(imageName string) any {
 // QueueAllContentAtStartup discovers and queues all pages and images for background pregeneration
 func (m *Manager) QueueAllContentAtStartup() {
 	// always log this important startup activity
-	m.wiki.Log("PREGENERATION: discovering and queuing all content for background pregeneration")
+	m.wiki.Log("pregenerate: discovering and queuing all content for background pregeneration")
 
 	// queue all pages for background pregeneration
 	go func() {
 		allPages := m.wiki.AllPageFiles()
-		m.wiki.Log(fmt.Sprintf("PREGENERATION: found %d total pages, starting to queue them", len(allPages)))
+		m.wiki.Log(fmt.Sprintf("pregenerate: found %d total pages, starting to queue them", len(allPages)))
 		if m.options.LogVerbose {
 			m.wiki.Log(fmt.Sprintf("queuing %d pages for background pregeneration", len(allPages)))
 		}
@@ -418,10 +418,15 @@ func (m *Manager) QueueAllContentAtStartup() {
 		queuedCount := 0
 		skippedCount := 0
 		for _, pageName := range allPages {
-			// check if already processed or queued
+			// for background startup queueing, only check if currently processing
+			// don't check completedPages since background processing should be repeatable
 			m.mu.Lock()
-			if m.processingPages[pageName] || m.completedPages[pageName] || m.promotedPages[pageName] {
+			isProcessing := m.processingPages[pageName]
+			isPromoted := m.promotedPages[pageName]
+			if isProcessing || isPromoted {
 				skippedCount++
+				m.wiki.Log(fmt.Sprintf("pregenerate: skipping page %s - processing:%v promoted:%v",
+					pageName, isProcessing, isPromoted))
 				m.mu.Unlock()
 				continue
 			}
@@ -430,9 +435,9 @@ func (m *Manager) QueueAllContentAtStartup() {
 			select {
 			case m.backgroundCh <- pageName:
 				queuedCount++
-				m.wiki.Log("PREGENERATION: queued page for background processing: " + pageName)
+				m.wiki.Log("pregenerate: queued page for background processing: " + pageName)
 			case <-m.ctx.Done():
-				m.wiki.Log("PREGENERATION: context canceled while queueing pages")
+				m.wiki.Log("pregenerate: context canceled while queueing pages")
 				return
 			default:
 				// background queue full, skip for now
@@ -442,7 +447,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 				}
 			}
 		}
-		m.wiki.Log(fmt.Sprintf("PREGENERATION: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
+		m.wiki.Log(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
 	}()
 
 	// queue all images for background pregeneration
@@ -715,7 +720,7 @@ func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
 	})
 
 	if err != nil {
-		m.wiki.Log("skipping pregeneration: " + err.Error())
+		m.wiki.Log("skipping pregenerate: " + err.Error())
 	}
 
 	// return current stats
@@ -791,11 +796,11 @@ func (m *Manager) backgroundWorker() {
 	for {
 		select {
 		case pageName := <-m.backgroundCh:
-			m.wiki.Log("PREGENERATION: background worker received page: " + pageName)
+			m.wiki.Log("pregenerate: background worker received page: " + pageName)
 			// check if already being processed, completed, or promoted
 			m.mu.Lock()
 			if m.processingPages[pageName] || m.completedPages[pageName] || m.promotedPages[pageName] {
-				m.wiki.Log("PREGENERATION: background worker skipping page (already processed/processing): " + pageName)
+				m.wiki.Log("pregenerate: background worker skipping page (already processed/processing): " + pageName)
 				m.mu.Unlock()
 				<-ticker.C // rate limit even for skipped items to prevent queue flooding
 				continue
@@ -803,7 +808,7 @@ func (m *Manager) backgroundWorker() {
 			m.processingPages[pageName] = true
 			m.mu.Unlock()
 
-			m.wiki.Log("PREGENERATION: background worker generating page: " + pageName)
+			m.wiki.Log("pregenerate: background worker generating page: " + pageName)
 			result := m.pregeneratePage(pageName, false)
 
 			// notify any waiting result channels
@@ -831,12 +836,12 @@ func (m *Manager) backgroundWorker() {
 // pregeneratePage generates a single page and updates statistics
 func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	start := time.Now()
-	m.wiki.Log(fmt.Sprintf("PREGENERATION: starting generation for page: %s (priority: %v)", pageName, isHighPriority))
+	m.wiki.Log(fmt.Sprintf("pregenerate: starting generation for page: %s (priority: %v)", pageName, isHighPriority))
 
 	// check if page exists
 	page := m.wiki.FindPage(pageName)
 	if !page.Exists() {
-		m.wiki.Log("PREGENERATION: page does not exist: " + pageName)
+		m.wiki.Log("pregenerate: page does not exist: " + pageName)
 		return wiki.DisplayError{Error: "Page not found"}
 	}
 
@@ -845,7 +850,7 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		cacheModify := page.CacheModified()
 		pageModified := page.Modified()
 		if !pageModified.After(cacheModify) {
-			m.wiki.Log(fmt.Sprintf("PREGENERATION: page %s already cached and fresh", pageName))
+			m.wiki.Log(fmt.Sprintf("pregenerate: page %s already cached and fresh", pageName))
 			if m.options.LogVerbose {
 				m.wiki.Log(fmt.Sprintf("page %s already cached and fresh", pageName))
 			}
@@ -854,7 +859,7 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		}
 	}
 
-	m.wiki.Log("PREGENERATION: calling DisplayPageDraft for: " + pageName)
+	m.wiki.Log("pregenerate: calling DisplayPageDraft for: " + pageName)
 	// temporarily modify ForceGen in a thread-safe way
 	var result any
 	originalForceGen := m.wiki.Opt.Page.ForceGen
@@ -869,8 +874,8 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	} else {
 		result = m.wiki.DisplayPageDraft(pageName, true)
 	}
-	
-	m.wiki.Log("PREGENERATION: DisplayPageDraft completed for: " + pageName)
+
+	m.wiki.Log("pregenerate: DisplayPageDraft completed for: " + pageName)
 
 	// update stats
 	m.mu.Lock()
