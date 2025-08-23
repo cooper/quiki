@@ -1147,8 +1147,8 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		loopImg.Width = size[0]
 		loopImg.Height = size[1]
 
-		// generate the image
-		result := m.wiki.DisplaySizedImageGenerate(loopImg, true)
+		// generate the image (lock-free since we already hold the lock)
+		result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false)
 
 		// if this is the exact size that was requested, save the result
 		if size == requestedSize {
@@ -1166,7 +1166,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		return requestedResult
 	}
 	m.debug("pregenerateImage generating final result for: %s", imageName)
-	finalResult := m.wiki.DisplaySizedImageGenerate(requestedImg, true)
+	finalResult := m.wiki.DisplaySizedImageGenerateInternal(requestedImg, true, false)
 	m.debug("pregenerateImage completed for: %s", imageName)
 	return finalResult
 }

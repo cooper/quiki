@@ -205,6 +205,11 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) any {
 // DisplaySizedImageGenerate returns the display result for an image in specific dimensions
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
+	return w.DisplaySizedImageGenerateInternal(img, generateOK, true)
+}
+
+// DisplaySizedImageGenerateInternal is the internal implementation that can skip locking
+func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool, needLock bool) any {
 	var r DisplayImage
 	logName := img.ScaleName()
 	w.Debug("display image:", logName)
@@ -289,7 +294,7 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 			w.Debugf("display image: %s: also generating retina @%dx", logName, scale)
 			scaledImage := img        // copy
 			scaledImage.Scale = scale // set scale
-			w.DisplaySizedImageGenerate(scaledImage, generateOK)
+			w.DisplaySizedImageGenerateInternal(scaledImage, generateOK, needLock)
 		}
 	}
 
@@ -334,10 +339,12 @@ func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
 	// so if we made it all the way down to here, we need to
 	// generate the image in specific dimensions
 
-	// use image-specific locking to prevent duplicate generation
-	imageLock := w.GetImageLock(trueName)
-	imageLock.Lock()
-	defer imageLock.Unlock()
+	// use image-specific locking to prevent duplicate generation (if needed)
+	if needLock {
+		imageLock := w.GetImageLock(trueName)
+		imageLock.Lock()
+		defer imageLock.Unlock()
+	}
 
 	// check cache again after acquiring lock (another process might have generated it)
 	cacheFi, err = os.Lstat(cachePath)
