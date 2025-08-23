@@ -75,17 +75,22 @@ func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 	m.activeMu.Lock()
 	defer m.activeMu.Unlock()
 
-	if m.currentActive == 0 {
-		return true
-	}
-
+	// always update memory stats when checking (but still cache for 3 seconds)
 	if time.Since(m.lastCheck) > 3*time.Second {
 		m.updateMemoryStats()
 	}
 
+	// get current memory info for logging
 	m.mu.RLock()
 	availableMB := m.availableMemoryMB
 	m.mu.RUnlock()
+
+	// first worker always gets through
+	if m.currentActive == 0 {
+		fmt.Printf("memory: first worker - available=%dMB, active=0, max=%d\n",
+			availableMB, m.maxConcurrency)
+		return true
+	}
 
 	// external processors (libvips/imagemagick) use minimal process memory
 	estimatedMemoryPerWorkerMB := int64(25)
