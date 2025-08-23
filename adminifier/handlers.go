@@ -52,23 +52,30 @@ type adminRequest struct {
 }
 
 func setupAdminHandlers() {
+	// ensure we have proper separator between host and paths
+	hostRoot := host + root
+	if root == "" && host != "" {
+		hostRoot = host + "/"
+	}
+	
 	for name, function := range adminUnauthenticatedHandlers {
-		mux.HandleFunc(host+root+name, function)
+		mux.HandleFunc(hostRoot+name, function)
 	}
 	for name, function := range adminUnauthenticatedFuncHandlers {
-		mux.HandleFunc(host+root+"func/"+name, function)
+		mux.HandleFunc(hostRoot+"func/"+name, function)
 	}
 
 	// authenticated handlers
 
 	// each of these generates admin.tpl
 	for which := range adminFrameHandlers {
-		mux.HandleFunc(host+root+which, handleAdmin)
+		mux.HandleFunc(hostRoot+which, handleAdmin)
 	}
 
 	// frames to load via ajax
 	frameRoot := root + "frame/"
-	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
+	framePattern := hostRoot + "frame/"
+	mux.HandleFunc(framePattern, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if redirectIfNotLoggedIn(w, r) {

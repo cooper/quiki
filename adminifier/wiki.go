@@ -103,24 +103,32 @@ func initWikis() {
 
 func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	wikiRoot := root + wikiDelimeter + shortcode
+	
+	// ensure proper host+path separator
+	hostWikiRoot := host + wikiRoot
+	if root == "" && host != "" {
+		hostWikiRoot = host + "/" + wikiDelimeter + shortcode
+	}
 
 	// each of these URLs generates wiki.tpl
-	mux.RegisterFunc(host+wikiRoot, "adminifier site root", func(w http.ResponseWriter, r *http.Request) {
+	mux.RegisterFunc(hostWikiRoot, "adminifier site root", func(w http.ResponseWriter, r *http.Request) {
 		handleWikiRoot(shortcode, wi, w, r)
 	})
 	wikiRoot += "/"
-	mux.HandleFunc(host+wikiRoot, func(w http.ResponseWriter, r *http.Request) {
+	hostWikiRootSlash := hostWikiRoot + "/"
+	mux.HandleFunc(hostWikiRootSlash, func(w http.ResponseWriter, r *http.Request) {
 		handleWikiRoot(shortcode, wi, w, r)
 	})
 	for which := range wikiFrameHandlers {
-		mux.HandleFunc(host+wikiRoot+which, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(hostWikiRootSlash+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
 	}
 
 	// frames to load via ajax
 	frameRoot := wikiRoot + "frame/"
-	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
+	hostFrameRoot := hostWikiRootSlash + "frame/"
+	mux.HandleFunc(hostFrameRoot, func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if redirectIfNotLoggedIn(w, r) {
@@ -190,10 +198,10 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	})
 
 	// functions
-	funcRoot := wikiRoot + "func/"
+	hostFuncRoot := hostWikiRootSlash + "func/"
 	for funcName, thisHandler := range wikiFuncHandlers {
 		handler := thisHandler
-		mux.HandleFunc(host+funcRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(hostFuncRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
 
 			// check logged in
 			//
