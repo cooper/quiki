@@ -15,6 +15,7 @@ import (
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
+	log.Printf("handleRoot: %s %s", r.Method, r.URL.Path)
 	var delayedWiki *WikiInfo
 
 	// try each wiki
@@ -66,6 +67,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// anything else is a generic 404
+	log.Printf("handleRoot: no matching wiki for host=%s, path=%s", r.Host, r.URL.Path)
 	http.NotFound(w, r)
 }
 
