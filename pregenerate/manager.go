@@ -66,6 +66,14 @@ type Manager struct {
 	// synchronous operation support
 	pageResults  map[string]chan any // channels waiting for page results
 	imageResults map[string]chan any // channels waiting for image results
+
+	// validation state tracking
+	init           bool // tracks if we enabled deferred checking mode
+	initComplete   bool // tracks if initial startup pregeneration is complete
+	initPages      int  // number of pages queued during initial startup
+	initImages     int  // number of images queued during initial startup
+	initPagesDone  int  // number of initial pages completed
+	initImagesDone int  // number of initial images completed
 }
 
 // Options configures pregeneration behavior
@@ -226,9 +234,19 @@ func (m *Manager) Stop() {
 	if m.backgroundImageCh != nil {
 		close(m.backgroundImageCh)
 	}
-}
 
-// GeneratePageSync generates a single page synchronously (blocks until complete)
+	// if we're in the middle of initial pregeneration and haven't processed
+	// deferred checks yet, do it now before stopping
+	m.mu.Lock()
+	shouldProcessChecks := m.init && !m.initComplete
+	m.init = false
+	m.mu.Unlock()
+
+	if shouldProcessChecks {
+		m.wiki.SetDeferringChecks(false)
+		m.wiki.ProcessChecks()
+	}
+} // GeneratePageSync generates a single page synchronously (blocks until complete)
 // this is the new unified entry point for all page generation
 func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
 	// first check if already cached and fresh
@@ -465,6 +483,19 @@ func (m *Manager) QueueAllContentAtStartup() {
 			}
 		}
 		m.debug(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
+
+		// update initial pages queued count
+		m.mu.Lock()
+		m.initPages = queuedCount
+
+		// if no pages were queued, mark pages as complete immediately
+		if queuedCount == 0 {
+			m.initPagesDone = 0
+		}
+		m.mu.Unlock()
+
+		// check if initial pregeneration might be complete (in case of 0 pages)
+		m.checkInitialPregenerationComplete()
 	}()
 
 	// queue all images for background pregeneration
@@ -473,6 +504,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 			allImages := m.wiki.AllImageFiles()
 			m.debug("queuing %d images for background pregeneration", len(allImages))
 
+			queued := 0
 			for _, imageName := range allImages {
 				// check if already processed or queued
 				m.mu.Lock()
@@ -484,7 +516,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 
 				select {
 				case m.backgroundImageCh <- imageName:
-					// queued
+					queued++
 				case <-m.ctx.Done():
 					return
 				default:
@@ -492,6 +524,19 @@ func (m *Manager) QueueAllContentAtStartup() {
 					m.debug("background image queue full, skipping: %s", imageName)
 				}
 			}
+
+			// update initial images queued count
+			m.mu.Lock()
+			m.initImages = queued
+
+			// if no images were queued, mark images as complete immediately
+			if queued == 0 {
+				m.initImagesDone = 0
+			}
+			m.mu.Unlock()
+
+			// check if initial pregeneration might be complete (in case of 0 images)
+			m.checkInitialPregenerationComplete()
 		}()
 	}
 }
@@ -616,6 +661,12 @@ func (m *Manager) RequestImagePregeneration(imageName string) {
 
 // StartBackground begins low-priority background pregeneration of all pages and images
 func (m *Manager) StartBackground() *Manager {
+	// enable pregeneration mode for background operations
+	m.mu.Lock()
+	m.init = true
+	m.mu.Unlock()
+	m.wiki.SetDeferringChecks(true)
+
 	// queue all content for background pregeneration at startup
 	m.QueueAllContentAtStartup()
 	return m
@@ -633,7 +684,44 @@ func (m *Manager) debug(format string, args ...interface{}) {
 	// }
 }
 
-// pregenerateAllImages handles both synchronous and asynchronous image pregeneration
+// checkInitialPregenerationComplete checks if initial pregeneration is done and processes deferred validations
+func (m *Manager) checkInitialPregenerationComplete() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// if already processed or not in deferred mode, nothing to do
+	if m.initComplete || !m.init {
+		return
+	}
+
+	// check if we have counts for both pages and images (if enabled)
+	pagesReady := m.initPages >= 0 && m.initPagesDone >= m.initPages
+	imagesReady := true // default to ready if images disabled
+	if m.options.EnableImages {
+		imagesReady = m.initImages >= 0 && m.initImagesDone >= m.initImages
+	}
+
+	m.debug("checkInitialPregenerationComplete: pages %d/%d (ready: %v), images %d/%d (ready: %v)",
+		m.initPagesDone, m.initPages, pagesReady,
+		m.initImagesDone, m.initImages, imagesReady)
+
+	if pagesReady && imagesReady {
+		m.debug("initial pregeneration complete: pages %d/%d, images %d/%d",
+			m.initPagesDone, m.initPages,
+			m.initImagesDone, m.initImages)
+
+		m.initComplete = true
+		m.init = false
+
+		// unlock temporarily to avoid holding lock during validation processing
+		m.mu.Unlock()
+		m.wiki.SetDeferringChecks(false)
+		m.debug("processing deferred validations after initial pregeneration...")
+		m.wiki.ProcessChecks()
+		m.debug("deferred validation processing complete - system now in normal validation mode")
+		m.mu.Lock() // re-lock for defer unlock
+	}
+} // pregenerateAllImages handles both synchronous and asynchronous image pregeneration
 func (m *Manager) pregenerateAllImages(synchronous bool) {
 	if !m.options.EnableImages {
 		return
@@ -683,6 +771,16 @@ func (m *Manager) pregenerateAllImages(synchronous bool) {
 	}
 } // PregenerateSync synchronously pregenerates all pages and images
 func (m *Manager) PregenerateSync() Stats {
+	// enable pregeneration mode to defer validations
+	m.wiki.SetDeferringChecks(true)
+	defer func() {
+		m.wiki.SetDeferringChecks(false)
+		// process deferred validations after pregeneration
+		m.debug("processing deferred validations...")
+		m.wiki.ProcessChecks()
+		m.debug("deferred validation processing complete")
+	}()
+
 	stats := m.pregenerateAllPages(true)
 	m.pregenerateAllImages(true)
 	return stats
@@ -852,7 +950,15 @@ func (m *Manager) backgroundWorker() {
 			m.mu.Lock()
 			delete(m.processingPages, pageName)
 			m.completedPages[pageName] = true
+
+			// track initial pregeneration completion
+			if !m.initComplete {
+				m.initPagesDone++
+			}
 			m.mu.Unlock()
+
+			// check if initial pregeneration is complete
+			m.checkInitialPregenerationComplete()
 
 			<-ticker.C // rate limit
 		case <-m.ctx.Done():
@@ -1038,7 +1144,15 @@ func (m *Manager) backgroundImageWorker() {
 			m.mu.Lock()
 			delete(m.processingImages, imageName)
 			m.completedImages[imageName] = true
+
+			// track initial pregeneration completion
+			if !m.initComplete {
+				m.initImagesDone++
+			}
 			m.mu.Unlock()
+
+			// check if initial pregeneration is complete
+			m.checkInitialPregenerationComplete()
 
 			<-ticker.C // rate limit
 		case <-m.ctx.Done():
@@ -1105,7 +1219,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	if imageCat == nil || !imageCat.Exists() {
 		m.debug("no references found for image: %s, checking if full-size or valid", imageName)
 		m.debug("debug: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists())
-		
+
 		// let DisplaySizedImageGenerateInternal handle the security check
 		// it will allow full-size images and reject arbitrary sizes
 		finalResult := m.wiki.DisplaySizedImageGenerateInternal(sizedImg, false, false) // generateOK=false to enforce security

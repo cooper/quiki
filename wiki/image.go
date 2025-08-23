@@ -368,11 +368,11 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 		if bigW == 0 || bigH == 0 {
 			bigW, bigH = getImageDimensions(bigPath)
 		}
-		
+
 		// allow full-size images (either 0x0 or matching original dimensions)
-		isFullSize := (img.Width == 0 && img.Height == 0) || 
-		             (img.TrueWidth() == bigW && img.TrueHeight() == bigH)
-		
+		isFullSize := (img.Width == 0 && img.Height == 0) ||
+			(img.TrueWidth() == bigW && img.TrueHeight() == bigH)
+
 		if !isFullSize && !w.isImageSizeReferenced(img) {
 			dimensions := strconv.Itoa(img.TrueWidth()) + "x" + strconv.Itoa(img.TrueHeight())
 			return DisplayError{

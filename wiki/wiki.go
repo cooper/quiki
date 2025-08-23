@@ -22,6 +22,8 @@ type Wiki struct {
 	imageLocks    map[string]*sync.Mutex // locks for image generation
 	imageLocksmu  sync.RWMutex
 	pregenerating bool
+	checks        []Check
+	checkMu       sync.Mutex
 	_repo         *git.Repository
 	_logger       *log.Logger
 }
