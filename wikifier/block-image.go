@@ -86,6 +86,11 @@ func (image *imageBlock) parse(page *Page) {
 
 	sizeMethod := strings.ToLower(page.Opt.Image.SizeMethod)
 
+	// debug what size method we're using
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("image block: file='%s', sizeMethod='%s'", image.file, sizeMethod)
+	}
+
 	if externalImageRegex.MatchString(image.file) {
 		// if the file is an absolute URL, we cannot size the image
 		// do nothing
@@ -137,6 +142,11 @@ func (image *imageBlock) parse(page *Page) {
 			calcHeight,
 			page,
 		)
+
+		// debug final path
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("image block: final path='%s'", image.path)
+		}
 
 		// remember that the page uses this image in these dimensions
 		// consider: should we remember the retina scales? I guess it doesn't really DEPEND on them

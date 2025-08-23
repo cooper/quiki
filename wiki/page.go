@@ -139,10 +139,12 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 
 	// these are available to all pages
 	p.Wiki = w
-	p.Opt = &w.Opt
+	// give each page its own copy of the wiki options
+	// so that page-specific options don't affect other pages
+	pageOpt := w.Opt // copy the struct
+	p.Opt = &pageOpt
 
 	// page lock will be created by GetPageLock if needed
-
 	return
 }
 
