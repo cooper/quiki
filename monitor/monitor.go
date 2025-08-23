@@ -23,10 +23,11 @@ type Manager struct {
 
 // wikiWatcher represents monitoring for a single wiki.
 type wikiWatcher struct {
-	wiki    *wiki.Wiki
-	watcher *fsnotify.Watcher
-	ctx     context.Context
-	cancel  context.CancelFunc
+	wiki           *wiki.Wiki
+	watcher        *fsnotify.Watcher
+	ctx            context.Context
+	cancel         context.CancelFunc
+	symlinkTargets sync.Map // maps target file paths to slice of symlink relative paths
 }
 
 // Global manager instance
@@ -53,13 +54,13 @@ func (m *Manager) AddWiki(w *wiki.Wiki) error {
 
 	wikiName := w.Name()
 
-	// Stop existing watcher if present
+	// stop existing watcher if present
 	if existing, exists := m.watchers[wikiName]; exists {
 		existing.stop()
 		delete(m.watchers, wikiName)
 	}
 
-	// Create new watcher
+	// create new watcher
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
@@ -73,7 +74,7 @@ func (m *Manager) AddWiki(w *wiki.Wiki) error {
 		cancel:  cancel,
 	}
 
-	// Add directories to watch
+	// add directories to watch
 	dirs := []string{
 		w.Opt.Dir.Page,
 		w.Opt.Dir.Image,
@@ -92,6 +93,22 @@ func (m *Manager) AddWiki(w *wiki.Wiki) error {
 			if info.IsDir() {
 				return watcher.Add(path)
 			}
+
+			// if this is in the page directory and is a symlink, track it and watch the target
+			if dir == w.Opt.Dir.Page && info.Mode()&os.ModeSymlink != 0 {
+				if target, err := filepath.EvalSymlinks(path); err == nil {
+					// get relative path of the symlink
+					if relPath, err := filepath.Rel(w.Opt.Dir.Page, path); err == nil {
+						// track this symlink target
+						ww.addSymlinkTarget(target, relPath)
+
+						// add target to watcher if it's not already watched
+						if err := watcher.Add(target); err == nil {
+							log.Printf("Watching symlink target: %s -> %s", relPath, target)
+						}
+					}
+				}
+			}
 			return nil
 		})
 
@@ -102,7 +119,7 @@ func (m *Manager) AddWiki(w *wiki.Wiki) error {
 
 	m.watchers[wikiName] = ww
 
-	// Start monitoring in background
+	// start monitoring in background
 	go ww.monitor()
 
 	log.Printf("Started monitoring wiki: %s", wikiName)
@@ -141,6 +158,56 @@ func (ww *wikiWatcher) stop() {
 	if ww.watcher != nil {
 		ww.watcher.Close()
 	}
+}
+
+// addSymlinkTarget tracks a symlink target for regeneration
+func (ww *wikiWatcher) addSymlinkTarget(targetPath, symlinkRelPath string) {
+	if existing, ok := ww.symlinkTargets.Load(targetPath); ok {
+		if symlinks, ok := existing.([]string); ok {
+			// add to existing slice if not already present
+			for _, existing := range symlinks {
+				if existing == symlinkRelPath {
+					return
+				}
+			}
+			ww.symlinkTargets.Store(targetPath, append(symlinks, symlinkRelPath))
+		}
+	} else {
+		ww.symlinkTargets.Store(targetPath, []string{symlinkRelPath})
+	}
+}
+
+// removeSymlinkTarget removes a symlink from target tracking
+func (ww *wikiWatcher) removeSymlinkTarget(targetPath, symlinkRelPath string) {
+	if existing, ok := ww.symlinkTargets.Load(targetPath); ok {
+		if symlinks, ok := existing.([]string); ok {
+			// remove from slice
+			for i, symlink := range symlinks {
+				if symlink == symlinkRelPath {
+					newSymlinks := append(symlinks[:i], symlinks[i+1:]...)
+					if len(newSymlinks) == 0 {
+						// no more symlinks for this target, remove entirely
+						ww.symlinkTargets.Delete(targetPath)
+						// stop watching the target since nothing points to it now
+						_ = ww.watcher.Remove(targetPath)
+					} else {
+						ww.symlinkTargets.Store(targetPath, newSymlinks)
+					}
+					return
+				}
+			}
+		}
+	}
+}
+
+// getSymlinkTargets returns all symlinks that point to the given target path.
+func (ww *wikiWatcher) getSymlinkTargets(targetPath string) []string {
+	if symlinks, ok := ww.symlinkTargets.Load(targetPath); ok {
+		if slice, ok := symlinks.([]string); ok {
+			return slice
+		}
+	}
+	return nil
 }
 
 // monitor is the main monitoring loop for a wiki.
@@ -191,35 +258,130 @@ func (ww *wikiWatcher) handleEvent(event fsnotify.Event) {
 	pageDir, _ := filepath.Abs(ww.wiki.Opt.Dir.Page)
 	if relPath, err := filepath.Rel(pageDir, abs); err == nil && !filepath.IsAbs(relPath) {
 		ww.handlePageEvent(relPath, event)
+		return
+	}
+
+	// check if this is a symlink target file that we should regenerate symlinks for
+	if symlinks := ww.getSymlinkTargets(abs); symlinks != nil {
+		for _, symlinkRelPath := range symlinks {
+			log.Printf("Symlink target changed, regenerating symlink: %s -> %s", symlinkRelPath, abs)
+			ww.regeneratePage(symlinkRelPath)
+		}
+		return
+	}
+
+	// check if this might be a broken symlink target (file deleted)
+	if event.Op&fsnotify.Remove == fsnotify.Remove {
+		// clean up any symlink targets that pointed to this file
+		ww.symlinkTargets.Range(func(key, value interface{}) bool {
+			targetPath := key.(string)
+			if targetPath == abs {
+				if symlinks, ok := value.([]string); ok {
+					for _, symlinkRelPath := range symlinks {
+						log.Printf("Symlink target deleted, regenerating broken symlink page: %s (target %s)", symlinkRelPath, abs)
+						ww.regeneratePage(symlinkRelPath)
+					}
+				}
+				// remove from tracking and stop watching the target path
+				ww.symlinkTargets.Delete(targetPath)
+				_ = ww.watcher.Remove(targetPath)
+			}
+			return true
+		})
 	}
 }
 
-// handlePageEvent processes page file changes.
+// handlePageEvent processes page file changes
 func (ww *wikiWatcher) handlePageEvent(relPath string, event fsnotify.Event) {
 	switch event.Op {
 	case fsnotify.Create, fsnotify.Write:
-		// Skip if it's a symlink
 		abs := filepath.Join(ww.wiki.Opt.Dir.Page, relPath)
+
+		// if this is a newly created symlink, track its target
 		if fi, err := os.Lstat(abs); err == nil && fi.Mode()&os.ModeSymlink != 0 {
-			return
+			if target, err := filepath.EvalSymlinks(abs); err == nil {
+				ww.addSymlinkTarget(target, relPath)
+				// also add target to watcher
+				if err := ww.watcher.Add(target); err == nil {
+					log.Printf("Watching new symlink target: %s -> %s", relPath, target)
+				}
+			}
+		} else if event.Op == fsnotify.Write {
+			// check if this is an existing symlink whose target changed
+			ww.handlePotentialSymlinkChange(relPath)
 		}
 
-		log.Printf("Page changed, regenerating: %s", relPath)
-
-		// Use page locking to coordinate with other operations
-		pageLock := ww.wiki.GetPageLock(relPath)
-		pageLock.Lock()
-		defer pageLock.Unlock()
-
-		// Force regeneration
-		ww.wiki.DisplayPageDraft(relPath, true)
+		ww.regeneratePage(relPath)
 
 	case fsnotify.Rename, fsnotify.Remove:
 		log.Printf("Page removed: %s", relPath)
 
-		// Clean up cache
+		// if this was a symlink, clean up target tracking
+		abs := filepath.Join(ww.wiki.Opt.Dir.Page, relPath)
+		// try to get the target before it's gone (for renames, this might still work)
+		if target, err := os.Readlink(abs); err == nil {
+			// resolve to absolute path
+			if !filepath.IsAbs(target) {
+				target = filepath.Join(filepath.Dir(abs), target)
+			}
+			if resolvedTarget, err := filepath.Abs(target); err == nil {
+				ww.removeSymlinkTarget(resolvedTarget, relPath)
+			}
+		}
+
+		// clean up cache
 		cacheDir := ww.wiki.Opt.Dir.Cache
 		os.Remove(filepath.Join(cacheDir, "page", relPath+".cache"))
 		os.Remove(filepath.Join(cacheDir, "page", relPath+".txt"))
 	}
+}
+
+// handlePotentialSymlinkChange checks if a symlink target has changed
+func (ww *wikiWatcher) handlePotentialSymlinkChange(relPath string) {
+	abs := filepath.Join(ww.wiki.Opt.Dir.Page, relPath)
+	if fi, err := os.Lstat(abs); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+		if newTarget, err := filepath.EvalSymlinks(abs); err == nil {
+			// find if this symlink was previously tracked under a different target
+			var oldTarget string
+			ww.symlinkTargets.Range(func(key, value interface{}) bool {
+				targetPath := key.(string)
+				if symlinks, ok := value.([]string); ok {
+					for _, symlink := range symlinks {
+						if symlink == relPath && targetPath != newTarget {
+							oldTarget = targetPath
+							return false // stop iteration
+						}
+					}
+				}
+				return true
+			})
+
+			if oldTarget != "" {
+				// remove from old target and add to new target
+				ww.removeSymlinkTarget(oldTarget, relPath)
+				ww.addSymlinkTarget(newTarget, relPath)
+				// add new target to watcher
+				if err := ww.watcher.Add(newTarget); err == nil {
+					log.Printf("Symlink target changed: %s -> %s (was %s)", relPath, newTarget, oldTarget)
+				}
+				// if old target has no more symlinks, stop watching it
+				if _, ok := ww.symlinkTargets.Load(oldTarget); !ok {
+					_ = ww.watcher.Remove(oldTarget)
+				}
+			}
+		}
+	}
+}
+
+// regenerates a single page with proper locking
+func (ww *wikiWatcher) regeneratePage(relPath string) {
+	log.Printf("Page changed, regenerating: %s", relPath)
+
+	// use page locking to coordinate with other operations
+	pageLock := ww.wiki.GetPageLock(relPath)
+	pageLock.Lock()
+	defer pageLock.Unlock()
+
+	// force regeneration
+	ww.wiki.DisplayPageDraft(relPath, true)
 }
