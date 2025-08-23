@@ -485,7 +485,10 @@ func (p *Page) CachePath() string {
 
 // CacheModified returns the page cache file time.
 func (p *Page) CacheModified() time.Time {
-	fi, _ := os.Lstat(p.CachePath())
+	fi, err := os.Lstat(p.CachePath())
+	if err != nil || fi == nil {
+		return time.Time{} // return zero time if cache file doesn't exist
+	}
 	return fi.ModTime()
 }
 
