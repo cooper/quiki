@@ -1209,9 +1209,9 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	defer imageLock.Unlock()
 
 	// get the image category that tracks all references to this image
-	// extract base image name (without dimensions) for category lookup
+	// extract base image name (with full path) for category lookup
 	sizedImg := wiki.SizedImageFromName(imageName)
-	baseImageName := sizedImg.RelNameNE + "." + sizedImg.Ext // reconstruct full name with extension
+	baseImageName := sizedImg.FullSizeName() // get full path: prefix + name + ext
 	m.debug("debug: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName)
 	imageCat := m.wiki.GetSpecialCategory(baseImageName, wiki.CategoryTypeImage)
 

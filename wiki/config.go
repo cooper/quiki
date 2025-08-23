@@ -109,8 +109,10 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 
 	// this must happen here to guarantee proper tracking before image pregeneration
 	if w, ok := page.Wiki.(*Wiki); ok {
-		imageCat := w.GetSpecialCategory(name, CategoryTypeImage)
-		imageCat.addImage(w, name, page, [][]int{{width, height}})
+		img := SizedImageFromName(name)
+		imageName := img.FullSizeName()
+		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
+		imageCat.addImage(w, imageName, page, [][]int{{width, height}})
 	}
 
 	return width, height, false
