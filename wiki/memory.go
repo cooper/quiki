@@ -25,12 +25,14 @@ var memoryMonitorOnce sync.Once
 func GetMemoryMonitor() *MemoryMonitor {
 	memoryMonitorOnce.Do(func() {
 		maxConcurrency := max(4, runtime.NumCPU()*2)
+		fmt.Printf("memory: creating global instance with %d max workers\n", maxConcurrency)
 		globalMemoryMonitor = NewMemoryMonitor(maxConcurrency)
 	})
 	return globalMemoryMonitor
 }
 
 func NewMemoryMonitor(maxConcurrency int) *MemoryMonitor {
+	fmt.Printf("memory: initializing with max concurrency %d\n", maxConcurrency)
 	m := &MemoryMonitor{
 		maxConcurrency: maxConcurrency,
 	}
@@ -65,7 +67,7 @@ func (m *MemoryMonitor) updateMemoryStats() {
 	m.availableMemoryMB = availableMB
 	m.lastCheck = time.Now()
 
-	fmt.Printf("memory stats: total=%dMB, used=%dMB, available=%dMB, go_heap=%dMB\n", 
+	fmt.Printf("memory stats: total=%dMB, used=%dMB, available=%dMB, go_heap=%dMB\n",
 		totalMB, usedMB, availableMB, goHeapMB)
 }
 
