@@ -56,7 +56,7 @@ func NewImageMagickProcessor(opts ImageMagickOptions) (*ImageMagickProcessor, er
 	baseOpts := ImageProcessorOptions{
 		MaxConcurrent: opts.MaxConcurrent,
 		Timeout:       opts.Timeout,
-		MaxMemoryMB:   512, // not used for external processing but needed for interface
+		MaxMemoryMB:   512,
 	}
 	baseProcessor := NewImageProcessor(baseOpts)
 

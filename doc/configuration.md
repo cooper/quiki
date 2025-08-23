@@ -185,7 +185,7 @@ __Default__: (webserver) built-in function
 _Optional_. Maximum number of concurrent image processing operations.
 
 Limits how many images can be processed simultaneously to prevent system
-overload. Set to 0 for automatic detection based on CPU cores.
+overload and memory exhaustion. quiki also monitors available memory and throttles accordingly.
 
 __Default__: 2
 
@@ -224,7 +224,8 @@ __Default__: 85
 _Optional_. Maximum memory usage per image in megabytes.
 
 Prevents crashes from loading extremely large images by checking dimensions
-before processing. An image requiring more memory will be rejected.
+before processing. An image requiring more memory will be rejected. Additionally,
+quiki monitors memory usage and reduces concurrency when memory is low to prevent crashing.
 
 __Default__: 256
 
@@ -561,11 +562,15 @@ Number of workers handling high-priority image requests.
 
 __Example__: `@server.pregen.img_workers: 6;`
 
+__Default__: max(1, CPU_cores/4)
+
 ### server.pregen.img_bg_workers
 
 Number of workers handling background image pregeneration.
 
 __Example__: `@server.pregen.img_bg_workers: 2;`
+
+__Default__: max(1, CPU_cores/8)
 
 ### server.pregen.timeout
 

@@ -239,7 +239,7 @@ func (p *ImageProcessor) ResizeImageDirect(inputPath, outputPath string, width, 
 	return imaging.Save(resized, outputPath)
 }
 
-// withConcurrencyControl executes a function with proper concurrency control
+// withConcurrencyControl executes a function with memory-aware concurrency control
 func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() error) error {
 	// check if already processing this image
 	p.mu.Lock()
@@ -256,17 +256,35 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 		p.mu.Unlock()
 	}()
 
-	// acquire semaphore to limit concurrent processing (blocking)
-	p.semaphore <- struct{}{}
-	defer func() { <-p.semaphore }()
+	// try to acquire worker with memory awareness using global monitor
+	memMonitor := GetMemoryMonitor()
+	maxRetries := 10
+	retryDelay := 100 * time.Millisecond
 
-	return fn()
-}
+	for i := 0; i < maxRetries; i++ {
+		if memMonitor.acquireWorker() {
+			defer memMonitor.releaseWorker()
+			return fn()
+		}
 
-// min returns the minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
+		// if we can't get a worker due to memory constraints, wait and retry
+		// this prevents crashes by backing off when memory is low
+		if i < maxRetries-1 {
+			time.Sleep(retryDelay)
+			retryDelay *= 2 // exponential backoff
+			if retryDelay > 2*time.Second {
+				retryDelay = 2 * time.Second
+			}
+		}
 	}
-	return b
+
+	// if we still can't get a worker after retries, fall back to basic semaphore
+	// this ensures we never completely block, but with minimal concurrency
+	select {
+	case p.semaphore <- struct{}{}:
+		defer func() { <-p.semaphore }()
+		return fn()
+	default:
+		return fmt.Errorf("system overloaded - too many concurrent image operations and insufficient memory")
+	}
 }

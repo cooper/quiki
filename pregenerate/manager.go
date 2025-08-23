@@ -109,8 +109,8 @@ func DefaultOptions() Options {
 		ImageBackgroundQueueSize: 500,
 		PriorityWorkers:          max(2, numCPU/2),  // minimum 2, scale with CPU
 		BackgroundWorkers:        max(1, numCPU/4),  // background uses fewer resources
-		ImagePriorityWorkers:     max(2, numCPU/2),  // images need good parallelism
-		ImageBackgroundWorkers:   max(1, numCPU/4),  // background image processing
+		ImagePriorityWorkers:     max(1, numCPU/4),  // more conservative for memory safety
+		ImageBackgroundWorkers:   max(1, numCPU/8),  // very conservative for background processing
 		RequestTimeout:           30 * time.Second,  // reasonable timeout for users
 		ImageRequestTimeout:      120 * time.Second, // longer timeout for large image processing
 		EnableImages:             true,              // pregenerate common image sizes
@@ -125,11 +125,11 @@ func FastOptions() Options {
 	opts := DefaultOptions()
 	opts.RateLimit = 1 * time.Millisecond // essentially unlimited (~1000 pages per second)
 	opts.ProgressInterval = 100
-	// use more aggressive worker scaling for speed
+	// use more aggressive worker scaling for speed, but still memory-aware
 	numCPU := runtime.NumCPU()
-	opts.PriorityWorkers = max(4, numCPU)      // more priority workers for speed
-	opts.ImagePriorityWorkers = max(4, numCPU) // more image workers for speed
-	opts.RequestTimeout = 10 * time.Second     // shorter timeout for fast mode
+	opts.PriorityWorkers = max(4, numCPU)        // more priority workers for speed
+	opts.ImagePriorityWorkers = max(2, numCPU/2) // more conservative for images to prevent crashes
+	opts.RequestTimeout = 10 * time.Second       // shorter timeout for fast mode
 	return opts
 }
 
@@ -1240,7 +1240,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		// if we have pregen thumbs to generate, do that first
 		if len(usedSizes) > 0 {
 			m.debug("found %d thumbnail sizes to pregenerate for unreferenced image: %s", len(usedSizes), imageName)
-			
+
 			// generate images for each thumbnail size
 			var requestedResult any
 			requestedImg := wiki.SizedImageFromName(imageName)
