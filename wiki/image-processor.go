@@ -258,8 +258,8 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 
 	// try to acquire worker with memory awareness using global monitor
 	memMonitor := GetMemoryMonitor()
-	maxRetries := 10
-	retryDelay := 100 * time.Millisecond
+	maxRetries := 50  // increased from 10
+	retryDelay := 10 * time.Millisecond  // reduced from 100ms
 
 	for i := 0; i < maxRetries; i++ {
 		if memMonitor.acquireWorker() {
@@ -268,12 +268,12 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 		}
 
 		// if we can't get a worker due to memory constraints, wait and retry
-		// this prevents crashes by backing off when memory is low
+		// much more aggressive retry for better parallelization
 		if i < maxRetries-1 {
 			time.Sleep(retryDelay)
-			retryDelay *= 2 // exponential backoff
-			if retryDelay > 2*time.Second {
-				retryDelay = 2 * time.Second
+			// much slower exponential backoff - only increase every 5 attempts
+			if i > 0 && i%5 == 0 {
+				retryDelay = min(retryDelay*2, 100*time.Millisecond)  // cap at 100ms
 			}
 		}
 	}

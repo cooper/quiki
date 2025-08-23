@@ -120,6 +120,7 @@ func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 }
 
 func (m *MemoryMonitor) acquireWorker() bool {
+	start := time.Now()
 	if !m.shouldAllowNewWorker() {
 		m.mu.RLock()
 		availableMB := m.availableMemoryMB
@@ -148,14 +149,18 @@ func (m *MemoryMonitor) acquireWorker() bool {
 
 	m.activeMu.Lock()
 	m.currentActive++
+	currentActive := m.currentActive
 	m.activeMu.Unlock()
 
-	fmt.Printf("memory: acquired worker - active: %d/%d\n", m.currentActive, m.maxConcurrency)
+	elapsed := time.Since(start)
+	fmt.Printf("memory: acquired worker - active: %d/%d (took %v)\n", 
+		currentActive, m.maxConcurrency, elapsed)
 	return true
 }
 
 // releaseWorker releases a worker slot
 func (m *MemoryMonitor) releaseWorker() {
+	start := time.Now()
 	m.activeMu.Lock()
 	if m.currentActive > 0 {
 		m.currentActive--
@@ -163,7 +168,9 @@ func (m *MemoryMonitor) releaseWorker() {
 	released := m.currentActive
 	m.activeMu.Unlock()
 
-	fmt.Printf("memory: released worker - active: %d/%d\n", released, m.maxConcurrency)
+	elapsed := time.Since(start)
+	fmt.Printf("memory: released worker - active: %d/%d (took %v)\n", 
+		released, m.maxConcurrency, elapsed)
 }
 
 // GetStats returns current memory statistics for monitoring
