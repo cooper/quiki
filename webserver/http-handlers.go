@@ -99,7 +99,9 @@ func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 
 // image request
 func handleImage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	log.Printf("handleImage: relPath=%s", relPath)
 	result := wi.pregenerateManager.GenerateImageSync(relPath, true)
+	log.Printf("handleImage: result type=%T, value=%+v", result, result)
 	handleResponse(wi, result, w, r)
 }
 
