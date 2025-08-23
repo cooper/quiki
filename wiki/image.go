@@ -205,11 +205,11 @@ func (w *Wiki) DisplaySizedImage(img SizedImage) any {
 // DisplaySizedImageGenerate returns the display result for an image in specific dimensions
 // and allows images to be generated in any dimension.
 func (w *Wiki) DisplaySizedImageGenerate(img SizedImage, generateOK bool) any {
-	return w.DisplaySizedImageGenerateInternal(img, generateOK, true)
+	return w.DisplaySizedImageGenerateInternal(img, generateOK, true, false)
 }
 
 // DisplaySizedImageGenerateInternal is the internal implementation that can skip locking
-func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool, needLock bool) any {
+func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool, needLock bool, nonBlocking bool) any {
 	var r DisplayImage
 	logName := img.ScaleName()
 	w.Debug("display image:", logName)
@@ -294,7 +294,7 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 			w.Debugf("display image: %s: also generating retina @%dx", logName, scale)
 			scaledImage := img        // copy
 			scaledImage.Scale = scale // set scale
-			w.DisplaySizedImageGenerateInternal(scaledImage, generateOK, needLock)
+			w.DisplaySizedImageGenerateInternal(scaledImage, generateOK, needLock, false)
 		}
 	}
 
@@ -384,6 +384,15 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 
 	// generate the image
 	// note: bigW and bigH might still be empty
+	if nonBlocking {
+		// in non-blocking mode, return an error immediately and queue for background generation
+		// TODO: queue image for background generation here
+		return DisplayError{
+			Error:         "Image being generated.",
+			DetailedError: "Image '" + img.TrueName() + "' is being generated in the background.",
+		}
+	}
+	
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
 		return dispErr
 	}

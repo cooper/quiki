@@ -1252,7 +1252,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 				loopImg.Height = size[1]
 
 				// generate the image (lock-free since we already hold the lock)
-				result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false)
+				result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false, false)
 
 				// if this is the exact size that was requested, save the result
 				if size == requestedSize {
@@ -1273,7 +1273,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 
 		// let DisplaySizedImageGenerateInternal handle the security check
 		// it will allow full-size images and reject arbitrary sizes
-		finalResult := m.wiki.DisplaySizedImageGenerateInternal(sizedImg, false, false) // generateOK=false to enforce security
+		finalResult := m.wiki.DisplaySizedImageGenerateInternal(sizedImg, false, false, false) // generateOK=false to enforce security
 		m.debug("pregenerateImage completed for unreferenced image: %s", imageName)
 		return finalResult
 	}
@@ -1302,7 +1302,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		loopImg.Height = size[1]
 
 		// generate the image (lock-free since we already hold the lock)
-		result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false)
+		result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false, false)
 
 		// if this is the exact size that was requested, save the result
 		if size == requestedSize {
@@ -1320,7 +1320,7 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		return requestedResult
 	}
 	m.debug("pregenerateImage generating final result for: %s", imageName)
-	finalResult := m.wiki.DisplaySizedImageGenerateInternal(requestedImg, true, false)
+	finalResult := m.wiki.DisplaySizedImageGenerateInternal(requestedImg, true, false, false)
 	m.debug("pregenerateImage completed for: %s", imageName)
 	return finalResult
 }
