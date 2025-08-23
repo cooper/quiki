@@ -2,7 +2,6 @@ package wiki
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"os"
 	"sort"
@@ -500,27 +499,6 @@ func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Pag
 				Width  int `json:"width,omitempty"`
 				Height int `json:"height,omitempty"`
 			}{width, height}
-			
-			// pregenerate configurable thumbnail sizes to avoid on-demand generation
-			// this runs async so it doesn't block ImageInfo calls
-			go func() {
-				defer func() {
-					if r := recover(); r != nil {
-						w.Log(fmt.Sprintf("failed to pregenerate thumbnails for %s: %v", imageName, r))
-					}
-				}()
-				
-				// parse thumbnail sizes from config
-				thumbnailSizes := w.ParseThumbnailSizes(w.Opt.Image.PregenThumbs, width, height)
-				
-				// generate each configured thumbnail size
-				for _, size := range thumbnailSizes {
-					img := SizedImageFromName(imageName)
-					img.Width = size[0]
-					img.Height = size[1]
-					w.DisplaySizedImageGenerate(img, false) // don't force regeneration
-				}
-			}()
 		}
 	}
 
@@ -533,16 +511,16 @@ func (w *Wiki) ParseThumbnailSizes(config string, origWidth, origHeight int) [][
 	if config == "" {
 		return nil
 	}
-	
+
 	var sizes [][2]int
 	parts := strings.Split(config, ",")
-	
+
 	for _, part := range parts {
 		part = strings.TrimSpace(part)
 		if part == "" {
 			continue
 		}
-		
+
 		// check if it's exact dimensions (NxN format)
 		if strings.Contains(part, "x") {
 			dims := strings.Split(part, "x")
@@ -584,7 +562,7 @@ func (w *Wiki) ParseThumbnailSizes(config string, origWidth, origHeight int) [][
 			}
 		}
 	}
-	
+
 	return sizes
 }
 

@@ -115,7 +115,7 @@ func InitWikis() error {
 		log.Println(w.BranchNames())
 
 		// start pregeneration manager
-		wi.pregenerateManager = pregenerate.New(w)
+		wi.pregenerateManager = pregenerate.New(w).StartBackground()
 
 		// monitor for changes with new monitoring system
 		if err := monitor.GetManager().AddWiki(w); err != nil {

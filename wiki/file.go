@@ -188,6 +188,11 @@ func (w *Wiki) allImageFiles() []string {
 	return files
 }
 
+// AllImageFiles returns all image files in the wiki.
+func (w *Wiki) AllImageFiles() []string {
+	return w.allImageFiles()
+}
+
 func (w *Wiki) imageFilesInDir(where string) []string {
 	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Image, where), imageExtensions, true)
 	return files

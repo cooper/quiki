@@ -149,17 +149,69 @@ func (m *Manager) RequestImagePregeneration(imageName string) {
 	}
 }
 
-// StartBackground begins low-priority background pregeneration of all pages
-func (m *Manager) StartBackground() {
-	m.pregenerateAll(false)
+// StartBackground begins low-priority background pregeneration of all pages and images
+func (m *Manager) StartBackground() *Manager {
+	m.pregenerateAllPages(false)
+	m.pregenerateAllImages(false)
+	return m
 }
 
-// PregenerateSync synchronously pregenerates all pages
+// pregenerateAllImages handles both synchronous and asynchronous image pregeneration  
+func (m *Manager) pregenerateAllImages(synchronous bool) {
+	if !m.options.EnableImages {
+		return
+	}
+
+	imageFiles := m.wiki.AllImageFiles()
+	if len(imageFiles) == 0 {
+		return
+	}
+
+	if synchronous {
+		m.wiki.Log(fmt.Sprintf("synchronously pregenerating %d images...", len(imageFiles)))
+
+		for i, imageName := range imageFiles {
+			if m.options.ProgressInterval > 0 && i%m.options.ProgressInterval == 0 && i > 0 {
+				m.wiki.Log(fmt.Sprintf("pregenerated %d/%d images", i, len(imageFiles)))
+			}
+
+			m.pregenerateImage(imageName)
+
+			// apply rate limiting if configured
+			if m.options.RateLimit > 0 && i < len(imageFiles)-1 {
+				time.Sleep(m.options.RateLimit * 2) // slower rate for images
+			}
+		}
+
+		m.wiki.Log(fmt.Sprintf("synchronous image pregeneration complete: %d images processed", len(imageFiles)))
+
+	} else {
+		if m.imageCh == nil {
+			return
+		}
+
+		m.wiki.Log(fmt.Sprintf("queuing %d images for background pregeneration", len(imageFiles)))
+		
+		go func() {
+			for _, imageName := range imageFiles {
+				select {
+				case m.imageCh <- imageName:
+					// queued
+				case <-m.ctx.Done():
+					// shutting down
+					return
+				}
+			}
+		}()
+	}
+}// PregenerateSync synchronously pregenerates all pages and images
 func (m *Manager) PregenerateSync() Stats {
-	return m.pregenerateAll(true)
+	stats := m.pregenerateAllPages(true)
+	m.pregenerateAllImages(true)
+	return stats
 }
 
-func (m *Manager) pregenerateAll(synchronous bool) Stats {
+func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
 	// Use wiki-level locking for cross-process coordination
 	err := m.wiki.WithWikiLock(func() error {
 		allPages := m.wiki.AllPageFiles()
@@ -344,7 +396,7 @@ func (m *Manager) pregenerateImage(imageName string) {
 	if imageCat.ImageInfo != nil {
 		origWidth := imageCat.ImageInfo.Width
 		origHeight := imageCat.ImageInfo.Height
-		
+
 		// parse thumbnail sizes from wiki config
 		thumbnailSizes := m.wiki.ParseThumbnailSizes(m.wiki.Opt.Image.PregenThumbs, origWidth, origHeight)
 		for _, size := range thumbnailSizes {
