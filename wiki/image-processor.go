@@ -258,8 +258,8 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 
 	// try to acquire worker with memory awareness using global monitor
 	memMonitor := GetMemoryMonitor()
-	maxRetries := 50  // increased from 10
-	retryDelay := 10 * time.Millisecond  // reduced from 100ms
+	maxRetries := 50                    // increased from 10
+	retryDelay := 10 * time.Millisecond // reduced from 100ms
 
 	for i := 0; i < maxRetries; i++ {
 		if memMonitor.acquireWorker() {
@@ -273,7 +273,7 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 			time.Sleep(retryDelay)
 			// much slower exponential backoff - only increase every 5 attempts
 			if i > 0 && i%5 == 0 {
-				retryDelay = min(retryDelay*2, 100*time.Millisecond)  // cap at 100ms
+				retryDelay = min(retryDelay*2, 100*time.Millisecond) // cap at 100ms
 			}
 		}
 	}

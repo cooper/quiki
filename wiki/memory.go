@@ -153,7 +153,7 @@ func (m *MemoryMonitor) acquireWorker() bool {
 	m.activeMu.Unlock()
 
 	elapsed := time.Since(start)
-	fmt.Printf("memory: acquired worker - active: %d/%d (took %v)\n", 
+	fmt.Printf("memory: acquired worker - active: %d/%d (took %v)\n",
 		currentActive, m.maxConcurrency, elapsed)
 	return true
 }
@@ -169,7 +169,7 @@ func (m *MemoryMonitor) releaseWorker() {
 	m.activeMu.Unlock()
 
 	elapsed := time.Since(start)
-	fmt.Printf("memory: released worker - active: %d/%d (took %v)\n", 
+	fmt.Printf("memory: released worker - active: %d/%d (took %v)\n",
 		released, m.maxConcurrency, elapsed)
 }
 
