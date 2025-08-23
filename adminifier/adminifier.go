@@ -97,11 +97,7 @@ func Configure() {
 
 	// if there are no users yet, let them know token
 	if tok, _ := conf.Get("adminifier.token"); tok != nil && len(webserver.Auth.Users) == 0 {
-		userURL := host + root
-		if root == "" && host != "" {
-			userURL = host + "/"
-		}
-		log.Printf("no admin users exist yet, visit %screate-user to create one", userURL)
+		log.Printf("no admin users exist yet, visit %screate-user to create one", host+root)
 		log.Printf("your setup token: %s", tok)
 	}
 }
