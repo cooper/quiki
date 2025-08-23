@@ -260,7 +260,7 @@ func UniqueFilesInDir(dir string, extensions []string, thisDirOnly bool) ([]stri
 			// skip files without desired extension
 			skip := true
 			for _, acceptable := range extensions {
-				if ext == acceptable {
+				if strings.EqualFold(ext, acceptable) {
 					skip = false
 					break
 				}
