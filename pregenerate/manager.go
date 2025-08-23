@@ -185,7 +185,7 @@ func NewWithOptions(w *wiki.Wiki, opts Options) *Manager {
 
 	// background page workers
 	m.wg.Add(opts.BackgroundWorkers)
-	m.wiki.Log(fmt.Sprintf("pregenerate: starting %d background workers, queue size: %d, rate limit: %v",
+	m.debug(fmt.Sprintf("pregenerate: starting %d background workers, queue size: %d, rate limit: %v",
 		opts.BackgroundWorkers, opts.BackgroundQueueSize, opts.RateLimit))
 	for i := 0; i < opts.BackgroundWorkers; i++ {
 		go m.backgroundWorker()
@@ -315,50 +315,63 @@ func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
 
 // GenerateImageSync generates image thumbnails synchronously (blocks until complete)
 func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
-	m.debug("GenerateImageSync called: %s, highPriority: %v, EnableImages: %v", imageName, highPriority, m.options.EnableImages)
+	m.debug("generateImageSync START: %s, highPriority: %v, EnableImages: %v", imageName, highPriority, m.options.EnableImages)
 
 	if !m.options.EnableImages {
 		// even with images disabled, use unified generation for consistency
-		m.debug("Images disabled, calling pregenerateImage directly")
-		return m.pregenerateImage(imageName)
+		m.debug("images disabled, calling pregenerateImage directly")
+		result := m.pregenerateImage(imageName)
+		m.debug("pregenerateImage returned, exiting GenerateImageSync")
+		return result
 	}
 
-	m.debug("Images enabled, using queue system")
+	m.debug("images enabled, using queue system")
 	// create result channel for this request
 	resultCh := make(chan any, 1)
 
+	m.debug("created result channel")
 	m.mu.Lock()
+	m.debug("acquired lock")
 	// check if already being processed with result channel
 	if existingCh, exists := m.imageResults[imageName]; exists {
+		m.debug("image already being processed, waiting for result")
 		m.mu.Unlock()
 		// someone else is already generating this, wait for their result with timeout
 		select {
 		case result := <-existingCh:
+			m.debug("received result from existing processing")
 			return result
 		case <-time.After(m.options.ImageRequestTimeout):
 			// timeout - return error
+			m.debug("timeout waiting for existing processing")
 			return wiki.DisplayError{Error: "Request timeout: image generation took too long"}
 		}
 	}
 
 	// register our result channel
+	m.debug("registering result channel")
 	m.imageResults[imageName] = resultCh
 	m.mu.Unlock()
+	m.debug("released lock")
 
 	// queue for generation
+	m.debug("starting queue section")
 	if highPriority {
+		m.debug("attempting priority queue")
 		select {
 		case m.priorityImageCh <- imageName:
-			// queued for priority
+			m.debug("successfully queued to priority queue")
 		default:
+			m.debug("priority queue full, falling back to background with promotion")
 			// priority queue full, fall back to background but mark as promoted
 			m.mu.Lock()
 			m.promotedImages[imageName] = true
 			m.mu.Unlock()
 			select {
 			case m.backgroundImageCh <- imageName:
-				// queued for background
+				m.debug("successfully queued to background queue with promotion")
 			default:
+				m.debug("both queues full, generating directly")
 				// both queues full, generate directly
 				m.mu.Lock()
 				delete(m.imageResults, imageName)
@@ -368,10 +381,12 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 			}
 		}
 	} else {
+		m.debug("attempting background queue")
 		select {
 		case m.backgroundImageCh <- imageName:
-			// queued for background
+			m.debug("successfully queued to background queue")
 		default:
+			m.debug("background queue full, generating directly")
 			// background queue full, generate directly
 			m.mu.Lock()
 			delete(m.imageResults, imageName)
@@ -382,14 +397,15 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 	}
 
 	// wait for result with timeout
-	m.debug("Waiting for image result: %s", imageName)
+	m.debug("waiting for image result from worker")
 	select {
 	case result := <-resultCh:
-		m.debug("Received image result: %s", imageName)
+		m.debug("received image result from worker, returning result")
+		// don't close the channel - the worker that sent the result owns it and will close it
 		return result
 	case <-time.After(m.options.ImageRequestTimeout):
 		// timeout - clean up and return error
-		m.debug("Image request timeout: %s", imageName)
+		m.debug("image request timeout, cleaning up and returning error")
 		m.mu.Lock()
 		delete(m.imageResults, imageName)
 		m.mu.Unlock()
@@ -411,12 +427,12 @@ func (m *Manager) generateImageDirect(imageName string) any {
 // QueueAllContentAtStartup discovers and queues all pages and images for background pregeneration
 func (m *Manager) QueueAllContentAtStartup() {
 	// always log this important startup activity
-	m.wiki.Log("pregenerate: discovering and queuing all content for background pregeneration")
+	m.debug("pregenerate: discovering and queuing all content for background pregeneration")
 
 	// queue all pages for background pregeneration
 	go func() {
 		allPages := m.wiki.AllPageFiles()
-		m.wiki.Log(fmt.Sprintf("pregenerate: found %d total pages, starting to queue them", len(allPages)))
+		m.debug(fmt.Sprintf("pregenerate: found %d total pages, starting to queue them", len(allPages)))
 		m.debug("queuing %d pages for background pregeneration", len(allPages))
 
 		queuedCount := 0
@@ -440,7 +456,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 				queuedCount++
 				m.debug("pregenerate: queued page for background processing: %s", pageName)
 			case <-m.ctx.Done():
-				m.wiki.Log("pregenerate: context canceled while queueing pages")
+				m.debug("pregenerate: context canceled while queueing pages")
 				return
 			default:
 				// background queue full, skip for now
@@ -448,7 +464,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 				m.debug("pregenerate: background queue FULL, skipping: %s (queue size: %d)", pageName, cap(m.backgroundCh))
 			}
 		}
-		m.wiki.Log(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
+		m.debug(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
 	}()
 
 	// queue all images for background pregeneration
@@ -537,7 +553,7 @@ func (m *Manager) RequestPregeneration(pageName string) {
 		// queued
 	default:
 		// priority queue is full, skip
-		m.wiki.Log("priority queue full, skipping: " + pageName)
+		m.debug("priority queue full, skipping: " + pageName)
 	}
 }
 
@@ -629,11 +645,11 @@ func (m *Manager) pregenerateAllImages(synchronous bool) {
 	}
 
 	if synchronous {
-		m.wiki.Log(fmt.Sprintf("synchronously pregenerating %d images...", len(imageFiles)))
+		m.debug(fmt.Sprintf("synchronously pregenerating %d images...", len(imageFiles)))
 
 		for i, imageName := range imageFiles {
 			if m.options.ProgressInterval > 0 && i%m.options.ProgressInterval == 0 && i > 0 {
-				m.wiki.Log(fmt.Sprintf("pregenerated %d/%d images", i, len(imageFiles)))
+				m.debug(fmt.Sprintf("pregenerated %d/%d images", i, len(imageFiles)))
 			}
 
 			m.pregenerateImage(imageName)
@@ -644,14 +660,14 @@ func (m *Manager) pregenerateAllImages(synchronous bool) {
 			}
 		}
 
-		m.wiki.Log(fmt.Sprintf("synchronous image pregeneration complete: %d images processed", len(imageFiles)))
+		m.debug(fmt.Sprintf("synchronous image pregeneration complete: %d images processed", len(imageFiles)))
 
 	} else {
 		if m.backgroundImageCh == nil {
 			return
 		}
 
-		m.wiki.Log(fmt.Sprintf("queuing %d images for background pregeneration", len(imageFiles)))
+		m.debug(fmt.Sprintf("queuing %d images for background pregeneration", len(imageFiles)))
 
 		go func() {
 			for _, imageName := range imageFiles {
@@ -681,12 +697,12 @@ func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
 		m.mu.Unlock()
 
 		if synchronous {
-			m.wiki.Log(fmt.Sprintf("synchronously pregenerating %d pages...", len(allPages)))
+			m.debug(fmt.Sprintf("synchronously pregenerating %d pages...", len(allPages)))
 
 			// for sync pregen, process pages directly
 			for i, pageName := range allPages {
 				if m.options.ProgressInterval > 0 && i%m.options.ProgressInterval == 0 && i > 0 {
-					m.wiki.Log(fmt.Sprintf("pregenerated %d/%d pages", i, len(allPages)))
+					m.debug(fmt.Sprintf("pregenerated %d/%d pages", i, len(allPages)))
 				}
 
 				m.pregeneratePage(pageName, true)
@@ -697,11 +713,11 @@ func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
 				}
 			}
 
-			m.wiki.Log(fmt.Sprintf("synchronous pregeneration complete: %d pages processed, %d generated, %d failed",
+			m.debug(fmt.Sprintf("synchronous pregeneration complete: %d pages processed, %d generated, %d failed",
 				m.stats.TotalPages, m.stats.PregenedPages, m.stats.FailedPages))
 
 		} else {
-			m.wiki.Log(fmt.Sprintf("starting background pregeneration of %d pages", len(allPages)))
+			m.debug(fmt.Sprintf("starting background pregeneration of %d pages", len(allPages)))
 
 			go func() {
 				for _, pageName := range allPages {
@@ -719,7 +735,7 @@ func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
 	})
 
 	if err != nil {
-		m.wiki.Log("skipping pregenerate: " + err.Error())
+		m.debug("skipping pregenerate: " + err.Error())
 	}
 
 	// return current stats
@@ -816,7 +832,7 @@ func (m *Manager) backgroundWorker() {
 			m.mu.Lock()
 			if resultCh, exists := m.pageResults[pageName]; exists {
 				m.mu.Unlock()
-				
+
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
@@ -825,14 +841,14 @@ func (m *Manager) backgroundWorker() {
 					// timeout sending result, close channel anyway
 					close(resultCh)
 				}
-				
+
 				// only delete from map after sending
 				m.mu.Lock()
 				delete(m.pageResults, pageName)
 				m.mu.Unlock()
 			} else {
 				m.mu.Unlock()
-			}			// mark as completed
+			} // mark as completed
 			m.mu.Lock()
 			delete(m.processingPages, pageName)
 			m.completedPages[pageName] = true
@@ -853,7 +869,7 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	// check if page exists
 	page := m.wiki.FindPage(pageName)
 	if !page.Exists() {
-		m.wiki.Log("pregenerate: page does not exist: " + pageName)
+		m.debug("pregenerate: page does not exist: " + pageName)
 		return wiki.DisplayError{Error: "Page not found"}
 	}
 
@@ -899,10 +915,10 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 			m.stats.AverageGenTime = (m.stats.AverageGenTime + duration) / 2
 		}
 		// single log line for successful pregeneration
-		m.wiki.Log(fmt.Sprintf("pregenerated %s (%.2fms)", pageName, float64(duration.Nanoseconds())/1000000))
+		m.debug(fmt.Sprintf("pregenerated %s (%.2fms)", pageName, float64(duration.Nanoseconds())/1000000))
 	} else if _, isError := result.(wiki.DisplayError); isError {
 		m.stats.FailedPages++
-		m.wiki.Log(fmt.Sprintf("failed to pregenerate %s: %v", pageName, result))
+		m.debug(fmt.Sprintf("failed to pregenerate %s: %v", pageName, result))
 	}
 	m.mu.Unlock()
 
@@ -921,34 +937,39 @@ func (m *Manager) priorityImageWorker() {
 			if m.processingImages[imageName] || m.completedImages[imageName] {
 				// clean up promotion tracking if item was already handled
 				delete(m.promotedImages, imageName)
+				resultCh, hasWaiter := m.imageResults[imageName]
+				delete(m.imageResults, imageName)
 				m.mu.Unlock()
+
+				// notify waiter with cached result if available
+				if hasWaiter {
+					go func() {
+						result := m.wiki.DisplayImage(imageName)
+						select {
+						case resultCh <- result:
+						default:
+						}
+						close(resultCh)
+					}()
+				}
 				continue
 			}
 			m.processingImages[imageName] = true
+			resultCh, hasWaiter := m.imageResults[imageName]
+			delete(m.imageResults, imageName)
 			m.mu.Unlock()
 
 			result := m.pregenerateImage(imageName)
 
-			// notify any waiting result channels
-			m.mu.Lock()
-			if resultCh, exists := m.imageResults[imageName]; exists {
-				m.mu.Unlock()
-				
+			// notify any waiters
+			if hasWaiter {
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-					close(resultCh)
 				case <-time.After(m.options.ImageRequestTimeout):
-					// timeout sending result, close channel anyway
-					close(resultCh)
+					// timeout sending result, but still close channel
 				}
-				
-				// only delete from map after sending
-				m.mu.Lock()
-				delete(m.imageResults, imageName)
-				m.mu.Unlock()
-			} else {
-				m.mu.Unlock()
+				close(resultCh)
 			}
 
 			// mark as completed
@@ -978,37 +999,42 @@ func (m *Manager) backgroundImageWorker() {
 			m.mu.Lock()
 			if m.processingImages[imageName] || m.completedImages[imageName] || m.promotedImages[imageName] {
 				m.debug("pregenerate: background image worker skipping image (already processed/processing): %s", imageName)
+				resultCh, hasWaiter := m.imageResults[imageName]
+				delete(m.imageResults, imageName)
 				m.mu.Unlock()
+
+				// notify waiter with cached result if available
+				if hasWaiter {
+					go func() {
+						result := m.wiki.DisplayImage(imageName)
+						select {
+						case resultCh <- result:
+						default:
+						}
+						close(resultCh)
+					}()
+				}
 				<-ticker.C // rate limit even for skipped items to prevent queue flooding
 				continue
 			}
 			m.processingImages[imageName] = true
+			resultCh, hasWaiter := m.imageResults[imageName]
+			delete(m.imageResults, imageName)
 			m.mu.Unlock()
 
 			m.debug("pregenerate: background image worker generating image: %s", imageName)
 			result := m.pregenerateImage(imageName)
 
-			// notify any waiting result channels
-			m.mu.Lock()
-			if resultCh, exists := m.imageResults[imageName]; exists {
-				m.mu.Unlock()
-				
+			// notify any waiters
+			if hasWaiter {
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-					close(resultCh)
 				case <-time.After(m.options.ImageRequestTimeout):
-					// timeout sending result, close channel anyway
-					close(resultCh)
+					// timeout sending result, but still close channel
 				}
-				
-				// only delete from map after sending
-				m.mu.Lock()
-				delete(m.imageResults, imageName)
-				m.mu.Unlock()
-			} else {
-				m.mu.Unlock()
-			}			// mark as completed
+				close(resultCh)
+			} // mark as completed
 			m.mu.Lock()
 			delete(m.processingImages, imageName)
 			m.completedImages[imageName] = true
