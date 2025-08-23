@@ -759,9 +759,11 @@ func (m *Manager) priorityWorker() {
 
 			// notify any waiters
 			if hasWaiter {
+				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-				default:
+				case <-time.After(m.options.RequestTimeout):
+					// timeout sending result, but still close channel
 				}
 				close(resultCh)
 			}
@@ -805,14 +807,23 @@ func (m *Manager) backgroundWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.pageResults[pageName]; exists {
+				delete(m.pageResults, pageName)
+				m.mu.Unlock()
+
+				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-				default:
+					close(resultCh)
+				case <-time.After(m.options.RequestTimeout):
+					// timeout sending result, close channel anyway
+					close(resultCh)
 				}
-				delete(m.pageResults, pageName)
+			} else {
+				m.mu.Unlock()
 			}
 
 			// mark as completed
+			m.mu.Lock()
 			delete(m.processingPages, pageName)
 			m.completedPages[pageName] = true
 			m.mu.Unlock()
@@ -911,14 +922,23 @@ func (m *Manager) priorityImageWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.imageResults[imageName]; exists {
+				delete(m.imageResults, imageName)
+				m.mu.Unlock()
+
+				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-				default:
+					close(resultCh)
+				case <-time.After(m.options.ImageRequestTimeout):
+					// timeout sending result, close channel anyway
+					close(resultCh)
 				}
-				delete(m.imageResults, imageName)
+			} else {
+				m.mu.Unlock()
 			}
 
 			// mark as completed
+			m.mu.Lock()
 			delete(m.processingImages, imageName)
 			delete(m.promotedImages, imageName) // clean up promotion tracking
 			m.completedImages[imageName] = true
@@ -957,14 +977,23 @@ func (m *Manager) backgroundImageWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.imageResults[imageName]; exists {
+				delete(m.imageResults, imageName)
+				m.mu.Unlock()
+
+				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
-				default:
+					close(resultCh)
+				case <-time.After(m.options.ImageRequestTimeout):
+					// timeout sending result, close channel anyway
+					close(resultCh)
 				}
-				delete(m.imageResults, imageName)
+			} else {
+				m.mu.Unlock()
 			}
 
 			// mark as completed
+			m.mu.Lock()
 			delete(m.processingImages, imageName)
 			m.completedImages[imageName] = true
 			m.mu.Unlock()
