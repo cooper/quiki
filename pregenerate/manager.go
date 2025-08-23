@@ -628,9 +628,9 @@ func (m *Manager) StartWorkers() *Manager {
 
 // debug logs a message only if verbose logging is enabled
 func (m *Manager) debug(format string, args ...interface{}) {
-	if m.options.LogVerbose {
-		m.wiki.Log(fmt.Sprintf(format, args...))
-	}
+	// if m.options.LogVerbose {
+	fmt.Printf(format+"\n", args...)
+	// }
 }
 
 // pregenerateAllImages handles both synchronous and asynchronous image pregeneration
