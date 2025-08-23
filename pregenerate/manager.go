@@ -1215,20 +1215,68 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	m.debug("debug: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName)
 	imageCat := m.wiki.GetSpecialCategory(baseImageName, wiki.CategoryTypeImage)
 
+	// collect all unique dimensions that are actually used
+	usedSizes := make(map[[2]int]bool)
+
+	// always include configurable thumbnail sizes from PregenThumbs setting first
+	// this ensures adminifier and other interfaces load quickly without generating on-demand
+	// even for images that aren't referenced in wiki pages
+	if imageCat != nil && imageCat.ImageInfo != nil {
+		origWidth := imageCat.ImageInfo.Width
+		origHeight := imageCat.ImageInfo.Height
+
+		// parse thumbnail sizes from wiki config
+		thumbnailSizes := m.wiki.ParseThumbnailSizes(m.wiki.Opt.Image.PregenThumbs, origWidth, origHeight)
+		for _, size := range thumbnailSizes {
+			usedSizes[[2]int{size[0], size[1]}] = true
+		}
+	}
+
 	// no category means no references exist, but we should still check if this is a valid request
 	if imageCat == nil || !imageCat.Exists() {
 		m.debug("no references found for image: %s, checking if full-size or valid", imageName)
 		m.debug("debug: category lookup failed for %s - imageCat=%v exists=%v", imageName, imageCat != nil, imageCat != nil && imageCat.Exists())
 
+		// if we have pregen thumbs to generate, do that first
+		if len(usedSizes) > 0 {
+			m.debug("found %d thumbnail sizes to pregenerate for unreferenced image: %s", len(usedSizes), imageName)
+			
+			// generate images for each thumbnail size
+			var requestedResult any
+			requestedImg := wiki.SizedImageFromName(imageName)
+			requestedSize := [2]int{requestedImg.Width, requestedImg.Height}
+
+			for size := range usedSizes {
+				loopImg := wiki.SizedImageFromName(imageName)
+				loopImg.Width = size[0]
+				loopImg.Height = size[1]
+
+				// generate the image (lock-free since we already hold the lock)
+				result := m.wiki.DisplaySizedImageGenerateInternal(loopImg, true, false)
+
+				// if this is the exact size that was requested, save the result
+				if size == requestedSize {
+					requestedResult = result
+				}
+
+				// check if generation was successful
+				if _, isError := result.(wiki.DisplayError); isError {
+					m.debug("failed to pregenerate %s at %dx%d: %v", imageName, size[0], size[1], result)
+				}
+			}
+
+			if requestedResult != nil {
+				m.debug("pregenerateImage returning requestedResult for unreferenced image: %s", imageName)
+				return requestedResult
+			}
+		}
+
 		// let DisplaySizedImageGenerateInternal handle the security check
 		// it will allow full-size images and reject arbitrary sizes
 		finalResult := m.wiki.DisplaySizedImageGenerateInternal(sizedImg, false, false) // generateOK=false to enforce security
-		m.debug("pregenerateImage completed for: %s", imageName)
+		m.debug("pregenerateImage completed for unreferenced image: %s", imageName)
 		return finalResult
 	}
-
-	// collect all unique dimensions that are actually used
-	usedSizes := make(map[[2]int]bool)
 
 	// look through all pages that reference this image
 	for _, pageEntry := range imageCat.Pages {
@@ -1238,19 +1286,6 @@ func (m *Manager) pregenerateImage(imageName string) any {
 				width, height := dimensionPair[0], dimensionPair[1]
 				usedSizes[[2]int{width, height}] = true
 			}
-		}
-	}
-
-	// always include configurable thumbnail sizes from PregenThumbs setting
-	// this ensures adminifier and other interfaces load quickly without generating on-demand
-	if imageCat.ImageInfo != nil {
-		origWidth := imageCat.ImageInfo.Width
-		origHeight := imageCat.ImageInfo.Height
-
-		// parse thumbnail sizes from wiki config
-		thumbnailSizes := m.wiki.ParseThumbnailSizes(m.wiki.Opt.Image.PregenThumbs, origWidth, origHeight)
-		for _, size := range thumbnailSizes {
-			usedSizes[[2]int{size[0], size[1]}] = true
 		}
 	}
 
