@@ -5,6 +5,8 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 // MemoryMonitor provides application-wide protection against memory exhaustion
@@ -37,20 +39,34 @@ func NewMemoryMonitor(maxConcurrency int) *MemoryMonitor {
 }
 
 func (m *MemoryMonitor) updateMemoryStats() {
+	// get actual system memory statistics
+	memInfo, err := mem.VirtualMemory()
+	if err != nil {
+		// fallback to conservative estimate if we can't get system info
+		m.mu.Lock()
+		m.availableMemoryMB = 400 // assume 400MB available
+		m.lastCheck = time.Now()
+		m.mu.Unlock()
+		fmt.Printf("memory stats: failed to get system memory, assuming 400MB available\n")
+		return
+	}
+
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
+	goHeapMB := int64(memStats.Alloc) / (1024 * 1024)
 
-	totalMemoryMB := int64(memStats.Sys) / (1024 * 1024)
-	usedMemoryMB := int64(memStats.Alloc) / (1024 * 1024)
+	totalMB := int64(memInfo.Total) / (1024 * 1024)
+	usedMB := int64(memInfo.Used) / (1024 * 1024)
+	availableMB := int64(memInfo.Available) / (1024 * 1024)
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.availableMemoryMB = totalMemoryMB - usedMemoryMB
+	m.availableMemoryMB = availableMB
 	m.lastCheck = time.Now()
 
-	fmt.Printf("memory stats: total=%dMB, used=%dMB, available=%dMB\n", 
-		totalMemoryMB, usedMemoryMB, m.availableMemoryMB)
+	fmt.Printf("memory stats: total=%dMB, used=%dMB, available=%dMB, go_heap=%dMB\n", 
+		totalMB, usedMB, availableMB, goHeapMB)
 }
 
 func (m *MemoryMonitor) shouldAllowNewWorker() bool {
@@ -79,9 +95,9 @@ func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 	}
 
 	originalSafe := safeConcurrency
-	if availableMB < 100 {
+	if availableMB < 200 {
 		safeConcurrency = 1
-	} else if availableMB < 200 {
+	} else if availableMB < 400 {
 		safeConcurrency = max(2, safeConcurrency/2)
 	}
 
@@ -109,7 +125,7 @@ func (m *MemoryMonitor) acquireWorker() bool {
 		fmt.Printf("memory: blocking worker - available: %dMB, active: %d, max: %d\n",
 			availableMB, currentActive, m.maxConcurrency)
 
-		if availableMB < 100 {
+		if availableMB < 200 {
 			fmt.Printf("memory: forcing GC due to critically low memory (%dMB)\n", availableMB)
 			runtime.GC()
 			time.Sleep(50 * time.Millisecond)
