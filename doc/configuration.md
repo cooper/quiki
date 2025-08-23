@@ -207,6 +207,24 @@ it takes longer than this limit.
 
 __Default__: 20
 
+### image.pregen_thumbs
+
+_Optional_. Comma-separated list of thumbnail sizes to pregenerate automatically.
+
+This setting controls which thumbnail sizes are generated in the background
+when images are first processed, improving performance for common sizes.
+
+Each entry can be either:
+* A single number (e.g., "250") - constrains the larger dimension to this size
+* Exact dimensions (e.g., "400x300") - generates exactly this size
+
+The default value of "250" ensures adminifier gallery previews load quickly.
+Additional sizes can be added for custom interfaces or common usage patterns.
+
+__Example__: `@image.pregen_thumbs: 250,150,400x300,800;`
+
+__Default__: 250 (for adminifier thumbnail preloading)
+
 ### image.sizer
 
 _Optional_. A function reference that returns the URL to a sized version of an image. After

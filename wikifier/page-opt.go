@@ -81,10 +81,11 @@ type PageOptRoot struct {
 type PageOptImage struct {
 	Retina         []int
 	SizeMethod     string
-	MaxConcurrent  int   // max concurrent image operations (0 = auto)
-	MaxMemoryMB    int64 // max memory per image in MB (0 = default 512MB)
-	TimeoutSeconds int   // max processing time per image (0 = default 30s)
-	ArbitrarySizes bool  // allow arbitrary image sizes not referenced in wiki content (default false)
+	MaxConcurrent  int    // max concurrent image operations (0 = auto)
+	MaxMemoryMB    int64  // max memory per image in MB (0 = default 512MB)
+	TimeoutSeconds int    // max processing time per image (0 = default 30s)
+	ArbitrarySizes bool   // allow arbitrary image sizes not referenced in wiki content (default false)
+	PregenThumbs   string // comma-separated list of thumbnail sizes to pregenerate (default "250" for adminifier)
 	Calc           func(file string, width, height int, page *Page) (w, h int, fullSize bool)
 	Sizer          func(file string, width, height int, page *Page) (path string)
 }

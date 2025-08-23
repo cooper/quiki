@@ -339,6 +339,19 @@ func (m *Manager) pregenerateImage(imageName string) {
 		}
 	}
 
+	// always include configurable thumbnail sizes from PregenThumbs setting
+	// this ensures adminifier and other interfaces load quickly without generating on-demand
+	if imageCat.ImageInfo != nil {
+		origWidth := imageCat.ImageInfo.Width
+		origHeight := imageCat.ImageInfo.Height
+		
+		// parse thumbnail sizes from wiki config
+		thumbnailSizes := m.wiki.ParseThumbnailSizes(m.wiki.Opt.Image.PregenThumbs, origWidth, origHeight)
+		for _, size := range thumbnailSizes {
+			usedSizes[[2]int{size[0], size[1]}] = true
+		}
+	}
+
 	if m.options.LogVerbose {
 		m.wiki.Log(fmt.Sprintf("found %d unique sizes for image: %s", len(usedSizes), imageName))
 	}

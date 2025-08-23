@@ -39,6 +39,7 @@ var defaultWikiOpt = wikifier.PageOpt{
 		MaxMemoryMB:    256,
 		TimeoutSeconds: 20,
 		ArbitrarySizes: false, // disabled by default for security
+		PregenThumbs:   "250", // default for adminifier thumbnails
 		Calc:           defaultImageCalc,
 		Sizer:          defaultImageSizer,
 	},

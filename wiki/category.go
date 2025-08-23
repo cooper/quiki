@@ -2,10 +2,12 @@ package wiki
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Songmu/go-httpdate"
@@ -498,10 +500,92 @@ func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Pag
 				Width  int `json:"width,omitempty"`
 				Height int `json:"height,omitempty"`
 			}{width, height}
+			
+			// pregenerate configurable thumbnail sizes to avoid on-demand generation
+			// this runs async so it doesn't block ImageInfo calls
+			go func() {
+				defer func() {
+					if r := recover(); r != nil {
+						w.Log(fmt.Sprintf("failed to pregenerate thumbnails for %s: %v", imageName, r))
+					}
+				}()
+				
+				// parse thumbnail sizes from config
+				thumbnailSizes := w.ParseThumbnailSizes(w.Opt.Image.PregenThumbs, width, height)
+				
+				// generate each configured thumbnail size
+				for _, size := range thumbnailSizes {
+					img := SizedImageFromName(imageName)
+					img.Width = size[0]
+					img.Height = size[1]
+					w.DisplaySizedImageGenerate(img, false) // don't force regeneration
+				}
+			}()
 		}
 	}
 
 	cat.addPageExtras(w, pageMaybe, dimensionsMaybe, nil)
+}
+
+// ParseThumbnailSizes parses the PregenThumbnails config string into a list of dimensions
+// format: "250,400x300,150" where numbers are max dimension and NxN are exact dimensions
+func (w *Wiki) ParseThumbnailSizes(config string, origWidth, origHeight int) [][2]int {
+	if config == "" {
+		return nil
+	}
+	
+	var sizes [][2]int
+	parts := strings.Split(config, ",")
+	
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		
+		// check if it's exact dimensions (NxN format)
+		if strings.Contains(part, "x") {
+			dims := strings.Split(part, "x")
+			if len(dims) == 2 {
+				w, err1 := strconv.Atoi(strings.TrimSpace(dims[0]))
+				h, err2 := strconv.Atoi(strings.TrimSpace(dims[1]))
+				if err1 == nil && err2 == nil && w > 0 && h > 0 {
+					sizes = append(sizes, [2]int{w, h})
+				}
+			}
+		} else {
+			// single number = max dimension
+			maxDim, err := strconv.Atoi(part)
+			if err == nil && maxDim > 0 && origWidth > 0 && origHeight > 0 {
+				var thumbWidth, thumbHeight int
+				if origWidth > origHeight {
+					// width is larger dimension
+					if origWidth > maxDim {
+						thumbWidth = maxDim
+						thumbHeight = int(float64(maxDim) * float64(origHeight) / float64(origWidth))
+					} else {
+						thumbWidth = origWidth
+						thumbHeight = origHeight
+					}
+				} else {
+					// height is larger dimension
+					if origHeight > maxDim {
+						thumbHeight = maxDim
+						thumbWidth = int(float64(maxDim) * float64(origWidth) / float64(origHeight))
+					} else {
+						thumbWidth = origWidth
+						thumbHeight = origHeight
+					}
+				}
+				// only add if it's actually smaller than original
+				if thumbWidth != origWidth || thumbHeight != origHeight {
+					sizes = append(sizes, [2]int{thumbWidth, thumbHeight})
+				}
+			}
+		}
+	}
+	
+	return sizes
 }
 
 // cat_check_page
