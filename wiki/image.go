@@ -579,7 +579,13 @@ func (w *Wiki) generateImage(img SizedImage, bigPath string, bigW, bigH int, r *
 		}
 	}
 
-	newImageFi, _ := os.Lstat(newImagePath)
+	newImageFi, err := os.Lstat(newImagePath)
+	if err != nil || newImageFi == nil {
+		return DisplayError{
+			Error:         "Failed to stat generated image.",
+			DetailedError: "Stat image '" + newImagePath + "' error: " + err.Error(),
+		}
+	}
 
 	// inject info from the newly generated image
 	mod := newImageFi.ModTime()

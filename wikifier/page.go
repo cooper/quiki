@@ -451,7 +451,10 @@ func (p *Page) IsSymlink() bool {
 	if !strings.HasPrefix(p.Path(), dirPage) {
 		return false
 	}
-	fi, _ := os.Lstat(p.RelPath())
+	fi, err := os.Lstat(p.RelPath())
+	if err != nil || fi == nil {
+		return false
+	}
 	return fi.Mode()&os.ModeSymlink != 0
 }
 
@@ -472,7 +475,10 @@ func (p *Page) Created() time.Time {
 
 // Modified returns the page modification time.
 func (p *Page) Modified() time.Time {
-	fi, _ := os.Lstat(p.Path())
+	fi, err := os.Lstat(p.Path())
+	if err != nil || fi == nil {
+		return time.Time{}
+	}
 	return fi.ModTime()
 }
 
