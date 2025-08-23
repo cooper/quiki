@@ -815,9 +815,8 @@ func (m *Manager) backgroundWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.pageResults[pageName]; exists {
-				delete(m.pageResults, pageName)
 				m.mu.Unlock()
-
+				
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
@@ -826,11 +825,14 @@ func (m *Manager) backgroundWorker() {
 					// timeout sending result, close channel anyway
 					close(resultCh)
 				}
+				
+				// only delete from map after sending
+				m.mu.Lock()
+				delete(m.pageResults, pageName)
+				m.mu.Unlock()
 			} else {
 				m.mu.Unlock()
-			}
-
-			// mark as completed
+			}			// mark as completed
 			m.mu.Lock()
 			delete(m.processingPages, pageName)
 			m.completedPages[pageName] = true
@@ -930,9 +932,8 @@ func (m *Manager) priorityImageWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.imageResults[imageName]; exists {
-				delete(m.imageResults, imageName)
 				m.mu.Unlock()
-
+				
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
@@ -941,6 +942,11 @@ func (m *Manager) priorityImageWorker() {
 					// timeout sending result, close channel anyway
 					close(resultCh)
 				}
+				
+				// only delete from map after sending
+				m.mu.Lock()
+				delete(m.imageResults, imageName)
+				m.mu.Unlock()
 			} else {
 				m.mu.Unlock()
 			}
@@ -985,9 +991,8 @@ func (m *Manager) backgroundImageWorker() {
 			// notify any waiting result channels
 			m.mu.Lock()
 			if resultCh, exists := m.imageResults[imageName]; exists {
-				delete(m.imageResults, imageName)
 				m.mu.Unlock()
-
+				
 				// send result with timeout to avoid blocking forever
 				select {
 				case resultCh <- result:
@@ -996,11 +1001,14 @@ func (m *Manager) backgroundImageWorker() {
 					// timeout sending result, close channel anyway
 					close(resultCh)
 				}
+				
+				// only delete from map after sending
+				m.mu.Lock()
+				delete(m.imageResults, imageName)
+				m.mu.Unlock()
 			} else {
 				m.mu.Unlock()
-			}
-
-			// mark as completed
+			}			// mark as completed
 			m.mu.Lock()
 			delete(m.processingImages, imageName)
 			m.completedImages[imageName] = true
