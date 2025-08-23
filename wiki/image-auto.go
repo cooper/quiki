@@ -25,6 +25,8 @@ var (
 
 	magickOnce sync.Once
 	magickErr  error
+	
+	autoProcessorLogOnce sync.Once
 )
 
 func checkLibvipsOnce() error {
@@ -63,7 +65,9 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 
 		if processor, err := NewVipsProcessor(vipsOpts); err == nil {
 			c.vips = processor
-			log.Printf("image processor: using libvips auto (libvips -> imagemagick -> pure go)")
+			autoProcessorLogOnce.Do(func() {
+				log.Printf("image processor: using libvips auto (libvips -> imagemagick -> pure go)")
+			})
 		} else {
 			log.Printf("image processor: libvips initialization failed: %v", err)
 		}
@@ -78,7 +82,9 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 		if processor, err := NewImageMagickProcessor(magickOpts); err == nil {
 			c.imagemagick = processor
 			if c.vips == nil {
-				log.Printf("image processor: using imagemagick auto (imagemagick -> pure go)")
+				autoProcessorLogOnce.Do(func() {
+					log.Printf("image processor: using imagemagick auto (imagemagick -> pure go)")
+				})
 			}
 		} else {
 			log.Printf("image processor: ImageMagick initialization failed: %v", err)
@@ -86,8 +92,10 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 	}
 
 	if c.vips == nil && c.imagemagick == nil {
-		log.Printf("image processor: using pure go fallback (warning: poor performance with large images)")
-		log.Printf("image processor: install libvips ('brew install vips') or imagemagick ('brew install imagemagick') for better performance")
+		autoProcessorLogOnce.Do(func() {
+			log.Printf("image processor: using pure go fallback (warning: poor performance with large images)")
+			log.Printf("image processor: install libvips ('brew install vips') or imagemagick ('brew install imagemagick') for better performance")
+		})
 	}
 
 	return c
