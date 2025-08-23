@@ -181,10 +181,10 @@ func InitWikis() error {
 
 		// always create and start the manager for unified queue system
 		if pregenerationEnabled {
-			log.Printf("pregenerate: Starting background pregeneration for wiki %s", wikiName)
+			log.Printf("pregenerate: starting background pregeneration for wiki %s", wikiName)
 			wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartBackground()
 		} else {
-			log.Printf("pregenerate: DISABLED for wiki %s - content will be generated on-demand only. For production environments, enable pregeneration to improve user performance by having content ready to serve.", wikiName)
+			log.Printf("pregenerate: DISABLED for wiki %s - content will be generated on-demand only; for production environments, enable pregeneration to improve user performance", wikiName)
 			wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartWorkers()
 		}
 

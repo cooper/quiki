@@ -182,6 +182,8 @@ func NewWithOptions(w *wiki.Wiki, opts Options) *Manager {
 
 	// background page workers
 	m.wg.Add(opts.BackgroundWorkers)
+	m.wiki.Log(fmt.Sprintf("pregenerate: starting %d background workers, queue size: %d, rate limit: %v", 
+		opts.BackgroundWorkers, opts.BackgroundQueueSize, opts.RateLimit))
 	for i := 0; i < opts.BackgroundWorkers; i++ {
 		go m.backgroundWorker()
 	}
@@ -442,9 +444,7 @@ func (m *Manager) QueueAllContentAtStartup() {
 			default:
 				// background queue full, skip for now
 				skippedCount++
-				if m.options.LogVerbose {
-					m.wiki.Log("background page queue full, skipping: " + pageName)
-				}
+				m.wiki.Log(fmt.Sprintf("pregenerate: background queue FULL, skipping: %s (queue size: %d)", pageName, cap(m.backgroundCh)))
 			}
 		}
 		m.wiki.Log(fmt.Sprintf("pregenerate: finished queueing pages - queued: %d, skipped: %d", queuedCount, skippedCount))
