@@ -15,28 +15,23 @@ import (
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	log.Printf("DEBUG: handleRoot called with URL.Path='%s', Host='%s'", r.URL.Path, r.Host)
 	var delayedWiki *WikiInfo
 
 	// try each wiki
 	for _, w := range Wikis {
-		log.Printf("DEBUG: checking wiki '%s' with Host='%s', Root.Wiki='%s'", w.Name, w.Host, w.Opt.Root.Wiki)
 
 		// wrong root
 		wikiRoot := w.Opt.Root.Wiki
 		if r.URL.Path != wikiRoot && !strings.HasPrefix(r.URL.Path, wikiRoot+"/") {
-			log.Printf("DEBUG: wiki '%s' skipped - wrong root", w.Name)
 			continue
 		}
 
 		// wrong host
 		if w.Host != r.Host {
-			log.Printf("DEBUG: wiki '%s' host mismatch: wiki.Host='%s' vs r.Host='%s'", w.Name, w.Host, r.Host)
 
 			// if the wiki host is empty, it is the fallback wiki.
 			// delay it until we've checked all other wikis.
 			if w.Host == "" && delayedWiki == nil {
-				log.Printf("DEBUG: wiki '%s' set as fallback (empty host)", w.Name)
 				delayedWiki = w
 			}
 
@@ -44,39 +39,33 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// host matches
-		log.Printf("DEBUG: wiki '%s' host matches", w.Name)
 		delayedWiki = w
 		break
 	}
 
 	// a wiki matches this
 	if delayedWiki != nil {
-		log.Printf("DEBUG: using wiki '%s' for request", delayedWiki.Name)
 
 		// show the main page for the delayed wiki
 		wikiRoot := delayedWiki.Opt.Root.Wiki
 		if r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/" {
-			log.Printf("DEBUG: calling handleWiki")
 			handleWiki(delayedWiki, "", w, r)
 			return
 		}
 
 		// if the page root is blank, this may be a page
 		if delayedWiki.Opt.Root.Page == "" {
-			log.Printf("DEBUG: calling handlePage (page root is blank)")
 			relPath := strings.TrimLeft(strings.TrimPrefix(r.URL.Path, wikiRoot), "/")
 			handlePage(delayedWiki, relPath, w, r)
 			return
 		}
 
 		// show the 404 page for the delayed wiki
-		log.Printf("DEBUG: calling handleError - page not found")
 		handleError(delayedWiki, "Page not found.", w, r)
 		return
 	}
 
 	// anything else is a generic 404
-	log.Printf("DEBUG: no wiki matched - generic 404")
 	http.NotFound(w, r)
 }
 
