@@ -108,6 +108,7 @@ func DefaultOptions() Options {
 		EnableImages:             true,              // pregenerate common image sizes
 		CleanupInterval:          30 * time.Minute,  // clean up tracking maps every 30 minutes
 		MaxTrackingEntries:       10000,             // max 10k entries before forced cleanup
+		LogVerbose:               true,              // for now
 	}
 }
 
@@ -314,11 +315,15 @@ func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
 
 // GenerateImageSync generates image thumbnails synchronously (blocks until complete)
 func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
+	m.debug("GenerateImageSync called: %s, highPriority: %v, EnableImages: %v", imageName, highPriority, m.options.EnableImages)
+
 	if !m.options.EnableImages {
 		// even with images disabled, use unified generation for consistency
+		m.debug("Images disabled, calling pregenerateImage directly")
 		return m.pregenerateImage(imageName)
 	}
 
+	m.debug("Images enabled, using queue system")
 	// create result channel for this request
 	resultCh := make(chan any, 1)
 
@@ -377,11 +382,14 @@ func (m *Manager) GenerateImageSync(imageName string, highPriority bool) any {
 	}
 
 	// wait for result with timeout
+	m.debug("Waiting for image result: %s", imageName)
 	select {
 	case result := <-resultCh:
+		m.debug("Received image result: %s", imageName)
 		return result
 	case <-time.After(m.options.ImageRequestTimeout):
 		// timeout - clean up and return error
+		m.debug("Image request timeout: %s", imageName)
 		m.mu.Lock()
 		delete(m.imageResults, imageName)
 		m.mu.Unlock()
@@ -1120,7 +1128,11 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	}
 
 	if requestedResult != nil {
+		m.debug("pregenerateImage returning requestedResult for: %s", imageName)
 		return requestedResult
 	}
-	return m.wiki.DisplaySizedImageGenerate(requestedImg, true)
+	m.debug("pregenerateImage generating final result for: %s", imageName)
+	finalResult := m.wiki.DisplaySizedImageGenerate(requestedImg, true)
+	m.debug("pregenerateImage completed for: %s", imageName)
+	return finalResult
 }
