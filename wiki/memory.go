@@ -48,6 +48,9 @@ func (m *MemoryMonitor) updateMemoryStats() {
 
 	m.availableMemoryMB = totalMemoryMB - usedMemoryMB
 	m.lastCheck = time.Now()
+
+	fmt.Printf("memory stats: total=%dMB, used=%dMB, available=%dMB\n", 
+		totalMemoryMB, usedMemoryMB, m.availableMemoryMB)
 }
 
 func (m *MemoryMonitor) shouldAllowNewWorker() bool {
@@ -81,6 +84,9 @@ func (m *MemoryMonitor) shouldAllowNewWorker() bool {
 	} else if availableMB < 200 {
 		safeConcurrency = max(2, safeConcurrency/2)
 	}
+
+	fmt.Printf("memory: available=%dMB, calculated=%d, final=%d, active=%d, max=%d\n",
+		availableMB, originalSafe, safeConcurrency, m.currentActive, m.maxConcurrency)
 
 	if originalSafe != safeConcurrency {
 		fmt.Printf("memory: adjusted concurrency from %d to %d due to low memory (%dMB)\n",
