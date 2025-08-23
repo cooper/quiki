@@ -1046,7 +1046,11 @@ func (m *Manager) pregenerateImage(imageName string) any {
 	defer imageLock.Unlock()
 
 	// Get the image category that tracks all references to this image
-	imageCat := m.wiki.GetSpecialCategory(imageName, wiki.CategoryTypeImage)
+	// Extract base image name (without dimensions) for category lookup
+	sizedImg := wiki.SizedImageFromName(imageName)
+	baseImageName := sizedImg.RelNameNE + "." + sizedImg.Ext // reconstruct full name with extension
+	m.wiki.Log(fmt.Sprintf("DEBUG: looking up category for base image name '%s' (from sized name '%s')", baseImageName, imageName))
+	imageCat := m.wiki.GetSpecialCategory(baseImageName, wiki.CategoryTypeImage)
 
 	// No category means no references exist, so nothing to pregenerate
 	if imageCat == nil || !imageCat.Exists() {
@@ -1090,12 +1094,12 @@ func (m *Manager) pregenerateImage(imageName string) any {
 
 	// Generate images for each actually-used size
 	for size := range usedSizes {
-		img := wiki.SizedImageFromName(imageName)
-		img.Width = size[0]
-		img.Height = size[1]
+		loopImg := wiki.SizedImageFromName(imageName)
+		loopImg.Width = size[0]
+		loopImg.Height = size[1]
 
 		// generate the image
-		result := m.wiki.DisplaySizedImageGenerate(img, true)
+		result := m.wiki.DisplaySizedImageGenerate(loopImg, true)
 
 		// check if generation was successful
 		if _, isError := result.(wiki.DisplayError); isError && m.options.LogVerbose {
@@ -1104,6 +1108,6 @@ func (m *Manager) pregenerateImage(imageName string) any {
 		}
 	}
 
-	img := wiki.SizedImageFromName(imageName)
-	return m.wiki.DisplaySizedImageGenerate(img, true)
+	finalImg := wiki.SizedImageFromName(imageName)
+	return m.wiki.DisplaySizedImageGenerate(finalImg, true)
 }
