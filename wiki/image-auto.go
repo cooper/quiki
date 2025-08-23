@@ -18,6 +18,37 @@ type AutoImageProcessor struct {
 	stats       ProcessorStats
 }
 
+// cache availability checks so we only log not-found once during startup
+var (
+	libvipsOnce sync.Once
+	libvipsErr  error
+
+	magickOnce sync.Once
+	magickErr  error
+)
+
+func checkLibvipsOnce() error {
+	libvipsOnce.Do(func() {
+		libvipsErr = CheckLibvipsAvailable()
+		if libvipsErr != nil {
+			// log not-found only once
+			log.Printf("image processor: libvips not available: %v", libvipsErr)
+		}
+	})
+	return libvipsErr
+}
+
+func checkImageMagickOnce() error {
+	magickOnce.Do(func() {
+		magickErr = CheckImageMagickAvailable()
+		if magickErr != nil {
+			// log not-found only once
+			log.Printf("image processor: ImageMagick not available: %v", magickErr)
+		}
+	})
+	return magickErr
+}
+
 // NewAutoImageProcessor creates a processor that tries libvips -> imagemagick -> pure go
 func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 	c := &AutoImageProcessor{
@@ -25,7 +56,7 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 	}
 
 	// try to initialize libvips (highest priority)
-	if err := CheckLibvipsAvailable(); err == nil {
+	if err := checkLibvipsOnce(); err == nil {
 		vipsOpts := DefaultVipsOptions()
 		vipsOpts.MaxConcurrent = opts.MaxConcurrent
 		vipsOpts.Timeout = opts.Timeout
@@ -36,12 +67,10 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 		} else {
 			log.Printf("image processor: libvips initialization failed: %v", err)
 		}
-	} else {
-		log.Printf("image processor: libvips not available: %v", err)
 	}
 
 	// try to initialize ImageMagick (second priority)
-	if err := CheckImageMagickAvailable(); err == nil {
+	if err := checkImageMagickOnce(); err == nil {
 		magickOpts := DefaultImageMagickOptions()
 		magickOpts.MaxConcurrent = opts.MaxConcurrent
 		magickOpts.Timeout = opts.Timeout
@@ -54,8 +83,6 @@ func NewAutoImageProcessor(opts ImageProcessorOptions) *AutoImageProcessor {
 		} else {
 			log.Printf("image processor: ImageMagick initialization failed: %v", err)
 		}
-	} else {
-		log.Printf("image processor: ImageMagick not available: %v", err)
 	}
 
 	if c.vips == nil && c.imagemagick == nil {
@@ -164,7 +191,7 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 		return NewImageProcessor(opts)
 
 	case "vips":
-		if err := CheckLibvipsAvailable(); err == nil {
+		if err := checkLibvipsOnce(); err == nil {
 			vipsOpts := DefaultVipsOptions()
 			vipsOpts.MaxConcurrent = opts.MaxConcurrent
 			vipsOpts.Timeout = opts.Timeout
@@ -180,15 +207,12 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 				w.Log("image processor: ensure libvips is properly installed: 'brew install vips' or 'apt-get install libvips-tools'")
 				return NewImageProcessor(opts)
 			}
-		} else {
-			w.Log(fmt.Sprintf("image processor: libvips not available: %v", err))
-			w.Log("image processor: install with 'brew install vips' or 'apt-get install libvips-tools', or set @image.processor: auto;")
-			w.Log("image processor: falling back to pure go (portable but slower)")
-			return NewImageProcessor(opts)
 		}
+		// libvips not available (already logged once by checkLibvipsOnce) - fall back to pure go
+		return NewImageProcessor(opts)
 
 	case "imagemagick":
-		if err := CheckImageMagickAvailable(); err == nil {
+		if err := checkImageMagickOnce(); err == nil {
 			magickOpts := DefaultImageMagickOptions()
 			magickOpts.MaxConcurrent = opts.MaxConcurrent
 			magickOpts.Timeout = opts.Timeout
@@ -204,12 +228,9 @@ func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 				w.Log("image processor: ensure imagemagick is properly installed: 'brew install imagemagick' or 'apt-get install imagemagick'")
 				return NewImageProcessor(opts)
 			}
-		} else {
-			w.Log(fmt.Sprintf("image processor: imagemagick not available: %v", err))
-			w.Log("image processor: install with 'brew install imagemagick' or 'apt-get install imagemagick', or set @image.processor: auto;")
-			w.Log("image processor: falling back to pure go (portable but slower)")
-			return NewImageProcessor(opts)
 		}
+		// ImageMagick not available (already logged once by checkImageMagickOnce) - fall back to pure go
+		return NewImageProcessor(opts)
 
 	case "auto":
 		fallthrough
