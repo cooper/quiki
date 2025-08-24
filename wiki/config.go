@@ -86,11 +86,6 @@ func (w *Wiki) readConfig(file string) error {
 
 func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int, bool) {
 
-	// debug what we're getting
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: name='%s', width=%d, height=%d", name, width, height)
-	}
-
 	// requesting 0x0 is same as requesting full-size
 	if width == 0 && height == 0 {
 		return 0, 0, true
@@ -98,11 +93,6 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 
 	path := filepath.Join(page.Opt.Dir.Image, filepath.FromSlash(name))
 	bigW, bigH := getImageDimensions(path)
-
-	// debug dimensions
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: original dimensions %dx%d", bigW, bigH)
-	}
 
 	// original has no dimensions??
 	if bigW == 0 || bigH == 0 {
@@ -117,19 +107,10 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	// determine missing dimension
 	width, height = calculateImageDimensions(bigW, bigH, width, height)
 
-	// debug calculated dimensions
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: calculated dimensions %dx%d", width, height)
-	}
-
 	// this must happen here to guarantee proper tracking before image pregeneration
 	if w, ok := page.Wiki.(*Wiki); ok {
 		img := SizedImageFromName(name)
 		imageName := img.FullSizeName()
-
-		// debug category tracking
-		w.Logf("defaultImageCalc: tracking category for '%s' (from name '%s')", imageName, name)
-
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
 		imageCat.addImage(w, imageName, page, [][]int{{width, height}})
 	}
@@ -138,32 +119,10 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
-	// debug what we're getting
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: name='%s', width=%d, height=%d", name, width, height)
-		w.Logf("defaultImageSizer: page.Opt.Root.Image='%s'", page.Opt.Root.Image)
-	}
-
 	si := SizedImageFromName(name)
-
-	// debug the parsed result
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: parsed - Prefix='%s', RelNameNE='%s', Ext='%s'",
-			si.Prefix, si.RelNameNE, si.Ext)
-	}
-
 	si.Width = width
 	si.Height = height
-
-	result := page.Opt.Root.Image + "/" + si.TrueName()
-
-	// debug final result
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: TrueName()='%s'", si.TrueName())
-		w.Logf("defaultImageSizer: final result='%s'", result)
-	}
-
-	return result
+	return page.Opt.Root.Image + "/" + si.TrueName()
 }
 
 func linkPageExists(page *wikifier.Page, o *wikifier.PageOptLinkOpts) {
