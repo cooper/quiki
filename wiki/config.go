@@ -86,9 +86,9 @@ func (w *Wiki) readConfig(file string) error {
 
 func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int, bool) {
 
-	// debug what we're getting
+	// CRITICAL DEBUG: function called
 	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: name='%s', width=%d, height=%d", name, width, height)
+		w.Logf("CALC_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
 	}
 
 	// requesting 0x0 is same as requesting full-size
@@ -138,10 +138,10 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 }
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
-	// debug what we're getting
+	// CRITICAL DEBUG: function called
 	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: name='%s', width=%d, height=%d", name, width, height)
-		w.Logf("defaultImageSizer: page.Opt.Root.Image='%s'", page.Opt.Root.Image)
+		w.Logf("SIZER_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
+		w.Logf("SIZER_ROOT_IMAGE: page=%s, Root.Image=%s", page.Name, page.Opt.Root.Image)
 	}
 
 	si := SizedImageFromName(name)
@@ -150,6 +150,9 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	if w, ok := page.Wiki.(*Wiki); ok {
 		w.Logf("defaultImageSizer: parsed - Prefix='%s', RelNameNE='%s', Ext='%s'",
 			si.Prefix, si.RelNameNE, si.Ext)
+		if si.Prefix == "" {
+			w.Logf("defaultImageSizer: WARNING - image has no prefix (root directory)")
+		}
 	}
 
 	si.Width = width
@@ -157,10 +160,10 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 
 	result := page.Opt.Root.Image + "/" + si.TrueName()
 
-	// debug final result
+	// CRITICAL DEBUG: final result
 	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: TrueName()='%s'", si.TrueName())
-		w.Logf("defaultImageSizer: final result='%s'", result)
+		w.Logf("SIZER_RESULT: page=%s, file=%s, TrueName=%s, final_result=%s",
+			page.Name, name, si.TrueName(), result)
 	}
 
 	return result
