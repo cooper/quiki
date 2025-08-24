@@ -20,7 +20,6 @@ type imageBlock struct {
 	fullSize                        bool
 	scales                          []int
 	id                              int // debug ID to track instances
-	inHTML                          bool // prevent recursive html generation
 	*Map
 }
 
@@ -216,15 +215,7 @@ func (image *imagebox) html(page *Page, el element) {
 
 // image{} or imagebox{} html
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
-	fmt.Printf("HTML_START: id=%d, page=%v, file=%s, inHTML=%t\n", image.id, page.Name, image.file, image.inHTML)
-
-	// prevent recursive html generation
-	if image.inHTML {
-		fmt.Printf("HTML_RECURSIVE: id=%d, page=%v, file=%s - skipping to prevent recursion\n", image.id, page.Name, image.file)
-		return
-	}
-	image.inHTML = true
-	defer func() { image.inHTML = false }()
+	fmt.Printf("HTML_START: id=%d, page=%v, file=%s\n", image.id, page.Name, image.file)
 
 	fmt.Printf("AFTER_MAP_HTML: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
 
