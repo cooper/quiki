@@ -1,7 +1,6 @@
 package wikifier
 
 import (
-	"log"
 	"net/url"
 	"path/filepath"
 	"regexp"
@@ -60,8 +59,6 @@ func (image *imageBlock) parse(page *Page) {
 		image.height = image.getPx("height")
 		image.parsedDimensions = true
 	}
-
-	log.Printf("IMAGE_PARSE_START: page=%s, file=%s\n", page.Name, image.file)
 
 	// compatibility
 	if image.align == "" {

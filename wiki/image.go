@@ -392,7 +392,7 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 			DetailedError: "Image '" + img.TrueName() + "' is being generated in the background.",
 		}
 	}
-
+	
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
 		return dispErr
 	}
@@ -645,9 +645,9 @@ func (w *Wiki) symlinkScaledImage(img SizedImage, name string) {
 }
 
 func getImageDimensions(path string) (w, h int) {
+	// use shared utility for dimension checking
 	width, height, err := GetImageDimensionsFromFile(path)
 	if err != nil {
-		log.Printf("getImageDimensions: error getting dimensions for '%s': %v", path, err)
 		return 0, 0
 	}
 	return width, height
