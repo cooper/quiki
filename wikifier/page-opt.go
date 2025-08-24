@@ -205,12 +205,6 @@ var defaultPageOpt = PageOpt{
 // injects them into the provided PageOpt pointer.
 func InjectPageOpt(page *Page, opt *PageOpt) error {
 
-	// CRITICAL DEBUG: log injection start
-	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-		wiki.Logf("INJECT_OPT_START: page=%s, input_SizeMethod=%s, input_Calc=%t, input_Sizer=%t",
-			page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil)
-	}
-
 	// easy string options
 	pageOptString := map[string]*string{
 		"name":            &opt.Name,            // wiki name
@@ -324,10 +318,6 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 			return errors.New("image.size_method: must be one of 'javascript' or 'server'")
 		}
 		opt.Image.SizeMethod = str
-		// CRITICAL DEBUG: size method override
-		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-			wiki.Logf("INJECT_OPT_SIZE_METHOD: page=%s, new_SizeMethod=%s", page.Name, str)
-		}
 	}
 
 	// cat.per_page - how many posts to show on each page of /topic
@@ -368,12 +358,6 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	}
 
 	// TODO: External wikis
-
-	// CRITICAL DEBUG: log injection completion
-	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-		wiki.Logf("INJECT_OPT_COMPLETE: page=%s, final_SizeMethod=%s, final_Calc=%t, final_Sizer=%t, final_Root_Image=%s",
-			page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil, opt.Root.Image)
-	}
 
 	return nil
 }

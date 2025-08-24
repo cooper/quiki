@@ -144,10 +144,6 @@ func (w *Wiki) FindPage(name string) (p *wikifier.Page) {
 	pageOpt := w.Opt // copy the struct
 	p.Opt = &pageOpt
 
-	// CRITICAL DEBUG: log initial page options
-	w.Logf("PAGE_OPT_INIT: page=%s, SizeMethod=%s, Calc=%t, Sizer=%t, Root.Image=%s",
-		name, p.Opt.Image.SizeMethod, p.Opt.Image.Calc != nil, p.Opt.Image.Sizer != nil, p.Opt.Root.Image)
-
 	// page lock will be created by GetPageLock if needed
 	return
 }
@@ -162,7 +158,6 @@ func (w *Wiki) DisplayPage(name string) any {
 // Unlike DisplayPage, if draftOK is true, the content is served even if it is
 // marked as draft.
 func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
-	w.Logf("CRITICAL: DisplayPageDraft START for page: %s", name)
 	var r DisplayPage
 
 	// create the page
@@ -202,20 +197,12 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 
 	// Safe point - we will be generating the page right now.
 
-	// CRITICAL DEBUG: log before parse
-	w.Logf("PAGE_PARSE_START: page=%s, SizeMethod=%s, Calc=%t, Sizer=%t",
-		name, page.Opt.Image.SizeMethod, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
-
 	// parse the page
 	//
 	// if an error occurs, parse it again in variable-only mode.
 	// then hopefully we can at least get the metadata and categories
 	//
 	err := page.Parse()
-
-	// CRITICAL DEBUG: log after parse
-	w.Logf("PAGE_PARSE_COMPLETE: page=%s, error=%t, SizeMethod=%s, Calc=%t, Sizer=%t",
-		name, err != nil, page.Opt.Image.SizeMethod, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
 	if err != nil {
 
 		// copy original error because we will reparse

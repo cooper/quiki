@@ -94,9 +94,7 @@ func handleWiki(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 
 // page request
 func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	log.Printf("CRITICAL: handlePage called with relPath: %s", relPath)
 	result := wi.pregenerateManager.GeneratePageSync(relPath, true)
-	log.Printf("CRITICAL: handlePage got result for %s", relPath)
 	handleResponse(wi, result, w, r)
 }
 

@@ -249,7 +249,6 @@ func (m *Manager) Stop() {
 } // GeneratePageSync generates a single page synchronously (blocks until complete)
 // this is the new unified entry point for all page generation
 func (m *Manager) GeneratePageSync(pageName string, highPriority bool) any {
-	m.debug("CRITICAL: GeneratePageSync START for page: %s, highPriority: %v", pageName, highPriority)
 	// first check if already cached and fresh
 	page := m.wiki.FindPage(pageName)
 	if page != nil && page.Exists() && !m.options.ForceGen {
@@ -971,7 +970,7 @@ func (m *Manager) backgroundWorker() {
 // pregeneratePage generates a single page and updates statistics
 func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	start := time.Now()
-	m.debug("CRITICAL: pregeneratePage START for page: %s (priority: %v)", pageName, isHighPriority)
+	m.debug("pregenerate: starting generation for page: %s (priority: %v)", pageName, isHighPriority)
 
 	// check if page exists
 	page := m.wiki.FindPage(pageName)
@@ -991,7 +990,7 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		}
 	}
 
-	m.debug("CRITICAL: calling DisplayPageDraft for: %s", pageName)
+	m.debug("pregenerate: calling DisplayPageDraft for: %s", pageName)
 	// temporarily modify ForceGen in a thread-safe way
 	var result any
 	originalForceGen := m.wiki.Opt.Page.ForceGen
