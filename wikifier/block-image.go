@@ -238,30 +238,6 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 		return
 	}
 
-	// check if we're in server mode and path hasn't been set yet (still just filename)
-	if page.Opt.Image.SizeMethod == "server" && image.path == image.file {
-		fmt.Printf("IMAGE_HTML_PATH_FIXING: page=%v, file=%s, calling sizing functions\n", page.Name, image.file)
-		
-		// determine dimensions
-		calcWidth, calcHeight, fullSize := page.Opt.Image.Calc(
-			image.file,
-			image.width,
-			image.height,
-			page,
-		)
-		
-		// set the path using the sizer
-		image.path = page.Opt.Image.Sizer(
-			image.file,
-			calcWidth,
-			calcHeight,
-			page,
-		)
-		image.fullSize = fullSize
-		
-		fmt.Printf("IMAGE_HTML_PATH_FIXED: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
-	}
-
 	// add the appropriate float class
 	if isBox {
 		if image.float == "" {
