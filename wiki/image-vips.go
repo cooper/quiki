@@ -28,8 +28,8 @@ type VipsOptions struct {
 // DefaultVipsOptions returns sensible defaults
 func DefaultVipsOptions() VipsOptions {
 	return VipsOptions{
-		MaxConcurrent: max(2, runtime.NumCPU()/2), // more conservative default based on CPU cores
-		Timeout:       20 * time.Second,           // libvips is much faster than imagemagick
+		MaxConcurrent: max(4, runtime.NumCPU()), // utilize all CPU cores with minimum of 4
+		Timeout:       20 * time.Second,         // libvips is much faster than imagemagick
 		Quality:       85,
 		MaxPixels:     500_000_000, // 500MP limit - libvips handles very large images efficiently
 	}
