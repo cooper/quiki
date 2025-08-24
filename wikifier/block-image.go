@@ -292,7 +292,6 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 		// create img with parent as either a or div
 		img := divOrA.createChild("img", "image-img")
 		img.setMeta("nonContainer", true)
-		fmt.Printf("ABOUT_TO_SET_SRC: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
 		img.setAttr("src", image.path)
 		img.setAttr("alt", image.alt)
 		img.setAttr("srcset", srcset) // CRITICAL DEBUG: image HTML created
@@ -318,7 +317,6 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	// create img with parent as either a or div
 	img := divOrA.createChild("img", "imagebox-img")
 	img.setMeta("nonContainer", true)
-	fmt.Printf("ABOUT_TO_SET_SRC_BOX: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
 	img.setAttr("src", image.path)
 	img.setAttr("alt", image.alt)
 	img.setAttr("srcset", srcset)
