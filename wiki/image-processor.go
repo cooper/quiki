@@ -218,11 +218,6 @@ func GetImageDimensionsFromFile(path string) (width, height int, err error) {
 	return config.Width, config.Height, nil
 }
 
-// GetImageDimensionsSafe safely gets image dimensions without loading the full image
-func (p *ImageProcessor) GetImageDimensionsSafe(path string) (width, height int, err error) {
-	return GetImageDimensionsFromFile(path)
-}
-
 // ResizeImageDirect implements ImageProcessorInterface - file-to-file resize using pure go
 func (p *ImageProcessor) ResizeImageDirect(inputPath, outputPath string, width, height, quality int) error {
 	// for pure go processor, we have to load into memory

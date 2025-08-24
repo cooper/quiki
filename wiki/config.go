@@ -1,6 +1,8 @@
 package wiki
 
 import (
+	"fmt"
+	"log"
 	"path/filepath"
 	"strings"
 
@@ -87,9 +89,7 @@ func (w *Wiki) readConfig(file string) error {
 func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int, int, bool) {
 
 	// CRITICAL DEBUG: function called
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("CALC_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
-	}
+	log.Printf("CALC_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
 
 	// requesting 0x0 is same as requesting full-size
 	if width == 0 && height == 0 {
@@ -100,9 +100,7 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	bigW, bigH := getImageDimensions(path)
 
 	// debug dimensions
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: original dimensions %dx%d", bigW, bigH)
-	}
+	log.Printf("defaultImageCalc: original dimensions %dx%d", bigW, bigH)
 
 	// original has no dimensions??
 	if bigW == 0 || bigH == 0 {
@@ -118,18 +116,16 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 	width, height = calculateImageDimensions(bigW, bigH, width, height)
 
 	// debug calculated dimensions
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageCalc: calculated dimensions %dx%d", width, height)
-	}
+	log.Printf("defaultImageCalc: calculated dimensions %dx%d", width, height)
 
 	// this must happen here to guarantee proper tracking before image pregeneration
+	img := SizedImageFromName(name)
+	imageName := img.FullSizeName()
+
+	// debug category tracking
+	fmt.Printf("defaultImageCalc: tracking category for '%s' (from name '%s')\n", imageName, name)
+
 	if w, ok := page.Wiki.(*Wiki); ok {
-		img := SizedImageFromName(name)
-		imageName := img.FullSizeName()
-
-		// debug category tracking
-		w.Logf("defaultImageCalc: tracking category for '%s' (from name '%s')", imageName, name)
-
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
 		imageCat.addImage(w, imageName, page, [][]int{{width, height}})
 	}
@@ -139,20 +135,15 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 
 func defaultImageSizer(name string, width, height int, page *wikifier.Page) string {
 	// CRITICAL DEBUG: function called
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("SIZER_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
-		w.Logf("SIZER_ROOT_IMAGE: page=%s, Root.Image=%s", page.Name, page.Opt.Root.Image)
-	}
+	log.Printf("SIZER_CALLED: page=%s, file=%s, width=%d, height=%d", page.Name, name, width, height)
+	log.Printf("SIZER_ROOT_IMAGE: page=%s, Root.Image=%s", page.Name, page.Opt.Root.Image)
 
 	si := SizedImageFromName(name)
 
 	// debug the parsed result
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("defaultImageSizer: parsed - Prefix='%s', RelNameNE='%s', Ext='%s'",
-			si.Prefix, si.RelNameNE, si.Ext)
-		if si.Prefix == "" {
-			w.Logf("defaultImageSizer: WARNING - image has no prefix (root directory)")
-		}
+	log.Printf("defaultImageSizer: parsed - Prefix='%s', RelNameNE='%s', Ext='%s'", si.Prefix, si.RelNameNE, si.Ext)
+	if si.Prefix == "" {
+		log.Printf("defaultImageSizer: WARNING - image has no prefix (root directory)")
 	}
 
 	si.Width = width
@@ -161,10 +152,7 @@ func defaultImageSizer(name string, width, height int, page *wikifier.Page) stri
 	result := page.Opt.Root.Image + "/" + si.TrueName()
 
 	// CRITICAL DEBUG: final result
-	if w, ok := page.Wiki.(*Wiki); ok {
-		w.Logf("SIZER_RESULT: page=%s, file=%s, TrueName=%s, final_result=%s",
-			page.Name, name, si.TrueName(), result)
-	}
+	log.Printf("SIZER_RESULT: page=%s, file=%s, TrueName=%s, final_result=%s", page.Name, name, si.TrueName(), result)
 
 	return result
 }
