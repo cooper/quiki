@@ -1,7 +1,7 @@
 package wikifier
 
 import (
-	"fmt"
+	"log"
 	"net/url"
 	"path/filepath"
 	"regexp"
@@ -50,7 +50,9 @@ func (image *imageBlock) parse(page *Page) {
 	image.license = image.getString("license")
 
 	// CRITICAL DEBUG: log image parse start
-	fmt.Printf("IMAGE_PARSE_START: page=%v, file=%s\n", page.Name, image.file)
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("IMAGE_PARSE_START: page=%s, file=%s", page.Name, image.file)
+	}
 
 	// fetch dimensions
 	if !image.parsedDimensions {
@@ -58,6 +60,8 @@ func (image *imageBlock) parse(page *Page) {
 		image.height = image.getPx("height")
 		image.parsedDimensions = true
 	}
+
+	log.Printf("IMAGE_PARSE_START: page=%s, file=%s\n", page.Name, image.file)
 
 	// compatibility
 	if image.align == "" {
@@ -76,7 +80,9 @@ func (image *imageBlock) parse(page *Page) {
 
 	// no file - this is mandatory
 	if image.file == "" {
-		fmt.Printf("IMAGE_PARSE_FAILED: page=%v, reason=no_file\n", page.Name)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_PARSE_FAILED: page=%s, reason=no_file", page.Name)
+		}
 		image.warn(image.getKeyPos("file"), "No file specified for image")
 		image.parseFailed = true
 		return
@@ -92,17 +98,21 @@ func (image *imageBlock) parse(page *Page) {
 	sizeMethod := strings.ToLower(page.Opt.Image.SizeMethod)
 
 	// CRITICAL DEBUG: log sizing info
-	fmt.Printf("IMAGE_SIZING_START: page=%v, file=%s, sizeMethod=%s, width=%d, height=%d\n",
-		page.Name, image.file, sizeMethod, image.width, image.height)
-	fmt.Printf("IMAGE_SIZING_FUNCS: page=%v, file=%s, Calc=%t, Sizer=%t\n",
-		page.Name, image.file, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
-	fmt.Printf("IMAGE_SIZING_ROOT: page=%v, file=%s, Root.Image=%s\n",
-		page.Name, image.file, page.Opt.Root.Image)
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("IMAGE_SIZING_START: page=%s, file=%s, sizeMethod=%s, width=%d, height=%d",
+			page.Name, image.file, sizeMethod, image.width, image.height)
+		wiki.Logf("IMAGE_SIZING_FUNCS: page=%s, file=%s, Calc=%t, Sizer=%t",
+			page.Name, image.file, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
+		wiki.Logf("IMAGE_SIZING_ROOT: page=%s, file=%s, Root.Image=%s",
+			page.Name, image.file, page.Opt.Root.Image)
+	}
 
 	if externalImageRegex.MatchString(image.file) {
 		// if the file is an absolute URL, we cannot size the image
 		// do nothing
-		fmt.Printf("IMAGE_EXTERNAL: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_EXTERNAL: page=%s, file=%s, path=%s", page.Name, image.file, image.path)
+		}
 
 	} else if sizeMethod == "javascript" {
 		// use javascript image sizing
@@ -120,8 +130,10 @@ func (image *imageBlock) parse(page *Page) {
 		// path is file relative to image root (full size image)
 		image.path = page.Opt.Root.Image + "/" + image.file
 
-		fmt.Printf("IMAGE_JAVASCRIPT: page=%v, file=%s, path=%s, useJS=%t, width=%d\n",
-			page.Name, image.file, image.path, image.useJS, image.width)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_JAVASCRIPT: page=%s, file=%s, path=%s, useJS=%t, width=%d",
+				page.Name, image.file, image.path, image.useJS, image.width)
+		}
 
 	} else if sizeMethod == "server" {
 		// use server-size image sizing
@@ -133,8 +145,10 @@ func (image *imageBlock) parse(page *Page) {
 
 		// these must be provided by wiki
 		if page.Opt.Image.Sizer == nil || page.Opt.Image.Calc == nil {
-			fmt.Printf("IMAGE_SERVER_FAILED: page=%v, file=%s, reason=missing_funcs, Calc=%t, Sizer=%t\n",
-				page.Name, image.file, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
+			if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+				wiki.Logf("IMAGE_SERVER_FAILED: page=%s, file=%s, reason=missing_funcs, Calc=%t, Sizer=%t",
+					page.Name, image.file, page.Opt.Image.Calc != nil, page.Opt.Image.Sizer != nil)
+			}
 			image.warn(image.openPos, "image.sizer and image.calc required with image.size_method 'server'")
 			image.parseFailed = true
 			return
@@ -149,8 +163,10 @@ func (image *imageBlock) parse(page *Page) {
 			page,
 		)
 
-		fmt.Printf("IMAGE_SERVER_CALC: page=%v, file=%s, inputW=%d, inputH=%d, calcW=%d, calcH=%d, fullSize=%t\n",
-			page.Name, image.file, image.width, image.height, calcWidth, calcHeight, image.fullSize)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_SERVER_CALC: page=%s, file=%s, inputW=%d, inputH=%d, calcW=%d, calcH=%d, fullSize=%t",
+				page.Name, image.file, image.width, image.height, calcWidth, calcHeight, image.fullSize)
+		}
 
 		// path is as returned by the function that sizes the image
 		image.path = page.Opt.Image.Sizer(
@@ -161,7 +177,9 @@ func (image *imageBlock) parse(page *Page) {
 		)
 
 		// CRITICAL DEBUG: final path
-		fmt.Printf("IMAGE_SERVER_FINAL: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_SERVER_FINAL: page=%s, file=%s, path=%s", page.Name, image.file, image.path)
+		}
 
 		// remember that the page uses this image in these dimensions
 		// consider: should we remember the retina scales? I guess it doesn't really DEPEND on them
@@ -182,15 +200,19 @@ func (image *imageBlock) parse(page *Page) {
 
 	} else {
 		// note: this should never happen because the config parser validates it
-		fmt.Printf("IMAGE_INVALID_METHOD: page=%v, file=%s, sizeMethod=%s\n", page.Name, image.file, sizeMethod)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_INVALID_METHOD: page=%s, file=%s, sizeMethod=%s", page.Name, image.file, sizeMethod)
+		}
 		image.warn(image.openPos, "image.size_method neither 'javascript' nor 'server'")
 		image.parseFailed = true
 		return
 	}
 
 	// CRITICAL DEBUG: parse completion
-	fmt.Printf("IMAGE_PARSE_COMPLETE: page=%v, file=%s, path=%s, parseFailed=%t\n",
-		page.Name, image.file, image.path, image.parseFailed)
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("IMAGE_PARSE_COMPLETE: page=%s, file=%s, path=%s, parseFailed=%t",
+			page.Name, image.file, image.path, image.parseFailed)
+	}
 }
 
 // image{} html
@@ -207,16 +229,17 @@ func (image *imagebox) html(page *Page, el element) {
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	image.Map.html(page, el)
 
-	// CRITICAL DEBUG: Check path after parsing
-	fmt.Printf("AFTER_MAP_HTML: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
-
 	// CRITICAL DEBUG: HTML generation start
-	fmt.Printf("IMAGE_HTML_START: page=%v, file=%s, path=%s, parseFailed=%t, isBox=%t\n",
-		page.Name, image.file, image.path, image.parseFailed, isBox)
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("IMAGE_HTML_START: page=%s, file=%s, path=%s, parseFailed=%t, isBox=%t",
+			page.Name, image.file, image.path, image.parseFailed, isBox)
+	}
 
 	// image parse failed, so no need to waste any time here
 	if image.parseFailed {
-		fmt.Printf("IMAGE_HTML_SKIPPED: page=%v, file=%s, reason=parseFailed\n", page.Name, image.file)
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_HTML_SKIPPED: page=%s, file=%s, reason=parseFailed", page.Name, image.file)
+		}
 		return
 	}
 
@@ -272,8 +295,10 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	// ############
 
 	// CRITICAL DEBUG: about to generate HTML
-	fmt.Printf("IMAGE_HTML_GENERATE: page=%v, file=%s, path=%s, link=%s, srcset=%s\n",
-		page.Name, image.file, image.path, image.link, srcset)
+	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+		wiki.Logf("IMAGE_HTML_GENERATE: page=%s, file=%s, path=%s, link=%s, srcset=%s",
+			page.Name, image.file, image.path, image.link, srcset)
+	}
 
 	// create an anchor for the link if there is one
 
@@ -294,9 +319,13 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 		img.setMeta("nonContainer", true)
 		img.setAttr("src", image.path)
 		img.setAttr("alt", image.alt)
-		img.setAttr("srcset", srcset) // CRITICAL DEBUG: image HTML created
-		fmt.Printf("IMAGE_HTML_CREATED: page=%v, file=%s, src=%s, alt=%s\n",
-			page.Name, image.file, image.path, image.alt)
+		img.setAttr("srcset", srcset)
+
+		// CRITICAL DEBUG: image HTML created
+		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
+			wiki.Logf("IMAGE_HTML_CREATED: page=%s, file=%s, src=%s, alt=%s",
+				page.Name, image.file, image.path, image.alt)
+		}
 
 		return
 	}
