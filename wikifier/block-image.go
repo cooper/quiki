@@ -217,6 +217,12 @@ func (image *imagebox) html(page *Page, el element) {
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	fmt.Printf("HTML_START: id=%d, page=%v, file=%s\n", image.id, page.Name, image.file)
 
+	// only call Map.html if we're not already in html generation (prevent recursion)
+	// check if image.path has been set by parsing - if so, skip Map.html
+	if image.path == "" || image.path == image.file {
+		// format map values but don't trigger recursive html generation
+		image.Map.html(page, el)
+	} // CRITICAL DEBUG: Check path after parsing
 	fmt.Printf("AFTER_MAP_HTML: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
 
 	// CRITICAL DEBUG: HTML generation start
