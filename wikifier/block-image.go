@@ -218,13 +218,13 @@ func (image *imagebox) html(page *Page, el element) {
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	fmt.Printf("HTML_START: id=%d, page=%v, file=%s, inHTML=%t\n", image.id, page.Name, image.file, image.inHTML)
 
-	// set recursion flag but don't return early - we still need to generate HTML
+	// prevent recursive html generation
 	if image.inHTML {
-		fmt.Printf("HTML_RECURSIVE: id=%d, page=%v, file=%s - continuing with existing path\n", image.id, page.Name, image.file)
-	} else {
-		image.inHTML = true
-		defer func() { image.inHTML = false }()
+		fmt.Printf("HTML_RECURSIVE: id=%d, page=%v, file=%s - skipping to prevent recursion\n", image.id, page.Name, image.file)
+		return
 	}
+	image.inHTML = true
+	defer func() { image.inHTML = false }()
 
 	fmt.Printf("AFTER_MAP_HTML: page=%v, file=%s, path=%s\n", page.Name, image.file, image.path)
 
@@ -239,8 +239,7 @@ func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
 	}
 
 	// check if we're in server mode and path hasn't been set yet (still just filename)
-	// but only do this if we're not already in HTML generation (to prevent recursion)
-	if page.Opt.Image.SizeMethod == "server" && image.path == image.file && !image.inHTML {
+	if page.Opt.Image.SizeMethod == "server" && image.path == image.file {
 		fmt.Printf("IMAGE_HTML_PATH_FIXING: page=%v, file=%s, calling sizing functions\n", page.Name, image.file)
 		
 		// determine dimensions
