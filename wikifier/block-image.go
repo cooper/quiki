@@ -19,6 +19,7 @@ type imageBlock struct {
 	parsedDimensions                bool
 	fullSize                        bool
 	scales                          []int
+	id                              int // debug ID to track instances
 	*Map
 }
 
@@ -28,7 +29,12 @@ type imagebox struct {
 
 // new image{}
 func newImageBlock(name string, b *parserBlock) block {
-	return &imageBlock{Map: newMapBlock("", b).(*Map)}
+	img := &imageBlock{
+		Map: newMapBlock("", b).(*Map),
+		id:  0, // simple counter would be better but this will work for debugging
+	}
+	fmt.Printf("NEW_IMAGE_BLOCK: id=%d, name=%s\n", img.id, name)
+	return img
 }
 
 // new imagebox{}
@@ -38,6 +44,7 @@ func newImagebox(name string, b *parserBlock) block {
 
 // image{} or imagebox{} parse
 func (image *imageBlock) parse(page *Page) {
+	fmt.Printf("PARSE_START: id=%d, page=%v, file=%s, VarsOnly=%t\n", image.id, page.Name, image.file, page.VarsOnly)
 	image.Map.parse(page)
 
 	// fetch string values from map
@@ -142,12 +149,14 @@ func (image *imageBlock) parse(page *Page) {
 
 		// determine dimensions
 		var calcWidth, calcHeight int
+		fmt.Printf("BEFORE_CALC: page=%v, file=%s\n", page.Name, image.file)
 		calcWidth, calcHeight, image.fullSize = page.Opt.Image.Calc(
 			image.file,
 			image.width,
 			image.height,
 			page,
 		)
+		fmt.Printf("AFTER_CALC: page=%v, file=%s, calcW=%d, calcH=%d\n", page.Name, image.file, calcWidth, calcHeight)
 
 		fmt.Printf("IMAGE_SERVER_CALC: page=%v, file=%s, inputW=%d, inputH=%d, calcW=%d, calcH=%d, fullSize=%t\n",
 			page.Name, image.file, image.width, image.height, calcWidth, calcHeight, image.fullSize)
@@ -191,6 +200,7 @@ func (image *imageBlock) parse(page *Page) {
 	// CRITICAL DEBUG: parse completion
 	fmt.Printf("IMAGE_PARSE_COMPLETE: page=%v, file=%s, path=%s, parseFailed=%t\n",
 		page.Name, image.file, image.path, image.parseFailed)
+	fmt.Printf("PARSE_END: id=%d, page=%v, file=%s, path=%s\n", image.id, page.Name, image.file, image.path)
 }
 
 // image{} html
@@ -205,6 +215,10 @@ func (image *imagebox) html(page *Page, el element) {
 
 // image{} or imagebox{} html
 func (image *imageBlock) imageHTML(isBox bool, page *Page, el element) {
+	fmt.Printf("HTML_START: id=%d, page=%v, file=%s\n", image.id, page.Name, image.file)
+
+	// ensure parsing is complete first, then do html formatting
+	image.Map.parse(page)
 	image.Map.html(page, el)
 
 	// CRITICAL DEBUG: Check path after parsing
