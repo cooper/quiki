@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -206,10 +207,8 @@ var defaultPageOpt = PageOpt{
 func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// CRITICAL DEBUG: log injection start
-	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-		wiki.Logf("INJECT_OPT_START: page=%s, input_SizeMethod=%s, input_Calc=%t, input_Sizer=%t",
-			page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil)
-	}
+	fmt.Printf("INJECT_OPT_START: page=%s, input_SizeMethod=%s, input_Calc=%t, input_Sizer=%t\n",
+		page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil)
 
 	// easy string options
 	pageOptString := map[string]*string{
@@ -325,9 +324,7 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		}
 		opt.Image.SizeMethod = str
 		// CRITICAL DEBUG: size method override
-		if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-			wiki.Logf("INJECT_OPT_SIZE_METHOD: page=%s, new_SizeMethod=%s", page.Name, str)
-		}
+		fmt.Printf("INJECT_OPT_SIZE_METHOD: page=%s, new_SizeMethod=%s\n", page.Name, str)
 	}
 
 	// cat.per_page - how many posts to show on each page of /topic
@@ -370,10 +367,8 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 	// TODO: External wikis
 
 	// CRITICAL DEBUG: log injection completion
-	if wiki, ok := page.Wiki.(interface{ Logf(string, ...interface{}) }); ok {
-		wiki.Logf("INJECT_OPT_COMPLETE: page=%s, final_SizeMethod=%s, final_Calc=%t, final_Sizer=%t, final_Root_Image=%s",
-			page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil, opt.Root.Image)
-	}
+	fmt.Printf("INJECT_OPT_COMPLETE: page=%s, final_SizeMethod=%s, final_Calc=%t, final_Sizer=%t, final_Root_Image=%s\n",
+		page.Name, opt.Image.SizeMethod, opt.Image.Calc != nil, opt.Image.Sizer != nil, opt.Root.Image)
 
 	return nil
 }

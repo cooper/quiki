@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"sort"
@@ -203,7 +204,7 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 
 	if err := p.Parse(); err != nil {
 		// TODO: do something with this error
-		w.Logf("readCategoryMeta(%s): parse error: %v", cat.Name, err)
+		fmt.Printf("readCategoryMeta(%s): parse error: %v\n", cat.Name, err)
 	}
 
 	// extract string options
@@ -220,7 +221,7 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 		if err != nil {
 			err = errors.Wrap(err, name)
 			// TODO: do something with this error
-			w.Logf("readCategoryMeta(%s): vars error: %v", cat.Name, err)
+			fmt.Printf("readCategoryMeta(%s): vars error: %v\n", cat.Name, err)
 		}
 		if str != "" {
 			*ptr = str
@@ -236,7 +237,7 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 		val, err := p.Get("category." + name)
 		if err != nil {
 			// TODO: do something with this error
-			w.Logf("readCategoryMeta(%s): vars error: %v", cat.Name, err)
+			fmt.Printf("readCategoryMeta(%s): vars error: %v\n", cat.Name, err)
 		}
 		if enable, ok := val.(bool); ok {
 			*ptr = enable
@@ -249,7 +250,7 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 		cat.PerPage, err = strconv.Atoi(perPage)
 		if err != nil {
 			// TODO: do something with this error
-			w.Logf("readCategoryMeta(%s): vars error: per_page: %v", cat.Name, err)
+			fmt.Printf("readCategoryMeta(%s): vars error: per_page: %v\n", cat.Name, err)
 		}
 	}
 
