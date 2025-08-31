@@ -319,6 +319,42 @@ func (w *Wiki) DeleteFile(name string, commit CommitOpts) error {
 	return w.removeAndCommit(path, commit)
 }
 
+// DeletePage deletes a page file and triggers regeneration of referencing pages.
+func (w *Wiki) DeletePage(name string, commit CommitOpts) error {
+	// delete the page file
+	pagePath := w.PathForPage(name)
+	relPath, err := filepath.Rel(w.Opt.Dir.Wiki, pagePath)
+	if err != nil {
+		return err
+	}
+
+	err = w.DeleteFile(relPath, commit)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteModel deletes a model file.
+func (w *Wiki) DeleteModel(name string, commit CommitOpts) error {
+	modelPath := w.PathForModel(name)
+	relPath, err := filepath.Rel(w.Opt.Dir.Wiki, modelPath)
+	if err != nil {
+		return err
+	}
+	return w.DeleteFile(relPath, commit)
+}
+
+// DeleteImage deletes an image file.
+func (w *Wiki) DeleteImage(name string, commit CommitOpts) error {
+	imagePath := w.PathForImage(name)
+	relPath, err := filepath.Rel(w.Opt.Dir.Wiki, imagePath)
+	if err != nil {
+		return err
+	}
+	return w.DeleteFile(relPath, commit)
+}
+
 // GetLatestCommitHash returns the most recent commit hash.
 func (w *Wiki) GetLatestCommitHash() (string, error) {
 	repo, err := w.repo()
@@ -349,7 +385,14 @@ func (w *Wiki) CreatePage(where string, title string, content []byte, commit Com
 	if where != "" && !strings.HasSuffix(where, "/") {
 		where += "/"
 	}
-	return name, w.WritePage(where+name, content, true, commit)
+
+	fullName := where + name
+	err := w.WritePage(fullName, content, true, commit)
+	if err != nil {
+		return name, err
+	}
+
+	return name, nil
 }
 
 // CreateModel creates a new model file.

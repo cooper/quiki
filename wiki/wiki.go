@@ -91,3 +91,21 @@ func (w *Wiki) GetImageLock(imageName string) *sync.Mutex {
 	}
 	return w.imageLocks[imageName]
 }
+
+// GetReferencingPages returns a list of page names that reference the given page.
+func (w *Wiki) GetReferencingPages(pageName string) []string {
+	cat := w.GetSpecialCategory(pageName, CategoryTypePage)
+
+	// if the category doesn't exist or has no pages, return empty list
+	if !cat.Exists() || len(cat.Pages) == 0 {
+		return nil
+	}
+
+	// collect all page names that reference this page
+	var referencingPages []string
+	for referencingPageName := range cat.Pages {
+		referencingPages = append(referencingPages, referencingPageName)
+	}
+
+	return referencingPages
+}

@@ -318,10 +318,30 @@ func (ww *wikiWatcher) handlePageEvent(relPath string, event fsnotify.Event) {
 			ww.handlePotentialSymlinkChange(relPath)
 		}
 
+		// regenerate the page itself
 		ww.regeneratePage(relPath)
+
+		// for newly created pages, regenerate pages that reference it
+		if event.Op == fsnotify.Create {
+			// convert relPath to page name by removing .page extension if present
+			pageName := relPath
+			if filepath.Ext(pageName) == ".page" {
+				pageName = pageName[:len(pageName)-5]
+			}
+			ww.regenerateReferencingPages(pageName)
+		}
 
 	case fsnotify.Rename, fsnotify.Remove:
 		log.Printf("Page removed: %s", relPath)
+
+		// convert relPath to page name by removing .page extension if present
+		pageName := relPath
+		if filepath.Ext(pageName) == ".page" {
+			pageName = pageName[:len(pageName)-5]
+		}
+
+		// regenerate pages that reference the deleted page to update broken links
+		ww.regenerateReferencingPages(pageName)
 
 		// if this was a symlink, clean up target tracking
 		abs := filepath.Join(ww.wiki.Opt.Dir.Page, relPath)
@@ -384,4 +404,17 @@ func (ww *wikiWatcher) handlePotentialSymlinkChange(relPath string) {
 func (ww *wikiWatcher) regeneratePage(relPath string) {
 	log.Printf("Page changed, regenerating: %s", relPath)
 	ww.pregenerateManager.GeneratePageSync(relPath, true)
+}
+
+// regenerateReferencingPages regenerates all pages that reference the given page
+func (ww *wikiWatcher) regenerateReferencingPages(pageName string) {
+	referencingPages := ww.wiki.GetReferencingPages(pageName)
+	if len(referencingPages) == 0 {
+		return
+	}
+
+	log.Printf("Regenerating %d pages that reference '%s': %v", len(referencingPages), pageName, referencingPages)
+	for _, referencingPage := range referencingPages {
+		ww.pregenerateManager.GeneratePageSync(referencingPage, true)
+	}
 }
