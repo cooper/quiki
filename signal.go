@@ -27,16 +27,7 @@ func handleSignals() {
 
 // handleReload sends SIGHUP to the running server
 func handleReload() {
-	// pidFile is now set up in setupQuikiDirectory(), but handle backward compatibility
-	pidPath := pidFile
-	if pidPath == "" {
-		configPath := opts.Config
-		if configPath == "" {
-			configPath = filepath.Join(os.Getenv("HOME"), "quiki", "quiki.conf")
-		}
-		configDir := filepath.Dir(configPath)
-		pidPath = filepath.Join(configDir, "server.pid")
-	}
+	pidPath := filepath.Join(QuikiDir, "server.pid")
 
 	// read PID from file
 	pidData, err := os.ReadFile(pidPath)
@@ -67,16 +58,7 @@ func handleReload() {
 
 // writePIDFile writes the current process PID to the PID file
 func writePIDFile() {
-	// pidFile is now set up in setupQuikiDirectory(), but handle backward compatibility
-	pidPath := pidFile
-	if pidPath == "" {
-		configPath := opts.Config
-		if configPath == "" {
-			configPath = filepath.Join(os.Getenv("HOME"), "quiki", "quiki.conf")
-		}
-		configDir := filepath.Dir(configPath)
-		pidPath = filepath.Join(configDir, "server.pid")
-	}
+	pidPath := filepath.Join(QuikiDir, "server.pid")
 
 	// ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(pidPath), 0755); err != nil {

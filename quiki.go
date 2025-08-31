@@ -21,7 +21,6 @@ var (
 	forceGen    bool
 	jsonOutput  bool
 	reload      bool
-	pidFile     string
 	QuikiDir    string
 	opts        webserver.Options
 )
@@ -44,9 +43,7 @@ func main() {
 	flag.StringVar(&opts.Bind, "bind", "", "address to bind to")
 	flag.StringVar(&opts.Port, "port", "", "port to listen on")
 	flag.StringVar(&opts.Host, "host", "", "default HTTP host")
-	flag.StringVar(&opts.WikisDir, "wikis-dir", "", "directory to store wikis in")
 	flag.BoolVar(&reload, "reload", false, "send reload signal to running server")
-	flag.StringVar(&pidFile, "pidfile", "", "path to PID file (default: {quiki-dir}/server.pid)")
 	flag.Parse()
 
 	initQuikiDir()
@@ -139,15 +136,6 @@ func initQuikiDir() {
 		QuikiDir = filepath.Dir(opts.Config)
 	}
 
-	if opts.Config == "" {
-		opts.Config = filepath.Join(QuikiDir, "quiki.conf")
-	}
-
-	if pidFile == "" {
-		pidFile = filepath.Join(QuikiDir, "server.pid")
-	}
-
-	if opts.WikisDir == "" {
-		opts.WikisDir = filepath.Join(QuikiDir, "wikis")
-	}
+	opts.Config = filepath.Join(QuikiDir, "quiki.conf")
+	opts.WikisDir = filepath.Join(QuikiDir, "wikis")
 }

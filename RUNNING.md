@@ -98,9 +98,6 @@ If you want to store data in a different location, you can specify:
 quiki -w -dir=/data/quiki
 ```
 
-The `-wikis-dir` flag can still be used to override the wikis subdirectory location
-if you need wikis stored separately (though this is no longer recommended).
-
 See the [configuration spec](doc/configuration.md) for all options.
 
 ### Admin account setup
