@@ -7,6 +7,7 @@ package webserver
 import (
 	"context"
 	"encoding/gob"
+	"fmt"
 	"io/fs"
 	"log"
 	"net"
@@ -127,6 +128,12 @@ func Configure(_initial_options Options) {
 	gob.Register(&authenticator.User{})
 
 	// parse configuration
+	if _, err := os.Stat(Opts.Config); err != nil {
+		fmt.Printf("no quiki config found at: %s\n", Opts.Config)
+		fmt.Printf("use -dir=/path to specify a different quiki directory, or -w to run setup wizard\n")
+		os.Exit(1)
+	}
+
 	Conf = wikifier.NewPage(Opts.Config)
 	Conf.VarsOnly = true
 	if err = Conf.Parse(); err != nil {
