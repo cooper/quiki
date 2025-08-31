@@ -132,7 +132,7 @@ func handleCreateUser(auth *authenticator.Authenticator) {
 	}
 
 	// create user
-	err = auth.CreateUser(username, string(password))
+	_, err = auth.CreateUser(username, string(password))
 	if err != nil {
 		fmt.Printf("error creating user: %v\n", err)
 		return

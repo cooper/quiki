@@ -369,7 +369,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// create user using the modern interface
 	username := r.Form.Get("username")
-	err = webserver.Auth.CreateUser(username, r.Form.Get("password"))
+	user, err := webserver.Auth.CreateUser(username, r.Form.Get("password"))
 
 	// error occurred
 	if err != nil {
@@ -377,17 +377,14 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get the created user and set admin details
-	user, exists := webserver.Auth.GetUser(username)
-	if exists {
-		user.DisplayName = r.Form.Get("display")
-		user.Email = r.Form.Get("email")
-		user.Permissions = []string{"read.*", "write.*"} // first user gets full admin permissions
-		err = webserver.Auth.UpdateUser(username, user)
-		if err != nil {
-			http.Error(w, "failed to set user details: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
+	// set admin details on the created user
+	user.DisplayName = r.Form.Get("display")
+	user.Email = r.Form.Get("email")
+	user.Permissions = []string{"read.*", "write.*"} // first user gets full admin permissions
+	err = webserver.Auth.UpdateUser(username, user)
+	if err != nil {
+		http.Error(w, "failed to set user details: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	// log 'em in by simulating a request to /func/login

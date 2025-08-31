@@ -23,7 +23,6 @@ type WikiInfo struct {
 	Title              string // wiki title from @name in the wiki config
 	Logo               string
 	Host               string
-	RequireAuth        bool // whether this wiki requires authentication to view
 	template           wikiTemplate
 	pregenerateManager *pregenerate.Manager
 	*wiki.Wiki
@@ -111,9 +110,6 @@ func InitWikis() error {
 
 		// create wiki info for webserver
 		wi := &WikiInfo{Wiki: w, Host: wikiHost, Name: wikiName}
-
-		// set RequireAuth from the parsed config
-		wi.RequireAuth = w.Opt.Auth.Require
 
 		// initialize git repsitory
 		log.Println(w.BranchNames())

@@ -161,15 +161,15 @@ func (auth *Authenticator) GetUserWikis(serverUser string) []string {
 }
 
 // CreateUser creates a new user with the given username and password
-func (auth *Authenticator) CreateUser(username, password string) error {
+func (auth *Authenticator) CreateUser(username, password string) (user User, err error) {
 	// validate username
-	if err := validateUsername(username); err != nil {
-		return err
+	if err = validateUsername(username); err != nil {
+		return user, err
 	}
 
 	// validate password strength
 	if err := validatePassword(password); err != nil {
-		return err
+		return user, err
 	}
 
 	if auth.Users == nil {
@@ -178,17 +178,17 @@ func (auth *Authenticator) CreateUser(username, password string) error {
 
 	// check if user already exists
 	if _, exists := auth.Users[username]; exists {
-		return ErrUserExists
+		return user, ErrUserExists
 	}
 
 	// hash the password
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
-		return err
+		return user, err
 	}
 
 	// create the user
-	auth.Users[username] = User{
+	user = User{
 		Username:    username,
 		Password:    hashedPassword,
 		Roles:       []string{},
@@ -196,7 +196,8 @@ func (auth *Authenticator) CreateUser(username, password string) error {
 		Wikis:       make(map[string]string),
 	}
 
-	return auth.write()
+	auth.Users[username] = user
+	return user, auth.write()
 }
 
 // GetUser returns a user by username
@@ -289,55 +290,6 @@ func (auth *Authenticator) ChangePassword(username, password string) error {
 // hashPassword hashes a password using bcrypt
 func hashPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-}
-
-// GetAvailableRoles returns all available roles (built-in defaults + custom roles from file)
-func (auth *Authenticator) GetAvailableRoles() map[string]Role {
-	roles := make(map[string]Role)
-
-	// start with built-in default roles for server auth
-	if auth.IsServer {
-		defaults := getDefaultServerRoles()
-		for name, role := range defaults {
-			roles[name] = role
-		}
-	}
-
-	// add custom roles from file (these can override defaults)
-	if auth.Roles != nil {
-		for name, role := range auth.Roles {
-			roles[name] = role
-		}
-	}
-
-	return roles
-}
-
-// getDefaultServerRoles returns the built-in default roles for server authentication
-// these are always available and get updated when the software is upgraded
-func getDefaultServerRoles() map[string]Role {
-	return map[string]Role{
-		"admin": {
-			Name:        "admin",
-			Description: "full server administration access",
-			Permissions: []string{"read.*", "write.*"},
-		},
-		"wiki-admin": {
-			Name:        "wiki-admin",
-			Description: "wiki administration access",
-			Permissions: []string{"read.wiki.*", "write.wiki.*", "read.server.wikis"},
-		},
-		"editor": {
-			Name:        "editor",
-			Description: "content editing access",
-			Permissions: []string{"read.wiki", "write.wiki.pages", "write.wiki.images"},
-		},
-		"viewer": {
-			Name:        "viewer",
-			Description: "read-only access",
-			Permissions: []string{"read.wiki"},
-		},
-	}
 }
 
 // validatePassword checks if a password meets minimum security requirements

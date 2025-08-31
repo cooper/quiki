@@ -539,7 +539,7 @@ func getWikiInfo(r *http.Request) *WikiInfo {
 
 // requireAuth checks if the wiki requires authentication and redirects to login if needed
 func requireAuth(wi *WikiInfo, w http.ResponseWriter, r *http.Request) bool {
-	if wi.RequireAuth && !SessMgr.GetBool(r.Context(), "loggedIn") {
+	if wi.Opt.Auth.Require && !SessMgr.GetBool(r.Context(), "loggedIn") {
 		// redirect to login with current page as redirect target
 		loginURL := wi.Opt.Root.Wiki + "login?redirect=" + r.URL.Path
 		http.Redirect(w, r, loginURL, http.StatusFound)
@@ -715,21 +715,14 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// create the user with basic read permissions
-		if err := wikiAuth.CreateUser(username, password); err != nil {
+		user, err := wikiAuth.CreateUser(username, password)
+		if err != nil {
 			log.Printf("register error: failed to create user: %v", err)
 			wi.showRegisterForm(w, r, "failed to create account", username, email)
 			return
 		}
 
-		// get the created user to set additional fields
-		user, exists := wikiAuth.GetUser(username)
-		if !exists {
-			log.Printf("register error: user not found after creation")
-			wi.showRegisterForm(w, r, "failed to create account", username, email)
-			return
-		}
-
-		// set email and permissions (CreateUser doesn't handle this)
+		// set email and permissions
 		user.Email = email
 		if len(user.Permissions) == 0 {
 			user.Permissions = []string{"read.wiki"}

@@ -82,7 +82,7 @@ type wikiRequest struct {
 // canUserReadWiki checks if a user can access a wiki for reading
 func canUserReadWiki(r *http.Request, shortcode string, wi *webserver.WikiInfo) bool {
 	// if wiki doesn't require auth, anyone can access it
-	if !wi.RequireAuth {
+	if !wi.Opt.Auth.Require {
 		return true
 	}
 
@@ -279,7 +279,7 @@ func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter,
 	// check if user can access this wiki (public vs private wiki)
 	if !canUserReadWiki(r, shortcode, wi) {
 		// wiki requires auth but user not logged in; redirect to login
-		if wi.RequireAuth && !sessMgr.GetBool(r.Context(), "loggedIn") {
+		if wi.Opt.Auth.Require && !sessMgr.GetBool(r.Context(), "loggedIn") {
 			redirectIfNotLoggedIn(w, r)
 		} else {
 			// either logged in but no permission, or wiki is public (shouldn't happen)
