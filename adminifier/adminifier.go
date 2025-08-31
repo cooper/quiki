@@ -93,8 +93,20 @@ func Configure() {
 
 	// if there are no users yet, let them know token
 	if tok, _ := conf.Get("adminifier.token"); tok != nil && len(webserver.Auth.Users) == 0 {
-		log.Printf("no admin users exist yet, visit %screate-user to create one", host+root)
-		log.Printf("your setup token: %s", tok)
+		const (
+			red    = "\033[31m"
+			yellow = "\033[33m"
+			bold   = "\033[1m"
+			reset  = "\033[0m"
+		)
+		log.Printf("%s%sno server users exist yet!%s", bold, yellow, reset)
+		log.Println()
+		log.Printf("%s%s/!\\          YOUR SETUP TOKEN           /!\\%s", bold, red, reset)
+		log.Printf("%s%s/!\\   %s%s%s%s  /!\\%s", bold, red, reset, bold, tok, red, reset)
+		log.Printf("%s%s/!\\                                     /!\\%s", bold, red, reset)
+		log.Println()
+		log.Printf("%s%svisit %screate-user%s to create the first user%s", bold, yellow, host+root, reset, reset)
+		log.Printf("%s%scopy+paste the above token%s into browser to claim your server", bold, yellow, reset)
 	}
 }
 func setupStatic(efs fs.FS, staticRoot string) error {

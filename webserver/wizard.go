@@ -24,7 +24,7 @@ func CreateWizardConfig(opts Options) {
 
 	// config already exists
 	if _, err := os.Stat(opts.Config); err == nil {
-		log.Printf("config %s already exists, skipping wizard", opts.Config)
+		log.Printf("config found at %s", opts.Config)
 		return
 	}
 
