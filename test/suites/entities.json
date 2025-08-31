@@ -1,0 +1,24 @@
+{
+  "name": "entities",
+  "description": "html entity formatting tests",
+  "tests": [
+    {
+      "name": "named_entity",
+      "input": "[&copy]",
+      "expected": "&copy;",
+      "description": "named html entity"
+    },
+    {
+      "name": "numeric_entity",
+      "input": "[&#34]",
+      "expected": "&#34;",
+      "description": "numeric html entity"
+    },
+    {
+      "name": "entity_amp",
+      "input": "[&amp]",
+      "expected": "&amp;",
+      "description": "ampersand entity"
+    }
+  ]
+}

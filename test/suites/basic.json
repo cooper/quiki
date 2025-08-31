@@ -1,0 +1,54 @@
+{
+  "name": "basic",
+  "description": "basic quiki formatting tests",
+  "tests": [
+    {
+      "name": "bold",
+      "input": "[b]bold text[/b]",
+      "expected": "<span style=\"font-weight: bold;\">bold text</span>",
+      "description": "basic bold formatting"
+    },
+    {
+      "name": "italic",
+      "input": "[i]italic text[/i]", 
+      "expected": "<span style=\"font-style: italic;\">italic text</span>",
+      "description": "basic italic formatting"
+    },
+    {
+      "name": "strikethrough",
+      "input": "[s]strike text[/s]",
+      "expected": "<span style=\"text-decoration: line-through;\">strike text</span>",
+      "description": "strikethrough formatting"
+    },
+    {
+      "name": "inline_code",
+      "input": "[c]code text[/c]",
+      "expected": "<code>code text</code>",
+      "description": "inline code formatting"
+    },
+    {
+      "name": "superscript",
+      "input": "super[^]script[/^]",
+      "expected": "super<sup>script</sup>",
+      "description": "superscript formatting"
+    },
+    {
+      "name": "subscript",
+      "input": "sub[v]script[/v]",
+      "expected": "sub<sub>script</sub>",
+      "description": "subscript formatting"
+    },
+    {
+      "name": "quote_formatting",
+      "input": "[q]quoted text[/q]",
+      "expected": "<span style=\"font-style: italic;\">\"quoted text\"</span>",
+      "description": "inline quote formatting"
+    },
+    {
+      "name": "nested_formatting",
+      "input": "[b][i]bold italic[/i][/b]",
+      "expected": "<span style=\"font-weight: bold;\"><span style=\"font-style: italic;\">bold italic</span></span>",
+      "description": "nested bold and italic"
+    }
+  ]
+}

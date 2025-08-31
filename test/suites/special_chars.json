@@ -1,0 +1,24 @@
+{
+  "name": "special_chars",
+  "description": "special character formatting tests",
+  "tests": [
+    {
+      "name": "line_break",
+      "input": "line one[nl]line two",
+      "expected": "line one<br />line two",
+      "description": "line break"
+    },
+    {
+      "name": "en_dash",
+      "input": "range: 1[--]10",
+      "expected": "range: 1&ndash;10",
+      "description": "en dash"
+    },
+    {
+      "name": "em_dash",
+      "input": "pause[---]dramatic effect",
+      "expected": "pause&mdash;dramatic effect",
+      "description": "em dash"
+    }
+  ]
+}

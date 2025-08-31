@@ -1,0 +1,18 @@
+{
+  "name": "inline_html",
+  "description": "inline html formatting tests",
+  "tests": [
+    {
+      "name": "inline_html_simple",
+      "input": "[html:<strong>raw html</strong>]",
+      "expected": "<strong>raw html</strong>",
+      "description": "simple inline html"
+    },
+    {
+      "name": "inline_html_complex",
+      "input": "[html:<span class=\"custom\">styled</span>]",
+      "expected": "<span class=\"custom\">styled</span>",
+      "description": "complex inline html with attributes"
+    }
+  ]
+}

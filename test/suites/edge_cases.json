@@ -1,0 +1,41 @@
+{
+  "name": "edge_cases",
+  "description": "edge case and unusual behavior tests",
+  "tests": [
+    {
+      "name": "empty_format",
+      "input": "[b][/b]",
+      "expected": "<span style=\"font-weight: bold;\"></span>",
+      "description": "empty formatting tags",
+      "tags": ["edge", "weird"]
+    },
+    {
+      "name": "nested_same_format",
+      "input": "[b][b]double bold[/b][/b]",
+      "expected": "<span style=\"font-weight: bold;\"><span style=\"font-weight: bold;\">double bold</span></span>",
+      "description": "nested same formatting type",
+      "tags": ["edge", "weird"]
+    },
+    {
+      "name": "unclosed_format",
+      "input": "[b]unclosed bold",
+      "expected": "<span style=\"font-weight: bold;\">unclosed bold",
+      "description": "unclosed tags remain unclosed",
+      "tags": ["edge", "weird"]
+    },
+    {
+      "name": "mismatched_close",
+      "input": "[b]bold[/i]",
+      "expected": "<span style=\"font-weight: bold;\">bold</span>",
+      "description": "mismatched closing tag gets ignored",
+      "tags": ["edge", "weird"]
+    },
+    {
+      "name": "markdown_multiline",
+      "input": "*spans\nnewline*",
+      "expected": "*spansnewline*",
+      "description": "markdown breaks on newlines",
+      "tags": ["edge", "weird", "markdown"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "colors",
+  "description": "color formatting tests",
+  "tests": [
+    {
+      "name": "color_name",
+      "input": "[red]red text[/]",
+      "expected": "<span style=\"color: #ff0000;\">red text</span>",
+      "description": "color by name"
+    },
+    {
+      "name": "color_hex",
+      "input": "[#ff1337]hex color[/]",
+      "expected": "<span style=\"color: #ff1337;\">hex color</span>",
+      "description": "color by hex code"
+    },
+    {
+      "name": "color_case_insensitive",
+      "input": "[RED]red text[/]",
+      "expected": "<span style=\"color: #ff0000;\">red text</span>",
+      "description": "color name case insensitive"
+    },
+    {
+      "name": "color_with_formatting",
+      "input": "[red][b]red bold[/b][/]",
+      "expected": "<span style=\"color: #ff0000;\"><span style=\"font-weight: bold;\">red bold</span></span>",
+      "description": "color with nested formatting"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "markdown",
+  "description": "markdown-style asterisk formatting tests",
+  "tests": [
+    {
+      "name": "bold_simple",
+      "input": "**bold text**",
+      "expected": "<span style=\"font-weight: bold;\">bold text</span>",
+      "description": "basic bold with **"
+    },
+    {
+      "name": "italic_simple", 
+      "input": "*italic text*",
+      "expected": "<span style=\"font-style: italic;\">italic text</span>",
+      "description": "basic italic with *"
+    },
+    {
+      "name": "bold_italic_mixed",
+      "input": "**bold** and *italic*",
+      "expected": "<span style=\"font-weight: bold;\">bold</span> and <span style=\"font-style: italic;\">italic</span>",
+      "description": "bold and italic together"
+    },
+    {
+      "name": "bold_italic_nested",
+      "input": "***bold italic***",
+      "expected": "<span style=\"font-weight: bold;\"><span style=\"font-style: italic;\">bold italic</span></span>",
+      "description": "nested bold italic with ***"
+    },
+    {
+      "name": "escaped_asterisk",
+      "input": "\\*not italic\\*",
+      "expected": "*not italic*",
+      "description": "escaped single asterisks"
+    },
+    {
+      "name": "escaped_double_asterisk",
+      "input": "\\**not bold\\**", 
+      "expected": "**not bold**",
+      "description": "escaped double asterisks"
+    },
+    {
+      "name": "mixed_with_quiki",
+      "input": "[b]**double bold**[/b]",
+      "expected": "<span style=\"font-weight: bold;\"><span style=\"font-weight: bold;\">double bold</span></span>",
+      "description": "markdown inside quiki formatting"
+    }
+  ]
+}

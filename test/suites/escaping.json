@@ -1,0 +1,24 @@
+{
+  "name": "escaping",
+  "description": "escape sequence tests",
+  "tests": [
+    {
+      "name": "escaped_brackets",
+      "input": "\\[not a format\\]",
+      "expected": "[not a format]",
+      "description": "escaped square brackets"
+    },
+    {
+      "name": "escaped_backslash",
+      "input": "backslash: \\\\",
+      "expected": "backslash: \\",
+      "description": "escaped backslash"
+    },
+    {
+      "name": "escaping_in_format",
+      "input": "[b]bold \\[not format\\] text[/b]",
+      "expected": "<span style=\"font-weight: bold;\">bold [not format] text</span>",
+      "description": "escaping within formatting"
+    }
+  ]
+}

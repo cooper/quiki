@@ -1,0 +1,27 @@
+{
+  "name": "complex",
+  "description": "complex mixed formatting scenarios",
+  "tests": [
+    {
+      "name": "deeply_nested",
+      "input": "[b][i][s][c]deeply nested[/c][/s][/i][/b]",
+      "expected": "<span style=\"font-weight: bold;\"><span style=\"font-style: italic;\"><span style=\"text-decoration: line-through;\"><code>deeply nested</code></span></span></span>",
+      "description": "deeply nested formatting",
+      "tags": ["complex", "nested"]
+    },
+    {
+      "name": "markdown_in_quiki",
+      "input": "[red]**bold red** and *italic red*[/]",
+      "expected": "<span style=\"color: #ff0000;\"><span style=\"font-weight: bold;\">bold red</span> and <span style=\"font-style: italic;\">italic red</span></span>",
+      "description": "markdown inside quiki color",
+      "tags": ["complex", "markdown", "color"]
+    },
+    {
+      "name": "everything_mixed",
+      "input": "[b]bold, **markdown bold**, [red]colored[/], and [c]code[/c][/b]",
+      "expected": "<span style=\"font-weight: bold;\">bold, <span style=\"font-weight: bold;\">markdown bold</span>, <span style=\"color: #ff0000;\">colored</span>, and <code>code</code></span>",
+      "description": "complex mixed formatting",
+      "tags": ["complex", "mixed", "markdown"]
+    }
+  ]
+}
