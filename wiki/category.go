@@ -104,8 +104,8 @@ type Category struct {
 	// dirty indicates if this category has unsaved changes
 	dirty bool `json:"-"`
 
-	// mu protects concurrent access to the category data
-	mu sync.RWMutex `json:"-"`
+	// file lock
+	lock *lock.Lock `json:"-"`
 
 	// wiki reference for operations (set during initialization)
 	wiki *Wiki `json:"-"`
@@ -149,14 +149,14 @@ func (w *Wiki) WithCategoryBatching(fn func()) {
 		pending: make(map[string]*Category),
 		locks:   make(map[string]*lock.Lock),
 	}
-	
+
 	// store the batcher in the wiki context
 	w.currentBatcher = batcher
 	defer func() { w.currentBatcher = nil }()
-	
+
 	// execute the function with batching enabled
 	fn()
-	
+
 	// flush all pending writes
 	batcher.flush(w)
 }
@@ -166,9 +166,10 @@ func (cb *categoryBatcher) add(cat *Category) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 
-	cat.mu.Lock()
-	cat.dirty = true
-	cat.mu.Unlock()
+	cat.lock.WithLock(func() error {
+		cat.dirty = true
+		return nil
+	})
 
 	cb.pending[cat.Path] = cat
 }
@@ -188,26 +189,13 @@ func (cb *categoryBatcher) flush(w *Wiki) {
 
 // writeCategory writes a single category with locking
 func (cb *categoryBatcher) writeCategory(cat *Category) {
-	// get or create lock for this category
-	cb.mu.Lock()
-	catLock, exists := cb.locks[cat.Path]
-	if !exists {
-		catLock = lock.New(cat.Path + ".lock")
-		cb.locks[cat.Path] = catLock
-	}
-	cb.mu.Unlock()
-
-	// acquire lock and write
-	catLock.WithLock(func() error {
-		cat.mu.Lock()
-		defer cat.mu.Unlock()
-
+	cat.lock.WithLock(func() error {
 		if !cat.dirty {
 			return nil // someone else already wrote it
 		}
 
 		cat.dirty = false
-		cat.write()
+		cat.writeUnlocked()
 		return nil
 	})
 }
@@ -277,6 +265,7 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 	cat.Type = typ
 	cat.FileNE = name // alias
 	cat.wiki = w      // set the wiki reference
+	cat.lock = lock.New(path + ".lock")
 
 	// load category metadata if available--
 	// but only in these cases:
@@ -369,11 +358,26 @@ func (cat *Category) AddPage(page *wikifier.Page) {
 }
 
 func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int, lines []int) {
-	cat.mu.Lock()
-	defer cat.mu.Unlock()
+	var changed bool
+	cat.lock.WithLock(func() error {
+		changed = cat.addPageExtrasUnlocked(pageMaybe, dimensions, lines)
+		return nil
+	})
 
-	// update existing info
-	cat.update()
+	// queue for writing outside the lock to avoid deadlock
+	if changed {
+		if cat.wiki.currentBatcher != nil {
+			// we're in a batching context, queue
+			cat.wiki.currentBatcher.add(cat)
+		} else {
+			// otherwise write immediately
+			cat.write()
+		}
+	}
+}
+
+func (cat *Category) addPageExtrasUnlocked(pageMaybe *wikifier.Page, dimensions [][]int, lines []int) bool {
+	cat.updateUnlocked()
 
 	// do nothing if the entry exists and the page has not changed since the asof time
 	if pageMaybe != nil {
@@ -384,7 +388,7 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 		entry, exist := cat.Pages[pageMaybe.Name()]
 		if exist && entry.Asof != nil {
 			if mod.Before(*entry.Asof) || mod.Equal(*entry.Asof) {
-				return
+				return false
 			}
 		}
 	}
@@ -417,14 +421,7 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 		cat.ModifiedHTTP = httpdate.Time2Str(now)
 	}
 
-	// queue for writing or write immediately
-	if cat.wiki.currentBatcher != nil {
-		// we're in a batching context, queue for later
-		cat.wiki.currentBatcher.add(cat)
-	} else {
-		// not in batching context, write immediately
-		cat.write()
-	}
+	return changed
 }
 
 // Exists returns whether a category currently exists.
@@ -440,9 +437,13 @@ func (cat *Category) IsSpecial() bool {
 
 // write category to file
 func (cat *Category) write() {
-	cat.mu.Lock()
-	defer cat.mu.Unlock()
+	cat.lock.WithLock(func() error {
+		cat.writeUnlocked()
+		return nil
+	})
+}
 
+func (cat *Category) writeUnlocked() {
 	// encode as JSON
 	jsonData, err := json.Marshal(cat)
 	if err != nil {
@@ -457,9 +458,13 @@ func (cat *Category) write() {
 }
 
 func (cat *Category) update() {
-	cat.mu.Lock()
-	defer cat.mu.Unlock()
+	cat.lock.WithLock(func() error {
+		cat.updateUnlocked()
+		return nil
+	})
+}
 
+func (cat *Category) updateUnlocked() {
 	// we're probably just now creating the category, so
 	// it's not gonna have any outdated information.
 	if !cat.Exists() {
@@ -551,7 +556,7 @@ func (cat *Category) update() {
 
 	// write update
 	if changed {
-		cat.write()
+		cat.writeUnlocked()
 	}
 }
 
@@ -722,7 +727,9 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		modelCat.ModelInfo = &modelInfo
 		modelCat.addPageExtras(page, nil, nil)
 	}
-}// DisplayCategoryPosts returns the display result for a category.
+}
+
+// DisplayCategoryPosts returns the display result for a category.
 func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) any {
 	cat := w.GetCategory(catName)
 
