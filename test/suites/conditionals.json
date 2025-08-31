@@ -1,0 +1,36 @@
+{
+  "name": "Conditionals",
+  "description": "Testing conditional syntax if{} blocks",
+  "tests": [
+    {
+      "name": "simple if true",
+      "input": "@flag;\nif [@flag] {\n  true content\n}",
+      "expected": "true content"
+    },
+    {
+      "name": "simple if false",
+      "input": "-@flag;\nif [@flag] {\n  false content\n}",
+      "expected": ""
+    },
+    {
+      "name": "if with string variable",
+      "input": "@name: world;\nif [@name] {\n  hello [@name]\n}",
+      "expected": "hello world"
+    },
+    {
+      "name": "if else true",
+      "input": "@flag;\nif [@flag] {\n  true\n}\nelse {\n  false\n}",
+      "expected": "true"
+    },
+    {
+      "name": "if else false",
+      "input": "-@flag;\nif [@flag] {\n  true\n}\nelse {\n  false\n}",
+      "expected": "false"
+    },
+    {
+      "name": "nested conditionals",
+      "input": "@outer;\n@inner;\nif [@outer] {\n  if [@inner] {\n    nested\n  }\n}",
+      "expected": "nested"
+    }
+  ]
+}

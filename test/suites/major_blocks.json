@@ -1,0 +1,36 @@
+{
+  "name": "Major Block Types",
+  "description": "Testing major block types like sec{}, fmt{}, map{}, etc.",
+  "tests": [
+    {
+      "name": "section with title",
+      "input": "sec {\n  @title: my section;\n  content here\n}",
+      "expected": "@title: my section; content here"
+    },
+    {
+      "name": "fmt block with html and quiki",
+      "input": "fmt {\n  <em>[b]bold inside html[/b]</em>\n}",
+      "expected": "<em><span style=\"font-weight: bold;\">bold inside html</span></em>"
+    },
+    {
+      "name": "map block simple",
+      "input": "map {\n  key1: value1;\n  key2: value2;\n}",
+      "expected": "<div class=\"q-map\">"
+    },
+    {
+      "name": "style block",
+      "input": "style {\n  body { color: red; }\n}",
+      "expected": "<div class=\"q-main--1 q-main\">"
+    },
+    {
+      "name": "infobox basic",
+      "input": "infobox {\n  @title: info;\n  content: data;\n}",
+      "expected": "<table class=\"q-infobox\"> <tr class=\"q-infobox-pair\"> <th class=\"q-infobox-key q-infosec-first\"> @title </th> <td class=\"q-infobox-value q-infosec-first\"> info </td> </tr> <tr class=\"q-infobox-pair\"> <th class=\"q-infobox-key q-infosec-last\"> content </th> <td class=\"q-infobox-value q-infosec-last\"> data </td> </tr> </table>"
+    },
+    {
+      "name": "model shorthand",
+      "input": "[[test_model]];",
+      "expected": "<a class=\"q-link-internal\" href=\"/test_model\" title=\"test_model\">test_model</a>;"
+    }
+  ]
+}

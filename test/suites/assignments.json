@@ -1,0 +1,41 @@
+{
+  "name": "Variable Assignments",
+  "description": "Testing variable assignment syntax",
+  "tests": [
+    {
+      "name": "basic string assignment",
+      "input": "@name: hello world;",
+      "expected": ""
+    },
+    {
+      "name": "string with semicolon escape",
+      "input": "@title: my article\\; subtitle;",
+      "expected": ""
+    },
+    {
+      "name": "numeric assignment",
+      "input": "@count: 42;",
+      "expected": ""
+    },
+    {
+      "name": "boolean true assignment",
+      "input": "@flag;",
+      "expected": ""
+    },
+    {
+      "name": "boolean false assignment", 
+      "input": "-@flag;",
+      "expected": ""
+    },
+    {
+      "name": "assignment then retrieval",
+      "input": "@name: world;\nhello [@name]",
+      "expected": "hello world"
+    },
+    {
+      "name": "multiple assignments",
+      "input": "@first: john;\n@last: doe;\n[@first] [@last]",
+      "expected": "john doe"
+    }
+  ]
+}
