@@ -55,7 +55,11 @@ func Configure() {
 	// configure session manager and permission checker
 	sessMgr = webserver.SessMgr
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
-	sessMgr.Cookie.Path = root
+
+	if sessMgr.Cookie.Domain == "" {
+		sessMgr.Cookie.Path = root
+	}
+
 	permissionChecker = webserver.NewPermissionChecker(sessMgr)
 
 	// setup adminifier static files server

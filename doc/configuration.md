@@ -731,6 +731,22 @@ Should be a hostname only or IP only, e.g. `server.example.com`.
 
 __Default__: None (serve wikis with no host configured on all hosts)
 
+### server.domain
+
+_Optional_. Cookie domain for session sharing across subdomains.
+
+When specified, session cookies will be set with this domain, allowing login
+sessions to be shared between the adminifier and wikis served on different
+subdomains. For example, setting `@server.domain: .example.com;` allows
+sessions to work across `admin.example.com` and `wiki.example.com`.
+
+```
+@server.domain: .example.com;
+```
+
+__Important__: It must start with a dot (.) for proper subdomain sharing.
+__Default__: None (sessions limited to same host)
+
 ### server.dir.template
 
 _Optional_. Template search paths.

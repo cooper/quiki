@@ -134,12 +134,13 @@ func Configure(_initial_options Options) {
 	}
 
 	// extract strings
-	var templateDirs string
+	var templateDirs, domain string
 	for key, ptr := range map[string]*string{
 		"server.http.port":    &Opts.Port,
 		"server.http.bind":    &Opts.Bind,
 		"server.http.host":    &Opts.Host,
 		"server.dir.template": &templateDirs,
+		"server.domain":       &domain,
 	} {
 		if *ptr != "" {
 			// already set by opts
@@ -195,6 +196,11 @@ func Configure(_initial_options Options) {
 	SessMgr.Cookie.HttpOnly = true                    // prevent js access to session cookies
 	SessMgr.Cookie.SameSite = http.SameSiteStrictMode // prevent csrf
 	SessMgr.Cookie.Name = "__quiki_session"           // use custom session cookie name for security
+
+	// configure cookie domain for cross-subdomain sharing if specified
+	if domain != "" {
+		SessMgr.Cookie.Domain = domain
+	}
 
 	// create global permission checker
 	GlobalPermissionChecker = NewPermissionChecker(SessMgr)
