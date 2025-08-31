@@ -83,6 +83,7 @@ func Configure() {
 
 	// main handler
 	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
+	mux.RegisterFunc(host+root+"static/config.js", "adminifier config.js", handleConfigJS)
 	log.Println("registered adminifier root: " + host + root)
 
 	// admin handlers

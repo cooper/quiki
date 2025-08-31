@@ -187,6 +187,17 @@ func createAdminTemplate(r *http.Request) adminTemplate {
 	}
 }
 
+func handleConfigJS(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/javascript")
+	data := createAdminTemplate(r)
+
+	err := tmpl.ExecuteTemplate(w, "config.js.tpl", data)
+	if err != nil {
+		http.Error(w, "failed to generate config", http.StatusInternalServerError)
+		return
+	}
+}
+
 func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	// if no users exist, redirect to create-user
 	if len(webserver.Auth.Users) == 0 {

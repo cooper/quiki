@@ -56,16 +56,15 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 
 // wikiTemplate members are available to all wiki templates
 type wikiTemplate struct {
-	User              *authenticator.User  // user
-	ServerPanelAccess bool                 // whether user can access main panel
-	Shortcode         string               // wiki shortcode
-	Title             string               // wiki title
-	Branch            string               // selected branch
-	Static            string               // adminifier static root
-	QStatic           string               // webserver static root
-	AdminRoot         string               // adminifier root
-	Root              string               // wiki root
-	WikiRoots         wikifier.PageOptRoot // wiki roots
+	User      *authenticator.User  // user
+	Shortcode string               // wiki shortcode
+	Title     string               // wiki title
+	Branch    string               // selected branch
+	Static    string               // adminifier static root
+	QStatic   string               // webserver static root
+	AdminRoot string               // adminifier root
+	Root      string               // wiki root
+	WikiRoots wikifier.PageOptRoot // wiki roots
 }
 
 type wikiRequest struct {
@@ -276,15 +275,15 @@ func handleWikiRoot(shortcode string, wi *webserver.WikiInfo, w http.ResponseWri
 }
 
 func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		redirectIfNotLoggedIn(w, r)
+		return
+	}
+
 	// check if user can access this wiki (public vs private wiki)
 	if !canUserReadWiki(r, shortcode, wi) {
-		// wiki requires auth but user not logged in; redirect to login
-		if wi.Opt.Auth.Require && !sessMgr.GetBool(r.Context(), "loggedIn") {
-			redirectIfNotLoggedIn(w, r)
-		} else {
-			// either logged in but no permission, or wiki is public (shouldn't happen)
-			http.Error(w, "insufficient permissions to view this wiki", http.StatusForbidden)
-		}
+		// logged in but no permission
+		http.Error(w, "insufficient permissions to view this wiki", http.StatusForbidden)
 		return
 	}
 
@@ -808,17 +807,24 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 		Ext:      roots.Ext,
 	}
 
+	sessionData := sessMgr.Get(wr.r.Context(), "user")
+	var user *authenticator.User
+
+	if sessionData != nil {
+		session := sessionData.(*webserver.Session)
+		user = &session.User
+	}
+
 	return wikiTemplate{
-		User:              sessMgr.Get(wr.r.Context(), "user").(*authenticator.User),
-		ServerPanelAccess: true, // TODO
-		Branch:            sessMgr.GetString(wr.r.Context(), "branch"),
-		Shortcode:         wr.shortcode,
-		Title:             wr.wi.Title,
-		AdminRoot:         strings.TrimRight(root, "/"),
-		Static:            root + "static",
-		QStatic:           root + "qstatic",
-		Root:              root + wikiDelimeter + wr.shortcode,
-		WikiRoots:         roots,
+		User:      user,
+		Branch:    sessMgr.GetString(wr.r.Context(), "branch"),
+		Shortcode: wr.shortcode,
+		Title:     wr.wi.Title,
+		AdminRoot: strings.TrimRight(root, "/"),
+		Static:    root + "static",
+		QStatic:   root + "qstatic",
+		Root:      root + wikiDelimeter + wr.shortcode,
+		WikiRoots: roots,
 	}
 }
 

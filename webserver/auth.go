@@ -61,7 +61,8 @@ func SetSecurityHeaders(w http.ResponseWriter) {
 
 	// content security policy - tightened for production security
 	// removed unsafe-inline for scripts to prevent xss attacks
-	w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'")
+	// added unsafe-eval temporarily for tmpl.js templating library
+	w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'")
 }
 
 // SanitizeInput sanitizes user input to prevent xss attacks
