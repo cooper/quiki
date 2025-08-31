@@ -27,7 +27,8 @@ func CreateWizardConfig(opts Options) {
 
 	// config already exists
 	if _, err := os.Stat(opts.Config); err == nil {
-		log.Fatalf("config file already exists: %s; please run without -w", opts.Config)
+		log.Printf("config %s already exists, skipping wizard", opts.Config)
+		return
 	}
 
 	// make the directory path if needed

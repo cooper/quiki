@@ -1,0 +1,25 @@
+services:
+  quiki:
+    build: .
+    volumes:
+      - ./data:/quiki
+    networks:
+      - quiki
+
+  # example frontend: a reverse proxy with auto ssl using caddy
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/caddy:/data
+    environment:
+      # set your host here for auto ssl
+      - QUIKI_HOST=
+    command: sh -c "caddy reverse-proxy --from $${QUIKI_HOST:-localhost} --to quiki:8080"
+    networks:
+      - quiki
+
+networks:
+  quiki:
