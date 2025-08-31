@@ -16,8 +16,8 @@ file. All quiki configuration files are written in the quiki language:
 
 If you are using **quiki webserver**, you must have a dedicated configuration
 file for the webserver. This tells it where to listen and where to find the
-wikis you have configured on the server. This is typically called `quiki.conf`,
-and is required as the first argument to the `quiki` executable.
+wikis you have configured on the server. This file is called `quiki.conf` and
+is located in your quiki directory (default: `~/quiki/quiki.conf`).
 
 **Every wiki** also requires its own configuration file called
 `wiki.conf` at the root level of the wiki directory.

@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/cooper/quiki/adminifier"
 	"github.com/cooper/quiki/webserver"
@@ -14,7 +13,7 @@ func runServer() {
 
 	useDefaultConfigPath := opts.Config == ""
 	if useDefaultConfigPath {
-		opts.Config = filepath.Join(os.Getenv("HOME"), "quiki", "quiki.conf")
+		log.Printf("using default quiki directory and config at: %s", opts.Config)
 	}
 
 	// if running wizard, create a new config file

@@ -27,7 +27,7 @@ func handleSignals() {
 
 // handleReload sends SIGHUP to the running server
 func handleReload() {
-	// determine PID file path
+	// pidFile is now set up in setupQuikiDirectory(), but handle backward compatibility
 	pidPath := pidFile
 	if pidPath == "" {
 		configPath := opts.Config
@@ -67,7 +67,7 @@ func handleReload() {
 
 // writePIDFile writes the current process PID to the PID file
 func writePIDFile() {
-	// determine PID file path
+	// pidFile is now set up in setupQuikiDirectory(), but handle backward compatibility
 	pidPath := pidFile
 	if pidPath == "" {
 		configPath := opts.Config

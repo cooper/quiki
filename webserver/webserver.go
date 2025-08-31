@@ -204,7 +204,14 @@ func Configure(_initial_options Options) {
 	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
-	Auth, err = authenticator.OpenServer(filepath.Join(filepath.Dir(Opts.Config), "quiki-auth.json"))
+	var authPath string
+	if dir := filepath.Dir(Opts.Config); dir != "" {
+		authPath = filepath.Join(dir, "quiki-auth.json")
+	} else {
+		authPath = "quiki-auth.json"
+	}
+
+	Auth, err = authenticator.OpenServer(authPath)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "init server authenticator"))
 	}

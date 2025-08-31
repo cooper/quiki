@@ -21,9 +21,6 @@ func CreateWizardConfig(opts Options) {
 	if opts.Port == "" {
 		opts.Port = "8080"
 	}
-	if opts.WikisDir == "" {
-		opts.WikisDir = filepath.Join(filepath.Dir(opts.Config), "wikis")
-	}
 
 	// config already exists
 	if _, err := os.Stat(opts.Config); err == nil {
@@ -31,9 +28,10 @@ func CreateWizardConfig(opts Options) {
 		return
 	}
 
-	// make the directory path if needed
-	if err := os.MkdirAll(filepath.Dir(opts.Config), 0755); err != nil {
-		log.Fatal(errors.Wrap(err, "make config dir"))
+	// make the quiki dir if needed
+	quikiDir := filepath.Dir(opts.Config)
+	if err := os.MkdirAll(quikiDir, 0755); err != nil {
+		log.Fatal(errors.Wrap(err, "make quiki dir"))
 	}
 
 	// make the wikis dir if needed

@@ -4,21 +4,33 @@ The `quiki` executable can be used for several different functions.
 
 Please note: it is intended to be run as a non-super user.
 
+## About the quiki dir
+
+quiki uses a unified directory to store all server-level data:
+- configuration file (`quiki.conf`)
+- sites that it serves (`wikis/` subdirectory)
+- server state like pid file, authenticator db
+
+By default, this directory is `~/quiki`. In the docker image, this becomes `/quiki`,
+which should be mapped to a volume or directory on the host for persistence.
+
+For atypical configurations, can specify a different directory with the `-dir` flag.
+
 ## Cheat Sheet
 
 #### First Run Wizard
 
 ```
-quiki -w        # Run wizard with defaults of *:8080 and data directory at ~/quiki 
+quiki -w                                # run wizard with defaults (*:8080, ~/quiki)
 quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com   # custom server params
-quiki -w -config=/etc/quiki.conf -wikis-dir=/var/www/wikis  # custom paths
+quiki -w -dir=/data/quiki                # custom quiki directory
 ```
 
 #### Run Webserver
 
 ```
-quiki                                   # using server config at ~/quiki/quiki.conf
-quiki -config=/path/to/quiki.conf       # using config in another location
+quiki                                   # using default directory ~/quiki
+quiki -dir=/path/to/quiki               # using custom data directory
 quiki -host=sites.example.com           # override default http host
 quiki -bind=1.2.3.4 -port=8090          # override host and port in config
 ```
@@ -47,7 +59,7 @@ quiki -create-wiki=/path/to/wiki        # create a new wiki at the path
 
 #### Server Operations
 
-Use with `-config=/path/to/quiki.conf`, otherwise assumes `~/quiki/quiki.conf`.
+Use with `-dir=/path/to/quiki-data` if your quiki dir is not `~/quiki`.
 
 ```
 quiki -enable-wiki=shortcode            # start serving a wiki within the server wikis directory
@@ -75,15 +87,19 @@ to do something different, you can specify them to the wizard like:
 quiki -w -bind=1.2.3.4 -port=9091 -host=sites.example.com
 ```
 
-### Alternate config and sites locations
+### Alternate quiki directory
 By default, the wizard creates a directory at `~/quiki` to store your quiki
-configuration and sites. It will write the configuration file to `~/quiki/quiki.conf` and
-create a sites root directory at `~/quiki/wikis`.
+configuration, user database, sites, and other server data. It will write the 
+configuration file to `~/quiki/quiki.conf` and create a sites root directory 
+at `~/quiki/wikis`.
 
-If you want to store the config and sites elsewhere, you can specify like so:
+If you want to store data in a different location, you can specify:
 ```
-quiki -w -config=/etc/quiki.conf -wikis-dir=/var/www/wikis
+quiki -w -dir=/data/quiki
 ```
+
+The `-wikis-dir` flag can still be used to override the wikis subdirectory location
+if you need wikis stored separately (though this is no longer recommended).
 
 See the [configuration spec](doc/configuration.md) for all options.
 
@@ -99,7 +115,7 @@ config, usually at `~/quiki/quiki.conf`.
 
 It also allows you to specify a location to store your wiki sites. This will be
 prepopulated with the recommended location which is the `wikis` dir relative
-to the config location, typically `~/quiki/wikis`.
+to the quiki directory, typically `~/quiki/wikis`.
 
 Upon successful completion of this form, you are logged in and ready to create
 your first wiki!
@@ -110,13 +126,22 @@ To run the quiki webserver if you've already set it up, simply run
 ```
 quiki
 ```
-This will assume the webserver config path of `~/quiki/quiki.conf`.
+This will use the default quiki directory at `~/quiki`.
 
-### Alternate config location
-To run with a different config, use
+### Alternate quiki directory
+To run with a different quiki directory, use
 ```
-quiki -config=/path/to/quiki.conf
+quiki -dir=/path/to/quiki
 ```
+
+### Backward compatibility
+The legacy `-config` flag is still supported for now but deprecated:
+```
+quiki -config=/path/to/quiki.conf       # deprecated, use -dir instead
+```
+
+Please update your service/autostart files accordingly, or moved to a containerized
+approach using the example [Docker compose file](./docker-compose.yml).
 
 See the [configuration spec](doc/configuration.md) for all options.
 

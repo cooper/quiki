@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"syscall"
 
 	"github.com/cooper/quiki/authenticator"
@@ -14,15 +15,21 @@ import (
 
 func handleAuthCommand() {
 	if len(os.Args) < 3 {
-		printUsage()
+		printAuthUsage()
 		return
 	}
 
 	var auth *authenticator.Authenticator
 	var err error
 	if wikiPath == "" {
-		// server-level auth
-		auth, err = authenticator.OpenServer("quiki-auth.json")
+		// server-level auth - use the established quiki directory
+		var authPath string
+		if QuikiDir != "" {
+			authPath = filepath.Join(QuikiDir, "quiki-auth.json")
+		} else {
+			authPath = "quiki-auth.json" // fallback for relative path
+		}
+		auth, err = authenticator.OpenServer(authPath)
 	} else {
 		// wiki-level auth
 		auth, err = authenticator.Open(wikiPath + "/auth.json")
@@ -56,11 +63,11 @@ func handleAuthCommand() {
 		handleListMappings(auth)
 	default:
 		fmt.Printf("unknown auth subcommand: %s\n", subcommand)
-		printUsage()
+		printAuthUsage()
 	}
 }
 
-func printUsage() {
+func printAuthUsage() {
 	fmt.Println("quiki auth management usage:")
 	fmt.Println("")
 	fmt.Println("server or wiki commands")
