@@ -208,7 +208,6 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		Error        string
 		Success      string
 		ShowLinks    bool
-		IsDarkTheme  bool
 		CSRFToken    string
 	}{
 		Title:        serverTitle + " login",
@@ -220,7 +219,6 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		WikiLogo:     "image/favicon.png",
 		WikiTitle:    serverTitle,
 		ShowLinks:    false,
-		IsDarkTheme:  true,
 		CSRFToken:    webserver.GetOrCreateCSRFToken(r),
 	}
 
@@ -298,25 +296,27 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Title           string
-		Heading         string
-		Static          string
-		SharedStatic    string
-		WikiTitle       string
-		ShowLinks       bool
-		IsDarkTheme     bool
-		DefaultWikiPath string
-		CSRFToken       string
+		Title        string
+		Heading      string
+		Redirect     string
+		Static       string
+		SharedStatic string
+		WikiName     string
+		WikiLogo     string
+		WikiTitle    string
+		Error        string
+		Success      string
+		ShowLinks    bool
+		CSRFToken    string
 	}{
-		Title:           serverTitle + " setup wizard",
-		Heading:         "create initial user",
-		Static:          root + "static",
-		SharedStatic:    root + "shared",
-		WikiTitle:       serverTitle,
-		ShowLinks:       false,
-		IsDarkTheme:     true,
-		DefaultWikiPath: "", // add default path if needed
-		CSRFToken:       webserver.GetOrCreateCSRFToken(r),
+		Title:        serverTitle + " setup wizard",
+		Heading:      "Create Iniital User",
+		Static:       root + "static",
+		SharedStatic: root + "shared",
+		WikiName:     serverTitle,
+		WikiLogo:     "image/favicon.png",
+		WikiTitle:    serverTitle,
+		CSRFToken:    webserver.GetOrCreateCSRFToken(r),
 	}
 
 	handleTemplate(w, r, data)

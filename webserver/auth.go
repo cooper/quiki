@@ -485,7 +485,6 @@ type authTemplateData struct {
 	HomeURL        string
 	AllowRegister  bool
 	ShowLinks      bool
-	IsDarkTheme    bool
 	CSRFToken      string
 }
 
@@ -503,7 +502,6 @@ func (wi *WikiInfo) newAuthTemplateData(pageTitle, heading string, r *http.Reque
 		HomeURL:       wi.Opt.Root.Wiki,
 		AllowRegister: wi.Opt.Auth.Register,
 		ShowLinks:     true,
-		IsDarkTheme:   false, // webserver uses light theme
 		CSRFToken:     getOrCreateCSRFToken(r),
 	}
 }

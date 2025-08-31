@@ -105,7 +105,7 @@ func Configure() {
 		log.Printf("%s%s/!\\   %s%s%s%s  /!\\%s", bold, red, reset, bold, tok, red, reset)
 		log.Printf("%s%s/!\\                                     /!\\%s", bold, red, reset)
 		log.Println()
-		log.Printf("%s%svisit %screate-user%s to create the first user%s", bold, yellow, host+root, reset, reset)
+		log.Printf("%s%svisit %s%s to create the first user%s", bold, yellow, host+root, reset, reset)
 		log.Printf("%s%scopy+paste the above token%s into browser to claim your server", bold, yellow, reset)
 	}
 }
