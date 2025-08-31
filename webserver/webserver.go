@@ -125,7 +125,7 @@ func Configure(_initial_options Options) {
 	var err error
 	Opts = _initial_options
 	Mux = NewServeMux()
-	gob.Register(&authenticator.User{})
+	gob.Register(&Session{})
 
 	// parse configuration
 	if _, err := os.Stat(Opts.Config); err != nil {

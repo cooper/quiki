@@ -171,9 +171,15 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func createAdminTemplate(r *http.Request) adminTemplate {
-	user, _ := sessMgr.Get(r.Context(), "user").(*authenticator.User)
+	session, _ := sessMgr.Get(r.Context(), "user").(*webserver.Session)
+	var user *authenticator.User
+	if session != nil {
+		user = &session.User
+	}
 	return adminTemplate{
 		User:      user,
+		Wikis:     make(map[string]*webserver.WikiInfo),
+		Templates: []string{},
 		Title:     "quiki",
 		AdminRoot: strings.TrimRight(root, "/"),
 		Static:    root + "static",
@@ -268,7 +274,8 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	webserver.ClearSuccessfulLogin(r, username)
 
 	// start session and remember user info
-	sessMgr.Put(r.Context(), "user", &user)
+	session := webserver.NewSession(&user)
+	sessMgr.Put(r.Context(), "user", session)
 	sessMgr.Put(r.Context(), "loggedIn", true)
 	sessMgr.Put(r.Context(), "branch", "master") // FIXME: derive default branch
 
@@ -400,8 +407,8 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 func handleLogout(w http.ResponseWriter, r *http.Request) {
 	// get username before destroying session for cache cleanup
 	var username string
-	if user, ok := sessMgr.Get(r.Context(), "user").(*authenticator.User); ok && user != nil {
-		username = user.Username
+	if session, ok := sessMgr.Get(r.Context(), "user").(*webserver.Session); ok && session != nil && session.Username != "" {
+		username = session.Username
 	}
 
 	// destroy session

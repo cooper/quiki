@@ -51,7 +51,7 @@
             <div class="auth-form-group">
                 <label class="auth-label" for="token">Setup Token</label>
                 <input class="auth-input" type="text" name="token" id="token" required />
-                <div class="auth-help-text">Enter the setup token from the startup logs</div>
+                <div class="auth-help-text">Found in startup logs and quiki.conf</div>
             </div>
             <button type="submit" class="auth-button">Create User</button>
         </form>
