@@ -1,0 +1,41 @@
+{
+  "name": "comments_and_parsing",
+  "description": "comment handling and parsing edge cases",
+  "tests": [
+    {
+      "name": "simple_comment",
+      "input": "Text before /* this is a comment */ text after",
+      "expected": "Text before text after",
+      "description": "simple block comment removal",
+      "tags": ["comments", "parsing"]
+    },
+    {
+      "name": "nested_comment",
+      "input": "Text /* outer /* inner */ comment */ after",
+      "expected": "Text after",
+      "description": "nested block comments",
+      "tags": ["comments", "parsing", "nested"]
+    },
+    {
+      "name": "mixed_formatting_markdown",
+      "input": "[b]bold [red]**markdown bold**[/] normal[/b]",
+      "expected": "<span style=\"font-weight: bold;\">bold <span style=\"color: #ff0000;\"><span style=\"font-weight: bold;\">markdown bold</span></span> normal</span>",
+      "description": "quiki formatting mixed with markdown",
+      "tags": ["parsing", "formatting", "markdown"]
+    },
+    {
+      "name": "escaped_brackets",
+      "input": "\\[not a format\\] and \\{not a block\\}",
+      "expected": "[not a format] and {not a block}",
+      "description": "escaped bracket handling",
+      "tags": ["parsing", "escape"]
+    },
+    {
+      "name": "escaped_backslash",
+      "input": "literal backslash \\\\ in text",
+      "expected": "literal backslash \\ in text",
+      "description": "escaped backslash handling",
+      "tags": ["parsing", "escape", "backslash"]
+    }
+  ]
+}

@@ -33,7 +33,7 @@
     {
       "name": "markdown_multiline",
       "input": "*spans\nnewline*",
-      "expected": "*spansnewline*",
+      "expected": "*spans newline*",
       "description": "markdown breaks on newlines",
       "tags": ["edge", "weird", "markdown"]
     }

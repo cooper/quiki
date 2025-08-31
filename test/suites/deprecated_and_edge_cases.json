@@ -1,0 +1,62 @@
+{
+  "name": "deprecated_and_edge_cases",
+  "description": "deprecated features and edge case behaviors",
+  "tests": [
+    {
+      "name": "deprecated_link_exclamation",
+      "input": "[!internal link!]",
+      "expected": "<a class=\"q-link-external\" href=\"https://en.wikipedia.org/wiki/internal_link\" title=\"Wikipedia: internal link\">internal link</a>",
+      "description": "deprecated exclamation link format (becomes wikipedia)",
+      "tags": ["deprecated", "links", "fishy"]
+    },
+    {
+      "name": "deprecated_link_dollar",
+      "input": "[$external link$]",
+      "expected": "<a class=\"q-link-internal\" href=\"/external_link\" title=\"external link\">external link</a>",
+      "description": "deprecated dollar link format (becomes internal)",
+      "tags": ["deprecated", "links", "fishy"]
+    },
+    {
+      "name": "deprecated_link_tilde",
+      "input": "[~category link~]",
+      "expected": "<a class=\"q-link-category\" href=\"/topic/category_link\" title=\"category link\">category link</a>",
+      "description": "deprecated tilde link format (category)",
+      "tags": ["deprecated", "links"]
+    },
+    {
+      "name": "emoji_no_conversion",
+      "input": ":smile: :heart: :fire:",
+      "expected": ":smile: :heart: :fire:",
+      "description": "emoji codes remain literal (no conversion)",
+      "tags": ["emoji", "fishy"]
+    },
+    {
+      "name": "reference_tags_ignored",
+      "input": "Text with reference[ref] and numbered[1]",
+      "expected": "Text with reference and numbered",
+      "description": "reference tags are ignored/removed",
+      "tags": ["references", "fishy"]
+    },
+    {
+      "name": "br_tag_deprecated",
+      "input": "line one[br]line two",
+      "expected": "line one<br />line two",
+      "description": "deprecated br tag still works",
+      "tags": ["deprecated", "formatting"]
+    },
+    {
+      "name": "unclosed_formatting_behavior",
+      "input": "[b]unclosed bold text",
+      "expected": "<span style=\"font-weight: bold;\">unclosed bold text",
+      "description": "unclosed formatting tags remain unclosed in output",
+      "tags": ["edge", "formatting"]
+    },
+    {
+      "name": "mismatched_closing_tags",
+      "input": "[b]bold text[/i]",
+      "expected": "<span style=\"font-weight: bold;\">bold text</span>",
+      "description": "mismatched closing tags are ignored",
+      "tags": ["edge", "formatting"]
+    }
+  ]
+}

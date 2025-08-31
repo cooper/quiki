@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -139,30 +140,35 @@ func (r *Runner) runTest(test TestCase) TestResult {
 
 // extractContent pulls the actual content from quiki's html output
 func (r *Runner) extractContent(html string) string {
-	// find content between <p class="q-p"> and </p>
-	start := strings.Index(html, `<p class="q-p">`)
-	if start == -1 {
-		return strings.TrimSpace(html)
-	}
-	start += len(`<p class="q-p">`)
+	content := strings.TrimSpace(html)
 
-	end := strings.Index(html[start:], "</p>")
-	if end == -1 {
-		return strings.TrimSpace(html[start:])
+	// remove q-main wrapper
+	re1 := regexp.MustCompile(`(?s)<div class="q-main">\s*(.*?)\s*</div>`)
+	if matches := re1.FindStringSubmatch(content); len(matches) > 1 {
+		content = matches[1]
 	}
 
-	content := html[start : start+end]
-	// clean up whitespace
-	content = strings.TrimSpace(content)
-	// normalize multiple spaces/newlines
-	content = strings.ReplaceAll(content, "\n            ", "")
-	content = strings.ReplaceAll(content, "\n        ", "")
-	content = strings.ReplaceAll(content, "\n    ", "")
+	// if it's a simple single section with single paragraph, unwrap completely
+	re2 := regexp.MustCompile(`(?s)^\s*<div class="q-sec">\s*<p class="q-p">\s*(.*?)\s*</p>\s*</div>\s*$`)
+	if matches := re2.FindStringSubmatch(content); len(matches) > 1 {
+		return strings.TrimSpace(matches[1])
+	}
 
-	return content
-}
+	// for complex content with multiple elements, handle differently
+	// extract content from p tags while preserving structure
+	content = regexp.MustCompile(`(?s)<p class="q-p">\s*(.*?)\s*</p>`).ReplaceAllString(content, "$1")
+	// remove empty q-sec wrappers
+	content = regexp.MustCompile(`(?s)<div class="q-sec">\s*</div>`).ReplaceAllString(content, "")
+	// remove q-sec wrapper tags but preserve content
+	content = regexp.MustCompile(`(?s)<div class="q-sec">\s*`).ReplaceAllString(content, "")
+	content = regexp.MustCompile(`(?s)\s*</div>`).ReplaceAllString(content, " ")
 
-// RunAllSuites finds and runs all test suites in a directory
+	// normalize whitespace
+	content = regexp.MustCompile(`\s*\n\s*`).ReplaceAllString(content, " ")
+	content = regexp.MustCompile(`\s+`).ReplaceAllString(content, " ")
+
+	return strings.TrimSpace(content)
+} // RunAllSuites finds and runs all test suites in a directory
 func (r *Runner) RunAllSuites(testDir string) ([]*SuiteResult, error) {
 	pattern := filepath.Join(testDir, "*.json")
 	files, err := filepath.Glob(pattern)
@@ -220,7 +226,6 @@ func (r *Runner) PrintResults(results []*SuiteResult) {
 				}
 			}
 		}
-		fmt.Println()
 
 		totalPassed += suite.Passed
 		totalFailed += suite.Failed

@@ -1,0 +1,62 @@
+{
+  "name": "links",
+  "description": "comprehensive link formatting tests", 
+  "tests": [
+    {
+      "name": "internal_page_link",
+      "input": "[[ Page Name ]]",
+      "expected": "<a class=\"q-link-internal\" href=\"/Page_Name\" title=\"Page Name\">Page Name</a>",
+      "description": "internal wiki page link",
+      "tags": ["links", "internal"]
+    },
+    {
+      "name": "external_http_link",
+      "input": "[[ http://google.com ]]",
+      "expected": "<a class=\"q-link-other\" href=\"http://google.com\">google.com</a>",
+      "description": "external HTTP link",
+      "tags": ["links", "external"]
+    },
+    {
+      "name": "email_link",
+      "input": "[[ someone@example.com ]]",
+      "expected": "<a class=\"q-link-internal\" href=\"/someone_example.com\" title=\"someone@example.com\">someone@example.com</a>",
+      "description": "email link (treated as internal)",
+      "tags": ["links", "email"]
+    },
+    {
+      "name": "link_custom_text",
+      "input": "[[ Google | http://google.com ]]",
+      "expected": "<a class=\"q-link-other\" href=\"http://google.com\">Google</a>",
+      "description": "link with custom display text",
+      "tags": ["links", "custom"]
+    },
+    {
+      "name": "wiki_link",
+      "input": "[[ wp: Test Page ]]",
+      "expected": "<a class=\"q-link-external\" href=\"https://en.wikipedia.org/wiki/Test_Page\" title=\"Wikipedia: Test Page\">Test Page</a>",
+      "description": "external wiki link (Wikipedia)",
+      "tags": ["links", "wiki"]
+    },
+    {
+      "name": "category_link",
+      "input": "[[ ~ Category Name ]]",
+      "expected": "<a class=\"q-link-category\" href=\"/topic/Category_Name\" title=\"Category Name\"> Category Name</a>",
+      "description": "category link",
+      "tags": ["links", "category"]
+    },
+    {
+      "name": "mailto_link",
+      "input": "[[ mailto:test@example.com ]]",
+      "expected": "<a class=\"q-link-contact\" href=\"mailto:test@example.com\" title=\"email test@example.com\">test@example.com</a>",
+      "description": "explicit mailto link",
+      "tags": ["links", "mailto"]
+    },
+    {
+      "name": "external_link_with_dollar",
+      "input": "[[ $http://example.com ]]",
+      "expected": "<a class=\"q-link-other\" href=\"http://example.com\">http://example.com</a>",
+      "description": "external link with dollar prefix",
+      "tags": ["links", "external"]
+    }
+  ]
+}

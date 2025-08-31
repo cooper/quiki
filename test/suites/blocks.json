@@ -1,0 +1,27 @@
+{
+  "name": "blocks",
+  "description": "block-level element tests",
+  "tests": [
+    {
+      "name": "simple_text",
+      "input": "just plain text",
+      "expected": "just plain text",
+      "description": "basic paragraph text",
+      "tags": ["blocks", "text"]
+    },
+    {
+      "name": "bold_in_paragraph",
+      "input": "text with [b]bold[/b] formatting",
+      "expected": "text with <span style=\"font-weight: bold;\">bold</span> formatting",
+      "description": "formatted text in paragraph",
+      "tags": ["blocks", "text", "formatting"]
+    },
+    {
+      "name": "text_before_list",
+      "input": "before list\nlist { item one; item two; }",
+      "expected": "before list",
+      "description": "text before list block",
+      "tags": ["blocks", "list"]
+    }
+  ]
+}

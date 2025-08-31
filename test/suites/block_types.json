@@ -1,0 +1,55 @@
+{
+  "name": "block_types", 
+  "description": "comprehensive block type tests",
+  "tests": [
+    {
+      "name": "clear_block",
+      "input": "clear{}",
+      "expected": "<div class=\"q-clear\">",
+      "description": "clear block creates clearing div",
+      "tags": ["blocks", "clear"]
+    },
+    {
+      "name": "code_block_simple",
+      "input": "code { console.log('hello'); }",
+      "expected": "<pre class=\"q-code chroma\"><span class=\"line\"><span class=\"cl\"> console.log(&#39;hello&#39;); </span></span></pre>",
+      "description": "simple code block",
+      "tags": ["blocks", "code"]
+    },
+    {
+      "name": "html_block_simple",
+      "input": "html { <div>raw html</div> }",
+      "expected": "<div>raw html",
+      "description": "simple html block",
+      "tags": ["blocks", "html"]
+    },
+    {
+      "name": "list_block_simple",
+      "input": "list { item one; item two; item three; }",
+      "expected": "<ul class=\"q-list\"> <li class=\"q-list-item\"> item one </li> <li class=\"q-list-item\"> item two </li> <li class=\"q-list-item\"> item three </li> </ul>",
+      "description": "simple unordered list",
+      "tags": ["blocks", "list"]
+    },
+    {
+      "name": "olist_block_simple",
+      "input": "olist { first; second; third; }",
+      "expected": "<ol class=\"q-numlist\"> <li class=\"q-list-item\"> first </li> <li class=\"q-list-item\"> second </li> <li class=\"q-list-item\"> third </li> </ol>",
+      "description": "simple ordered list",
+      "tags": ["blocks", "olist"]
+    },
+    {
+      "name": "paragraph_block",
+      "input": "p { this is a paragraph block }",
+      "expected": "this is a paragraph block",
+      "description": "explicit paragraph block",
+      "tags": ["blocks", "paragraph"]
+    },
+    {
+      "name": "invisible_block",
+      "input": "visible invisible { hidden content } visible",
+      "expected": "visible",
+      "description": "invisible block hides content",
+      "tags": ["blocks", "invisible"]
+    }
+  ]
+}

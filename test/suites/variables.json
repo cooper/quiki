@@ -1,0 +1,48 @@
+{
+  "name": "variables",
+  "description": "variable assignment and interpolation tests",
+  "tests": [
+    {
+      "name": "simple_variable",
+      "input": "@test_var: hello world;\nVariable value: [@test_var]",
+      "expected": "Variable value: hello world",
+      "description": "simple string variable",
+      "tags": ["variables", "basic"]
+    },
+    {
+      "name": "boolean_variable_true",
+      "input": "@flag;\nFlag is: [@flag]",
+      "expected": "Flag is: true",
+      "description": "boolean variable set to true",
+      "tags": ["variables", "boolean"]
+    },
+    {
+      "name": "boolean_variable_false",
+      "input": "-@flag;\nFlag is: [@flag]",
+      "expected": "Flag is: false",
+      "description": "boolean variable set to false",
+      "tags": ["variables", "boolean"]
+    },
+    {
+      "name": "variable_with_formatting",
+      "input": "@formatted: [b]bold text[/b];\nResult: [@formatted]",
+      "expected": "Result: <span style=\"font-weight: bold;\">bold text</span>",
+      "description": "variable containing formatted text",
+      "tags": ["variables", "formatting"]
+    },
+    {
+      "name": "undefined_variable",
+      "input": "Missing: [@undefined_var]",
+      "expected": "Missing: (null)",
+      "description": "undefined variable reference",
+      "tags": ["variables", "undefined"]
+    },
+    {
+      "name": "interpolable_variable_simple",
+      "input": "@name: John;\n@greeting: Hello [%name]!;\nResult: [@greeting]",
+      "expected": "Result: Hello John!",
+      "description": "interpolable variable in string",
+      "tags": ["variables", "interpolation"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "text_formatting", 
+  "description": "comprehensive text formatting tests",
+  "tests": [
+    {
+      "name": "subscript", 
+      "input": "H[v]2[/v]O",
+      "expected": "H<sub>2</sub>O",
+      "description": "subscript formatting",
+      "tags": ["formatting", "subscript"]
+    },
+    {
+      "name": "inline_quote",
+      "input": "[q]quoted text[/q]",
+      "expected": "<span style=\"font-style: italic;\">\"quoted text\"</span>",
+      "description": "inline quote formatting",
+      "tags": ["formatting", "quote"]
+    }
+  ]
+}
