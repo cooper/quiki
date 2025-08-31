@@ -19,6 +19,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/whyrusleeping/hellabot v0.0.0-20191113145436-fd8fa1922281
 	golang.org/x/crypto v0.41.0
+	golang.org/x/term v0.34.0
 )
 
 require (

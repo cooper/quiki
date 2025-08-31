@@ -1,6 +1,7 @@
 package adminifier
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"net/url"
@@ -11,6 +12,9 @@ import (
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 )
+
+// permissionChecker is the shared permission checker for adminifier
+var permissionChecker *webserver.PermissionChecker
 
 // handlers that call functions
 var adminUnauthenticatedHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
@@ -52,24 +56,32 @@ type adminRequest struct {
 	err      error
 }
 
+// withSecurityHeaders wraps a handler function to add security headers
+func withSecurityHeaders(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		webserver.SetSecurityHeaders(w)
+		handler(w, r)
+	}
+}
+
 func setupAdminHandlers() {
 	for name, function := range adminUnauthenticatedHandlers {
-		mux.HandleFunc(host+root+name, function)
+		mux.HandleFunc(host+root+name, withSecurityHeaders(function))
 	}
 	for name, function := range adminUnauthenticatedFuncHandlers {
-		mux.HandleFunc(host+root+"func/"+name, function)
+		mux.HandleFunc(host+root+"func/"+name, withSecurityHeaders(function))
 	}
 
 	// authenticated handlers
 
 	// each of these generates admin.tpl
 	for which := range adminFrameHandlers {
-		mux.HandleFunc(host+root+which, handleAdmin)
+		mux.HandleFunc(host+root+which, withSecurityHeaders(handleAdmin))
 	}
 
 	// frames to load via ajax
 	frameRoot := root + "frame/"
-	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(host+frameRoot, withSecurityHeaders(func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if redirectIfNotLoggedIn(w, r) {
@@ -124,11 +136,10 @@ func setupAdminHandlers() {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+	}))
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-
 	// make sure that this is admin root
 	if strings.TrimPrefix(r.URL.Path, root) != "" {
 		http.NotFound(w, r)
@@ -140,6 +151,12 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	if redirectIfNotLoggedIn(w, r) {
+		return
+	}
+
+	// check if user has server access
+	if !permissionChecker.HasServerPermission(r, "read.server.config") {
+		http.Error(w, "insufficient permissions for server administration", http.StatusForbidden)
 		return
 	}
 
@@ -165,7 +182,6 @@ func createAdminTemplate(r *http.Request) adminTemplate {
 }
 
 func handleLoginPage(w http.ResponseWriter, r *http.Request) {
-
 	// if no users exist, redirect to create-user
 	if len(webserver.Auth.Users) == 0 {
 		http.Redirect(w, r, "create-user", http.StatusTemporaryRedirect)
@@ -173,10 +189,36 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
-	handleTemplate(w, r, struct {
-		Redirect string
-		adminTemplate
-	}{r.Form.Get("redirect"), createAdminTemplate(r)})
+
+	// get server title from config
+	serverTitle := "quiki"
+	if title, err := webserver.Conf.GetStr("server.name"); err == nil {
+		serverTitle = title
+	}
+
+	data := struct {
+		Title        string
+		Heading      string
+		Redirect     string
+		Static       string
+		SharedStatic string
+		WikiTitle    string
+		ShowLinks    bool
+		IsDarkTheme  bool
+		CSRFToken    string
+	}{
+		Title:        serverTitle + " login",
+		Heading:      serverTitle + " login",
+		Redirect:     r.Form.Get("redirect"),
+		Static:       root + "static",
+		SharedStatic: root + "shared",
+		WikiTitle:    serverTitle,
+		ShowLinks:    false,
+		IsDarkTheme:  true,
+		CSRFToken:    webserver.GetOrCreateCSRFToken(r),
+	}
+
+	handleTemplate(w, r, data)
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -186,20 +228,50 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username := webserver.SanitizeInput(r.Form.Get("username"))
+	password := r.Form.Get("password") // don't sanitize passwords
+
+	// validate form fields
+	if err := webserver.ValidateAuthForm(username, password); err != nil {
+		http.Error(w, "username and password are required", http.StatusBadRequest)
+		return
+	}
+
+	// validate csrf token
+	csrfToken := webserver.GetOrCreateCSRFToken(r)
+	if !webserver.ValidateCSRFToken(r, csrfToken) {
+		http.Error(w, "security token validation failed, please try again", http.StatusBadRequest)
+		return
+	}
+
+	// check modern multi-factor rate limiting
+	if webserver.CheckRateLimit(r, username) {
+		http.Error(w, "too many failed attempts, please try again later", http.StatusTooManyRequests)
+		return
+	}
+
 	// any login attempt voids the current session
 	sessMgr.Destroy(r.Context())
 
 	// attempt login
-	user, err := webserver.Auth.Login(r.Form.Get("username"), r.Form.Get("password"))
+	user, err := webserver.Auth.Login(username, password)
 	if err != nil {
-		w.Write([]byte("Bad password"))
+		webserver.HandleAuthError(w, err, r, username)
 		return
 	}
+
+	// login successful - clear failed attempts
+	webserver.ClearSuccessfulLogin(r, username)
 
 	// start session and remember user info
 	sessMgr.Put(r.Context(), "user", &user)
 	sessMgr.Put(r.Context(), "loggedIn", true)
 	sessMgr.Put(r.Context(), "branch", "master") // FIXME: derive default branch
+
+	// regenerate session id after successful login for security
+	if err := sessMgr.RenewToken(r.Context()); err != nil {
+		log.Printf("failed to renew session token: %v", err)
+	}
 
 	// redirect to dashboard, which is now located at adminifier root
 	redirect := r.Form.Get("redirect")
@@ -207,14 +279,41 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
-
 	// if users exist, redirect to login
 	if len(webserver.Auth.Users) != 0 {
 		http.Redirect(w, r, "login", http.StatusTemporaryRedirect)
 		return
 	}
 
-	handleTemplate(w, r, nil)
+	// get server title from config
+	serverTitle := "quiki"
+	if title, err := webserver.Conf.GetStr("server.name"); err == nil {
+		serverTitle = title
+	}
+
+	data := struct {
+		Title           string
+		Heading         string
+		Static          string
+		SharedStatic    string
+		WikiTitle       string
+		ShowLinks       bool
+		IsDarkTheme     bool
+		DefaultWikiPath string
+		CSRFToken       string
+	}{
+		Title:           serverTitle + " setup wizard",
+		Heading:         "create initial user",
+		Static:          root + "static",
+		SharedStatic:    root + "shared",
+		WikiTitle:       serverTitle,
+		ShowLinks:       false,
+		IsDarkTheme:     true,
+		DefaultWikiPath: "", // add default path if needed
+		CSRFToken:       webserver.GetOrCreateCSRFToken(r),
+	}
+
+	handleTemplate(w, r, data)
 }
 
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -228,6 +327,13 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	// not authorized otherwise
 	if len(webserver.Auth.Users) != 0 {
 		http.Error(w, "user already exists", http.StatusUnauthorized)
+		return
+	}
+
+	// validate csrf token
+	csrfToken := webserver.GetOrCreateCSRFToken(r)
+	if !webserver.ValidateCSRFToken(r, csrfToken) {
+		http.Error(w, "security token validation failed, please try again", http.StatusBadRequest)
 		return
 	}
 
@@ -261,13 +367,9 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// create user
-	// TODO: validate things
-	err = webserver.Auth.NewUser(authenticator.User{
-		Username:    r.Form.Get("username"),
-		DisplayName: r.Form.Get("display"),
-		Email:       r.Form.Get("email"),
-	}, r.Form.Get("password"))
+	// create user using the modern interface
+	username := r.Form.Get("username")
+	err = webserver.Auth.CreateUser(username, r.Form.Get("password"))
 
 	// error occurred
 	if err != nil {
@@ -275,19 +377,49 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get the created user and set admin details
+	user, exists := webserver.Auth.GetUser(username)
+	if exists {
+		user.DisplayName = r.Form.Get("display")
+		user.Email = r.Form.Get("email")
+		user.Permissions = []string{"read.*", "write.*"} // first user gets full admin permissions
+		err = webserver.Auth.UpdateUser(username, user)
+		if err != nil {
+			http.Error(w, "failed to set user details: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	// log 'em in by simulating a request to /func/login
 	handleLogin(w, r)
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	// destory session
+	// get username before destroying session for cache cleanup
+	var username string
+	if user, ok := sessMgr.Get(r.Context(), "user").(*authenticator.User); ok && user != nil {
+		username = user.Username
+	}
+
+	// destroy session
 	sessMgr.Destroy(r.Context())
+
+	// clear permission cache if we had a user
+	if username != "" {
+		permissionChecker.ClearPermissionCache(r, username)
+	}
 
 	// redirect to login
 	http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
 }
 
 func handleSitesFrame(ar *adminRequest) {
+	// check if user can view wikis
+	if !permissionChecker.HasServerPermission(ar.r, "read.server.wikis") {
+		ar.err = errors.New("insufficient permissions to view wikis")
+		return
+	}
+
 	ar.dot = struct {
 		Wikis         map[string]*webserver.WikiInfo
 		Templates     []string

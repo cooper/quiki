@@ -62,8 +62,16 @@ func main() {
 		}
 	}
 
-	// run standalone
 	if len(flag.Args()) > 0 {
+
+		// subcommands
+		switch flag.Arg(0) {
+		case "auth":
+			handleAuthCommand()
+			return
+		}
+
+		// otherwise, running a page in standalone mode
 
 		// page in a standalone wiki
 		if w != nil {

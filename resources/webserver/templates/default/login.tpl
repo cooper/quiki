@@ -1,9 +1,9 @@
 {{template "auth-base.tpl" .}}
 
-{{define "title"}}adminifier login{{end}}
+{{define "title"}}{{.PageTitle}}{{end}}
 
 {{define "form"}}
-<form action="func/login?redirect={{.Redirect}}" method="post">
+<form action="{{.LoginAction}}" method="post">
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
     <div class="auth-form-group">
         <label class="auth-label" for="username">username</label>
@@ -15,9 +15,13 @@
         <input class="auth-input" type="password" id="password" name="password" required />
     </div>
     
-    <button type="submit" class="auth-button">login</button>
+    <button type="submit" class="auth-button">sign in</button>
 </form>
 {{end}}
 
 {{define "links"}}
+{{if .AllowRegister}}
+    <a href="{{.RegisterURL}}">create account</a> |
+{{end}}
+<a href="{{.HomeURL}}">back to {{.WikiName}}</a>
 {{end}}

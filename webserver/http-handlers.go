@@ -15,39 +15,31 @@ import (
 
 // master handler
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	var delayedWiki *WikiInfo
+	// set security headers for all requests
+	SetSecurityHeaders(w)
 
-	// try each wiki
-	for _, w := range Wikis {
-
-		// wrong root
-		wikiRoot := w.Opt.Root.Wiki
-		if r.URL.Path != wikiRoot && !strings.HasPrefix(r.URL.Path, wikiRoot+"/") {
-			continue
-		}
-
-		// wrong host
-		if w.Host != r.Host {
-
-			// if the wiki host is empty, it is the fallback wiki.
-			// delay it until we've checked all other wikis.
-			if w.Host == "" && delayedWiki == nil {
-				delayedWiki = w
-			}
-
-			continue
-		}
-
-		// host matches
-		delayedWiki = w
-		break
-	}
+	delayedWiki := getWikiInfo(r)
 
 	// a wiki matches this
 	if delayedWiki != nil {
+		wikiRoot := delayedWiki.Opt.Root.Wiki
+		relPath := strings.TrimPrefix(r.URL.Path, wikiRoot)
+		relPath = strings.TrimLeft(relPath, "/")
+
+		// handle auth routes
+		switch {
+		case relPath == "login":
+			handleLogin(w, r)
+			return
+		case relPath == "logout":
+			handleLogout(w, r)
+			return
+		case relPath == "register":
+			handleRegister(w, r)
+			return
+		}
 
 		// show the main page for the delayed wiki
-		wikiRoot := delayedWiki.Opt.Root.Wiki
 		if r.URL.Path == wikiRoot || r.URL.Path == wikiRoot+"/" {
 			handleWiki(delayedWiki, "", w, r)
 			return
@@ -55,7 +47,6 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 		// if the page root is blank, this may be a page
 		if delayedWiki.Opt.Root.Page == "" {
-			relPath := strings.TrimLeft(strings.TrimPrefix(r.URL.Path, wikiRoot), "/")
 			handlePage(delayedWiki, relPath, w, r)
 			return
 		}
@@ -72,6 +63,11 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 // wiki root
 func handleWiki(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	// check if authentication is required
+	if !requireAuth(wi, w, r) {
+		return // redirected to login
+	}
+
 	mainPage := wi.Opt.MainPage
 	isRoot := relPath == "" || relPath == "/"
 
@@ -94,6 +90,11 @@ func handleWiki(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 
 // page request
 func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
+	// check if authentication is required
+	if !requireAuth(wi, w, r) {
+		return // redirected to login
+	}
+
 	result := wi.pregenerateManager.GeneratePageSync(relPath, true)
 	handleResponse(wi, result, w, r)
 }

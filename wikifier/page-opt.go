@@ -25,6 +25,7 @@ type PageOpt struct {
 	ErrorPage    string // name of error page
 	Template     string // name of template
 	MainRedirect bool   // redirect on main page rather than serve root
+	Auth         PageOptAuth
 	Page         PageOptPage
 	Host         PageOptHost
 	Dir          PageOptDir
@@ -35,6 +36,13 @@ type PageOpt struct {
 	Link         PageOptLink
 	External     map[string]PageOptExternal
 	Navigation   []PageOptNavigation
+}
+
+// PageOptAuth describes authentication options.
+type PageOptAuth struct {
+	Enable   bool // enable user management system
+	Require  bool // require authentication to view content (implies Enable)
+	Register bool // allow web registration
 }
 
 // PageOptPage describes option relating to a page.
@@ -151,6 +159,9 @@ type PageOptNavigation struct {
 
 // defaults for Page
 var defaultPageOpt = PageOpt{
+	Auth: PageOptAuth{
+		Enable: true,
+	},
 	Page: PageOptPage{
 		EnableTitle: true,
 		EnableCache: false,
@@ -266,6 +277,9 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 
 	// easy bool options
 	pageOptBool := map[string]*bool{
+		"auth.enable":           &opt.Auth.Enable,          // enable user management
+		"auth.require":          &opt.Auth.Require,         // require authentication to view
+		"auth.register":         &opt.Auth.Register,        // allow web registration
 		"main_redirect":         &opt.MainRedirect,         // redirect root to main page
 		"page.enable.title":     &opt.Page.EnableTitle,     // enable page title headings
 		"page.enable.cache":     &opt.Page.EnableCache,     // enable page caching
@@ -280,6 +294,11 @@ func InjectPageOpt(page *Page, opt *PageOpt) error {
 		if enable, ok := val.(bool); ok {
 			*ptr = enable
 		}
+	}
+
+	// auth.require implies auth.enable
+	if opt.Auth.Require {
+		opt.Auth.Enable = true
 	}
 
 	// image.retina - retina image scales

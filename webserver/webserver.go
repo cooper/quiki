@@ -114,6 +114,9 @@ var Auth *authenticator.Authenticator
 // SessMgr is the session manager service.
 var SessMgr *scs.SessionManager
 
+// GlobalPermissionChecker is the global permission checker for webserver handlers
+var GlobalPermissionChecker *PermissionChecker
+
 // Configure parses a configuration file and initializes webserver.
 //
 // If any errors occur, the program is terminated.
@@ -165,6 +168,13 @@ func Configure(_initial_options Options) {
 		log.Fatal(errors.Wrap(err, "loading embedded templates"))
 	}
 
+	// add shared templates
+	if sub, err := fs.Sub(resources.Shared, "template"); err == nil {
+		templateFses = append(templateFses, sub)
+	} else {
+		log.Fatal(errors.Wrap(err, "loading shared templates"))
+	}
+
 	// set up wikis
 	if err = InitWikis(); err != nil {
 		log.Fatal(errors.Wrap(err, "init wikis"))
@@ -175,15 +185,26 @@ func Configure(_initial_options Options) {
 		log.Fatal(errors.Wrap(err, "setup static"))
 	}
 
-	// create session manager
+	// create session manager with security hardening
 	SessMgr = scs.New()
+
+	// security hardening for production
+	SessMgr.Lifetime = 24 * time.Hour                 // maximum session lifetime
+	SessMgr.IdleTimeout = 4 * time.Hour               // session expires after inactivity
+	SessMgr.Cookie.Secure = true                      // require https in production
+	SessMgr.Cookie.HttpOnly = true                    // prevent js access to session cookies
+	SessMgr.Cookie.SameSite = http.SameSiteStrictMode // prevent csrf
+	SessMgr.Cookie.Name = "__quiki_session"           // use custom session cookie name for security
+
+	// create global permission checker
+	GlobalPermissionChecker = NewPermissionChecker(SessMgr)
 
 	// create server with main handler
 	Mux.RegisterFunc("/", "webserver root", handleRoot)
 	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
 
 	// create authenticator
-	Auth, err = authenticator.Open(filepath.Join(filepath.Dir(Opts.Config), "quiki-auth.json"))
+	Auth, err = authenticator.OpenServer(filepath.Join(filepath.Dir(Opts.Config), "quiki-auth.json"))
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "init server authenticator"))
 	}
@@ -247,5 +268,14 @@ func setupStatic() error {
 	}
 	fileServer := http.FileServer(http.FS(subFS))
 	Mux.Register("/static/", "webserver static files", http.StripPrefix("/static/", fileServer))
+
+	// setup shared static files
+	sharedFS, err := fs.Sub(resources.Shared, "static")
+	if err != nil {
+		return errors.Wrap(err, "creating shared static sub filesystem")
+	}
+	sharedFileServer := http.FileServer(http.FS(sharedFS))
+	Mux.Register("/shared/", "shared static files", http.StripPrefix("/shared/", sharedFileServer))
+
 	return nil
 }

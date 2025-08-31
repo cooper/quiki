@@ -2,7 +2,6 @@ package authenticator
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -10,61 +9,46 @@ import (
 
 // User represents a user.
 type User struct {
-	Username    string `json:"u"`
-	DisplayName string `json:"d"`
-	Email       string `json:"e"`
-	Password    []byte `json:"p"`
-}
+	Username    string   `json:"u"`
+	DisplayName string   `json:"d"`
+	Email       string   `json:"e"`
+	Password    []byte   `json:"p"`
+	Roles       []string `json:"r,omitempty"`
+	Permissions []string `json:"a,omitempty"`
 
-// NewUser registers a new user with the given information.
-//
-// The Password field of the struct should be left empty and
-// the plain-text password passed to the function.
-//
-func (auth *Authenticator) NewUser(user User, password string) error {
-	// consider: is it possible 2 users could be created with the same username
-	// at the same time?
-	lcun := strings.ToLower(user.Username)
-
-	// user already exists!!
-	if _, exist := auth.Users[lcun]; exist {
-		return errors.New("user exists")
-	}
-
-	// hash password
-	var err error
-	user.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
-	// store the user
-	if auth.Users == nil {
-		auth.Users = make(map[string]User)
-	}
-	auth.Users[lcun] = user
-
-	// write to file
-	return auth.write()
+	// for server users, this maps wiki name to wiki username
+	Wikis map[string]string `json:"w,omitempty"`
 }
 
 // Login attempts a user login, returning the user on success.
-//
+// uses generic error messages to prevent user enumeration attacks
 func (auth *Authenticator) Login(username, password string) (User, error) {
 	lcun := strings.ToLower(username)
 
-	// user does not exist
+	// check if user exists and password is correct
 	user, exist := auth.Users[lcun]
 	if !exist {
-		return user, errors.New("user does not exist")
+		return user, ErrInvalidCredentials // don't reveal that user doesn't exist
 	}
 
-	// bad password
+	// verify password
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(password)); err != nil {
-		return user, errors.New("bad password")
+		return user, ErrInvalidCredentials // use same error as above
 	}
 
 	return user, nil
+}
+
+// HasPermission checks if user has a specific permission (including role permissions)
+func (user *User) HasPermission(required string, availableRoles map[string]Role) bool {
+	// check direct permissions first
+	if CheckPermission(user.Permissions, required) {
+		return true
+	}
+
+	// check role permissions
+	rolePermissions := ExpandRolePermissions(user.Roles, availableRoles)
+	return CheckPermission(rolePermissions, required)
 }
 
 // GobDecode allows users to be decoded from a session.

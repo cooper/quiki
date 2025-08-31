@@ -52,14 +52,20 @@ func Configure() {
 		root += "/"
 	}
 
-	// configure session manager
+	// configure session manager and permission checker
 	sessMgr = webserver.SessMgr
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
 	sessMgr.Cookie.Path = root
+	permissionChecker = webserver.NewPermissionChecker(sessMgr)
 
 	// setup adminifier static files server
 	if err := setupStatic(resources.Adminifier, root+"static/"); err != nil {
 		log.Fatal(errors.Wrap(err, "setup adminifier static"))
+	}
+
+	// setup shared static files server
+	if err := setupStatic(resources.Shared, root+"shared/"); err != nil {
+		log.Fatal(errors.Wrap(err, "setup shared static"))
 	}
 
 	// setup webserver static files server
@@ -68,7 +74,8 @@ func Configure() {
 	}
 
 	// create template
-	tmpl = template.Must(template.ParseFS(resources.Adminifier, "template/*.tpl"))
+	tmpl = template.Must(template.New("").ParseFS(resources.Adminifier, "template/*.tpl"))
+	tmpl = template.Must(tmpl.ParseFS(resources.Shared, "template/*.tpl"))
 
 	// main handler
 	mux.RegisterFunc(host+root, "adminifier root", handleRoot)

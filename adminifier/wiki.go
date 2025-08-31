@@ -79,6 +79,33 @@ type wikiRequest struct {
 	err       error
 }
 
+// canUserReadWiki checks if a user can access a wiki for reading
+func canUserReadWiki(r *http.Request, shortcode string, wi *webserver.WikiInfo) bool {
+	// if wiki doesn't require auth, anyone can access it
+	if !wi.RequireAuth {
+		return true
+	}
+
+	// wiki requires auth, check if user is logged in
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		return false
+	}
+
+	// user is logged in, check if they have permission to read this wiki
+	return permissionChecker.HasWikiPermission(r, shortcode, "read.wiki")
+}
+
+// canUserWriteWiki checks if a user can edit a wiki
+func canUserWriteWiki(r *http.Request, shortcode string) bool {
+	// editing always requires login
+	if !sessMgr.GetBool(r.Context(), "loggedIn") {
+		return false
+	}
+
+	// check if user has write permission for this wiki
+	return permissionChecker.HasWikiPermission(r, shortcode, "write.wiki")
+}
+
 type editorOpts struct {
 	page   bool // true if editing a page
 	model  bool // true if editing a model
@@ -88,8 +115,6 @@ type editorOpts struct {
 }
 
 var loadedWikiShortcodes = make(map[string]bool)
-
-// TODO: verify session on ALL wiki handlers
 
 func initWikis() {
 	for shortcode, wi := range webserver.Wikis {
@@ -195,13 +220,20 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 		handler := thisHandler
 		mux.HandleFunc(host+funcRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
 
-			// check logged in
+			// check if user can edit this wiki
 			//
 			// TODO: everything in func/ will be JSON,
 			// so return a "not logged in" error to present login popup
 			// rather than redirecting
 			//
-			if redirectIfNotLoggedIn(w, r) {
+			if !canUserWriteWiki(r, shortcode) {
+				// if not logged in, redirect to login
+				if !sessMgr.GetBool(r.Context(), "loggedIn") {
+					redirectIfNotLoggedIn(w, r)
+				} else {
+					// logged in but no permission
+					http.Error(w, "insufficient permissions to edit this wiki", http.StatusForbidden)
+				}
 				return
 			}
 
@@ -244,7 +276,15 @@ func handleWikiRoot(shortcode string, wi *webserver.WikiInfo, w http.ResponseWri
 }
 
 func handleWiki(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {
-	if redirectIfNotLoggedIn(w, r) {
+	// check if user can access this wiki (public vs private wiki)
+	if !canUserReadWiki(r, shortcode, wi) {
+		// wiki requires auth but user not logged in; redirect to login
+		if wi.RequireAuth && !sessMgr.GetBool(r.Context(), "loggedIn") {
+			redirectIfNotLoggedIn(w, r)
+		} else {
+			// either logged in but no permission, or wiki is public (shouldn't happen)
+			http.Error(w, "insufficient permissions to view this wiki", http.StatusForbidden)
+		}
 		return
 	}
 

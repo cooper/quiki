@@ -271,6 +271,42 @@ __Default__: (webserver) built-in function
 
 These options are available to the wiki website interface.
 
+### auth.enable
+
+_Optional_. When enabled, the wiki has its own user management system and can create 
+and manage users independently. When disabled, user management is prohibited, and all 
+HTTP users are assumed to have read access to the wiki.
+
+    @auth.enable;     /* enable wiki user management (default) */
+    -@auth.enable;    /* disable user management, assume public read access */
+
+__Default__: Enabled (but with public viewing / no login requirement)
+
+### auth.require
+
+_Optional_. When enabled, users must be logged in to view the wiki content. When disabled 
+(default), the wiki is publicly accessible and can be viewed by anyone.
+
+`auth.require` implies `auth.enable` also.
+
+    @auth.require;     /* require authentication to view wiki */
+    -@auth.require;    /* public wiki (default) */
+
+__Default__: Disabled (public)
+
+### auth.register
+
+_Optional_. When enabled, allows new users to register accounts through the web. 
+This option only has effect when `auth.enable` is also enabled.
+
+Further, if you wish to restrict access to authenticated users,
+see `auth.require`.
+
+    @auth.register;    /* allow web registration */
+    -@auth.register;   /* no web registration (default) */
+
+__Default__: Disabled
+
 ### image.type
 
 _Optional_. The desired file type for generated images.
@@ -465,6 +501,17 @@ are needed and display it where appropriate.
 ## webserver options
 
 These options are respected by the quiki webserver.
+
+### server.name
+
+_Optional_. The human-readable name of the server.
+
+This is used for page titles and administrative interface headings. When not 
+specified, "quiki" is used as the default server name.
+
+    @server.name: My Server;
+
+__Default__: *quiki*
 
 ### server.dir.resource
 
