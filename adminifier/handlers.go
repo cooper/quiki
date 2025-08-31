@@ -202,7 +202,11 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		Redirect     string
 		Static       string
 		SharedStatic string
+		WikiName     string
+		WikiLogo     string
 		WikiTitle    string
+		Error        string
+		Success      string
 		ShowLinks    bool
 		IsDarkTheme  bool
 		CSRFToken    string
@@ -212,6 +216,8 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		Redirect:     r.Form.Get("redirect"),
 		Static:       root + "static",
 		SharedStatic: root + "shared",
+		WikiName:     serverTitle,
+		WikiLogo:     "image/favicon.png",
 		WikiTitle:    serverTitle,
 		ShowLinks:    false,
 		IsDarkTheme:  true,
