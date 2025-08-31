@@ -1,4 +1,4 @@
-{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #111111 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/configuration.md","file_ne":"doc/configuration","base":"configuration.md","base_ne":"configuration","created":"2025-08-23T12:34:49.545311322-04:00","modified":"2025-08-23T12:34:49.545311322-04:00","generated":true,"external":true,"fmt_title":"Configuration","title":"Configuration","author":"Markdown","preview":"Contents Configuration Configuration files wikifier options name host.wiki dir.wiki root root.ext external page.enable.title page.code.lang"}
+{"css":"/* Background */ .bg { color: #272822; background-color: #fafafa; }\n/* PreWrapper */ .chroma { color: #272822; background-color: #fafafa; }\n/* Error */ .chroma .err { color: #960050; background-color: #1e0010 }\n/* LineLink */ .chroma .lnlinks { outline: none; text-decoration: none; color: inherit }\n/* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }\n/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }\n/* LineHighlight */ .chroma .hl { background-color: #e1e1e1 }\n/* LineNumbersTable */ .chroma .lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* LineNumbers */ .chroma .ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }\n/* Line */ .chroma .line { display: flex; }\n/* Keyword */ .chroma .k { color: #00a8c8 }\n/* KeywordConstant */ .chroma .kc { color: #00a8c8 }\n/* KeywordDeclaration */ .chroma .kd { color: #00a8c8 }\n/* KeywordNamespace */ .chroma .kn { color: #f92672 }\n/* KeywordPseudo */ .chroma .kp { color: #00a8c8 }\n/* KeywordReserved */ .chroma .kr { color: #00a8c8 }\n/* KeywordType */ .chroma .kt { color: #00a8c8 }\n/* Name */ .chroma .n { color: #111111 }\n/* NameAttribute */ .chroma .na { color: #75af00 }\n/* NameClass */ .chroma .nc { color: #75af00 }\n/* NameConstant */ .chroma .no { color: #00a8c8 }\n/* NameDecorator */ .chroma .nd { color: #75af00 }\n/* NameEntity */ .chroma .ni { color: #111111 }\n/* NameException */ .chroma .ne { color: #75af00 }\n/* NameLabel */ .chroma .nl { color: #111111 }\n/* NameNamespace */ .chroma .nn { color: #111111 }\n/* NameOther */ .chroma .nx { color: #75af00 }\n/* NameProperty */ .chroma .py { color: #111111 }\n/* NameTag */ .chroma .nt { color: #f92672 }\n/* NameBuiltin */ .chroma .nb { color: #111111 }\n/* NameBuiltinPseudo */ .chroma .bp { color: #111111 }\n/* NameVariable */ .chroma .nv { color: #111111 }\n/* NameVariableClass */ .chroma .vc { color: #111111 }\n/* NameVariableGlobal */ .chroma .vg { color: #111111 }\n/* NameVariableInstance */ .chroma .vi { color: #111111 }\n/* NameVariableMagic */ .chroma .vm { color: #111111 }\n/* NameFunction */ .chroma .nf { color: #75af00 }\n/* NameFunctionMagic */ .chroma .fm { color: #75af00 }\n/* Literal */ .chroma .l { color: #ae81ff }\n/* LiteralDate */ .chroma .ld { color: #d88200 }\n/* LiteralString */ .chroma .s { color: #d88200 }\n/* LiteralStringAffix */ .chroma .sa { color: #d88200 }\n/* LiteralStringBacktick */ .chroma .sb { color: #d88200 }\n/* LiteralStringChar */ .chroma .sc { color: #d88200 }\n/* LiteralStringDelimiter */ .chroma .dl { color: #d88200 }\n/* LiteralStringDoc */ .chroma .sd { color: #d88200 }\n/* LiteralStringDouble */ .chroma .s2 { color: #d88200 }\n/* LiteralStringEscape */ .chroma .se { color: #8045ff }\n/* LiteralStringHeredoc */ .chroma .sh { color: #d88200 }\n/* LiteralStringInterpol */ .chroma .si { color: #d88200 }\n/* LiteralStringOther */ .chroma .sx { color: #d88200 }\n/* LiteralStringRegex */ .chroma .sr { color: #d88200 }\n/* LiteralStringSingle */ .chroma .s1 { color: #d88200 }\n/* LiteralStringSymbol */ .chroma .ss { color: #d88200 }\n/* LiteralNumber */ .chroma .m { color: #ae81ff }\n/* LiteralNumberBin */ .chroma .mb { color: #ae81ff }\n/* LiteralNumberFloat */ .chroma .mf { color: #ae81ff }\n/* LiteralNumberHex */ .chroma .mh { color: #ae81ff }\n/* LiteralNumberInteger */ .chroma .mi { color: #ae81ff }\n/* LiteralNumberIntegerLong */ .chroma .il { color: #ae81ff }\n/* LiteralNumberOct */ .chroma .mo { color: #ae81ff }\n/* Operator */ .chroma .o { color: #f92672 }\n/* OperatorWord */ .chroma .ow { color: #f92672 }\n/* Punctuation */ .chroma .p { color: #111111 }\n/* Comment */ .chroma .c { color: #75715e }\n/* CommentHashbang */ .chroma .ch { color: #75715e }\n/* CommentMultiline */ .chroma .cm { color: #75715e }\n/* CommentSingle */ .chroma .c1 { color: #75715e }\n/* CommentSpecial */ .chroma .cs { color: #75715e }\n/* CommentPreproc */ .chroma .cp { color: #75715e }\n/* CommentPreprocFile */ .chroma .cpf { color: #75715e }\n/* GenericEmph */ .chroma .ge { font-style: italic }\n/* GenericStrong */ .chroma .gs { font-weight: bold }\n\n","file":"doc/configuration.md","file_ne":"doc/configuration","base":"configuration.md","base_ne":"configuration","created":"2025-08-31T15:13:12.995929304-04:00","modified":"2025-08-31T15:13:12.995929304-04:00","generated":true,"external":true,"fmt_title":"Configuration","title":"Configuration","author":"Markdown","preview":"Contents Configuration Configuration files wikifier options name host.wiki dir.wiki root root.ext external page.enable.title page.code.lang"}
 <div class="q-main-doc/configuration q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>
@@ -78,6 +78,16 @@
                             </a>
                         </li>
                         <li>
+                            <a class="q-link-internal" href="#imageprocessor">
+                                image.processor
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#imagequality">
+                                image.quality
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#imagemax_memory_mb">
                                 image.max_memory_mb
                             </a>
@@ -105,12 +115,27 @@
                     </a>
                     <ul>
                         <li>
+                            <a class="q-link-internal" href="#authenable">
+                                auth.enable
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#authrequire">
+                                auth.require
+                            </a>
+                        </li>
+                        <li>
+                            <a class="q-link-internal" href="#authregister">
+                                auth.register
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#imagetype">
                                 image.type
                             </a>
                         </li>
                         <li>
-                            <a class="q-link-internal" href="#imagequality">
+                            <a class="q-link-internal" href="#imagequality-1">
                                 image.quality
                             </a>
                         </li>
@@ -193,6 +218,11 @@
                         webserver options
                     </a>
                     <ul>
+                        <li>
+                            <a class="q-link-internal" href="#servername">
+                                server.name
+                            </a>
+                        </li>
                         <li>
                             <a class="q-link-internal" href="#serverdirresource">
                                 server.dir.resource
@@ -338,6 +368,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="q-link-internal" href="#serverdomain">
+                                server.domain
+                            </a>
+                        </li>
+                        <li>
                             <a class="q-link-internal" href="#serverdirtemplate">
                                 server.dir.template
                             </a>
@@ -397,8 +432,8 @@
             <p class="q-p">
                 If you are using <span style="font-weight: bold;">quiki webserver</span>, you must have a dedicated configuration
                 file for the webserver. This tells it where to listen and where to find the
-                wikis you have configured on the server. This is typically called <code>quiki.conf</code>,
-                and is required as the first argument to the <code>quiki</code> executable.
+                wikis you have configured on the server. This file is called <code>quiki.conf</code> and
+                is located in your quiki directory (default: <code>~/quiki/quiki.conf</code>).
             </p>
             <p class="q-p">
                 <span style="font-weight: bold;">Every wiki</span> also requires its own configuration file called
@@ -710,10 +745,72 @@
                 </p>
                 <p class="q-p">
                     Limits how many images can be processed simultaneously to prevent system
-                    overload. Set to 0 for automatic detection based on CPU cores.
+                    overload and memory exhaustion. quiki also monitors available memory and throttles accordingly.
                 </p>
                 <p class="q-p">
                     <span style="font-weight: bold;">Default</span>: 2
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imageprocessor">
+                    image.processor
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The image processing backend to use.
+                </p>
+                <p class="q-p">
+                    Controls which image processing engine is used for resizing and manipulation. By default, we try processors in order of performance:
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Accepted values</span>
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">auto</span> - Automatic selection: libvips -&gt; imagemagick -&gt; pure go (recommended)
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">vips</span> - Use libvips only (highest performance, 4-8x faster than ImageMagick)
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">imagemagick</span> - Use ImageMagick only (high performance as compared to Go)
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">go</span> - Use Pure Go only (most portable, worst performance, crashes with large images)
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Installation</span>
+                </p>
+                <ul class="q-list">
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">vips</span>: <code>brew install vips</code> or <code>apt-get install libvips-tools</code>
+                    </li>
+                    <li class="q-list-item">
+                        <span style="font-style: italic;">imagemagick</span>: <code>brew install imagemagick</code> or <code>apt-get install imagemagick</code>
+                    </li>
+                </ul>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@image.processor: vips;</code>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: auto
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-imagequality">
+                    image.quality
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. JPEG quality setting for libvips/ImageMagick processors (1-100).
+                </p>
+                <p class="q-p">
+                    Only used when <code>processor</code> is set to &#34;vips&#34;, &#34;imagemagick&#34;, or &#34;auto&#34; (when libvips/ImageMagick is available). Higher values mean better quality but larger file sizes to store and transfer.
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Example</span>: <code>@image.quality: 85;</code>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: 85
                 </p>
             </div>
             <div class="q-sec">
@@ -725,7 +822,8 @@
                 </p>
                 <p class="q-p">
                     Prevents crashes from loading extremely large images by checking dimensions
-                    before processing. An image requiring more memory will be rejected.
+                    before processing. An image requiring more memory will be rejected. Additionally,
+                    quiki monitors memory usage and reduces concurrency when memory is low to prevent crashing.
                 </p>
                 <p class="q-p">
                     <span style="font-weight: bold;">Default</span>: 256
@@ -805,6 +903,59 @@
                 These options are available to the wiki website interface.
             </p>
             <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-authenable">
+                    auth.enable
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. When enabled, the wiki has its own user management system and can create
+                    and manage users independently. When disabled, user management is prohibited, and all
+                    HTTP users are assumed to have read access to the wiki.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@auth.enable;     /* enable wiki user management (default) */
+</span></span><span class="line"><span class="cl">-@auth.enable;    /* disable user management, assume public read access */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Enabled (but with public viewing / no login requirement)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-authrequire">
+                    auth.require
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. When enabled, users must be logged in to view the wiki content. When disabled
+                    (default), the wiki is publicly accessible and can be viewed by anyone.
+                </p>
+                <p class="q-p">
+                    <code>auth.require</code> implies <code>auth.enable</code> also.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@auth.require;     /* require authentication to view wiki */
+</span></span><span class="line"><span class="cl">-@auth.require;    /* public wiki (default) */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Disabled (public)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-authregister">
+                    auth.register
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. When enabled, allows new users to register accounts through the web.
+                    This option only has effect when <code>auth.enable</code> is also enabled.
+                </p>
+                <p class="q-p">
+                    Further, if you wish to restrict access to authenticated users,
+                    see <code>auth.require</code>.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@auth.register;    /* allow web registration */
+</span></span><span class="line"><span class="cl">-@auth.register;   /* no web registration (default) */
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: Disabled
+                </p>
+            </div>
+            <div class="q-sec">
                 <h3 class="q-sec-title" id="qa-imagetype">
                     image.type
                 </h3>
@@ -832,7 +983,7 @@
                 </p>
             </div>
             <div class="q-sec">
-                <h3 class="q-sec-title" id="qa-imagequality">
+                <h3 class="q-sec-title" id="qa-imagequality-1">
                     image.quality
                 </h3>
                 <p class="q-p">
@@ -1087,6 +1238,23 @@
                 These options are respected by the quiki webserver.
             </p>
             <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-servername">
+                    server.name
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. The human-readable name of the server.
+                </p>
+                <p class="q-p">
+                    This is used for page titles and administrative interface headings. When not
+                    specified, &#34;quiki&#34; is used as the default server name.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.name: My Server;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: <span style="font-style: italic;">quiki</span>
+                </p>
+            </div>
+            <div class="q-sec">
                 <h3 class="q-sec-title" id="qa-serverdirresource">
                     server.dir.resource
                 </h3>
@@ -1255,6 +1423,9 @@
                 <p class="q-p">
                     <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_workers: 6;</code>
                 </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: max(1, CPU_cores/4)
+                </p>
             </div>
             <div class="q-sec">
                 <h3 class="q-sec-title" id="qa-serverpregenimg_bg_workers">
@@ -1265,6 +1436,9 @@
                 </p>
                 <p class="q-p">
                     <span style="font-weight: bold;">Example</span>: <code>@server.pregen.img_bg_workers: 2;</code>
+                </p>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Default</span>: max(1, CPU_cores/8)
                 </p>
             </div>
             <div class="q-sec">
@@ -1435,6 +1609,26 @@
                 </p>
                 <p class="q-p">
                     <span style="font-weight: bold;">Default</span>: None (serve wikis with no host configured on all hosts)
+                </p>
+            </div>
+            <div class="q-sec">
+                <h3 class="q-sec-title" id="qa-serverdomain">
+                    server.domain
+                </h3>
+                <p class="q-p">
+                    <span style="font-style: italic;">Optional</span>. Cookie domain for session sharing across subdomains.
+                </p>
+                <p class="q-p">
+                    When specified, session cookies will be set with this domain, allowing login
+                    sessions to be shared between the adminifier and wikis served on different
+                    subdomains. For example, setting <code>@server.domain: .example.com;</code> allows
+                    sessions to work across <code>admin.example.com</code> and <code>wiki.example.com</code>.
+                </p>
+<pre class="q-code chroma"><span class="line"><span class="cl">@server.domain: .example.com;
+</span></span></pre>
+                <p class="q-p">
+                    <span style="font-weight: bold;">Important</span>: It must start with a dot (.) for proper subdomain sharing.
+                    <span style="font-weight: bold;">Default</span>: None (sessions limited to same host)
                 </p>
             </div>
             <div class="q-sec">

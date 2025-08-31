@@ -204,11 +204,11 @@ map {
                 Syntax for pairs. Each pair is separated by a colon (:). The left side is
                 the key; the right is the value. The key must be plain text (no formatting
                 permitted). Colons (:) can be included in the key by prefixing them with the
-                escape character (\). The value may contain
+                escape character ([/c]). The value may contain
                 formatted text or a single
                 block but not both together. Values are terminated
                 with the semicolon (;). If the value is text, semicolons can be included by
-                prefixing them with the escape character (\). Colons (:) do not need to be
+                prefixing them with the escape character ([/c]). Colons (:) do not need to be
                 escaped in the value.
             
 map {
@@ -230,7 +230,7 @@ map {
                 text, it should be prefixed with a colon (:). The advantage of this is that
                 colons consequently need not be escaped in the value. For blocks, this prefixing
                 colon is not required. Semicolons (;) can be included in standalone text
-                values by prefixing them with the escape character (\).
+                values by prefixing them with the escape character ([/c]).
             
 infobox [My Article] {
 
@@ -515,7 +515,7 @@ list {
                 formatted text or a single
                 block but not both simultaneously. Values are terminated
                 by the semicolon (;). If the value is text, additional semicolons may be
-                included by prefixing them with the escape character (\).
+                included by prefixing them with the escape character ([/c]).
             
 list {
     Item one;

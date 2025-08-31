@@ -16,8 +16,8 @@ file. All quiki configuration files are written in the quiki language:
 
 If you are using **quiki webserver**, you must have a dedicated configuration
 file for the webserver. This tells it where to listen and where to find the
-wikis you have configured on the server. This is typically called `quiki.conf`,
-and is required as the first argument to the `quiki` executable.
+wikis you have configured on the server. This file is called `quiki.conf` and
+is located in your quiki directory (default: `~/quiki/quiki.conf`).
 
 **Every wiki** also requires its own configuration file called
 `wiki.conf` at the root level of the wiki directory.
@@ -185,16 +185,47 @@ __Default__: (webserver) built-in function
 _Optional_. Maximum number of concurrent image processing operations.
 
 Limits how many images can be processed simultaneously to prevent system
-overload. Set to 0 for automatic detection based on CPU cores.
+overload and memory exhaustion. quiki also monitors available memory and throttles accordingly.
 
 __Default__: 2
+
+### image.processor
+
+_Optional_. The image processing backend to use.
+
+Controls which image processing engine is used for resizing and manipulation. By default, we try processors in order of performance:
+
+**Accepted values**
+* _auto_ - Automatic selection: libvips -> imagemagick -> pure go (recommended)
+* _vips_ - Use libvips only (highest performance, 4-8x faster than ImageMagick)
+* _imagemagick_ - Use ImageMagick only (high performance as compared to Go)
+* _go_ - Use Pure Go only (most portable, worst performance, crashes with large images)
+
+**Installation**
+- _vips_: `brew install vips` or `apt-get install libvips-tools`
+- _imagemagick_: `brew install imagemagick` or `apt-get install imagemagick`
+
+__Example__: `@image.processor: vips;`
+
+__Default__: auto
+
+### image.quality
+
+_Optional_. JPEG quality setting for libvips/ImageMagick processors (1-100).
+
+Only used when `processor` is set to "vips", "imagemagick", or "auto" (when libvips/ImageMagick is available). Higher values mean better quality but larger file sizes to store and transfer.
+
+__Example__: `@image.quality: 85;`
+
+__Default__: 85
 
 ### image.max_memory_mb
 
 _Optional_. Maximum memory usage per image in megabytes.
 
 Prevents crashes from loading extremely large images by checking dimensions
-before processing. An image requiring more memory will be rejected.
+before processing. An image requiring more memory will be rejected. Additionally,
+quiki monitors memory usage and reduces concurrency when memory is low to prevent crashing.
 
 __Default__: 256
 
@@ -239,6 +270,42 @@ __Default__: (webserver) built-in function
 ## Wiki public options
 
 These options are available to the wiki website interface.
+
+### auth.enable
+
+_Optional_. When enabled, the wiki has its own user management system and can create 
+and manage users independently. When disabled, user management is prohibited, and all 
+HTTP users are assumed to have read access to the wiki.
+
+    @auth.enable;     /* enable wiki user management (default) */
+    -@auth.enable;    /* disable user management, assume public read access */
+
+__Default__: Enabled (but with public viewing / no login requirement)
+
+### auth.require
+
+_Optional_. When enabled, users must be logged in to view the wiki content. When disabled 
+(default), the wiki is publicly accessible and can be viewed by anyone.
+
+`auth.require` implies `auth.enable` also.
+
+    @auth.require;     /* require authentication to view wiki */
+    -@auth.require;    /* public wiki (default) */
+
+__Default__: Disabled (public)
+
+### auth.register
+
+_Optional_. When enabled, allows new users to register accounts through the web. 
+This option only has effect when `auth.enable` is also enabled.
+
+Further, if you wish to restrict access to authenticated users,
+see `auth.require`.
+
+    @auth.register;    /* allow web registration */
+    -@auth.register;   /* no web registration (default) */
+
+__Default__: Disabled
 
 ### image.type
 
@@ -435,6 +502,17 @@ are needed and display it where appropriate.
 
 These options are respected by the quiki webserver.
 
+### server.name
+
+_Optional_. The human-readable name of the server.
+
+This is used for page titles and administrative interface headings. When not 
+specified, "quiki" is used as the default server name.
+
+    @server.name: My Server;
+
+__Default__: *quiki*
+
 ### server.dir.resource
 
 Path to quiki's `resources` directory.
@@ -531,11 +609,15 @@ Number of workers handling high-priority image requests.
 
 __Example__: `@server.pregen.img_workers: 6;`
 
+__Default__: max(1, CPU_cores/4)
+
 ### server.pregen.img_bg_workers
 
 Number of workers handling background image pregeneration.
 
 __Example__: `@server.pregen.img_bg_workers: 2;`
+
+__Default__: max(1, CPU_cores/8)
 
 ### server.pregen.timeout
 
@@ -648,6 +730,22 @@ public host of your server.
 Should be a hostname only or IP only, e.g. `server.example.com`.
 
 __Default__: None (serve wikis with no host configured on all hosts)
+
+### server.domain
+
+_Optional_. Cookie domain for session sharing across subdomains.
+
+When specified, session cookies will be set with this domain, allowing login
+sessions to be shared between the adminifier and wikis served on different
+subdomains. For example, setting `@server.domain: .example.com;` allows
+sessions to work across `admin.example.com` and `wiki.example.com`.
+
+```
+@server.domain: .example.com;
+```
+
+__Important__: It must start with a dot (.) for proper subdomain sharing.
+__Default__: None (sessions limited to same host)
 
 ### server.dir.template
 

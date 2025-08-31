@@ -787,53 +787,47 @@ func (m *Manager) PregenerateSync() Stats {
 }
 
 func (m *Manager) pregenerateAllPages(synchronous bool) Stats {
-	// use wiki-level locking for cross-process coordination
-	err := m.wiki.WithWikiLock(func() error {
-		allPages := m.wiki.AllPageFiles()
-		m.mu.Lock()
-		m.stats.TotalPages = len(allPages)
-		m.mu.Unlock()
+	// commented out wiki-level locking to fix hanging issue
+	// err := m.wiki.WithWikiLock(func() error {
+	allPages := m.wiki.AllPageFiles()
+	m.mu.Lock()
+	m.stats.TotalPages = len(allPages)
+	m.mu.Unlock()
 
-		if synchronous {
-			m.debug(fmt.Sprintf("synchronously pregenerating %d pages...", len(allPages)))
+	if synchronous {
+		m.debug(fmt.Sprintf("synchronously pregenerating %d pages...", len(allPages)))
 
-			// for sync pregen, process pages directly
-			for i, pageName := range allPages {
-				if m.options.ProgressInterval > 0 && i%m.options.ProgressInterval == 0 && i > 0 {
-					m.debug(fmt.Sprintf("pregenerated %d/%d pages", i, len(allPages)))
-				}
-
-				m.pregeneratePage(pageName, true)
-
-				// apply rate limiting if configured
-				if m.options.RateLimit > 0 && i < len(allPages)-1 {
-					time.Sleep(m.options.RateLimit)
-				}
+		// for sync pregen, process pages directly
+		for i, pageName := range allPages {
+			if m.options.ProgressInterval > 0 && i%m.options.ProgressInterval == 0 && i > 0 {
+				m.debug(fmt.Sprintf("pregenerated %d/%d pages", i, len(allPages)))
 			}
 
-			m.debug(fmt.Sprintf("synchronous pregeneration complete: %d pages processed, %d generated, %d failed",
-				m.stats.TotalPages, m.stats.PregenedPages, m.stats.FailedPages))
+			m.pregeneratePage(pageName, true)
 
-		} else {
-			m.debug(fmt.Sprintf("starting background pregeneration of %d pages", len(allPages)))
-
-			go func() {
-				for _, pageName := range allPages {
-					select {
-					case m.backgroundCh <- pageName:
-						// queued
-					case <-m.ctx.Done():
-						// shutting down
-						return
-					}
-				}
-			}()
+			// apply rate limiting if configured
+			if m.options.RateLimit > 0 && i < len(allPages)-1 {
+				time.Sleep(m.options.RateLimit)
+			}
 		}
-		return nil
-	})
 
-	if err != nil {
-		m.debug("skipping pregenerate: " + err.Error())
+		m.debug(fmt.Sprintf("synchronous pregeneration complete: %d pages processed, %d generated, %d failed",
+			m.stats.TotalPages, m.stats.PregenedPages, m.stats.FailedPages))
+
+	} else {
+		m.debug(fmt.Sprintf("starting background pregeneration of %d pages", len(allPages)))
+
+		go func() {
+			for _, pageName := range allPages {
+				select {
+				case m.backgroundCh <- pageName:
+					// queued
+				case <-m.ctx.Done():
+					// shutting down
+					return
+				}
+			}
+		}()
 	}
 
 	// return current stats
@@ -991,6 +985,8 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 	}
 
 	m.debug("pregenerate: calling DisplayPageDraft for: %s", pageName)
+	fmt.Printf("DEBUG: About to call DisplayPageDraft for page: %s\n", pageName)
+
 	// temporarily modify ForceGen in a thread-safe way
 	var result any
 	originalForceGen := m.wiki.Opt.Page.ForceGen

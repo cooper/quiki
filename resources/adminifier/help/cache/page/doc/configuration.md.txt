@@ -78,6 +78,16 @@
                         
                         
                             
+                                image.processor
+                            
+                        
+                        
+                            
+                                image.quality
+                            
+                        
+                        
+                            
                                 image.max_memory_mb
                             
                         
@@ -103,6 +113,21 @@
                         Wiki public options
                     
                     
+                        
+                            
+                                auth.enable
+                            
+                        
+                        
+                            
+                                auth.require
+                            
+                        
+                        
+                            
+                                auth.register
+                            
+                        
                         
                             
                                 image.type
@@ -192,6 +217,11 @@
                         webserver options
                     
                     
+                        
+                            
+                                server.name
+                            
+                        
                         
                             
                                 server.dir.resource
@@ -338,6 +368,11 @@
                         
                         
                             
+                                server.domain
+                            
+                        
+                        
+                            
                                 server.dir.template
                             
                         
@@ -396,8 +431,8 @@
             
                 If you are using quiki webserver, you must have a dedicated configuration
                 file for the webserver. This tells it where to listen and where to find the
-                wikis you have configured on the server. This is typically called quiki.conf,
-                and is required as the first argument to the quiki executable.
+                wikis you have configured on the server. This file is called quiki.conf and
+                is located in your quiki directory (default: ~/quiki/quiki.conf).
             
             
                 Every wiki also requires its own configuration file called
@@ -709,10 +744,72 @@ External wiki type
                 
                 
                     Limits how many images can be processed simultaneously to prevent system
-                    overload. Set to 0 for automatic detection based on CPU cores.
+                    overload and memory exhaustion. quiki also monitors available memory and throttles accordingly.
                 
                 
                     Default: 2
+                
+            
+            
+                
+                    image.processor
+                
+                
+                    Optional. The image processing backend to use.
+                
+                
+                    Controls which image processing engine is used for resizing and manipulation. By default, we try processors in order of performance:
+                
+                
+                    Accepted values
+                
+                
+                    
+                        auto - Automatic selection: libvips -> imagemagick -> pure go (recommended)
+                    
+                    
+                        vips - Use libvips only (highest performance, 4-8x faster than ImageMagick)
+                    
+                    
+                        imagemagick - Use ImageMagick only (high performance as compared to Go)
+                    
+                    
+                        go - Use Pure Go only (most portable, worst performance, crashes with large images)
+                    
+                
+                
+                    Installation
+                
+                
+                    
+                        vips: brew install vips or apt-get install libvips-tools
+                    
+                    
+                        imagemagick: brew install imagemagick or apt-get install imagemagick
+                    
+                
+                
+                    Example: @image.processor: vips;
+                
+                
+                    Default: auto
+                
+            
+            
+                
+                    image.quality
+                
+                
+                    Optional. JPEG quality setting for libvips/ImageMagick processors (1-100).
+                
+                
+                    Only used when processor is set to "vips", "imagemagick", or "auto" (when libvips/ImageMagick is available). Higher values mean better quality but larger file sizes to store and transfer.
+                
+                
+                    Example: @image.quality: 85;
+                
+                
+                    Default: 85
                 
             
             
@@ -724,7 +821,8 @@ External wiki type
                 
                 
                     Prevents crashes from loading extremely large images by checking dimensions
-                    before processing. An image requiring more memory will be rejected.
+                    before processing. An image requiring more memory will be rejected. Additionally,
+                    quiki monitors memory usage and reduces concurrency when memory is low to prevent crashing.
                 
                 
                     Default: 256
@@ -802,6 +900,59 @@ External wiki type
             
             
                 These options are available to the wiki website interface.
+            
+            
+                
+                    auth.enable
+                
+                
+                    Optional. When enabled, the wiki has its own user management system and can create
+                    and manage users independently. When disabled, user management is prohibited, and all
+                    HTTP users are assumed to have read access to the wiki.
+                
+@auth.enable;     /* enable wiki user management (default) */
+-@auth.enable;    /* disable user management, assume public read access */
+
+                
+                    Default: Enabled (but with public viewing / no login requirement)
+                
+            
+            
+                
+                    auth.require
+                
+                
+                    Optional. When enabled, users must be logged in to view the wiki content. When disabled
+                    (default), the wiki is publicly accessible and can be viewed by anyone.
+                
+                
+                    auth.require implies auth.enable also.
+                
+@auth.require;     /* require authentication to view wiki */
+-@auth.require;    /* public wiki (default) */
+
+                
+                    Default: Disabled (public)
+                
+            
+            
+                
+                    auth.register
+                
+                
+                    Optional. When enabled, allows new users to register accounts through the web.
+                    This option only has effect when auth.enable is also enabled.
+                
+                
+                    Further, if you wish to restrict access to authenticated users,
+                    see auth.require.
+                
+@auth.register;    /* allow web registration */
+-@auth.register;   /* no web registration (default) */
+
+                
+                    Default: Disabled
+                
             
             
                 
@@ -1087,6 +1238,23 @@ Welcome to [@site.display_name]!
             
             
                 
+                    server.name
+                
+                
+                    Optional. The human-readable name of the server.
+                
+                
+                    This is used for page titles and administrative interface headings. When not
+                    specified, "quiki" is used as the default server name.
+                
+@server.name: My Server;
+
+                
+                    Default: quiki
+                
+            
+            
+                
                     server.dir.resource
                 
                 
@@ -1254,6 +1422,9 @@ Welcome to [@site.display_name]!
                 
                     Example: @server.pregen.img_workers: 6;
                 
+                
+                    Default: max(1, CPU_cores/4)
+                
             
             
                 
@@ -1264,6 +1435,9 @@ Welcome to [@site.display_name]!
                 
                 
                     Example: @server.pregen.img_bg_workers: 2;
+                
+                
+                    Default: max(1, CPU_cores/8)
                 
             
             
@@ -1434,6 +1608,26 @@ server.http.port: 8080;
                 
                 
                     Default: None (serve wikis with no host configured on all hosts)
+                
+            
+            
+                
+                    server.domain
+                
+                
+                    Optional. Cookie domain for session sharing across subdomains.
+                
+                
+                    When specified, session cookies will be set with this domain, allowing login
+                    sessions to be shared between the adminifier and wikis served on different
+                    subdomains. For example, setting @server.domain: .example.com; allows
+                    sessions to work across admin.example.com and wiki.example.com.
+                
+@server.domain: .example.com;
+
+                
+                    Important: It must start with a dot (.) for proper subdomain sharing.
+                    Default: None (sessions limited to same host)
                 
             
             

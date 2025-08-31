@@ -1,4 +1,4 @@
-{"file":"doc/technical/parsing.md","file_ne":"doc/technical/parsing","base":"parsing.md","base_ne":"parsing","created":"2025-02-23T09:41:58.239669833-05:00","modified":"2025-02-23T09:41:58.239669833-05:00","generated":true,"external":true,"fmt_title":"Parsing","title":"Parsing","author":"Markdown","preview":"Contents Parsing Parsing stages Master parser Parsing The quiki source language is parsed hierarchically. Parsing stages The parsing process is"}
+{"file":"doc/technical/parsing.md","file_ne":"doc/technical/parsing","base":"parsing.md","base_ne":"parsing","created":"2025-08-23T14:04:54.549139255-04:00","modified":"2025-08-23T14:04:54.549139255-04:00","generated":true,"external":true,"fmt_title":"Parsing","title":"Parsing","author":"Markdown","preview":"Contents Parsing Parsing stages Master parser Parsing The quiki source language is parsed hierarchically. Parsing stages The parsing process is"}
 <div class="q-main-doc/technical/parsing q-main">
     <ul class="q-toc">
         <li><strong>Contents</strong></li>

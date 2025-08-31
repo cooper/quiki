@@ -218,7 +218,7 @@ quiki is a file-based wiki suite and standalone web server.
                     Escapes
                 
                 
-                    Some characters must be escaped for literal use. The escape character (\)
+                    Some characters must be escaped for literal use. The escape character ([/c])
                     denotes the character immediately following it as escaped.
                 
                 
@@ -305,7 +305,7 @@ Terminates a key
                     particular block. This is especially useful for things like
                     code{}, html{}, and
                     fmt{} because then you do not have to escape every
-                    instance of special characters like {, }, and \. It works as long as there
+                    instance of special characters like {, }, and [/c]. It works as long as there
                     is a closing bracket } to correspond with every opening bracket {. To enable
                     brace-escape mode, open and close the block with double curly brackets:
                 
@@ -382,7 +382,7 @@ imagebox {
                     For block types that support a [block name] field, it should follow the block
                     type and be delimited by square brackets [ and ]. The name field may
                     contain additional square brackets inside it without the need for the escape
-                    character (\) as long as the number of opening brackets and closing brackets
+                    character ([/c]) as long as the number of opening brackets and closing brackets
                     are equal. Otherwise, they must be escaped.
                 
 blocktype [block name] {
