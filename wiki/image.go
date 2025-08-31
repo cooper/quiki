@@ -267,7 +267,7 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 
 	// create or update image category
 	// consider: do we need to do this here, and does it write every time?
-	w.GetSpecialCategory(r.File, CategoryTypeImage).addImage(w, r.File, nil, nil)
+	w.GetSpecialCategory(r.File, CategoryTypeImage).addImage(r.File, nil, nil)
 
 	// if both dimensions are missing, display the full-size version of the image
 	if img.Width == 0 && img.Height == 0 {
@@ -392,7 +392,7 @@ func (w *Wiki) DisplaySizedImageGenerateInternal(img SizedImage, generateOK bool
 			DetailedError: "Image '" + img.TrueName() + "' is being generated in the background.",
 		}
 	}
-	
+
 	if dispErr := w.generateImage(img, bigPath, bigW, bigH, &r); dispErr != nil {
 		return dispErr
 	}
@@ -525,7 +525,7 @@ func (w *Wiki) ImageInfo(name string) (info ImageInfo) {
 
 	// it doesn't exist. let's create it
 	if !imageCat.Exists() {
-		imageCat.addImage(w, name, nil, nil)
+		imageCat.addImage(name, nil, nil)
 	}
 
 	// it should exist at this point

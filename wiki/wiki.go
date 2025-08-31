@@ -14,18 +14,19 @@ import (
 
 // A Wiki represents a quiki website.
 type Wiki struct {
-	ConfigFile    string
-	Opt           wikifier.PageOpt
-	Auth          *authenticator.Authenticator
-	pageLocks     map[string]*sync.Mutex
-	pageLocksmu   sync.RWMutex
-	imageLocks    map[string]*sync.Mutex // locks for image generation
-	imageLocksmu  sync.RWMutex
-	pregenerating bool
-	checks        []Check
-	checkMu       sync.Mutex
-	_repo         *git.Repository
-	_logger       *log.Logger
+	ConfigFile     string
+	Opt            wikifier.PageOpt
+	Auth           *authenticator.Authenticator
+	pageLocks      map[string]*sync.Mutex
+	pageLocksmu    sync.RWMutex
+	imageLocks     map[string]*sync.Mutex // locks for image generation
+	imageLocksmu   sync.RWMutex
+	pregenerating  bool
+	checks         []Check
+	checkMu        sync.Mutex
+	currentBatcher *categoryBatcher // current batching context, if any
+	_repo          *git.Repository
+	_logger        *log.Logger
 }
 
 // NewWiki creates a Wiki given its directory path.

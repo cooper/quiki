@@ -216,7 +216,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 
 		// add page to categories-
 		// should be possible if VarsOnly mode was successful
-		w.updatePageCategories(page)
+		w.WithCategoryBatching(func() {
+			w.updatePageCategories(page)
+		})
 
 		// extract the ParserError
 		var pErr *wikifier.ParserError
@@ -235,7 +237,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 	// this is for pages we just parsed with @page.redirect
 	if redir := page.Redirect(); redir != "" {
 		w.writeVarsCache(page)
-		w.updatePageCategories(page)
+		w.WithCategoryBatching(func() {
+			w.updatePageCategories(page)
+		})
 		// consider: set r.Categories? can redirects belong to categories?
 		return DisplayRedirect{Redirect: redir}
 	}
@@ -266,7 +270,9 @@ func (w *Wiki) DisplayPageDraft(name string, draftOK bool) any {
 	r.Warnings = page.Warnings
 
 	// update categories
-	w.updatePageCategories(page)
+	w.WithCategoryBatching(func() {
+		w.updatePageCategories(page)
+	})
 	r.Categories = page.Categories()
 
 	// only do these things if content was generated

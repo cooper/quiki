@@ -7,9 +7,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Songmu/go-httpdate"
+	"github.com/cooper/quiki/lock"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -27,6 +29,16 @@ const (
 	// CategoryTypePage is a metacategory that tracks which pages reference another page.
 	CategoryTypePage = "page"
 )
+
+// CategoryManager provides operations for category management
+type CategoryManager interface {
+	AddPage(page *wikifier.Page, dimensions [][]int, lines []int)
+	AddImage(imageName string, page *wikifier.Page, dimensions [][]int)
+	Update()
+	Write()
+	Exists() bool
+	ShouldPurge() bool
+}
 
 // A Category is a collection of pages pertaining to a topic.
 //
@@ -86,6 +98,17 @@ type Category struct {
 		Width  int `json:"width,omitempty"`
 		Height int `json:"height,omitempty"`
 	} `json:"image_info,omitempty"`
+
+	// INTERNAL STATE (not serialized)
+
+	// dirty indicates if this category has unsaved changes
+	dirty bool `json:"-"`
+
+	// mu protects concurrent access to the category data
+	mu sync.RWMutex `json:"-"`
+
+	// wiki reference for operations (set during initialization)
+	wiki *Wiki `json:"-"`
 }
 
 // A CategoryEntry describes a page that belongs to a category.
@@ -109,6 +132,84 @@ type CategoryEntry struct {
 	// for CategoryTypePage, an array of line numbers on which the tracked page is
 	// referenced on the page described by this entry
 	Lines []int `json:"lines,omitempty"`
+}
+
+// categoryBatcher manages batched category writes during a batching session
+type categoryBatcher struct {
+	pending map[string]*Category  // categories pending write, keyed by path
+	locks   map[string]*lock.Lock // locks per category path
+	mu      sync.Mutex            // protects pending and locks maps
+}
+
+// WithCategoryBatching executes a function with category batching enabled.
+// All category operations within the function will be batched and written at the end.
+func (w *Wiki) WithCategoryBatching(fn func()) {
+	// set up the batching context
+	batcher := &categoryBatcher{
+		pending: make(map[string]*Category),
+		locks:   make(map[string]*lock.Lock),
+	}
+	
+	// store the batcher in the wiki context
+	w.currentBatcher = batcher
+	defer func() { w.currentBatcher = nil }()
+	
+	// execute the function with batching enabled
+	fn()
+	
+	// flush all pending writes
+	batcher.flush(w)
+}
+
+// add queues a category for writing
+func (cb *categoryBatcher) add(cat *Category) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+
+	cat.mu.Lock()
+	cat.dirty = true
+	cat.mu.Unlock()
+
+	cb.pending[cat.Path] = cat
+}
+
+// flush writes all pending categories
+func (cb *categoryBatcher) flush(w *Wiki) {
+	cb.mu.Lock()
+	pending := cb.pending
+	cb.pending = make(map[string]*Category)
+	cb.mu.Unlock()
+
+	// write each category with proper locking
+	for _, cat := range pending {
+		cb.writeCategory(cat)
+	}
+}
+
+// writeCategory writes a single category with locking
+func (cb *categoryBatcher) writeCategory(cat *Category) {
+	// get or create lock for this category
+	cb.mu.Lock()
+	catLock, exists := cb.locks[cat.Path]
+	if !exists {
+		catLock = lock.New(cat.Path + ".lock")
+		cb.locks[cat.Path] = catLock
+	}
+	cb.mu.Unlock()
+
+	// acquire lock and write
+	catLock.WithLock(func() error {
+		cat.mu.Lock()
+		defer cat.mu.Unlock()
+
+		if !cat.dirty {
+			return nil // someone else already wrote it
+		}
+
+		cat.dirty = false
+		cat.write()
+		return nil
+	})
 }
 
 // DisplayCategoryPosts represents a category result to display.
@@ -169,12 +270,13 @@ func (w *Wiki) GetSpecialCategory(name string, typ CategoryType) *Category {
 		cat.ModifiedHTTP = cat.CreatedHTTP
 	}
 
-	// update these in any case
+	// update these in any case and set wiki reference
 	cat.Path = path
 	cat.Name = name
 	cat.File = name + ".cat"
 	cat.Type = typ
 	cat.FileNE = name // alias
+	cat.wiki = w      // set the wiki reference
 
 	// load category metadata if available--
 	// but only in these cases:
@@ -256,21 +358,22 @@ func (w *Wiki) readCategoryMeta(metaPath string, cat *Category) {
 	// update the category
 	now := time.Now()
 	cat.Asof = &now
-	cat.write(w)
+	cat.write()
 }
 
 // AddPage adds a page to a category.
 //
 // If the page already belongs and any information has changed, the category is updated.
-// If force is true,
-func (cat *Category) AddPage(w *Wiki, page *wikifier.Page) {
-	cat.addPageExtras(w, page, nil, nil)
+func (cat *Category) AddPage(page *wikifier.Page) {
+	cat.addPageExtras(page, nil, nil)
 }
 
-func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions [][]int, lines []int) {
+func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int, lines []int) {
+	cat.mu.Lock()
+	defer cat.mu.Unlock()
 
 	// update existing info
-	cat.update(w)
+	cat.update()
 
 	// do nothing if the entry exists and the page has not changed since the asof time
 	if pageMaybe != nil {
@@ -314,8 +417,14 @@ func (cat *Category) addPageExtras(w *Wiki, pageMaybe *wikifier.Page, dimensions
 		cat.ModifiedHTTP = httpdate.Time2Str(now)
 	}
 
-	// write it
-	cat.write(w)
+	// queue for writing or write immediately
+	if cat.wiki.currentBatcher != nil {
+		// we're in a batching context, queue for later
+		cat.wiki.currentBatcher.add(cat)
+	} else {
+		// not in batching context, write immediately
+		cat.write()
+	}
 }
 
 // Exists returns whether a category currently exists.
@@ -324,13 +433,22 @@ func (cat *Category) Exists() bool {
 	return err == nil
 }
 
+// IsSpecial returns true if this is a special category (image, model, or page)
+func (cat *Category) IsSpecial() bool {
+	return cat.Type != ""
+}
+
 // write category to file
-func (cat *Category) write(w *Wiki) {
+func (cat *Category) write() {
+	cat.mu.Lock()
+	defer cat.mu.Unlock()
 
 	// encode as JSON
 	jsonData, err := json.Marshal(cat)
 	if err != nil {
-		w.Debugf("Category(%s).write(): %v", cat.Name, err)
+		if cat.wiki != nil {
+			cat.wiki.Debugf("Category(%s).write(): %v", cat.Name, err)
+		}
 		return
 	}
 
@@ -338,7 +456,9 @@ func (cat *Category) write(w *Wiki) {
 	os.WriteFile(cat.Path, jsonData, 0666)
 }
 
-func (cat *Category) update(w *Wiki) {
+func (cat *Category) update() {
+	cat.mu.Lock()
+	defer cat.mu.Unlock()
 
 	// we're probably just now creating the category, so
 	// it's not gonna have any outdated information.
@@ -353,7 +473,7 @@ func (cat *Category) update(w *Wiki) {
 	for pageName, entry := range cat.Pages {
 
 		// page no longer exists
-		path := w.PathForPage(pageName)
+		path := cat.wiki.PathForPage(pageName)
 		pageFi, err := os.Lstat(path)
 		if err != nil {
 			changed = true
@@ -366,7 +486,7 @@ func (cat *Category) update(w *Wiki) {
 			// the page has been modified since we last parsed it;
 			// let's create a page that only reads variables
 			// FIXME: will images, models, etc. be set?
-			page := w.FindPage(pageName)
+			page := cat.wiki.FindPage(pageName)
 			page.VarsOnly = true
 
 			// parse variables. if errors occur, leave as-is
@@ -424,19 +544,19 @@ func (cat *Category) update(w *Wiki) {
 	}
 
 	// category should be deleted
-	if cat.shouldPurge(w) {
+	if cat.shouldPurge() {
 		os.Remove(cat.Path)
 		return
 	}
 
 	// write update
 	if changed {
-		cat.write(w)
+		cat.write()
 	}
 }
 
 // checks if a category should be deleted
-func (cat *Category) shouldPurge(w *Wiki) bool {
+func (cat *Category) shouldPurge() bool {
 
 	// whaa? there are still pages! why you even asking?
 	if len(cat.Pages) != 0 {
@@ -445,7 +565,7 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 
 	// the category meta file still exists, so let's keep it (issue #74)
 	nameNE := wikifier.CategoryNameNE(cat.Name)
-	metaPath := w.Dir("topics", nameNE+".cat")
+	metaPath := cat.wiki.Dir("topics", nameNE+".cat")
 	_, metaErr := os.Lstat(metaPath)
 	if metaErr == nil {
 		return false
@@ -460,16 +580,16 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 	// for page links, check if the page still exists.
 	// use NewPage because it considers all possible page extensions
 	case CategoryTypePage:
-		preserve = w.FindPage(nameNE).Exists()
+		preserve = cat.wiki.FindPage(nameNE).Exists()
 
 	// for images, check if the image still exists
 	case CategoryTypeImage:
-		_, err := os.Lstat(w.PathForImage(nameNE))
+		_, err := os.Lstat(cat.wiki.PathForImage(nameNE))
 		preserve = err != nil
 
 	// for models, check if the model still exists
 	case CategoryTypeModel:
-		_, err := os.Lstat(w.PathForModel(nameNE))
+		_, err := os.Lstat(cat.wiki.PathForModel(nameNE))
 		preserve = err != nil
 
 	// for normal categories, check if it's being manually preserved
@@ -481,8 +601,7 @@ func (cat *Category) shouldPurge(w *Wiki) bool {
 	return !preserve
 }
 
-func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Page, dimensionsMaybe [][]int) {
-
+func (cat *Category) addImage(imageName string, pageMaybe *wikifier.Page, dimensionsMaybe [][]int) {
 	// what !!
 	if cat.Type != CategoryTypeImage {
 		panic("addImage() on non-image category")
@@ -492,7 +611,7 @@ func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Pag
 
 	// find the image dimensions if not present
 	if cat.ImageInfo == nil {
-		path := w.PathForImage(imageName)
+		path := cat.wiki.PathForImage(imageName)
 		width, height := getImageDimensions(path)
 		if width != 0 && height != 0 {
 			cat.ImageInfo = &struct {
@@ -502,7 +621,7 @@ func (cat *Category) addImage(w *Wiki, imageName string, pageMaybe *wikifier.Pag
 		}
 	}
 
-	cat.addPageExtras(w, pageMaybe, dimensionsMaybe, nil)
+	cat.addPageExtras(pageMaybe, dimensionsMaybe, nil)
 }
 
 // ParseThumbnailSizes parses the PregenThumbnails config string into a list of dimensions
@@ -568,23 +687,23 @@ func (w *Wiki) ParseThumbnailSizes(config string, origWidth, origHeight int) [][
 
 // cat_check_page
 func (w *Wiki) updatePageCategories(page *wikifier.Page) {
-
 	// page metadata category
 	info := page.Info()
 	pageCat := w.GetSpecialCategory(page.NameNE(), CategoryTypePage)
 	pageCat.PageInfo = &info
 	pageCat.Preserve = true // keep until page no longer exists
-	pageCat.addPageExtras(w, nil, nil, nil)
+	pageCat.addPageExtras(nil, nil, nil)
 
 	// actual categories
 	for _, name := range page.Categories() {
-		w.GetCategory(name).AddPage(w, page)
+		cat := w.GetCategory(name)
+		cat.addPageExtras(page, nil, nil)
 	}
 
 	// image tracking categories
 	for imageName, dimensions := range page.Images {
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
-		imageCat.addImage(w, imageName, page, dimensions)
+		imageCat.addImage(imageName, page, dimensions)
 	}
 
 	// page tracking categories
@@ -593,7 +712,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		// however, we track references to not-yet-existent pages as well
 		pageCat := w.GetSpecialCategory(pageName, CategoryTypePage)
 		pageCat.Preserve = true // keep until there are no more references
-		pageCat.addPageExtras(w, page, nil, lines)
+		pageCat.addPageExtras(page, nil, lines)
 	}
 
 	// model tracking categories
@@ -601,17 +720,15 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 		modelCat := w.GetSpecialCategory(modelName, CategoryTypeModel)
 		modelCat.Preserve = true // keep until there are no more references
 		modelCat.ModelInfo = &modelInfo
-		modelCat.AddPage(w, page)
+		modelCat.addPageExtras(page, nil, nil)
 	}
-}
-
-// DisplayCategoryPosts returns the display result for a category.
+}// DisplayCategoryPosts returns the display result for a category.
 func (w *Wiki) DisplayCategoryPosts(catName string, pageN int) any {
 	cat := w.GetCategory(catName)
 
 	// update info
 	// note: this needs to be before existence check because it may purge
-	cat.update(w)
+	cat.update()
 
 	// category does not exist
 	if !cat.Exists() {

@@ -112,7 +112,7 @@ func defaultImageCalc(name string, width, height int, page *wikifier.Page) (int,
 		img := SizedImageFromName(name)
 		imageName := img.FullSizeName()
 		imageCat := w.GetSpecialCategory(imageName, CategoryTypeImage)
-		imageCat.addImage(w, imageName, page, [][]int{{width, height}})
+		imageCat.addImage(imageName, page, [][]int{{width, height}})
 	}
 
 	return width, height, false
