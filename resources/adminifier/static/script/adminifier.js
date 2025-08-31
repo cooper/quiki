@@ -119,7 +119,7 @@ a.loadScripts = function (srcs) {
 		else if (src == 'colorpicker')
 			src = adminifier.staticRoot + '/ext/colorpicker/DynamicColorPicker.js';
 		else if (src == 'prettify')
-            src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
+            src = adminifier.staticRoot + '/ext/prettify/run_prettify.js';
             
         // normal script
 		else
