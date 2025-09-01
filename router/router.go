@@ -163,6 +163,13 @@ func (r *Router) matchPattern(pattern, path string) *Params {
 		}
 	}
 
+	// prefix routes ending with / should also match subpaths
+	if strings.HasSuffix(pattern, "/") {
+		if strings.HasPrefix(path, pattern) {
+			return &Params{}
+		}
+	}
+
 	// exact match
 	if pattern == path {
 		return &Params{}
