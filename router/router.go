@@ -93,14 +93,6 @@ func (r *Router) RemoveWiki(wikiName string) {
 			delete(r.routes, pattern)
 		}
 	}
-
-	// remove from static map (wiki routes are typically dynamic, but just in case)
-	wikiPattern := "/" + wikiName + "/"
-	for pattern := range r.static {
-		if strings.Contains(pattern, wikiPattern) {
-			delete(r.static, pattern)
-		}
-	}
 }
 
 // ServeHTTP implements the http.Handler interface.
@@ -149,8 +141,17 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (r *Router) matchPattern(pattern, path string) *Params {
 	// prefix matching for routes ending with /
 	if strings.HasSuffix(pattern, "/") {
+		// exact match (e.g., "/admin/" matches "/admin/")
+		if path == pattern {
+			return &Params{}
+		}
+		// prefix match (e.g., "/admin/" matches "/admin/something")
 		if strings.HasPrefix(path, pattern) {
-			return &Params{} // no named params for prefix routes
+			return &Params{}
+		}
+		// also match without trailing slash (e.g., "/admin/" matches "/admin")
+		if path == strings.TrimSuffix(pattern, "/") {
+			return &Params{}
 		}
 	}
 

@@ -141,6 +141,11 @@ func setupAdminHandlers() {
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == strings.TrimSuffix(root, "/") {
+		http.Redirect(w, r, root, http.StatusMovedPermanently)
+		return
+	}
+
 	// make sure that this is admin root
 	if strings.TrimPrefix(r.URL.Path, root) != "" {
 		http.NotFound(w, r)
