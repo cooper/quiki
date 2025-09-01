@@ -8,12 +8,13 @@ import (
 	"syscall"
 
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/cli"
 	"golang.org/x/term"
 )
 
 // this file handles CLI commands for managing users and roles
 
-func handleAuthCommand() {
+func handleAuthCommand(c *cli.Config) {
 	if len(os.Args) < 3 {
 		printAuthUsage()
 		return
@@ -21,18 +22,18 @@ func handleAuthCommand() {
 
 	var auth *authenticator.Authenticator
 	var err error
-	if wikiPath == "" {
+	if c.WikiPath == "" {
 		// server-level auth - use the established quiki directory
 		var authPath string
-		if QuikiDir != "" {
-			authPath = filepath.Join(QuikiDir, "quiki-auth.json")
+		if c.QuikiDir != "" {
+			authPath = filepath.Join(c.QuikiDir, "quiki-auth.json")
 		} else {
 			authPath = "quiki-auth.json" // fallback for relative path
 		}
 		auth, err = authenticator.OpenServer(authPath)
 	} else {
 		// wiki-level auth
-		auth, err = authenticator.Open(wikiPath + "/auth.json")
+		auth, err = authenticator.Open(c.WikiPath + "/auth.json")
 	}
 
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/cooper/quiki/cli"
 	"github.com/cooper/quiki/webserver"
 )
 
@@ -26,8 +27,8 @@ func handleSignals() {
 }
 
 // handleReload sends SIGHUP to the running server
-func handleReload() {
-	pidPath := filepath.Join(QuikiDir, "server.pid")
+func handleReload(c *cli.Config) {
+	pidPath := filepath.Join(c.QuikiDir, "server.pid")
 
 	// read PID from file
 	pidData, err := os.ReadFile(pidPath)
@@ -57,8 +58,8 @@ func handleReload() {
 }
 
 // writePIDFile writes the current process PID to the PID file
-func writePIDFile() {
-	pidPath := filepath.Join(QuikiDir, "server.pid")
+func writePIDFile(c *cli.Config) {
+	pidPath := filepath.Join(c.QuikiDir, "server.pid")
 
 	// ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(pidPath), 0755); err != nil {
