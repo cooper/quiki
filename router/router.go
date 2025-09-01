@@ -95,8 +95,9 @@ func (r *Router) RemoveWiki(wikiName string) {
 	}
 
 	// remove from static map (wiki routes are typically dynamic, but just in case)
+	wikiPattern := "/" + wikiName + "/"
 	for pattern := range r.static {
-		if strings.Contains(pattern, "/"+wikiName+"/") {
+		if strings.Contains(pattern, wikiPattern) {
 			delete(r.static, pattern)
 		}
 	}

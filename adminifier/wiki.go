@@ -116,6 +116,13 @@ type editorOpts struct {
 var loadedWikiShortcodes = make(map[string]bool)
 
 func initWikis() {
+	// register our setup hook so we get called for all wiki setups/rehashes
+	webserver.RegisterWikiSetupHook(func(shortcode string, wi *webserver.WikiInfo) error {
+		setupWikiHandlers(shortcode, wi)
+		return nil
+	})
+
+	// handle any existing wikis
 	for shortcode, wi := range webserver.Wikis {
 		if loadedWikiShortcodes[shortcode] {
 			continue
@@ -125,7 +132,7 @@ func initWikis() {
 	}
 }
 
-func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
+func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) error {
 	wikiRoot := root + wikiDelimeter + shortcode
 
 	// each of these URLs generates wiki.tpl
@@ -262,6 +269,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 			}
 		})
 	}
+	return nil
 }
 
 func handleWikiRoot(shortcode string, wi *webserver.WikiInfo, w http.ResponseWriter, r *http.Request) {

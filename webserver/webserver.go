@@ -503,3 +503,21 @@ func setupStatic() error {
 
 	return nil
 }
+
+type WikiSetupHook func(string, *WikiInfo) error
+
+var wikiSetupHooks []WikiSetupHook
+
+// RegisterWikiSetupHook registers a callback to be called when a wiki is set up or rehashed
+func RegisterWikiSetupHook(hook WikiSetupHook) {
+	wikiSetupHooks = append(wikiSetupHooks, hook)
+}
+
+func callWikiSetupHooks(shortcode string, wi *WikiInfo) error {
+	for _, hook := range wikiSetupHooks {
+		if err := hook(shortcode, wi); err != nil {
+			return errors.Wrapf(err, "wiki setup hook failed for %s", shortcode)
+		}
+	}
+	return nil
+}

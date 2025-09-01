@@ -314,6 +314,12 @@ func setupWiki(wi *WikiInfo) error {
 
 	// store the wiki info
 	wi.Title = wi.Opt.Name
+
+	// call setup hooks
+	if err := callWikiSetupHooks(wi.Name, wi); err != nil {
+		return err
+	}
+
 	return nil
 }
 
