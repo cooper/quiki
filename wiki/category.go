@@ -366,13 +366,7 @@ func (cat *Category) addPageExtras(pageMaybe *wikifier.Page, dimensions [][]int,
 
 	// queue for writing outside the lock to avoid deadlock
 	if changed {
-		if cat.wiki.currentBatcher != nil {
-			// we're in a batching context, queue
-			cat.wiki.currentBatcher.add(cat)
-		} else {
-			// otherwise write immediately
-			cat.write()
-		}
+		cat.writeOrBatch()
 	}
 }
 
@@ -422,6 +416,14 @@ func (cat *Category) addPageExtrasUnlocked(pageMaybe *wikifier.Page, dimensions 
 	}
 
 	return changed
+}
+
+func (cat *Category) writeOrBatch() {
+	if cat.wiki.currentBatcher != nil {
+		cat.wiki.currentBatcher.add(cat)
+	} else {
+		cat.write()
+	}
 }
 
 // Exists returns whether a category currently exists.
@@ -697,6 +699,7 @@ func (w *Wiki) updatePageCategories(page *wikifier.Page) {
 	pageCat := w.GetSpecialCategory(page.NameNE(), CategoryTypePage)
 	pageCat.PageInfo = &info
 	pageCat.Preserve = true // keep until page no longer exists
+	pageCat.writeOrBatch()
 	pageCat.addPageExtras(nil, nil, nil)
 
 	// actual categories

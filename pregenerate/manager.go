@@ -973,19 +973,18 @@ func (m *Manager) pregeneratePage(pageName string, isHighPriority bool) any {
 		return wiki.DisplayError{Error: "Page not found"}
 	}
 
-	// check if page is already cached and fresh - avoid unnecessary work
+	// avoid unnecessary work
 	if !m.options.ForceGen {
 		cacheModify := page.CacheModified()
 		pageModified := page.Modified()
 		if !pageModified.After(cacheModify) {
-			m.debug("pregenerate: page %s already cached and fresh", pageName)
+			m.debug("pregenerate: page %s already fresh", pageName)
 			// return the cached result
 			return m.wiki.DisplayPageDraft(pageName, true)
 		}
 	}
 
 	m.debug("pregenerate: calling DisplayPageDraft for: %s", pageName)
-	fmt.Printf("DEBUG: About to call DisplayPageDraft for page: %s\n", pageName)
 
 	// temporarily modify ForceGen in a thread-safe way
 	var result any
