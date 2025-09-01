@@ -210,7 +210,7 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 
 	// get server title from config
 	serverTitle := "quiki"
-	if title, err := webserver.Conf.GetStr("server.name"); err == nil {
+	if title, _ := webserver.Conf.GetStr("server.name"); title != "" {
 		serverTitle = title
 	}
 

@@ -745,7 +745,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 // showLoginForm renders the login template
 func (wi *WikiInfo) showLoginForm(w http.ResponseWriter, r *http.Request, errorMsg, redirect string) {
-	data := wi.newAuthTemplateData("login", "welcome back", r)
+	data := wi.newAuthTemplateData("Login", "Welcome back", r)
 	data.Error = errorMsg
 	data.LoginAction = wi.Opt.Root.Wiki + "login?redirect=" + redirect
 
@@ -757,7 +757,7 @@ func (wi *WikiInfo) showLoginForm(w http.ResponseWriter, r *http.Request, errorM
 
 // showRegisterForm renders the registration template
 func (wi *WikiInfo) showRegisterForm(w http.ResponseWriter, r *http.Request, errorMsg, username, email string) {
-	data := wi.newAuthTemplateData("register", "join "+wi.Name, r)
+	data := wi.newAuthTemplateData("Register", "Join "+wi.Name, r)
 	data.Error = errorMsg
 	data.Username = username
 	data.Email = email
@@ -771,8 +771,8 @@ func (wi *WikiInfo) showRegisterForm(w http.ResponseWriter, r *http.Request, err
 
 // showRegisterSuccess shows a success message after registration
 func (wi *WikiInfo) showRegisterSuccess(w http.ResponseWriter, r *http.Request) {
-	data := wi.newAuthTemplateData("register", "join "+wi.Name, r)
-	data.Success = "account created successfully! you can now log in."
+	data := wi.newAuthTemplateData("Register", "Join "+wi.Name, r)
+	data.Success = "Account created successfully! You can now log in."
 	data.RegisterAction = wi.Opt.Root.Wiki + "register"
 
 	if err := wi.template.template.ExecuteTemplate(w, "register.tpl", data); err != nil {
