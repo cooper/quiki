@@ -721,7 +721,16 @@ func handlePageRevisions(wr *wikiRequest) {
 	}
 
 	pageName := wr.r.Form.Get("page")
-	revisions, err := wr.wi.RevisionsMatchingPage(pageName)
+
+	var revisions []wiki.RevisionInfo
+	var err error
+
+	if pageName == "wiki.conf" {
+		revisions, err = wr.wi.RevisionsMatchingFile("wiki.conf")
+	} else {
+		revisions, err = wr.wi.RevisionsMatchingPage(pageName)
+	}
+
 	if err != nil {
 		wr.err = err
 		return

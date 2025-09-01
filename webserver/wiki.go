@@ -413,23 +413,14 @@ func generateWikiLogo(wi *WikiInfo) {
 	}
 }
 
-// updateWikiConfig updates the configuration parts of a wiki without touching routes.
-// this is used when rehashing an existing wiki to pick up config changes.
-func updateWikiConfig(wi *WikiInfo) error {
-	configureWikiRoots(wi)
-
-	if err := loadWikiTemplate(wi); err != nil {
-		return err
-	}
-
-	generateWikiLogo(wi)
-	return nil
-}
-
 // Shutdown gracefully shuts down the wiki and its services
 func (wi *WikiInfo) Shutdown() {
 	if wi.pregenerateManager != nil {
 		wi.pregenerateManager.Stop()
 		wi.pregenerateManager = nil
+	}
+
+	if wi.Wiki != nil {
+		wi.Wiki.Shutdown()
 	}
 }

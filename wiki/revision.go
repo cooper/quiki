@@ -414,6 +414,11 @@ func (w *Wiki) RevisionsMatchingPage(nameOrPath string) ([]RevisionInfo, error) 
 	return w._revisionsMatchingFile(w.RelPath(w.PathForPage(nameOrPath)))
 }
 
+// RevisionsMatchingFile returns a list of commit infos matching any file by relative path.
+func (w *Wiki) RevisionsMatchingFile(relPath string) ([]RevisionInfo, error) {
+	return w._revisionsMatchingFile(relPath)
+}
+
 // Diff returns the diff between two revisions.
 // NOTE: For now, this includes all changes, not just those to a specific file.
 func (w *Wiki) Diff(from, to string) (*object.Patch, error) {

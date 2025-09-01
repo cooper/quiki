@@ -40,13 +40,13 @@ func (w *Wiki) logger() *log.Logger {
 	if w._logger != nil {
 		return w._logger
 	}
-	// consider: if wiki is ever destoryed, need to close this
 	f, err := os.OpenFile(w.Dir("cache", "wiki.log"),
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return log.New(io.Discard, "", log.LstdFlags)
 	}
 	w._logger = log.New(f, "", log.LstdFlags)
+	w._logFile = f
 	return w._logger
 }
 
@@ -60,7 +60,7 @@ var (
 func (w *Wiki) warnOccasionally(message string) {
 	occasionalWarningMu.Lock()
 	defer occasionalWarningMu.Unlock()
-	
+
 	now := time.Now()
 	if lastLogged, exists := occasionalWarningLastLogged[message]; !exists || now.Sub(lastLogged) >= 5*time.Minute {
 		log.Println(message)

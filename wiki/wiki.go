@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -27,6 +28,7 @@ type Wiki struct {
 	currentBatcher *categoryBatcher // current batching context, if any
 	_repo          *git.Repository
 	_logger        *log.Logger
+	_logFile       *os.File
 }
 
 // NewWiki creates a Wiki given its directory path.
@@ -108,4 +110,13 @@ func (w *Wiki) GetReferencingPages(pageName string) []string {
 	}
 
 	return referencingPages
+}
+
+// Shutdown closes the wiki active filehandles.
+func (w *Wiki) Shutdown() {
+	if w._logFile != nil {
+		w._logFile.Close()
+		w._logFile = nil
+		w._logger = nil
+	}
 }
