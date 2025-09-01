@@ -1,16 +1,28 @@
+# compiled executables
 .goutputstream*
 *~
 *.old
 quiki
-quiki.exe
-quiki.conf
-.DS_Store
+*.exe
+cli/wikifier/wikifier
+cli/quiki-wiki/quiki-wiki
+test/test
+
 standalone/standalone
 irc/irc
 irc/irc.exe
 monitor/monitor
 markdown/markdown
+
+# quiki stuff
+quiki.conf
 quiki-auth.json
+server.pid
+wikis/
+
+# other
 auth.json
 test/cache
 wiki.log
+.DS_Store
+.github
