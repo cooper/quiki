@@ -829,7 +829,7 @@ func getGenericTemplate(wr *wikiRequest) wikiTemplate {
 }
 
 func getCommitOpts(wr *wikiRequest, comment string) wiki.CommitOpts {
-	user := sessMgr.Get(wr.r.Context(), "user").(*authenticator.User)
+	user := sessMgr.Get(wr.r.Context(), "user").(*webserver.Session)
 	return wiki.CommitOpts{
 		Comment: comment,
 		Name:    user.DisplayName,
