@@ -57,7 +57,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// anything else is a generic 404
-	log.Printf("handleRoot: no matching wiki for host=%s, path=%s", r.Host, r.URL.Path)
+	log.Printf("404: host=%s, path=%s", r.Host, r.URL.Path)
 	http.NotFound(w, r)
 }
 
@@ -95,16 +95,24 @@ func handlePage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Req
 		return // redirected to login
 	}
 
+	if wi.pregenerateManager == nil {
+		http.Error(w, "please try again in a moment", http.StatusInternalServerError)
+		return
+	}
+
 	result := wi.pregenerateManager.GeneratePageSync(relPath, true)
 	handleResponse(wi, result, w, r)
 }
 
 // image request
 func handleImage(wi *WikiInfo, relPath string, w http.ResponseWriter, r *http.Request) {
-	log.Printf("DEBUG: handleImage called with relPath: %s", relPath)
-	log.Printf("DEBUG: wi.pregenerateManager is nil: %v", wi.pregenerateManager == nil)
+
+	if wi.pregenerateManager == nil {
+		http.Error(w, "please try again in a moment", http.StatusInternalServerError)
+		return
+	}
+
 	result := wi.pregenerateManager.GenerateImageSync(relPath, true)
-	log.Printf("DEBUG: handleImage got result, calling handleResponse")
 	handleResponse(wi, result, w, r)
 }
 
@@ -130,12 +138,10 @@ func handleResponse(wi *WikiInfo, res any, w http.ResponseWriter, r *http.Reques
 
 	// page content
 	case wiki.DisplayPage:
-		log.Printf("DEBUG: serving page")
 		renderTemplate(wi, w, "page", wikiPageFromRes(wi, res))
 
 	// image content
 	case wiki.DisplayImage:
-		log.Printf("DEBUG: serving image file: %s", res.Path)
 		http.ServeFile(w, r, res.Path)
 
 	// posts

@@ -10,13 +10,14 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/resources"
+	"github.com/cooper/quiki/router"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
 
 var tmpl *template.Template
-var mux *webserver.ServeMux
+var mux *router.Router
 var conf *wikifier.Page
 var sessMgr *scs.SessionManager
 var host, root string
@@ -26,7 +27,7 @@ const wikiDelimeter = "-/"
 // Configure sets up adminifier on webserver.ServeMux using webserver.Conf.
 func Configure() {
 	conf = webserver.Conf
-	mux = webserver.Mux
+	mux = webserver.Router
 
 	// do nothing if not enabled
 	if enable, _ := conf.GetBool("adminifier.enable"); !enable {
@@ -82,8 +83,8 @@ func Configure() {
 	tmpl = template.Must(tmpl.ParseFS(resources.Shared, "template/*.tpl"))
 
 	// main handler
-	mux.RegisterFunc(host+root, "adminifier root", handleRoot)
-	mux.RegisterFunc(host+root+"static/config.js", "adminifier config.js", handleConfigJS)
+	mux.HandleFunc(host+root, "adminifier root", handleRoot)
+	mux.HandleFunc(host+root+"static/config.js", "adminifier config.js", handleConfigJS)
 	log.Println("registered adminifier root: " + host + root)
 
 	// admin handlers
@@ -116,6 +117,6 @@ func setupStatic(efs fs.FS, staticRoot string) error {
 		return errors.Wrap(err, "creating static sub filesystem")
 	}
 	fileServer := http.FileServer(http.FS(subFS))
-	mux.Register(host+staticRoot, "adminifier static files", http.StripPrefix(staticRoot, fileServer))
+	mux.Handle(host+staticRoot, "adminifier static files", http.StripPrefix(staticRoot, fileServer))
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cooper/quiki/authenticator"
+	"github.com/cooper/quiki/router"
 	"github.com/cooper/quiki/webserver"
 	"github.com/cooper/quiki/wiki"
 )
@@ -66,22 +67,22 @@ func withSecurityHeaders(handler http.HandlerFunc) http.HandlerFunc {
 
 func setupAdminHandlers() {
 	for name, function := range adminUnauthenticatedHandlers {
-		mux.HandleFunc(host+root+name, withSecurityHeaders(function))
+		mux.HandleFunc(host+root+name, "adminifier "+name, withSecurityHeaders(function))
 	}
 	for name, function := range adminUnauthenticatedFuncHandlers {
-		mux.HandleFunc(host+root+"func/"+name, withSecurityHeaders(function))
+		mux.HandleFunc(host+root+"func/"+name, "adminifier func "+name, withSecurityHeaders(function))
 	}
 
 	// authenticated handlers
 
 	// each of these generates admin.tpl
 	for which := range adminFrameHandlers {
-		mux.HandleFunc(host+root+which, withSecurityHeaders(handleAdmin))
+		mux.HandleFunc(host+root+which, "adminifier "+which, withSecurityHeaders(handleAdmin))
 	}
 
 	// frames to load via ajax
 	frameRoot := root + "frame/"
-	mux.HandleFunc(host+frameRoot, withSecurityHeaders(func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(host+frameRoot, "adminifier frame", withSecurityHeaders(func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if redirectIfNotLoggedIn(w, r) {
@@ -458,10 +459,10 @@ func handleSitesFrame(ar *adminRequest) {
 
 func handleRoutesFrame(ar *adminRequest) {
 	ar.dot = struct {
-		Routes []webserver.Route
+		Routes []router.Route
 		adminTemplate
 	}{
-		Routes:        webserver.Mux.GetRoutes(),
+		Routes:        webserver.Router.Routes(),
 		adminTemplate: createAdminTemplate(ar.r),
 	}
 }

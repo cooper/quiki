@@ -1,7 +1,7 @@
 (function (a) {
 
 // regex to remove the wiki root 
-var wikiRootRgx = new RegExp(adminifier.wikiRoot.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+var wikiRootRgx = new RegExp('^' + adminifier.wikiRoot.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\/?(.*)$');
 
 // whether this page's scripts have been loaded yet
 var pageScriptsDone = false;
@@ -183,7 +183,9 @@ function addFrameClickHandler (where) {
     where.each(function (a) {
         a.addEvent('click', function (e) {
             e.preventDefault();
-            var page = a.href.replace(/^.*\/\/[^\/]+/, '').replace(wikiRootRgx, '').replace(/^\//, '');
+            var href = a.href.replace(/^.*\/\/[^\/]+/, '');
+            var match = href.match(wikiRootRgx);
+            var page = match ? match[1] : href.replace(/^\//, '');
             history.pushState(page, '', adminifier.wikiRoot + '/' + page);
             loadURL();
         });
@@ -286,7 +288,8 @@ function frameLoad (page) {
 // extract the page from the current URL and load it
 function loadURL() {
     var loc = window.location.pathname;
-    frameLoad(loc.replace(wikiRootRgx, '') + window.location.search);
+    var match = loc.match(wikiRootRgx);
+    frameLoad((match ? match[1] : loc) + window.location.search);
 }
 
 // page options

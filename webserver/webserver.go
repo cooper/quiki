@@ -20,7 +20,10 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/monitor"
+	"github.com/cooper/quiki/pregenerate"
 	"github.com/cooper/quiki/resources"
+	"github.com/cooper/quiki/router"
+	"github.com/cooper/quiki/wiki"
 	"github.com/cooper/quiki/wikifier"
 	"github.com/pkg/errors"
 )
@@ -61,32 +64,233 @@ func Rehash() error {
 		*ptr = str
 	}
 
-	// Get monitor manager for coordination
-	monitorMgr := monitor.GetManager()
-
-	// temporarily store current wikis for fallback
-	oldWikis := Wikis
-
-	// Stop monitoring and pregeneration for wikis that will be removed/replaced
-	for wikiName := range oldWikis {
-		if wi, exists := oldWikis[wikiName]; exists {
+	// find all wikis in the new configuration
+	found, err := Conf.Get("server.wiki")
+	if err != nil {
+		return errors.Wrap(err, "rehash: get wiki config")
+	}
+	if found == nil {
+		// no wikis configured, shut down all existing wikis
+		for wikiName, wi := range Wikis {
 			monitor.GetManager().RemoveWiki(wikiName)
-			wi.Shutdown() // Gracefully stop pregeneration
+			wi.Shutdown()
+			delete(Wikis, wikiName)
+		}
+		return nil
+	}
+	wikiMap, ok := found.(*wikifier.Map)
+	if !ok {
+		return errors.New("rehash: server.wiki is not a map")
+	}
+
+	configuredWikis := make(map[string]bool)
+	for _, wikiName := range wikiMap.Keys() {
+		configuredWikis[wikiName] = true
+	}
+
+	// remove wikis that are no longer in the configuration
+	for wikiName := range Wikis {
+		if !configuredWikis[wikiName] {
+			if wi, exists := Wikis[wikiName]; exists {
+				monitor.GetManager().RemoveWiki(wikiName)
+				wi.Shutdown()
+				delete(Wikis, wikiName)
+			}
 		}
 	}
 
-	// reset wikis map to allow InitWikis to rebuild from config
-	Wikis = make(map[string]*WikiInfo) // re-initialize wikis based on updated config
-	if err := InitWikis(); err != nil {
-		// restore old wikis and their monitors on failure
-		Wikis = oldWikis
-		for _, wi := range oldWikis {
-			monitorMgr.AddWikiWithPregeneration(wi.Wiki, wi.pregenerateManager)
+	// rehash each configured wiki individually (config already parsed)
+	for wikiName := range configuredWikis {
+		if err := rehashWikiWithConfig(wikiName); err != nil {
+			return errors.Wrap(err, "rehash: rehash wiki "+wikiName)
 		}
-		return errors.Wrap(err, "rehash: init wikis")
 	}
 
-	// old wikis are no longer needed, garbage collection will handle cleanup
+	// check if we have any wikis after rehashing
+	if len(Wikis) == 0 {
+		return errors.New("rehash: none of the configured wikis are enabled")
+	}
+
+	return nil
+}
+
+// RehashWiki reloads configuration and reinitializes a specific wiki.
+// this is more efficient than Rehash() when only one wiki's config has changed.
+func RehashWiki(wikiName string) error {
+	// re-parse configuration to get latest changes
+	if err := Conf.Parse(); err != nil {
+		return errors.Wrap(err, "rehash wiki: parse config")
+	}
+
+	return rehashWikiWithConfig(wikiName)
+}
+
+// rehashWikiWithConfig reinitializes a specific wiki using the already-parsed config.
+// this is used internally by both RehashWiki and Rehash to avoid duplicate config parsing.
+func rehashWikiWithConfig(wikiName string) error {
+	// check if the wiki exists in current configuration
+	configPfx := "server.wiki." + wikiName
+	enable, _ := Conf.GetBool(configPfx + ".enable")
+	if !enable {
+		// wiki is disabled, remove it if it exists
+		if wi, exists := Wikis[wikiName]; exists {
+			monitor.GetManager().RemoveWiki(wikiName)
+			wi.Shutdown()
+			delete(Wikis, wikiName)
+		}
+		return nil
+	}
+
+	// store the old wiki for cleanup after successful replacement
+	var oldWiki *WikiInfo
+	if wi, exists := Wikis[wikiName]; exists {
+		oldWiki = wi
+	}
+
+	// initialize the new wiki using the same logic as InitWikis()
+	// host to accept (optional)
+	wikiHost, _ := Conf.GetStr(configPfx + ".host")
+
+	// create the wiki instance
+	var w *wiki.Wiki
+	var err error
+
+	// first, prefer server.wiki.[name].dir
+	dirWiki, _ := Conf.GetStr(configPfx + ".dir")
+	if dirWiki != "" {
+		w, err = wiki.NewWiki(dirWiki)
+		if err != nil {
+			return errors.Wrap(err, "rehash wiki: create wiki from dir")
+		}
+	}
+
+	// still no wiki? use server.dir.wiki/[name]
+	if w == nil {
+		// if not set, give up because this is last resort
+		serverDirWiki, err := Conf.GetStr("server.dir.wiki")
+		if err != nil {
+			return errors.Wrap(err, "rehash wiki: get server wiki dir")
+		}
+
+		w, err = wiki.NewWiki(filepath.Join(serverDirWiki, wikiName))
+		if err != nil {
+			return errors.Wrap(err, "rehash wiki: create wiki from server dir")
+		}
+	}
+
+	// if wiki host was found in wiki config, use it ONLY when
+	// no host was specified in server config.
+	if wikiHost == "" {
+		wikiHost = w.Opt.Host.Wiki
+	}
+
+	// create wiki info for webserver
+	wi := &WikiInfo{Wiki: w, Host: wikiHost, Name: wikiName}
+
+	// initialize pregeneration manager
+	pregenerationEnabled, _ := Conf.GetBool("server.enable.pregeneration")
+
+	// get pregeneration options (same logic as InitWikis)
+	pregenerationMode, _ := Conf.GetStr("server.pregen.mode")
+	var opts pregenerate.Options
+	switch pregenerationMode {
+	case "fast":
+		opts = pregenerate.FastOptions()
+	case "slow":
+		opts = pregenerate.SlowOptions()
+	default:
+		opts = pregenerate.DefaultOptions()
+	}
+
+	// apply option overrides from config
+	if rateLimit, ok, _ := Conf.GetDuration("server.pregen.rate_limit"); ok {
+		opts.RateLimit = rateLimit
+	}
+	if progressInterval, ok, _ := Conf.GetInt("server.pregen.progress_interval"); ok {
+		opts.ProgressInterval = progressInterval
+	}
+	if priorityQueueSize, ok, _ := Conf.GetInt("server.pregen.page_priority"); ok {
+		opts.PriorityQueueSize = priorityQueueSize
+	}
+	if backgroundQueueSize, ok, _ := Conf.GetInt("server.pregen.page_background"); ok {
+		opts.BackgroundQueueSize = backgroundQueueSize
+	}
+	if imagePriorityQueueSize, ok, _ := Conf.GetInt("server.pregen.img_priority"); ok {
+		opts.ImagePriorityQueueSize = imagePriorityQueueSize
+	}
+	if imageBackgroundQueueSize, ok, _ := Conf.GetInt("server.pregen.img_background"); ok {
+		opts.ImageBackgroundQueueSize = imageBackgroundQueueSize
+	}
+	if priorityWorkers, ok, _ := Conf.GetInt("server.pregen.page_workers"); ok {
+		opts.PriorityWorkers = priorityWorkers
+	}
+	if backgroundWorkers, ok, _ := Conf.GetInt("server.pregen.page_bg_workers"); ok {
+		opts.BackgroundWorkers = backgroundWorkers
+	}
+	if imagePriorityWorkers, ok, _ := Conf.GetInt("server.pregen.img_workers"); ok {
+		opts.ImagePriorityWorkers = imagePriorityWorkers
+	}
+	if imageBackgroundWorkers, ok, _ := Conf.GetInt("server.pregen.img_bg_workers"); ok {
+		opts.ImageBackgroundWorkers = imageBackgroundWorkers
+	}
+	if requestTimeout, ok, _ := Conf.GetDuration("server.pregen.timeout"); ok {
+		opts.RequestTimeout = requestTimeout
+	}
+	if val, err := Conf.Get("server.pregen.force"); err == nil {
+		if forceGen, ok := val.(bool); ok {
+			opts.ForceGen = forceGen
+		}
+	}
+	if val, err := Conf.Get("server.pregen.verbose"); err == nil {
+		if logVerbose, ok := val.(bool); ok {
+			opts.LogVerbose = logVerbose
+		}
+	}
+	if val, err := Conf.Get("server.pregen.images"); err == nil {
+		if enableImages, ok := val.(bool); ok {
+			opts.EnableImages = enableImages
+		}
+	}
+	if cleanupInterval, ok, _ := Conf.GetDuration("server.pregen.cleanup"); ok {
+		opts.CleanupInterval = cleanupInterval
+	}
+	if maxTrackingEntries, ok, _ := Conf.GetInt("server.pregen.max_tracking"); ok {
+		opts.MaxTrackingEntries = maxTrackingEntries
+	}
+
+	// start pregeneration manager
+	if pregenerationEnabled {
+		wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartBackground()
+	} else {
+		wi.pregenerateManager = pregenerate.NewWithOptions(w, opts).StartWorkers()
+	}
+
+	// monitor for changes with pregeneration integration
+	if err := monitor.GetManager().AddWikiWithPregeneration(w, wi.pregenerateManager); err != nil {
+		return errors.Wrap(err, "rehash wiki: add wiki monitoring")
+	}
+
+	// set up the wiki for webserver
+	if oldWiki == nil {
+		// new wiki, set up everything including routes
+		if err := setupWiki(wi); err != nil {
+			return errors.Wrap(err, "rehash wiki: setup wiki")
+		}
+	} else {
+		// existing wiki - unregister old routes and set up new ones
+		Router.RemoveWiki(wikiName)
+		if err := setupWiki(wi); err != nil {
+			return errors.Wrap(err, "rehash wiki: setup wiki")
+		}
+	}
+
+	// store the updated wiki atomically
+	Wikis[wikiName] = wi
+
+	// now that the new wiki is in place, safely cleanup the old pregenerate manager only
+	if oldWiki != nil {
+		oldWiki.Shutdown()
+	}
 
 	return nil
 }
@@ -96,10 +300,10 @@ func Rehash() error {
 // It is available only after Configure is called.
 var Conf *wikifier.Page
 
-// Mux is the *http.ServeMux.
+// Router is the HTTP router.
 //
 // It is available only after Configure is called.
-var Mux *ServeMux
+var Router *router.Router
 
 // Server is the *http.Server.
 //
@@ -124,7 +328,7 @@ var GlobalPermissionChecker *PermissionChecker
 func Configure(_initial_options Options) {
 	var err error
 	Opts = _initial_options
-	Mux = NewServeMux()
+	Router = router.New()
 	gob.Register(&Session{})
 
 	// parse configuration
@@ -213,8 +417,8 @@ func Configure(_initial_options Options) {
 	GlobalPermissionChecker = NewPermissionChecker(SessMgr)
 
 	// create server with main handler
-	Mux.RegisterFunc("/", "webserver root", handleRoot)
-	Server = &http.Server{Handler: SessMgr.LoadAndSave(Mux)}
+	Router.HandleFunc("/", "webserver root", handleRoot)
+	Server = &http.Server{Handler: SessMgr.LoadAndSave(Router)}
 
 	// create authenticator
 	var authPath string
@@ -287,7 +491,7 @@ func setupStatic() error {
 		return errors.Wrap(err, "creating static sub filesystem")
 	}
 	fileServer := http.FileServer(http.FS(subFS))
-	Mux.Register("/static/", "webserver static files", http.StripPrefix("/static/", fileServer))
+	Router.Handle("/static/", "webserver static files", http.StripPrefix("/static/", fileServer))
 
 	// setup shared static files
 	sharedFS, err := fs.Sub(resources.Shared, "static")
@@ -295,7 +499,7 @@ func setupStatic() error {
 		return errors.Wrap(err, "creating shared static sub filesystem")
 	}
 	sharedFileServer := http.FileServer(http.FS(sharedFS))
-	Mux.Register("/shared/", "shared static files", http.StripPrefix("/shared/", sharedFileServer))
+	Router.Handle("/shared/", "shared static files", http.StripPrefix("/shared/", sharedFileServer))
 
 	return nil
 }

@@ -129,22 +129,22 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	wikiRoot := root + wikiDelimeter + shortcode
 
 	// each of these URLs generates wiki.tpl
-	mux.RegisterFunc(host+wikiRoot, "adminifier site root", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(host+wikiRoot, "adminifier site root", func(w http.ResponseWriter, r *http.Request) {
 		handleWikiRoot(shortcode, wi, w, r)
 	})
 	wikiRoot += "/"
-	mux.HandleFunc(host+wikiRoot, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(host+wikiRoot, "adminifier wiki root", func(w http.ResponseWriter, r *http.Request) {
 		handleWikiRoot(shortcode, wi, w, r)
 	})
 	for which := range wikiFrameHandlers {
-		mux.HandleFunc(host+wikiRoot+which, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(host+wikiRoot+which, "adminifier wiki frame: "+which, func(w http.ResponseWriter, r *http.Request) {
 			handleWiki(shortcode, wi, w, r)
 		})
 	}
 
 	// frames to load via ajax
 	frameRoot := wikiRoot + "frame/"
-	mux.HandleFunc(host+frameRoot, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(host+frameRoot+"*", "adminifier wiki frame handler", func(w http.ResponseWriter, r *http.Request) {
 
 		// check logged in
 		if redirectIfNotLoggedIn(w, r) {
@@ -217,7 +217,7 @@ func setupWikiHandlers(shortcode string, wi *webserver.WikiInfo) {
 	funcRoot := wikiRoot + "func/"
 	for funcName, thisHandler := range wikiFuncHandlers {
 		handler := thisHandler
-		mux.HandleFunc(host+funcRoot+funcName, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(host+funcRoot+funcName, "adminifier wiki func: "+funcName, func(w http.ResponseWriter, r *http.Request) {
 
 			// check if user can edit this wiki
 			//
@@ -639,7 +639,19 @@ func handleWriteWikiConfig(wr *wikiRequest) {
 	}
 	content, message := wr.r.Form.Get("content"), wr.r.Form.Get("message")
 	res := handleWriteFile(wr, func() error {
-		return wr.wi.WriteConfig([]byte(content), getCommitOpts(wr, message))
+		err := wr.wi.WriteConfig([]byte(content), getCommitOpts(wr, message))
+		if err != nil {
+			return err
+		}
+
+		// rehash wiki asynchronously to avoid router deadlock
+		go func() {
+			if err := webserver.RehashWiki(wr.wi.Name); err != nil {
+				log.Printf("error rehashing wiki %s: %v", wr.wi.Name, err)
+			}
+		}()
+
+		return nil
 	})
 	json.NewEncoder(wr.w).Encode(res)
 }

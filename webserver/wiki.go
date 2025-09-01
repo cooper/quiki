@@ -225,74 +225,13 @@ var warnedHostnameUsed bool
 
 // initialize a wiki
 func setupWiki(wi *WikiInfo) error {
+	configureWikiRoots(wi)
 
-	// derive root.ext if not configured
-	if wi.Opt.Root.Ext == "" {
-		host := wi.Opt.Host.Wiki
-		if host == "" {
-			host = Opts.Host
-		}
-		if host == "" {
-			host, _ = os.Hostname()
-			if host != "" && !warnedHostnameUsed {
-				log.Printf("[%s] @server.http.host not configured, using system "+
-					"hostname to configure external root: %s", wi.Name, host)
-				warnedHostnameUsed = true
-			}
-		}
-		if host == "" {
-			host = "localhost"
-			log.Printf("[%s] warning: no host configured for wiki nor default "+
-				"host on server. either set a default host in quiki.conf with "+
-				"@server.http.host, or set @host.wiki in wiki.conf", wi.Name)
-		}
-		port := ""
-		if Opts.Port != "80" {
-			port = ":" + Opts.Port
-		}
-		wi.Opt.Root.Ext = "http://" + path.Join(host+port, wi.Opt.Root.Wiki)
-	}
-
-	// if not configured, use default template
-	templateNameOrPath := wi.Opt.Template
-	if templateNameOrPath == "" {
-		templateNameOrPath = "default"
-	}
-
-	// find the template
-	var template wikiTemplate
-	var err error
-	if strings.Contains(templateNameOrPath, "/") {
-		// if a path is given, try to load the template at this exact path
-		template, err = loadTemplateAtPath(templateNameOrPath)
-	} else {
-		// otherwise, search template directories
-		template, err = findTemplate(templateNameOrPath)
-	}
-
-	// couldn't find it, or an error occurred in loading it
-	if err != nil {
+	if err := loadWikiTemplate(wi); err != nil {
 		return err
 	}
-	wi.template = template
 
-	// generate logo according to template
-	logoInfo := wi.template.manifest.Logo
-	logoName := wi.Opt.Logo
-	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
-		si := wiki.SizedImageFromName(logoName)
-		si.Width = logoInfo.Width
-		si.Height = logoInfo.Height
-		res := wi.DisplaySizedImageGenerate(si, true)
-		switch disp := res.(type) {
-		case wiki.DisplayImage:
-			wi.Logo = wi.Opt.Root.Image + "/" + disp.File
-		case wiki.DisplayRedirect:
-			wi.Logo = wi.Opt.Root.Image + "/" + disp.Redirect
-		default:
-			log.Printf("[%s] generate logo failed: %+v", wi.Name, res)
-		}
-	}
+	generateWikiLogo(wi)
 
 	type wikiHandler struct {
 		rootType string
@@ -347,7 +286,7 @@ func setupWiki(wi *WikiInfo) error {
 
 		// add the real handler
 		wi := wi // copy pointer so the handler below always refer to this one
-		Mux.HandleFunc(wi.Host+root, func(w http.ResponseWriter, r *http.Request) {
+		handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 			// determine the path relative to the root
 			relPath := strings.TrimPrefix(r.URL.Path, root)
@@ -357,7 +296,8 @@ func setupWiki(wi *WikiInfo) error {
 			}
 
 			handler(wi, relPath, w, r)
-		})
+		}
+		Router.HandleWiki(wi.Name, wi.Host+root, rootType+" root", http.HandlerFunc(handlerFunc))
 
 		log.Printf("[%s] registered %s root: %s", wi.Name, rootType, wi.Host+root)
 	}
@@ -368,7 +308,7 @@ func setupWiki(wi *WikiInfo) error {
 	if rootFile != "" && dirWiki != "" {
 		rootFile += "/"
 		fileServer := http.FileServer(http.Dir(dirWiki))
-		Mux.Register(wi.Host+rootFile, "site file directory index", http.StripPrefix(rootFile, fileServer))
+		Router.HandleWiki(wi.Name, wi.Host+rootFile, "site file directory index", http.StripPrefix(rootFile, fileServer))
 		log.Printf("[%s] registered file root: %s (%s)", wi.Name, wi.Host+rootFile, dirWiki)
 	}
 
@@ -388,6 +328,96 @@ func (wi *WikiInfo) Copy(w *wiki.Wiki) *WikiInfo {
 		template: wi.template,
 		Wiki:     w,
 	}
+}
+
+// configureWikiRoots sets up the root.ext configuration for a wiki
+func configureWikiRoots(wi *WikiInfo) {
+	// derive root.ext if not configured
+	if wi.Opt.Root.Ext == "" {
+		host := wi.Opt.Host.Wiki
+		if host == "" {
+			host = Opts.Host
+		}
+		if host == "" {
+			host, _ = os.Hostname()
+			if host != "" && !warnedHostnameUsed {
+				log.Printf("[%s] @server.http.host not configured, using system "+
+					"hostname to configure external root: %s", wi.Name, host)
+				warnedHostnameUsed = true
+			}
+		}
+		if host == "" {
+			host = "localhost"
+			log.Printf("[%s] warning: no host configured for wiki nor default "+
+				"host on server. either set a default host in quiki.conf with "+
+				"@server.http.host, or set @host.wiki in wiki.conf", wi.Name)
+		}
+		port := ""
+		if Opts.Port != "80" {
+			port = ":" + Opts.Port
+		}
+		wi.Opt.Root.Ext = "http://" + path.Join(host+port, wi.Opt.Root.Wiki)
+	}
+}
+
+// loadWikiTemplate finds and loads the template for a wiki
+func loadWikiTemplate(wi *WikiInfo) error {
+	// if not configured, use default template
+	templateNameOrPath := wi.Opt.Template
+	if templateNameOrPath == "" {
+		templateNameOrPath = "default"
+	}
+
+	// find the template
+	var template wikiTemplate
+	var err error
+	if strings.Contains(templateNameOrPath, "/") {
+		// if a path is given, try to load the template at this exact path
+		template, err = loadTemplateAtPath(templateNameOrPath)
+	} else {
+		// otherwise, search template directories
+		template, err = findTemplate(templateNameOrPath)
+	}
+
+	// couldn't find it, or an error occurred in loading it
+	if err != nil {
+		return err
+	}
+	wi.template = template
+	return nil
+}
+
+// generateWikiLogo creates the logo for a wiki based on its template
+func generateWikiLogo(wi *WikiInfo) {
+	logoInfo := wi.template.manifest.Logo
+	logoName := wi.Opt.Logo
+	if logoName != "" && (logoInfo.Width != 0 || logoInfo.Height != 0) {
+		si := wiki.SizedImageFromName(logoName)
+		si.Width = logoInfo.Width
+		si.Height = logoInfo.Height
+		res := wi.DisplaySizedImageGenerate(si, true)
+		switch disp := res.(type) {
+		case wiki.DisplayImage:
+			wi.Logo = wi.Opt.Root.Image + "/" + disp.File
+		case wiki.DisplayRedirect:
+			wi.Logo = wi.Opt.Root.Image + "/" + disp.Redirect
+		default:
+			log.Printf("[%s] generate logo failed: %+v", wi.Name, res)
+		}
+	}
+}
+
+// updateWikiConfig updates the configuration parts of a wiki without touching routes.
+// this is used when rehashing an existing wiki to pick up config changes.
+func updateWikiConfig(wi *WikiInfo) error {
+	configureWikiRoots(wi)
+
+	if err := loadWikiTemplate(wi); err != nil {
+		return err
+	}
+
+	generateWikiLogo(wi)
+	return nil
 }
 
 // Shutdown gracefully shuts down the wiki and its services
