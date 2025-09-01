@@ -1,8 +1,29 @@
 # Running
 
-The `quiki` executable can be used for several different functions.
+## Choose a binary
 
-Please note: it is intended to be run as a non-super user.
+There are a few options to install and interact with quiki:
+
+- **`quiki`** (38MB) - the main executable includes the fully featured webserver
+  and admin panel as a standalone app, and can also be used for all CLI capabilities.
+- **`quiki-wiki`** (28MB) - provides CLI interface for wiki operations without server.
+- **`wikifier`** (15MB) - tiny binary to interact with the underlying quiki
+  language parser, providing page rendering only.
+
+The quiki executables have zero dependencies. All resources are embedded.
+
+### Install
+
+```sh
+go install github.com/cooper/quiki                  # full suite
+go install github.com/cooper/quiki/cli/quiki-wiki   # wiki cli
+go install github.com/cooper/quiki/cli/wikifier     # standalone renderer
+```
+
+Please note: quiki is intended to be run as a non-super user.
+
+All examples in documentation reference the `quiki` binary, but the syntax for the
+other binaries is the same.
 
 ## About the quiki dir
 
