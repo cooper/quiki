@@ -17,6 +17,8 @@ type Router struct {
 // Route represents a registered route with its handler and metadata.
 type Route struct {
 	Pattern     string
+	Host        string
+	Path        string
 	Description string
 	Handler     http.Handler
 	WikiName    string // for wiki-specific routes
@@ -48,15 +50,20 @@ func (r *Router) Handle(pattern, description string, handler http.Handler) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	host, path := parsePattern(pattern)
+
 	route := &Route{
 		Pattern:     pattern,
+		Host:        host,
+		Path:        path,
 		Description: description,
 		Handler:     handler,
 	}
 
 	// if pattern has no wildcards AND doesn't end with /, treat as static route for fast lookup
-	if !strings.Contains(pattern, "*") && !strings.Contains(pattern, ":") && !strings.HasSuffix(pattern, "/") {
-		r.static[pattern] = handler
+	// but only if there's no host component
+	if host == "" && !strings.Contains(path, "*") && !strings.Contains(path, ":") && !strings.HasSuffix(path, "/") {
+		r.static[path] = handler
 	} else {
 		r.routes[pattern] = route
 	}
@@ -100,10 +107,10 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	path := req.URL.Path
+	reqPath := req.URL.Path
 
 	// try exact match first (fastest)
-	if handler, exists := r.static[path]; exists {
+	if handler, exists := r.static[reqPath]; exists {
 		handler.ServeHTTP(w, req)
 		return
 	}
@@ -112,12 +119,19 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var bestMatch *Route
 	bestSpecificity := -1
 
-	for pattern, route := range r.routes {
-		if params := r.matchPattern(pattern, path); params != nil {
+	reqHost := req.Host
+
+	for _, route := range r.routes {
+		if r.matchRoute(route, reqHost, reqPath) {
 			// calculate specificity: longer patterns and exact matches are more specific
-			specificity := len(pattern)
-			if !strings.HasSuffix(pattern, "/") && !strings.HasSuffix(pattern, "/*") {
-				specificity += 1000 // exact matches are most specific
+			specificity := len(route.Path)
+			if route.Host != "" {
+				// host-specific routes are more specific
+				specificity += len(route.Host) + 100
+			}
+			if !strings.HasSuffix(route.Path, "/") && !strings.HasSuffix(route.Path, "/*") {
+				// exact matches are super specific
+				specificity += 1000
 			}
 
 			if specificity > bestSpecificity {
@@ -176,6 +190,53 @@ func (r *Router) matchPattern(pattern, path string) *Params {
 	}
 
 	return nil
+}
+
+func (r *Router) matchRoute(route *Route, reqHost, reqPath string) bool {
+	// check host match first
+	if route.Host != "" {
+		// strip port
+		host := reqHost
+		if idx := strings.Index(reqHost, ":"); idx != -1 {
+			host = reqHost[:idx]
+		}
+
+		if route.Host != host {
+			return false
+		}
+	}
+
+	// check path match
+	return r.matchPattern(route.Path, reqPath) != nil
+}
+
+// parsePattern splits a pattern into host and path components.
+// e.g. "example.com/api/" -> ("example.com", "/api/")
+// e.g. "/api/" -> ("", "/api/")
+func parsePattern(pattern string) (host, path string) {
+	// strip scheme
+	if strings.Contains(pattern, "://") {
+		if idx := strings.Index(pattern, "://"); idx != -1 {
+			pattern = pattern[idx+3:]
+		}
+	}
+
+	if idx := strings.Index(pattern, "/"); idx != -1 {
+		// host with path
+		host = pattern[:idx]
+		path = pattern[idx:]
+
+		if host == "" || strings.Contains(host, ":") {
+			host = ""
+			path = pattern
+		}
+	} else {
+		// no slash, treat as path
+		host = ""
+		path = pattern
+	}
+
+	return host, path
 }
 
 // Routes returns a list of all registered routes for debugging.
