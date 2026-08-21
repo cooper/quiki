@@ -83,7 +83,9 @@ func Configure() {
 	tmpl = template.Must(tmpl.ParseFS(resources.Shared, "template/*.tpl"))
 
 	// main handler
-	mux.HandleFunc(host+root, "adminifier root", handleRoot)
+	mux.HandleFunc(host+root, "adminifier root", func(w http.ResponseWriter, r *http.Request) {
+		handleRoot(&adminifierLoginRedirectWriter{ResponseWriter: w}, r)
+	})
 	mux.HandleFunc(host+root+"static/config.js", "adminifier config.js", handleConfigJS)
 	log.Println("registered adminifier root: " + host + root)
 
@@ -111,6 +113,26 @@ func Configure() {
 		log.Printf("%s%scopy+paste the above token%s into browser to claim your server", bold, yellow, reset)
 	}
 }
+
+// adminifierLoginRedirectWriter rewrites relative login redirects to absolute adminifier paths.
+type adminifierLoginRedirectWriter struct {
+	http.ResponseWriter
+}
+
+func (l *adminifierLoginRedirectWriter) WriteHeader(status int) {
+	if status >= 300 && status < 400 {
+		loc := l.ResponseWriter.Header().Get("Location")
+		if loc == "login" || strings.HasPrefix(loc, "login?") ||
+			loc == "./login" || strings.HasPrefix(loc, "./login?") {
+			if strings.HasPrefix(loc, "./") {
+				loc = strings.TrimPrefix(loc, "./")
+			}
+			l.ResponseWriter.Header().Set("Location", root+loc)
+		}
+	}
+	l.ResponseWriter.WriteHeader(status)
+}
+
 func setupStatic(efs fs.FS, staticRoot string) error {
 	subFS, err := fs.Sub(efs, "static")
 	if err != nil {
