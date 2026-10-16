@@ -57,9 +57,9 @@ func Configure() {
 	sessMgr = webserver.SessMgr
 	sessMgr.Cookie.SameSite = http.SameSiteStrictMode
 
-	if sessMgr.Cookie.Domain == "" {
-		sessMgr.Cookie.Path = root
-	}
+	// note: the session cookie keeps the default path "/". the session manager is
+	// shared with the webserver's own wiki login, so scoping the cookie to the
+	// adminifier root would stop wiki logins from being sent back on wiki pages.
 
 	permissionChecker = webserver.NewPermissionChecker(sessMgr)
 
