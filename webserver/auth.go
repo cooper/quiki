@@ -7,6 +7,8 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"net/url"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -489,6 +491,40 @@ type authTemplateData struct {
 	CSRFToken      string
 }
 
+// homeURL returns the absolute path of the wiki root.
+// Root.Wiki is empty for a wiki served at the host root.
+func (wi *WikiInfo) homeURL() string {
+	return path.Join("/", wi.Opt.Root.Wiki)
+}
+
+// authURL returns the absolute path of an auth route (login, logout, register).
+// Root.Wiki has no trailing slash, so the route can't simply be appended to it.
+func (wi *WikiInfo) authURL(route string) string {
+	return path.Join("/", wi.Opt.Root.Wiki, route)
+}
+
+// safeRedirect returns target if it is a path on this server, or fallback otherwise,
+// so that a crafted ?redirect= can't send a freshly logged in user off-site
+func safeRedirect(target, fallback string) string {
+
+	// control characters are stripped by browsers before parsing, so
+	// "/\t/evil.example" would become the scheme-relative "//evil.example"
+	for _, r := range target {
+		if r < 0x20 || r == 0x7f {
+			return fallback
+		}
+	}
+
+	// must parse as a plain absolute path with no scheme or host
+	u, err := url.Parse(target)
+	if err != nil || u.IsAbs() || u.Host != "" || u.User != nil ||
+		!strings.HasPrefix(u.Path, "/") ||
+		strings.HasPrefix(target, "//") || strings.HasPrefix(target, "/\\") {
+		return fallback
+	}
+	return target
+}
+
 // newAuthTemplateData creates base template data for auth pages
 func (wi *WikiInfo) newAuthTemplateData(pageTitle, heading string, r *http.Request) authTemplateData {
 	return authTemplateData{
@@ -498,9 +534,9 @@ func (wi *WikiInfo) newAuthTemplateData(pageTitle, heading string, r *http.Reque
 		SharedStatic:  "/shared",
 		PageTitle:     pageTitle,
 		Heading:       heading,
-		RegisterURL:   wi.Opt.Root.Wiki + "register",
-		LoginURL:      wi.Opt.Root.Wiki + "login",
-		HomeURL:       wi.Opt.Root.Wiki,
+		RegisterURL:   wi.authURL("register"),
+		LoginURL:      wi.authURL("login"),
+		HomeURL:       wi.homeURL(),
 		AllowRegister: wi.Opt.Auth.Register,
 		ShowLinks:     true,
 		CSRFToken:     getOrCreateCSRFToken(r),
@@ -540,7 +576,7 @@ func getWikiInfo(r *http.Request) *WikiInfo {
 func requireAuth(wi *WikiInfo, w http.ResponseWriter, r *http.Request) bool {
 	if wi.Opt.Auth.Require && !SessMgr.GetBool(r.Context(), "loggedIn") {
 		// redirect to login with current page as redirect target
-		loginURL := wi.Opt.Root.Wiki + "login?redirect=" + r.URL.Path
+		loginURL := wi.authURL("login") + "?redirect=" + url.QueryEscape(r.URL.RequestURI())
 		http.Redirect(w, r, loginURL, http.StatusFound)
 		return false // auth required, redirected
 	}
@@ -557,15 +593,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// if auth is not enabled, redirect to home
 	if !wi.Opt.Auth.Enable {
-		http.Redirect(w, r, wi.Opt.Root.Wiki, http.StatusFound)
+		http.Redirect(w, r, wi.homeURL(), http.StatusFound)
 		return
 	}
 
 	// get redirect target
-	redirect := r.URL.Query().Get("redirect")
-	if redirect == "" {
-		redirect = wi.Opt.Root.Wiki
-	}
+	redirect := safeRedirect(r.URL.Query().Get("redirect"), wi.homeURL())
 
 	// if already logged in, redirect
 	if SessMgr.GetBool(r.Context(), "loggedIn") {
@@ -645,7 +678,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	SessMgr.Remove(r.Context(), "wikiName")
 
 	// redirect to home
-	http.Redirect(w, r, wi.Opt.Root.Wiki, http.StatusFound)
+	http.Redirect(w, r, wi.homeURL(), http.StatusFound)
 }
 
 // handleRegister displays the registration form or processes registration attempts
@@ -664,7 +697,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	// if already logged in, redirect to home
 	if SessMgr.GetBool(r.Context(), "loggedIn") {
-		http.Redirect(w, r, wi.Opt.Root.Wiki, http.StatusFound)
+		http.Redirect(w, r, wi.homeURL(), http.StatusFound)
 		return
 	}
 
@@ -747,7 +780,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 func (wi *WikiInfo) showLoginForm(w http.ResponseWriter, r *http.Request, errorMsg, redirect string) {
 	data := wi.newAuthTemplateData("Login", "Welcome back", r)
 	data.Error = errorMsg
-	data.LoginAction = wi.Opt.Root.Wiki + "login?redirect=" + redirect
+	data.LoginAction = wi.authURL("login") + "?redirect=" + url.QueryEscape(redirect)
 
 	if err := wi.template.template.ExecuteTemplate(w, "login.tpl", data); err != nil {
 		log.Printf("failed to render login template: %v", err)
@@ -761,7 +794,7 @@ func (wi *WikiInfo) showRegisterForm(w http.ResponseWriter, r *http.Request, err
 	data.Error = errorMsg
 	data.Username = username
 	data.Email = email
-	data.RegisterAction = wi.Opt.Root.Wiki + "register"
+	data.RegisterAction = wi.authURL("register")
 
 	if err := wi.template.template.ExecuteTemplate(w, "register.tpl", data); err != nil {
 		log.Printf("failed to render register template: %v", err)
@@ -773,7 +806,7 @@ func (wi *WikiInfo) showRegisterForm(w http.ResponseWriter, r *http.Request, err
 func (wi *WikiInfo) showRegisterSuccess(w http.ResponseWriter, r *http.Request) {
 	data := wi.newAuthTemplateData("Register", "Join "+wi.Name, r)
 	data.Success = "Account created successfully! You can now log in."
-	data.RegisterAction = wi.Opt.Root.Wiki + "register"
+	data.RegisterAction = wi.authURL("register")
 
 	if err := wi.template.template.ExecuteTemplate(w, "register.tpl", data); err != nil {
 		log.Printf("failed to render register success template: %v", err)

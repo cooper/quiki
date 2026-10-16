@@ -207,7 +207,7 @@ func handleConfigJS(w http.ResponseWriter, r *http.Request) {
 func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	// if no users exist, redirect to create-user
 	if len(webserver.Auth.Users) == 0 {
-		http.Redirect(w, r, "create-user", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, root+"create-user", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -309,7 +309,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 	// if users exist, redirect to login
 	if len(webserver.Auth.Users) != 0 {
-		http.Redirect(w, r, "login", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -505,16 +505,18 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		redirect := strings.TrimPrefix(r.URL.Path, root)
+		loginURL := root + "login"
+
+		// come back to this page after logging in
+		redirect := "/" + strings.TrimPrefix(r.URL.Path, root)
 		if r.URL.RawQuery != "" {
-			redirect += url.QueryEscape("?" + r.URL.RawQuery)
+			redirect += "?" + r.URL.RawQuery
 		}
-		if redirect == "/" {
-			redirect = ""
-		} else if redirect != "" {
-			redirect = "?redirect=/" + redirect
+		if redirect != "/" {
+			loginURL += "?redirect=" + url.QueryEscape(redirect)
 		}
-		http.Redirect(w, r, root+"login"+redirect, http.StatusTemporaryRedirect)
+
+		http.Redirect(w, r, loginURL, http.StatusTemporaryRedirect)
 		return true
 	}
 	return false
