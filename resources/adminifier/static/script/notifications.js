@@ -10,7 +10,7 @@ var pingCount = 0;
 
 function pingServer () {
     new Request.JSON({
-        url:        'func/events',
+        url:        a.adminRoot + '/func/events',
         secure:     true,
         onSuccess:  function (data) {
             
@@ -104,7 +104,7 @@ function displayLoginWindow () {
 
     // if some error we can't deal with occurs, redirect to real login
     var giveUp = function () {
-        window.location = 'logout';
+        window.location = a.adminRoot + '/logout';
     };
 
     // attempt to login remotely
@@ -119,7 +119,7 @@ function displayLoginWindow () {
         inputs.each(function (i) { i.set('disabled', true); });
 
         var req = new Request.JSON({
-            url: 'func/login',
+            url: a.adminRoot + '/func/login',
             secure: true,
             onSuccess: function (data) {
                 
