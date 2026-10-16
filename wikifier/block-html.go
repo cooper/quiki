@@ -14,6 +14,7 @@ func (b *htmlBlock) html(page *Page, el element) {
 	for _, item := range b.posContent() {
 		content := item.content
 		if s, ok := content.(string); ok {
+			page.registerHTMLAnchors(s)
 			el.add(HTML(s))
 		} else {
 			el.add(content)

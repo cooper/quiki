@@ -151,6 +151,12 @@ func (w *Wiki) andCommit(wt *git.Worktree, comment string, commit CommitOpts) er
 			When:  commit.Time,
 		},
 	})
+	// nothing to commit means the change is already in the repository, e.g.
+	// the repository was only just created (which commits everything on
+	// disk) by the write that is now being committed
+	if err == git.ErrEmptyCommit {
+		return nil
+	}
 	if err != nil {
 		return errors.Wrap(err, "git:worktree:Commit")
 	}
@@ -315,8 +321,13 @@ func (w *Wiki) DeleteFile(name string, commit CommitOpts) error {
 		return err
 	}
 
-	// delete the file and commit the change
-	return w.removeAndCommit(path, commit)
+	// delete the file and commit the change.
+	// the worktree wants the path relative to the repository, like writeFile
+	relPath, err := filepath.Rel(w.Dir(), path)
+	if err != nil {
+		return errors.Wrap(err, "filepath:Rel")
+	}
+	return w.removeAndCommit(filepath.ToSlash(relPath), commit)
 }
 
 // DeletePage deletes a page file and triggers regeneration of referencing pages.
@@ -332,6 +343,11 @@ func (w *Wiki) DeletePage(name string, commit CommitOpts) error {
 	if err != nil {
 		return err
 	}
+
+	// the generated page and its search text are no longer valid
+	page := w.FindPage(name)
+	os.Remove(page.CachePath())
+	os.Remove(page.SearchPath())
 	return nil
 }
 
@@ -352,7 +368,22 @@ func (w *Wiki) DeleteImage(name string, commit CommitOpts) error {
 	if err != nil {
 		return err
 	}
-	return w.DeleteFile(relPath, commit)
+	if err := w.DeleteFile(relPath, commit); err != nil {
+		return err
+	}
+
+	// remove generated sizes of the image, e.g. 100x200-name.jpg and 100x200-name@2x.jpg
+	base := filepath.Base(name)
+	ext := filepath.Ext(base)
+	nameNE := strings.TrimSuffix(base, ext)
+	cacheDir := filepath.Join(w.Opt.Dir.Cache, "image", filepath.Dir(name))
+	for _, pattern := range []string{"*x*-" + base, "*x*-" + nameNE + "@*" + ext} {
+		matches, _ := filepath.Glob(filepath.Join(cacheDir, pattern))
+		for _, match := range matches {
+			os.Remove(match)
+		}
+	}
+	return nil
 }
 
 // GetLatestCommitHash returns the most recent commit hash.

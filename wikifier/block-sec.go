@@ -108,6 +108,7 @@ func (sec *secBlock) html(page *Page, el element) {
 		if n != 0 {
 			sec.headingID += "-" + strconv.Itoa(n)
 		}
+		page.anchors[sec.headingID] = true
 
 		// create the heading
 		h := el.createChild("h"+strconv.Itoa(level), typ)

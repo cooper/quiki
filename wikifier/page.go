@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -36,11 +37,13 @@ type Page struct {
 	sectionN     int
 	name         string
 	headingIDs   map[string]int
-	Wiki         any       // only available during Parse() and HTML()
-	Markdown     bool      // true if this is a markdown source
-	model        bool      // true if this is a model being generated
-	Warnings     []Warning // parser warnings
-	Error        *Warning  // parser error, as an encodable Warning
+	anchors      map[string]bool // section ids that exist on this page
+	sectionLinks []sectionLink   // links to sections on this page, checked once generated
+	Wiki         any             // only available during Parse() and HTML()
+	Markdown     bool            // true if this is a markdown source
+	model        bool            // true if this is a model being generated
+	Warnings     []Warning       // parser warnings
+	Error        *Warning        // parser error, as an encodable Warning
 	_html        HTML
 	_text        string
 	_preview     string
@@ -88,6 +91,7 @@ func NewPage(filePath string) *Page {
 		Models:        make(map[string]ModelInfo),
 		PageLinks:     make(map[string][]int),
 		headingIDs:    make(map[string]int),
+		anchors:       make(map[string]bool),
 		Markdown:      strings.HasSuffix(filePath, ".md"),
 	}
 }
@@ -200,8 +204,40 @@ func (p *Page) _parse() error {
 func (p *Page) HTML() HTML {
 	if p._html == "" {
 		p._html = generateBlock(p.main, p)
+		p.checkSectionLinks()
 	}
 	return p._html
+}
+
+// sectionLink is a link to a section on the same page
+type sectionLink struct {
+	id     string
+	pos    Position // position in this page's source
+	source string   // where the link really is, if it came from a model
+}
+
+// anchorRegex finds anchors in raw HTML, with or without the qa- prefix
+// that section headings use (quiki.js redirects #x to #qa-x)
+var anchorRegex = regexp.MustCompile(`(?:\bid|\bname)\s*=\s*["'](?:qa-)?([^"']+)["']`)
+
+// registerHTMLAnchors records anchors found in raw HTML so that links to
+// them are not reported as missing
+func (p *Page) registerHTMLAnchors(html string) {
+	for _, match := range anchorRegex.FindAllStringSubmatch(html, -1) {
+		p.anchors[match[1]] = true
+	}
+}
+
+// checkSectionLinks warns about links to sections that do not exist on this
+// page. it runs once the whole page is generated, since a link may point at a
+// section further down and models contribute both links and sections.
+func (p *Page) checkSectionLinks() {
+	for _, link := range p.sectionLinks {
+		if !p.anchors[link.id] {
+			p.warn(link.pos, "Link to section #"+link.id+" which does not exist on this page"+link.source)
+		}
+	}
+	p.sectionLinks = nil
 }
 
 // HTMLAndCSS generates and returns the HTML code for the page, including CSS.
