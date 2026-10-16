@@ -79,10 +79,10 @@ function displayDeleteConfirmation () {
             btn.removeClass('progress');
             btn.innerHTML = 'File deleted';
 
-            // redirect
+            // back to the file list
             setTimeout(function () {
-                window.location = a.adminRoot
-            }, 3000);
+                window.location = a.wikiRoot + '/' + (ae.isModel() ? 'models' : 'pages');
+            }, 1500);
         };
 
         var fail = function () {

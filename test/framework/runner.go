@@ -19,6 +19,7 @@ type TestCase struct {
 	Description string   `json:"description"`
 	Skip        bool     `json:"skip,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
+	Markdown    bool     `json:"markdown,omitempty"` // input is markdown rather than quiki source
 }
 
 // TestSuite groups related test cases
@@ -47,6 +48,8 @@ type SuiteResult struct {
 	Failed   int
 	Skipped  int
 }
+
+var mainClassRe = regexp.MustCompile(`<div class="q-main-[^"]* q-main">`)
 
 // Runner executes test suites
 type Runner struct {
@@ -120,8 +123,27 @@ func (r *Runner) runTest(test TestCase) TestResult {
 	}
 
 	// run quiki with the input
-	cmd := exec.Command(r.QuikiPath, "-i")
-	cmd.Stdin = strings.NewReader(test.Input)
+	var cmd *exec.Cmd
+	if test.Markdown {
+		// quiki -i only accepts quiki source; markdown is detected by the .md
+		// file extension, so write the input to a temporary file
+		f, err := os.CreateTemp("", "quiki-test-*.md")
+		if err != nil {
+			result.Error = fmt.Sprintf("failed to create temp file: %v", err)
+			return result
+		}
+		defer os.Remove(f.Name())
+		if _, err := f.WriteString(test.Input); err != nil {
+			f.Close()
+			result.Error = fmt.Sprintf("failed to write temp file: %v", err)
+			return result
+		}
+		f.Close()
+		cmd = exec.Command(r.QuikiPath, f.Name())
+	} else {
+		cmd = exec.Command(r.QuikiPath, "-i")
+		cmd.Stdin = strings.NewReader(test.Input)
+	}
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -129,8 +151,15 @@ func (r *Runner) runTest(test TestCase) TestResult {
 		return result
 	}
 
+	html := string(output)
+	if test.Markdown {
+		// a page rendered from a file carries an extra q-main-<name> class;
+		// normalize it so extractContent sees the same wrapper as -i output
+		html = mainClassRe.ReplaceAllString(html, `<div class="q-main">`)
+	}
+
 	// extract just the content from the html output
-	actual := r.extractContent(string(output))
+	actual := r.extractContent(html)
 	result.Actual = actual
 	result.Passed = (actual == test.Expected)
 	result.Duration = time.Since(start)

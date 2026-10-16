@@ -1,0 +1,55 @@
+{
+  "name": "markdown_source",
+  "description": "real markdown input (rendered from a .md file), focusing on backslash handling (quiki#22)",
+  "tests": [
+    {
+      "name": "md_paragraph_backslash",
+      "input": "a\\b and C:\\Users\\foo",
+      "expected": "a\\b and C:\\Users\\foo",
+      "markdown": true,
+      "description": "backslashes in paragraph text are preserved as-is"
+    },
+    {
+      "name": "md_paragraph_escaped_backslash",
+      "input": "a\\\\b",
+      "expected": "a\\b",
+      "markdown": true,
+      "description": "markdown \\\\ renders as a single backslash"
+    },
+    {
+      "name": "md_inline_code_backslash",
+      "input": "`a\\b`",
+      "expected": "<code>a\\b</code>",
+      "markdown": true,
+      "description": "backslash in inline code"
+    },
+    {
+      "name": "md_fenced_code_backslash",
+      "input": "```\na\\b\nc\\\\d\n```\n",
+      "expected": "<pre class=\"q-code chroma\"><span class=\"line\"><span class=\"cl\">a\\b </span></span><span class=\"line\"><span class=\"cl\">c\\\\d </span></span></pre>",
+      "markdown": true,
+      "description": "backslashes in fenced code block are not doubled"
+    },
+    {
+      "name": "md_fenced_code_braces",
+      "input": "```\nif (x) {\n  y\n}\n```\n",
+      "expected": "<pre class=\"q-code chroma\"><span class=\"line\"><span class=\"cl\">if (x) { </span></span><span class=\"line\"><span class=\"cl\"> y </span></span><span class=\"line\"><span class=\"cl\">} </span></span></pre>",
+      "markdown": true,
+      "description": "braces in fenced code block survive brace-escape"
+    },
+    {
+      "name": "md_html_block_backslash",
+      "input": "<p>a\\b</p>\n",
+      "expected": "<p>a\\b</p>",
+      "markdown": true,
+      "description": "backslash in HTML block is not doubled"
+    },
+    {
+      "name": "md_list_item_backslash",
+      "input": "- a\\b\n",
+      "expected": "<ul class=\"q-list\"> <li class=\"q-list-item\"> a\\b </li> </ul>",
+      "markdown": true,
+      "description": "backslash in list item"
+    }
+  ]
+}

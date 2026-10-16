@@ -170,6 +170,26 @@ func (r *QuikiRenderer) addAbsPrefix(link []byte) []byte {
 	return link
 }
 
+// bracesBalanced reports whether s can be placed verbatim inside a
+// brace-escaped block ({{ ... }}). The parser tracks brace depth within such
+// a block and terminates it as soon as the depth returns to zero, so every
+// '}' in s must be preceded by a matching '{', and every '{' must be closed.
+func bracesBalanced(s string) bool {
+	depth := 0
+	for _, r := range s {
+		switch r {
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth < 0 {
+				return false
+			}
+		}
+	}
+	return depth == 0
+}
+
 func codeLanguage(info []byte) string {
 	endOfLang := bytes.IndexAny(info, "\t ")
 	if endOfLang < 0 {
@@ -468,11 +488,21 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			break
 		}
 		r.cr(w)
-		r.addText(w, "~html {\n")
-		r.indent++
-		r.addText(w, utils.Esc(string(node.Literal)))
-		r.indent--
-		r.addText(w, "\n}")
+		html := string(node.Literal)
+		if bracesBalanced(html) {
+			// brace-escape; see CodeBlock below (quiki#22)
+			r.addText(w, "~html {{\n")
+			r.indent++
+			r.addText(w, html)
+			r.indent--
+			r.addText(w, "\n}}")
+		} else {
+			r.addText(w, "~html {\n")
+			r.indent++
+			r.addText(w, utils.Esc(html))
+			r.indent--
+			r.addText(w, "\n}")
+		}
 		r.cr(w)
 
 	// heading
@@ -637,17 +667,28 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 	case blackfriday.CodeBlock:
 		r.cr(w)
 
-		// TODO: count opening and closing brackets.
-		// if they match, use brace-escape rather than utils.Esc()
 		r.addText(w, "~code ")
 		if lang := codeLanguage(node.Info); lang != "" {
 			r.addText(w, "["+lang+"] ")
 		}
-		r.addText(w, "{\n")
-		r.indent++
-		r.addText(w, utils.Esc(string(node.Literal)))
-		r.indent--
-		r.addText(w, "}")
+		code := string(node.Literal)
+		if bracesBalanced(code) {
+			// brace-escape: the parser takes the contents verbatim, so no
+			// escaping is needed. this is preferred over utils.Esc() because
+			// code{} does not undo escapes, so an escaped backslash (\\)
+			// would be displayed as two backslashes (quiki#22)
+			r.addText(w, "{{\n")
+			r.indent++
+			r.addText(w, code)
+			r.indent--
+			r.addText(w, "}}")
+		} else {
+			r.addText(w, "{\n")
+			r.indent++
+			r.addText(w, utils.Esc(code))
+			r.indent--
+			r.addText(w, "}")
+		}
 
 		if node.Parent.Type != blackfriday.Item {
 			r.cr(w)

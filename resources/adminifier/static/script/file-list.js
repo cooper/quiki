@@ -959,8 +959,49 @@ exports.deleteSelected = function (but) {
     a.displayPopupBox(box, 40, but);
 }
 
+// delete the selected files, one request each so that each deletion is its
+// own commit, then reload the list
 function deleteFiles (fileNames) {
-    console.log("DeleteFiles", fileNames);
+    var deleteBut = $('file-delete-button');
+    deleteBut.addClass('progress');
+    deleteBut.innerHTML = 'Deleting...';
+
+    // func/delete-page, func/delete-model, or func/delete-image
+    var typ = a.data.nav.replace(/s$/, '');
+    var remaining = fileNames.slice(), failed = [];
+    var next = function () {
+        var file = remaining.shift();
+
+        // all done
+        if (typeof file == 'undefined') {
+            deleteBut.removeClass('progress');
+            if (failed.length) {
+                deleteBut.addClass('failure');
+                deleteBut.innerHTML = 'Failed to delete ' + failed.join(', ');
+                return;
+            }
+            deleteBut.addClass('success');
+            deleteBut.innerHTML = 'Deleted';
+            setTimeout(a.reloadFrame, 1000);
+            return;
+        }
+
+        var params = {};
+        params[typ == 'image' ? 'image' : 'page'] = file;
+        new Request.JSON({
+            url: 'func/delete-' + typ,
+            onSuccess: function (data) {
+                if (!data.success)
+                    failed.push(file);
+                next();
+            },
+            onFailure: function () {
+                failed.push(file);
+                next();
+            }
+        }).post(params);
+    };
+    next();
 }
 
 })(adminifier, window);
