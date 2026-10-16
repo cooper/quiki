@@ -14,9 +14,9 @@ type styleBlock struct {
 }
 
 type styleEntry struct {
-	mainID        string
-	applyToParent bool
-	applyTo       [][]string
+	parent        element    // the element the style{} block belongs to
+	applyToParent bool       // apply the rules to the parent itself
+	applyTo       [][]string // matcher sets applied to descendants of the parent
 	rules         map[string]string
 }
 
@@ -113,29 +113,17 @@ func (sb *styleBlock) html(page *Page, el element) {
 	// my $parent_el = $block->parent->element;
 	parentEl := sb.parentBlock().el()
 
-	// set an id on the parent el like blocktype-pagename-n
-	page._styleId++
-	parentEl.setId(page.NameNE() + "-" + strconv.Itoa(page._styleId))
-
-	// # add other things, if any.
-	// foreach my $item (@{ $style{apply_to} }) {
-	//     unshift @$item, $parent_el->{id};
-	//     push @apply, $item;
-	// }
-	for i, item := range style.applyTo {
-		item = append([]string{parentEl.id()}, item...)
-		style.applyTo[i] = item
+	// make sure the parent el has an id like pagename-n so the CSS can refer to it.
+	// keep an existing id (e.g. the main block's, or one set by a previous style{}
+	// on the same parent) so that every style targeting this element agrees on it.
+	if parentEl.id() == "" {
+		page._styleId++
+		parentEl.setId(page.elementIDPrefix() + "-" + strconv.Itoa(page._styleId))
 	}
 
-	// # if we're applying to main, add that to the front
-	//     push @apply, [ $parent_el->{id} ] if $style{apply_to_parent};
-	if style.applyToParent {
-		style.applyTo = append([][]string{{parentEl.id()}}, style.applyTo...)
-	}
-
-	// $style{main_el}  = $parent_el->{id};
-	// $style{apply_to} = \@apply;
-	style.mainID = parentEl.id()
+	// the selectors are built from the parent element when the CSS is
+	// generated, so that they use whatever id it ends up with
+	style.parent = parentEl
 
 	// push @{ $page->{styles} ||= [] }, \%style;
 	page.styles = append(page.styles, style)
