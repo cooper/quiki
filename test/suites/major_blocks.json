@@ -19,8 +19,8 @@
     },
     {
       "name": "style block",
-      "input": "style {\n  body { color: red; }\n}",
-      "expected": "<div class=\"q-main--1 q-main\">"
+      "input": "style {\n  color: red;\n}",
+      "expected": "<style> .q-main--1 { color: red; } </style> <div class=\"q-main--1 q-main\">"
     },
     {
       "name": "infobox basic",
