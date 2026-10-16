@@ -104,6 +104,19 @@ func (r *Router) RemoveWiki(wikiName string) {
 
 // ServeHTTP implements the http.Handler interface.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	handler := r.lookup(req)
+	if handler == nil {
+		http.NotFound(w, req)
+		return
+	}
+	handler.ServeHTTP(w, req)
+}
+
+// lookup finds the handler for a request. the lock is held only for the lookup,
+// never while the handler runs: handlers such as create-wiki and create-user
+// rehash the server, which registers routes and needs the write lock, so
+// holding the read lock across the handler would deadlock the whole server.
+func (r *Router) lookup(req *http.Request) http.Handler {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -111,8 +124,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// try exact match first (fastest)
 	if handler, exists := r.static[reqPath]; exists {
-		handler.ServeHTTP(w, req)
-		return
+		return handler
 	}
 
 	// collect all matching routes and find the most specific one
@@ -142,12 +154,9 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if bestMatch != nil {
-		bestMatch.Handler.ServeHTTP(w, req)
-		return
+		return bestMatch.Handler
 	}
-
-	// no route found
-	http.NotFound(w, req)
+	return nil
 }
 
 // matchPattern checks if a path matches a pattern and extracts parameters.
