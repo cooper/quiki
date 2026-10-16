@@ -12,19 +12,28 @@
 
 {{ $sites := .WikiDelimeter }}
 
-{{if not .Wikis}}
+{{if not .Configured}}
     No sites exist yet.
 {{else}}
     <h2>Available Sites</h2>
-    <ul>
-    {{range $shortcode, $wi := .Wikis}}
-        <li>
-            {{$wi.Title}} -
-            <a href="{{$sites}}{{$shortcode}}">
-                <i class="fa fa-edit"></i>
-            </a>
-            <a href="{{$wi.Opt.Root.Ext}}" target="_blank">
-                <i class="fa fa-globe-americas"></i>
+    <ul class="site-list">
+    {{range .Configured}}
+        {{$name := .Name}}
+        <li class="site {{if .Enabled}}site-enabled{{else}}site-disabled{{end}}">
+            {{with index $.Wikis .Name}}
+                {{.Title}} -
+                <a href="{{$sites}}{{$name}}" title="Manage">
+                    <i class="fa fa-edit"></i>
+                </a>
+                <a href="{{.Opt.Root.Ext}}" target="_blank" title="Visit">
+                    <i class="fa fa-globe-americas"></i>
+                </a>
+            {{else}}
+                {{$name}} <em>(disabled)</em>
+            {{end}}
+            <a href="#" class="site-toggle" title="{{if .Enabled}}Disable{{else}}Enable{{end}} this site"
+               onclick="toggleSite({{$name}}, {{not .Enabled}}); return false;">
+                <i class="fa {{if .Enabled}}fa-toggle-on{{else}}fa-toggle-off{{end}}"></i>
             </a>
         </li>
     {{end}}

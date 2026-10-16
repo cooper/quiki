@@ -285,6 +285,11 @@ function frameLoad (page) {
     request.get();
 }
 
+// reload the current frame
+a.reloadFrame = function () {
+    loadURL();
+};
+
 // extract the page from the current URL and load it
 function loadURL() {
     var loc = window.location.pathname;

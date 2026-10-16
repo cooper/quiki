@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -106,12 +107,34 @@ func Rehash() error {
 		}
 	}
 
-	// check if we have any wikis after rehashing
+	// having no enabled wikis is a valid (if unusual) state
 	if len(Wikis) == 0 {
-		return errors.New("rehash: none of the configured wikis are enabled")
+		log.Println("rehash: none of the configured wikis are enabled")
 	}
 
 	return nil
+}
+
+// WikiConfig describes a wiki in the server configuration, enabled or not.
+type WikiConfig struct {
+	Name    string
+	Enabled bool
+}
+
+// ConfiguredWikis returns every wiki in the server configuration, sorted by name.
+func ConfiguredWikis() []WikiConfig {
+	found, _ := Conf.Get("server.wiki")
+	wikiMap, ok := found.(*wikifier.Map)
+	if !ok {
+		return nil
+	}
+	var wikis []WikiConfig
+	for _, name := range wikiMap.Keys() {
+		enabled, _ := Conf.GetBool("server.wiki." + name + ".enable")
+		wikis = append(wikis, WikiConfig{Name: name, Enabled: enabled})
+	}
+	sort.Slice(wikis, func(i, j int) bool { return wikis[i].Name < wikis[j].Name })
+	return wikis
 }
 
 // RehashWiki reloads configuration and reinitializes a specific wiki.
