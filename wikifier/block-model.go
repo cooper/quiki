@@ -1,6 +1,9 @@
 package wikifier
 
-import "path/filepath"
+import (
+	"os"
+	"path/filepath"
+)
 
 type modelBlock struct {
 	modelName   string
@@ -17,10 +20,17 @@ func newModelBlock(name string, b *parserBlock) block {
 func (mb *modelBlock) parse(page *Page) {
 	mb.Map.parse(page)
 
-	// remember that the page uses this model
+	// remember that the page uses this model.
+	// a model is written in quiki markup (name.model) or markdown (name.md)
 	name := mb.blockName()
 	file := ModelName(name)
 	path := pageAbs(filepath.Join(page.Opt.Dir.Model, file))
+	if _, err := os.Stat(path); err != nil {
+		if mdFile := PageNameExt(name, ".md"); fileExists(filepath.Join(page.Opt.Dir.Model, mdFile)) {
+			file = mdFile
+			path = pageAbs(filepath.Join(page.Opt.Dir.Model, file))
+		}
+	}
 
 	// create page
 	model := NewPage(path)

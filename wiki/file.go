@@ -173,13 +173,16 @@ func (w *Wiki) allCategoryFiles(catType CategoryType) []string {
 	return files
 }
 
+// models may be written in quiki markup (.model) or markdown (.md)
+var modelExtensions = []string{"model", "md"}
+
 func (w *Wiki) allModelFiles() []string {
-	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Model, []string{"model"}, false)
+	files, _ := wikifier.UniqueFilesInDir(w.Opt.Dir.Model, modelExtensions, false)
 	return files
 }
 
 func (w *Wiki) modelFilesInDir(where string) []string {
-	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Model, where), []string{"model"}, true)
+	files, _ := wikifier.UniqueFilesInDir(filepath.Join(w.Opt.Dir.Model, where), modelExtensions, true)
 	return files
 }
 

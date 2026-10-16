@@ -414,3 +414,9 @@ func ScaleString(name string, retina []int) string {
 
 	return strings.Join(scales, ", ")
 }
+
+// fileExists is true if a regular file (or symlink to one) exists at path
+func fileExists(path string) bool {
+	fi, err := os.Stat(path)
+	return err == nil && !fi.IsDir()
+}
