@@ -403,9 +403,9 @@ func Configure(_initial_options Options) {
 		log.Fatal(errors.Wrap(err, "loading embedded templates"))
 	}
 
-	// add shared templates
+	// shared templates (auth-base.tpl), parsed into every theme
 	if sub, err := fs.Sub(resources.Shared, "template"); err == nil {
-		templateFses = append(templateFses, sub)
+		sharedTemplateFs = sub
 	} else {
 		log.Fatal(errors.Wrap(err, "loading shared templates"))
 	}

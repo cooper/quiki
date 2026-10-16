@@ -1,6 +1,9 @@
 package wikifier
 
-import "path/filepath"
+import (
+	"path/filepath"
+	"slices"
+)
 
 type modelBlock struct {
 	modelName   string
@@ -92,7 +95,29 @@ func (mb *modelBlock) html(page *Page, mbEl element) {
 	// these properties are set just incase @model.tags is true
 	// FIXME: need to remove q-main
 	mainEl.addClass("model", "model-"+mb.modelName)
-	mainEl.setId(mb.modelName)
+
+	// styles are collected on the page being generated, which inside the
+	// model was the model itself. hand them up to the page that uses the model
+	// so they make it into its CSS. a style{} at the top level of the model
+	// targets the model's main element, so that element has to be rendered
+	// for the style to have any effect, regardless of @model.tags.
+	for _, style := range model.styles {
+		if style.parent == mainEl {
+			mb.includeTags = true
+		}
+	}
+	page.styles = append(page.styles, model.styles...)
+
+	// static styles (e.g. the syntax highlighting stylesheet) are shared,
+	// so don't repeat them for every model instance
+	for _, static := range model.staticStyles {
+		if !slices.Contains(page.staticStyles, static) {
+			page.staticStyles = append(page.staticStyles, static)
+		}
+	}
+	if model.codeStyles {
+		page.codeStyles = true
+	}
 
 	// disable tags on the main block element also unless @model.tags
 	if !mb.includeTags {

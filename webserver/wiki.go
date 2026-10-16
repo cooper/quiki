@@ -28,6 +28,18 @@ type WikiInfo struct {
 	*wiki.Wiki
 }
 
+// PurgeCache removes the wiki's generated page and image caches and, when
+// pregeneration is enabled, queues everything to be generated again.
+func (wi *WikiInfo) PurgeCache() error {
+	if err := wi.Wiki.PurgeCache(); err != nil {
+		return err
+	}
+	if wi.pregenerateManager != nil {
+		wi.pregenerateManager.RequeueAllContent()
+	}
+	return nil
+}
+
 // Wikis is all wikis served by this webserver.
 var Wikis map[string]*WikiInfo
 

@@ -5,8 +5,6 @@ import (
 	"log"
 	"sync"
 	"time"
-
-	"github.com/cooper/imaging"
 )
 
 // AutoImageProcessor tries processors in order: libvips -> imagemagick -> pure go
@@ -144,25 +142,7 @@ func (c *AutoImageProcessor) ResizeImageDirect(inputPath, outputPath string, wid
 	c.stats.PureGoUsed++
 	c.mu.Unlock()
 
-	return c.resizeWithPureGo(inputPath, outputPath, width, height)
-}
-
-// resizeWithPureGo handles file-to-file resize using pure go (loads into memory)
-func (c *AutoImageProcessor) resizeWithPureGo(inputPath, outputPath string, width, height int) error {
-	// load image into memory (only for pure go fallback)
-	img, err := c.pureGo.safeImageOpen(inputPath)
-	if err != nil {
-		return fmt.Errorf("failed to open image: %v", err)
-	}
-
-	// resize in memory
-	resized, err := c.pureGo.safeImageResize(img, width, height)
-	if err != nil {
-		return fmt.Errorf("failed to resize image: %v", err)
-	}
-
-	// save to output file
-	return imaging.Save(resized, outputPath)
+	return c.pureGo.ResizeImageDirect(inputPath, outputPath, width, height, quality)
 }
 
 // GetStats returns processor usage statistics
@@ -172,8 +152,21 @@ func (c *AutoImageProcessor) GetStats() ProcessorStats {
 	return c.stats
 }
 
-// GetImageProcessorForWiki returns a processor configured for a specific wiki
+// GetImageProcessorForWiki returns the processor for a wiki, creating it on first use.
+// the processor is kept for the life of the wiki so that its concurrency limits are
+// actually shared between requests; a fresh processor per request would give each
+// request its own limit, which is to say no limit at all.
 func GetImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
+	w.imageProcMu.Lock()
+	defer w.imageProcMu.Unlock()
+	if w.imageProc == nil {
+		w.imageProc = newImageProcessorForWiki(w)
+	}
+	return w.imageProc
+}
+
+// newImageProcessorForWiki creates a processor configured for a specific wiki
+func newImageProcessorForWiki(w *Wiki) ImageProcessorInterface {
 	// check what processor is configured
 	processor := w.Opt.Image.Processor
 	if processor == "" {
