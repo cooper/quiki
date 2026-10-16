@@ -1,6 +1,7 @@
 package wikifier
 
 import (
+	"fmt"
 	"path/filepath"
 	"slices"
 )
@@ -91,6 +92,23 @@ func (mb *modelBlock) html(page *Page, mbEl element) {
 	// which never has tags
 	mbEl.setMeta("noTags", true)
 	mbEl.addChild(mainEl)
+
+	// the model's sections and section links belong to the page it is
+	// rendered into: a page may link to a section in a model and vice versa
+	for id := range model.anchors {
+		page.anchors[id] = true
+	}
+
+	// a warning about a model's link is reported at the model{} block in the
+	// page, since that is what the position refers to in the page's source,
+	// and says where in the model the link is
+	for _, link := range model.sectionLinks {
+		if link.source == "" {
+			link.source = fmt.Sprintf(" (in model $%s at %d:%d)", mb.modelName, link.pos.Line, link.pos.Column)
+		}
+		link.pos = mb.openPos
+		page.sectionLinks = append(page.sectionLinks, link)
+	}
 
 	// these properties are set just incase @model.tags is true
 	// FIXME: need to remove q-main

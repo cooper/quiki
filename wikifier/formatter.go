@@ -695,6 +695,13 @@ func parseLink(b block, link string, o *FmtOpt) (ok bool, target, linkType, tool
 
 	linkType, target, tooltip, displayDefault, handler := determineLinkType(b, target, displayDefault)
 
+	// remember links to sections on this page so they can be checked
+	// against the headings once the whole page has been generated
+	if linkType == "internal" && strings.HasPrefix(target, "#") {
+		p := b.page()
+		p.sectionLinks = append(p.sectionLinks, sectionLink{id: strings.TrimPrefix(target, "#"), pos: o.Pos})
+	}
+
 	// let page options modify the link
 	if handler != nil {
 		handler(b.page(), &PageOptLinkOpts{
