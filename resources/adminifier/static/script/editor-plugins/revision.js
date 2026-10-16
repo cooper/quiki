@@ -78,13 +78,18 @@ function displayRevisionViewer () {
         ae.displayPopupBox(box, 'auto', li);
     };
 
-    // request revision history
+    // request revision history.
+    // onError fires when the response is not JSON (e.g. an expired session
+    // redirected us to the login page); without it the li would stay sticky.
     var req = new Request.JSON({
         url: 'func/page-revisions' + (ae.isModel() ? '?model' : ''),
         onSuccess: finish,
         onFailure: function () {
             finish({ error: 'Failed to fetch revision history' });
         },
+        onError: function () {
+            finish({ error: 'Failed to fetch revision history (not logged in?)' });
+        }
     }).post({
         page: ae.getFilename()
     });
@@ -167,22 +172,38 @@ function handleDiffClick (box, row, e) {
 // DIFF VIEWER
 
 function displayDiffViewer (box, from, to, message, which) {
+
+    // keep the revision pane open while the diff is loading and displayed.
+    // every exit path below must call unstick(), or the pane can never be closed.
+    // a previous unstick timer is cancelled so that two diffs in quick succession
+    // don't let the pane close while the later one's window is still open.
+    clearTimeout(box.retrieve('unstickTimer'));
     box.addClass('sticky');
+    var unstick = function () {
+        clearTimeout(box.retrieve('unstickTimer'));
+        box.store('unstickTimer', setTimeout(function () {
+            box.removeClass('sticky');
+        }, 100));
+    };
+
     var finish = function (data) {
-        
+
         // something wrong happened
         if (!data.success) {
+            unstick();
             alert(data.error);
             return;
         }
-        
+
         // no differences
         if (typeof data.diff == 'undefined') {
+            unstick();
             alert('No changes');
             return;
         }
         
-        // run diff2html
+        // run diff2html. if it throws (e.g. diff2html failed to load),
+        // give the pane back rather than leaving it stuck.
         var diffHTML, diffWindow;
         var runDiff = function (split) {
             diffHTML = Diff2Html.getPrettyHtml(data.diff, {
@@ -190,7 +211,14 @@ function displayDiffViewer (box, from, to, message, which) {
             });
             if (diffWindow) diffWindow.content.innerHTML = diffHTML;
         };
-        runDiff();
+        try {
+            runDiff();
+        }
+        catch (e) {
+            unstick();
+            alert('Failed to render diff: ' + e);
+            return;
+        }
         
         // create a modal window to show the diff in
         diffWindow = new ModalWindow({
@@ -202,9 +230,7 @@ function displayDiffViewer (box, from, to, message, which) {
             doneText:       'Done',
             id:             'editor-diff-window',
             autoDestroy:    true,
-            onDone:         function () {
-                setTimeout(function () { box.removeClass('sticky'); }, 100);
-            },
+            onDone:         unstick,
         });
         
         // switch modes
@@ -224,13 +250,17 @@ function displayDiffViewer (box, from, to, message, which) {
         diffWindow.show();
     };
 
-    // request revision history
+    // request the diff. onError fires when the response is not JSON
+    // (e.g. an expired session redirected us to the login page).
     var req = new Request.JSON({
         url: 'func/page-diff' + (ae.isModel() ? '?model' : ''),
         onSuccess: finish,
         onFailure: function () {
             finish({ error: 'Failed to fetch page diff' });
         },
+        onError: function () {
+            finish({ error: 'Failed to fetch page diff (not logged in?)' });
+        }
     }).post({
         page: ae.getFilename(),
         from: from,

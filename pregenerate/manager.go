@@ -443,6 +443,16 @@ func (m *Manager) generateImageDirect(imageName string) any {
 }
 
 // QueueAllContentAtStartup discovers and queues all pages and images for background pregeneration
+// RequeueAllContent forgets what has been generated so far and queues every
+// page and image for background regeneration, e.g. after the cache was purged
+func (m *Manager) RequeueAllContent() {
+	m.mu.Lock()
+	m.completedPages = make(map[string]bool)
+	m.completedImages = make(map[string]bool)
+	m.mu.Unlock()
+	m.QueueAllContentAtStartup()
+}
+
 func (m *Manager) QueueAllContentAtStartup() {
 	// always log this important startup activity
 	m.debug("pregenerate: discovering and queuing all content for background pregeneration")

@@ -211,6 +211,15 @@ func footnoteReturnLink(prefix, returnLink string, slug []byte) []byte {
 	return []byte(fmt.Sprintf(format, prefix, slug, returnLink))
 }
 
+// escListItem escapes the text of a list item. terms of a definition list
+// become map keys, so the colon has to be escaped in them too.
+func escListItem(item *blackfriday.Node, s string) string {
+	if item.ListFlags&blackfriday.ListTypeTerm != 0 {
+		return utils.EscMapKey(s)
+	}
+	return utils.EscListMapValue(s)
+}
+
 func skipParagraphTags(node *blackfriday.Node) bool {
 	grandparent := node.Parent.Parent
 	if grandparent == nil || grandparent.Type != blackfriday.List {
@@ -300,9 +309,9 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 		if node.Parent.Type == blackfriday.Link {
 			r.addText(w, utils.EscLink(s))
 		} else if node.Parent.Type == blackfriday.Paragraph && node.Parent.Parent.Type == blackfriday.Item {
-			r.addText(w, utils.EscListMapValue(s))
+			r.addText(w, escListItem(node.Parent.Parent, s))
 		} else if node.Parent.Type == blackfriday.Item {
-			r.addText(w, utils.EscListMapValue(s))
+			r.addText(w, escListItem(node.Parent, s))
 		} else if node.Parent.Type == blackfriday.Heading {
 			r.heading += s
 			r.addText(w, utils.EscFmt(s))
@@ -583,6 +592,11 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			r.indent++
 		} else {
 			r.indent--
+
+			// the last entry of a definition list is still open
+			if node.ListFlags&blackfriday.ListTypeDefinition != 0 && node.FirstChild != nil {
+				r.addText(w, ";")
+			}
 			r.addText(w, "\n}")
 			// if node.Parent.Type == blackfriday.Item && node.Next != nil {
 			// 	r.cr(w)
@@ -595,8 +609,31 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			}
 		}
 	case blackfriday.Item:
+		inDefinitions := node.Parent.ListFlags&blackfriday.ListTypeDefinition != 0
+		isTerm := node.ListFlags&blackfriday.ListTypeTerm != 0
 		if entering {
-			r.cr(w)
+			switch {
+
+			// a term starts a new "term: definition;" entry,
+			// so the previous entry ends here
+			case isTerm:
+				if node.Prev != nil {
+					r.addText(w, ";")
+				}
+				r.cr(w)
+
+			// a definition follows its term; further definitions
+			// of the same term are joined onto it
+			case inDefinitions:
+				if node.Prev != nil && node.Prev.ListFlags&blackfriday.ListTypeTerm == 0 {
+					r.addText(w, " [br] ")
+				} else {
+					r.addText(w, " ")
+				}
+
+			default:
+				r.cr(w)
+			}
 		} else {
 			// if node.ListData.RefLink != nil {
 			// 	slug := slugify(node.ListData.RefLink)
@@ -604,7 +641,14 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 			// 		r.out(w, footnoteReturnLink(r.FootnoteAnchorPrefix, r.FootnoteReturnLinkContents, slug))
 			// 	}
 			// }
-			r.addText(w, ";")
+			switch {
+			case isTerm:
+				r.addText(w, ":")
+			case inDefinitions:
+				// ended by the next term or the end of the list
+			default:
+				r.addText(w, ";")
+			}
 		}
 
 	// code block
