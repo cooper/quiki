@@ -285,6 +285,25 @@ function frameLoad (page) {
     request.get();
 }
 
+// resolve a window redirect target from a frame response.
+// relative targets are resolved against the adminifier root rather than the
+// window location, since the window may be several levels deep (e.g. a file
+// list subdirectory) while the target is a top-level route like 'login'.
+// when sent to the login page, pass along the current location so the user
+// comes back here after logging in.
+function resolveWindowRedirect (target) {
+    if (!/^(?:[a-z][a-z0-9+.\-]*:)?\/\//i.test(target) && target.charAt(0) != '/')
+        target = adminifier.adminRoot + '/' + target;
+    if (target == adminifier.adminRoot + '/login') {
+        var here = window.location.pathname + window.location.search;
+        if (here.indexOf(adminifier.adminRoot) == 0)
+            here = here.substr(adminifier.adminRoot.length);
+        if (here.length && here != '/')
+            target += '?redirect=' + encodeURIComponent(here);
+    }
+    return target;
+}
+
 // extract the page from the current URL and load it
 function loadURL() {
     var loc = window.location.pathname;
@@ -454,6 +473,7 @@ function handlePageData (page, data) {
     // window redirect
     var target = data.wredirect;
     if (target) {
+        target = resolveWindowRedirect(target);
         console.log('Redirecting to ' + target);
         window.location = target;
         return;

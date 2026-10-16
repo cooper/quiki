@@ -22,6 +22,8 @@ type Wiki struct {
 	pageLocksmu    sync.RWMutex
 	imageLocks     map[string]*sync.Mutex // locks for image generation
 	imageLocksmu   sync.RWMutex
+	imageProc      ImageProcessorInterface // shared image processor, created on first use
+	imageProcMu    sync.Mutex
 	pregenerating  bool
 	checks         []Check
 	checkMu        sync.Mutex

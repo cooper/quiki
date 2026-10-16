@@ -68,5 +68,5 @@ func handleCreateWiki(w http.ResponseWriter, r *http.Request) {
 	initWikis()
 
 	// redirect to the root
-	http.Redirect(w, r, "../", http.StatusSeeOther)
+	http.Redirect(w, r, root, http.StatusSeeOther)
 }

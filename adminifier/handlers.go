@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/cooper/quiki/authenticator"
 	"github.com/cooper/quiki/router"
@@ -207,7 +208,7 @@ func handleConfigJS(w http.ResponseWriter, r *http.Request) {
 func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	// if no users exist, redirect to create-user
 	if len(webserver.Auth.Users) == 0 {
-		http.Redirect(w, r, "create-user", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, root+"create-user", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -309,7 +310,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 	// if users exist, redirect to login
 	if len(webserver.Auth.Users) != 0 {
-		http.Redirect(w, r, "login", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, root+"login", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -346,12 +347,19 @@ func handleCreateUserPage(w http.ResponseWriter, r *http.Request) {
 	handleTemplate(w, r, data)
 }
 
+// createUserMu serialises first-user creation so that two requests carrying the
+// setup token can't both pass the "no users yet" check and both create a user
+var createUserMu sync.Mutex
+
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// missing parameters or malformed request
 	if !parsePost(w, r, "display", "email", "username", "password", "token") {
 		return
 	}
+
+	createUserMu.Lock()
+	defer createUserMu.Unlock()
 
 	// for now, you can only create a user if none exist
 	// not authorized otherwise
@@ -378,7 +386,33 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// remove the token from config
+	// create user using the modern interface
+	username := r.Form.Get("username")
+	user, err := webserver.Auth.CreateUser(username, r.Form.Get("password"))
+
+	// error occurred
+	if err != nil {
+		status := http.StatusInternalServerError
+		if errors.Is(err, authenticator.ErrWeakPassword) || errors.Is(err, authenticator.ErrInvalidUsername) {
+			status = http.StatusBadRequest
+		}
+		http.Error(w, err.Error(), status)
+		return
+	}
+
+	// set admin details on the created user
+	user.DisplayName = r.Form.Get("display")
+	user.Email = r.Form.Get("email")
+	user.Permissions = []string{"read.*", "write.*"} // first user gets full admin permissions
+	err = webserver.Auth.UpdateUser(username, user)
+	if err != nil {
+		http.Error(w, "failed to set user details: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// the user exists now, so the one-time token has done its job. this must
+	// come after user creation: removing it first and then failing (e.g. on a
+	// weak password) would leave the server with no users and no way to claim it.
 	err = webserver.Conf.Unset("adminifier.token")
 	if err != nil {
 		http.Error(w, "unsetting token in config: "+err.Error(), http.StatusInternalServerError)
@@ -394,26 +428,6 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	err = webserver.Rehash()
 	if err != nil {
 		http.Error(w, "rehash server: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// create user using the modern interface
-	username := r.Form.Get("username")
-	user, err := webserver.Auth.CreateUser(username, r.Form.Get("password"))
-
-	// error occurred
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// set admin details on the created user
-	user.DisplayName = r.Form.Get("display")
-	user.Email = r.Form.Get("email")
-	user.Permissions = []string{"read.*", "write.*"} // first user gets full admin permissions
-	err = webserver.Auth.UpdateUser(username, user)
-	if err != nil {
-		http.Error(w, "failed to set user details: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -505,16 +519,18 @@ func parsePost(w http.ResponseWriter, r *http.Request, required ...string) bool 
 func redirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// if not logged in, temp redirect to login page
 	if !sessMgr.GetBool(r.Context(), "loggedIn") {
-		redirect := strings.TrimPrefix(r.URL.Path, root)
+		loginURL := root + "login"
+
+		// come back to this page after logging in
+		redirect := "/" + strings.TrimPrefix(r.URL.Path, root)
 		if r.URL.RawQuery != "" {
-			redirect += url.QueryEscape("?" + r.URL.RawQuery)
+			redirect += "?" + r.URL.RawQuery
 		}
-		if redirect == "/" {
-			redirect = ""
-		} else if redirect != "" {
-			redirect = "?redirect=/" + redirect
+		if redirect != "/" {
+			loginURL += "?redirect=" + url.QueryEscape(redirect)
 		}
-		http.Redirect(w, r, root+"login"+redirect, http.StatusTemporaryRedirect)
+
+		http.Redirect(w, r, loginURL, http.StatusTemporaryRedirect)
 		return true
 	}
 	return false
