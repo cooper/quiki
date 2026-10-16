@@ -26,9 +26,11 @@ var adminUnauthenticatedHandlers = map[string]func(w http.ResponseWriter, r *htt
 }
 
 var adminUnauthenticatedFuncHandlers = map[string]func(w http.ResponseWriter, r *http.Request){
-	"login":       handleLogin,
-	"create-user": handleCreateUser,
-	"create-wiki": handleCreateWiki,
+	"login":        handleLogin,
+	"create-user":  handleCreateUser,
+	"create-wiki":  handleCreateWiki,
+	"enable-wiki":  handleEnableWiki,
+	"disable-wiki": handleDisableWiki,
 }
 
 // todo: separate authenticated func handlers
@@ -463,12 +465,14 @@ func handleSitesFrame(ar *adminRequest) {
 
 	ar.dot = struct {
 		Wikis         map[string]*webserver.WikiInfo
+		Configured    []webserver.WikiConfig
 		Templates     []string
 		BaseWikis     []string
 		WikiDelimeter string
 		adminTemplate
 	}{
 		Wikis:         webserver.Wikis,
+		Configured:    webserver.ConfiguredWikis(),
 		Templates:     webserver.TemplateNames(),
 		BaseWikis:     wiki.AvailableBaseWikis(),
 		WikiDelimeter: wikiDelimeter,
