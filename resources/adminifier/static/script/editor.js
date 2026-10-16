@@ -363,69 +363,42 @@ ae.insertBlankLineMaybe = function () {
     return false;
 };
 
-// remove extra newlines at the current position
-// returns number of lines removed
-ae.removeExtraNewlines = function () {
-    var oldLength = editor.session.getLength();
-    var oldRange  = editor.selection.getRange();
-
-    // not on a newline currently
-    var i = new Range(
-        oldRange.end.row, 0,
-        oldRange.end.row, Infinity
-    );
-    if (editor.session.getTextRange(i).trim().length)
-        return;
-
-    // remove newlines
-    editor.selection.selectLine();
-    while (editor.selection.getRange().start.row != 0) {
-        var text = editor.getSelectedText();
-
-        // the line has length, so this is the end of it.
-        if (text.trim().length) {
-            editor.insert('\n' + text);
-            break;
-        }
-
-        editor.removeLines();
-        editor.selection.selectLine();
-    }
-
-    // put the cursor back where it was
-    editor.selection.setRange(oldRange);
-    return oldLength - editor.session.getLength();
-};
-
-// remove all lines within the provided ranges
+// remove all lines within the provided ranges.
+// a blank line directly below a removed run of lines is also removed if
+// there is a blank line directly above it, so that removing (and later
+// re-inserting) lines does not leave extra blank lines behind.
 ae.removeLinesInRanges = function (ranges) {
     if (!ranges || !ranges.length)
         return;
+    var doc = editor.session.doc;
 
-    var rows = [], smallest = Infinity, biggest = -1;
+    // unique rows, bottom to top
+    var rows = [];
     ranges.each(function (i) {
-        rows[i.start.row] = true;
-        rows[i.end.row]   = true;
-        biggest  = Math.max(biggest,  i.start.row, i.end.row);
-        smallest = Math.min(smallest, i.start.row, i.end.row);
+        for (var row = i.start.row; row <= i.end.row; row++)
+            rows.include(row);
     });
+    rows.sort(function (a, b) { return b - a; });
 
-    smallest--;
-    var lastLine;
-    for (var i = biggest; i >= smallest; i--) {
-
-        // if the row does not exist, this is the end of a continuous range
-        if (!rows[i]) {
-            if (typeof lastLine != 'undefined') {
-                editor.session.doc.removeFullLines(i + 1, lastLine);
-                lastLine = undefined;
-            }
-            continue;
+    // remove each continuous run of rows
+    var first, last;
+    var removeRun = function () {
+        doc.removeFullLines(first, last);
+        if (first > 0 && first < doc.getLength() &&
+            !doc.getLine(first).trim().length &&
+            !doc.getLine(first - 1).trim().length)
+            doc.removeFullLines(first, first);
+    };
+    rows.each(function (row) {
+        if (typeof last == 'undefined')
+            last = row;
+        else if (row != first - 1) {
+            removeRun();
+            last = row;
         }
-
-        if (typeof lastLine == 'undefined')
-            lastLine = i;
-    }
+        first = row;
+    });
+    removeRun();
 };
 
 // move the cursor to the top left position

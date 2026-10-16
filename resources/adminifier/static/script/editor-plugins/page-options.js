@@ -153,44 +153,34 @@ function updatePageOptions () {
 }
 
 function insertPageOptions (newOpts, newCats) {
+    var doc = editor.session.doc;
 
-    // this will actually be passed user input
-    var optsString = generatePageOptions(newOpts);
-
-    // inject the new lines at the beginning
-    var pos = { row: 0, column: 0 };
-    pos = editor.session.insert(pos, optsString);
-
-    // after inserting, the selection will be the line following
-    // the insertion at column 0.
-
-    // now check for categories
+    // the header is the options, then a blank line, then the categories
+    var header = generatePageOptions(newOpts);
     if (newCats.length) {
-        pos = editor.session.insert(pos, '\n');
+        if (header.length)
+            header += '\n';
         newCats.sort().each(function (catName) {
-            pos = editor.session.insert(
-                pos,
-                '@category.' + catName + ';\n'
-            );
+            header += '@category.' + catName + ';\n';
         });
     }
 
-    // above this point, the selection has not been affected
+    // remove blank lines from the top of the file so that exactly one blank
+    // line will separate the header from the content. this also takes care
+    // of blank lines left behind by removeLinesInRanges().
+    while (doc.getLength() > 1 && !doc.getLine(0).trim().length)
+        doc.removeFullLines(0, 0);
 
-    // set the current selection to the insert position
-    var oldRange = editor.selection.getRange();
-    editor.selection.setRange(new Range(
-        pos.row, 0,
-        pos.row, 0
-    ));
+    // nothing to insert
+    if (!header.length)
+        return;
 
-    // remove extra newlines at the new position; set the selection to where
-    // it was originally by shifting up by number of lines removed
-    var removed = ae.removeExtraNewlines();
-    editor.selection.setRange(new Range(
-        oldRange.start.row - removed, oldRange.start.column,
-        oldRange.end.row   - removed, oldRange.end.column
-    ));
+    // separate the header from the content, if there is any
+    if (doc.getValue().trim().length)
+        header += '\n';
+
+    // inject the new lines at the beginning. the selection follows along.
+    doc.insert({ row: 0, column: 0 }, header);
 }
 
 function pageVariableFromRange (range, exp, bool) {
@@ -239,64 +229,49 @@ function findPageCategories () {
 }
 
 function generatePageOptions (opts) {
-    var string  = '',
-        biggest = 9,
-        done    = {};
-    var updateBiggest = function (length, ret) {
-        var maybeBigger = length + 5;
-        if (maybeBigger > biggest)
-            biggest = maybeBigger;
-        return ret;
-    };
+    var string = '',
+        prefix = ae.isModel() ? '@model.' : '@page.';
 
-    // these three always go at the top, in this order
-    ['title', 'author', 'created'].append(
-        Object.keys(opts).sort(function (a, b) {
-        var aBool = opts[a] === true,
-            bBool = opts[b] === true;
-
-        // both bool, fallback to alphabetical
-        if (aBool && bBool)
-            return a.localeCompare(b);
-
-        // one bool, it comes last
-        if (bBool && !aBool)
-            return updateBiggest(a.length, -1);
-        if (aBool && !bBool)
-            return updateBiggest(b.length, 1);
-
-        // neither bool, fallback to alphabetical
-        updateBiggest(Math.max(a.length, b.length));
-        return a.localeCompare(b);
-
-    })).each(function (optName) {
-        if (done[optName])
-            return;
-        done[optName] = true;
-
-        // not present
+    // true if the option is set
+    var isSet = function (optName) {
         var value = opts[optName];
         if (typeOf(value) == 'null')
-            return;
+            return false;
         if (typeOf(value) == 'string' && !value.length)
-            return;
+            return false;
         if (typeOf(value) == 'boolean' && !value)
-            return;
+            return false;
+        return true;
+    };
 
-        string += (ae.isModel() ? '@model.' : '@page.') + optName;
+    // these three always go at the top, in this order.
+    // then the rest alphabetically, with booleans last.
+    var names = ['title', 'author', 'created'].filter(isSet);
+    names.combine(Object.keys(opts).filter(isSet).sort(function (a, b) {
+        var aBool = opts[a] === true,
+            bBool = opts[b] === true;
+        if (aBool != bBool)
+            return aBool ? 1 : -1;
+        return a.localeCompare(b);
+    }));
+
+    // values line up two columns past the longest name
+    var biggest = 0;
+    names.each(function (optName) {
+        if (opts[optName] !== true)
+            biggest = Math.max(biggest, optName.length);
+    });
+
+    names.each(function (optName) {
+        var value = opts[optName];
+        string += prefix + optName;
 
         // non-boolean value
         if (value !== true) {
-            string += ':';
+            string += ':' + Array(biggest - optName.length + 3).join(' ');
 
-            // add however many spaces to make it line up
-            if (optName.length < biggest)
-                string += Array(biggest - optName.length).join(' ');
-
-            // escape semicolons
-            value = value.replace(/;/g, '\\;');
-
-            string += value;
+            // escape semicolons; see parsePageVariable in editor.js
+            string += value.replace(/;/g, '\\;');
         }
 
         string += ';\n';
