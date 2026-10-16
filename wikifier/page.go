@@ -145,10 +145,16 @@ func (p *Page) Parse() error {
 
 func (p *Page) _parse() error {
 
+	// markdown models get no page variables or table of contents
+	runMarkdown := markdown.Run
+	if p.model {
+		runMarkdown = markdown.RunModel
+	}
+
 	// create reader from file path or source code provided
 	var reader io.Reader
 	if p.Markdown && p.Source != "" {
-		d := markdown.Run([]byte(p.Source))
+		d := runMarkdown([]byte(p.Source))
 		reader = bytes.NewReader(d)
 	} else if p.Source != "" {
 		reader = strings.NewReader(p.Source)
@@ -158,7 +164,7 @@ func (p *Page) _parse() error {
 		if err != nil {
 			return err
 		}
-		d := markdown.Run(md)
+		d := runMarkdown(md)
 		reader = bytes.NewReader(d)
 	} else if p.FilePath != "" {
 		file, err := os.Open(p.FilePath)

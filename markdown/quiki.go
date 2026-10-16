@@ -16,7 +16,18 @@ var punctuationRegex = regexp.MustCompile(`[^\w\- ]`)
 
 // Run parses Markdown and renders quiki soure code.
 func Run(input []byte) []byte {
-	r := NewQuikiRenderer(QuikiRendererParameters{Flags: TableOfContents})
+	return run(input, TableOfContents)
+}
+
+// RunModel parses Markdown and renders quiki source code for a model:
+// no page variables or table of contents, and the first heading becomes
+// the model title rather than the page title.
+func RunModel(input []byte) []byte {
+	return run(input, PartialPage|ModelVars)
+}
+
+func run(input []byte, flags QuikiFlags) []byte {
+	r := NewQuikiRenderer(QuikiRendererParameters{Flags: flags})
 	return blackfriday.Run(input, blackfriday.WithRenderer(r), blackfriday.WithExtensions(blackfriday.NoEmptyLineBeforeBlock|blackfriday.CommonExtensions))
 }
 
@@ -32,6 +43,7 @@ const (
 	PartialPage                                // If true, no @page vars at start
 	TableOfContents                            // If true, include TOC
 	FootnoteReturnLinks                        // Generate a link at the end of a footnote to return to the source
+	ModelVars                                  // If true, emit @model vars rather than @page vars
 )
 
 // QuikiRendererParameters allows you to tweak the behavior of a QuikiRenderer.
@@ -763,7 +775,11 @@ func (r *QuikiRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering
 func (r *QuikiRenderer) RenderFooter(w io.Writer, ast *blackfriday.Node) {
 	// title must be done after the heading is extracted
 	if r.Title != "" {
-		io.WriteString(w, "\n@page.title: "+utils.EscFmt(r.Title)+";\n")
+		prefix := "@page"
+		if r.Flags&ModelVars != 0 {
+			prefix = "@model"
+		}
+		io.WriteString(w, "\n"+prefix+".title: "+utils.EscFmt(r.Title)+";\n")
 	}
 }
 
