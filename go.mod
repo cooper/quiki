@@ -1,8 +1,6 @@
 module github.com/cooper/quiki
 
-go 1.23.1
-
-toolchain go1.23.4
+go 1.24.0
 
 require (
 	github.com/Songmu/go-httpdate v1.0.0
@@ -12,14 +10,14 @@ require (
 	github.com/cooper/imaging v1.0.0
 	github.com/enescakir/emoji v1.0.0
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/go-git/go-git/v5 v5.16.2
+	github.com/go-git/go-git/v5 v5.16.5
 	github.com/grokify/html-strip-tags-go v0.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/whyrusleeping/hellabot v0.0.0-20191113145436-fd8fa1922281
-	golang.org/x/crypto v0.41.0
-	golang.org/x/term v0.34.0
+	golang.org/x/crypto v0.45.0
+	golang.org/x/term v0.37.0
 )
 
 require (
@@ -52,8 +50,8 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/image v0.30.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
 	gopkg.in/inconshreveable/log15.v2 v2.0.0-20200109203555-b30bc20e4fd1 // indirect
 	gopkg.in/sorcix/irc.v1 v1.1.4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
