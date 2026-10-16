@@ -31,6 +31,11 @@
       "name": "model shorthand",
       "input": "[[test_model]];",
       "expected": "<a class=\"q-link-internal\" href=\"/test_model\" title=\"test_model\">test_model</a>;"
+    },
+    {
+      "name": "definitions block",
+      "input": "definitions {\n  Term one: first;\n  Term two: [b]second[/b];\n}",
+      "expected": "<dl class=\"q-definitions\"> <dt class=\"q-definitions-term\"> Term one </dt> <dd class=\"q-definitions-definition\"> first </dd> <dt class=\"q-definitions-term\"> Term two </dt> <dd class=\"q-definitions-definition\"> <span style=\"font-weight: bold;\">second</span> </dd> </dl>"
     }
   ]
 }

@@ -60,6 +60,23 @@ code [perl] {{
 }}
 ```
 
+## definitions{}
+
+A definition list (`<dl>`). Each key is a term and its value the definition.
+
+```
+definitions {
+    Term one:   The first definition;
+    Term two:   The second definition, which may contain
+                [b]formatted text[/b] or a single block;
+}
+```
+
+Markdown definition lists (a term followed by a line starting with `:`) are
+converted to this block.
+
+`dl{}` is an alias.
+
 ## fmt{}
 
 Like [`html{}`](#html), except that text formatting is permitted. Often
