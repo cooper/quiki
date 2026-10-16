@@ -285,6 +285,11 @@ function frameLoad (page) {
     request.get();
 }
 
+// reload the current frame
+a.reloadFrame = function () {
+    loadURL();
+};
+
 // resolve a window redirect target from a frame response.
 // relative targets are resolved against the adminifier root rather than the
 // window location, since the window may be several levels deep (e.g. a file
