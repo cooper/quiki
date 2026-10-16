@@ -51,6 +51,9 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"create-model":        handleCreateModel,
 	"create-page-folder":  handleCreatePageFolder,
 	"create-model-folder": handleCreateModelFolder,
+	"delete-page":         handleDeletePage,
+	"delete-model":        handleDeleteModel,
+	"delete-image":        handleDeleteImage,
 	"create-image-folder": handleCreateImageFolder,
 }
 
@@ -713,6 +716,36 @@ func handleImage(wr *wikiRequest) {
 	default:
 		http.NotFound(wr.w, wr.r)
 	}
+}
+
+// each deletion is its own commit
+func handleDeletePage(wr *wikiRequest) {
+	handleDelete(wr, "page", func(name string) error {
+		return wr.wi.DeletePage(name, getCommitOpts(wr, "Delete page: "+name))
+	})
+}
+
+func handleDeleteModel(wr *wikiRequest) {
+	handleDelete(wr, "page", func(name string) error {
+		return wr.wi.DeleteModel(name, getCommitOpts(wr, "Delete model: "+name))
+	})
+}
+
+func handleDeleteImage(wr *wikiRequest) {
+	handleDelete(wr, "image", func(name string) error {
+		return wr.wi.DeleteImage(name, getCommitOpts(wr, "Delete image: "+name))
+	})
+}
+
+func handleDelete(wr *wikiRequest, param string, deleteFunc func(name string) error) {
+	if !parsePost(wr.w, wr.r, param) {
+		return
+	}
+	name := wr.r.Form.Get(param)
+	res := handleWriteFile(wr, func() error {
+		return deleteFunc(name)
+	})
+	json.NewEncoder(wr.w).Encode(res)
 }
 
 func handlePageRevisions(wr *wikiRequest) {
