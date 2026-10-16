@@ -73,7 +73,7 @@ func CheckLibvipsAvailable() error {
 
 // ResizeImageVips resizes an image using libvips
 func (p *VipsProcessor) ResizeImageVips(inputPath, outputPath string, width, height int, quality int) error {
-	return p.withConcurrencyControl(inputPath, func() error {
+	return p.withConcurrencyControl(func() error {
 		// ensure output directory exists
 		outputDir := filepath.Dir(outputPath)
 		if err := os.MkdirAll(outputDir, 0755); err != nil {
