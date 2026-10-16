@@ -1,7 +1,6 @@
 package wiki
 
 import (
-	"context"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -34,8 +33,6 @@ type ImageProcessor struct {
 	semaphore   chan struct{} // limits concurrent processing
 	maxMemoryMB int64         // max memory per image in MB
 	timeout     time.Duration // max processing time per image
-	mu          sync.RWMutex
-	processing  map[string]bool // tracks images currently being processed
 }
 
 // ImageProcessorOptions configures the image processor
@@ -91,115 +88,39 @@ func NewImageProcessor(opts ImageProcessorOptions) *ImageProcessor {
 		semaphore:   make(chan struct{}, opts.MaxConcurrent),
 		maxMemoryMB: opts.MaxMemoryMB,
 		timeout:     opts.Timeout,
-		processing:  make(map[string]bool),
 	}
 }
 
-// safeImageOpen opens an image with memory and timeout limits
-func (p *ImageProcessor) safeImageOpen(path string) (image.Image, error) {
-	// check if already processing this image
-	p.mu.Lock()
-	if p.processing[path] {
-		p.mu.Unlock()
-		return nil, fmt.Errorf("image already being processed: %s", path)
-	}
-	p.processing[path] = true
-	p.mu.Unlock()
-
-	defer func() {
-		p.mu.Lock()
-		delete(p.processing, path)
-		p.mu.Unlock()
-	}()
-
-	// acquire semaphore to limit concurrent processing
+// acquire waits for a processing slot and returns a func to release it.
+// it gives up after the processor timeout rather than failing immediately, so
+// a burst of requests (e.g. the adminifier image grid) queues up instead of
+// producing a pile of broken images.
+func (p *ImageProcessor) acquire() (release func(), err error) {
+	timer := time.NewTimer(p.timeout)
+	defer timer.Stop()
 	select {
 	case p.semaphore <- struct{}{}:
-		defer func() { <-p.semaphore }()
-	default:
-		return nil, fmt.Errorf("too many concurrent image operations")
+		return func() { <-p.semaphore }, nil
+	case <-timer.C:
+		return nil, fmt.Errorf("timed out waiting for an image processing slot")
 	}
+}
 
-	// first, check image dimensions without fully decoding
-	file, err := os.Open(path)
+// checkImageMemory rejects images that would use too much memory when decoded.
+// it reads only the header, so the image itself is never loaded.
+func (p *ImageProcessor) checkImageMemory(path string) error {
+	width, height, err := GetImageDimensionsFromFile(path)
 	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	config, _, err := image.DecodeConfig(file)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode image config: %v", err)
+		return err
 	}
 
 	// estimate memory usage (width * height * 4 bytes for RGBA)
-	estimatedMB := int64(config.Width * config.Height * 4 / (1024 * 1024))
+	estimatedMB := int64(width) * int64(height) * 4 / (1024 * 1024)
 	if estimatedMB > p.maxMemoryMB {
-		return nil, fmt.Errorf("image too large: %dx%d (~%dMB) exceeds limit of %dMB",
-			config.Width, config.Height, estimatedMB, p.maxMemoryMB)
+		return fmt.Errorf("image too large: %dx%d (~%dMB) exceeds limit of %dMB",
+			width, height, estimatedMB, p.maxMemoryMB)
 	}
-
-	// create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
-	defer cancel()
-
-	// channel to receive result
-	resultCh := make(chan struct {
-		img image.Image
-		err error
-	}, 1)
-
-	// process image in goroutine
-	go func() {
-		img, err := imaging.Open(path)
-		resultCh <- struct {
-			img image.Image
-			err error
-		}{img, err}
-	}()
-
-	// wait for result or timeout
-	select {
-	case result := <-resultCh:
-		return result.img, result.err
-	case <-ctx.Done():
-		return nil, fmt.Errorf("image processing timeout: %s", path)
-	}
-}
-
-// safeImageResize resizes an image with timeout protection
-func (p *ImageProcessor) safeImageResize(img image.Image, width, height int) (image.Image, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
-	defer cancel()
-
-	resultCh := make(chan struct {
-		img image.Image
-		err error
-	}, 1)
-
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				resultCh <- struct {
-					img image.Image
-					err error
-				}{nil, fmt.Errorf("resize panic: %v", r)}
-			}
-		}()
-
-		resized := imaging.Resize(img, width, height, imaging.Lanczos)
-		resultCh <- struct {
-			img image.Image
-			err error
-		}{resized, nil}
-	}()
-
-	select {
-	case result := <-resultCh:
-		return result.img, result.err
-	case <-ctx.Done():
-		return nil, fmt.Errorf("image resize timeout")
-	}
+	return nil
 }
 
 // GetImageDimensionsFromFile efficiently reads image dimensions from file header without loading the full image
@@ -223,39 +144,63 @@ func (p *ImageProcessor) GetImageDimensionsSafe(path string) (width, height int,
 	return GetImageDimensionsFromFile(path)
 }
 
-// ResizeImageDirect implements ImageProcessorInterface - file-to-file resize using pure go
+// ResizeImageDirect implements ImageProcessorInterface - file-to-file resize using pure go.
+// unlike the external processors, this has to decode the whole image into memory,
+// so it is guarded by the memory estimate, the concurrency limit, and the timeout.
 func (p *ImageProcessor) ResizeImageDirect(inputPath, outputPath string, width, height, quality int) error {
-	// for pure go processor, we have to load into memory
-	img, err := p.safeImageOpen(inputPath)
+	if err := p.checkImageMemory(inputPath); err != nil {
+		return err
+	}
+
+	release, err := p.acquire()
+	if err != nil {
+		return err
+	}
+
+	// do the work in a goroutine so the caller can give up after the timeout.
+	// the slot is held until the work actually finishes, since the memory is in
+	// use until then whether or not anyone is still waiting for the result.
+	// a panic in the decoder must be recovered here: an unrecovered panic in a
+	// goroutine takes down the whole server, not just the request.
+	done := make(chan error, 1)
+	go func() {
+		defer release()
+		defer func() {
+			if r := recover(); r != nil {
+				done <- fmt.Errorf("image processing panic: %v", r)
+			}
+		}()
+		done <- resizeWithImaging(inputPath, outputPath, width, height, quality)
+	}()
+
+	timer := time.NewTimer(p.timeout)
+	defer timer.Stop()
+	select {
+	case err := <-done:
+		return err
+	case <-timer.C:
+		return fmt.Errorf("image processing timeout: %s", inputPath)
+	}
+}
+
+// resizeWithImaging does the actual decode, resize, and encode in memory
+func resizeWithImaging(inputPath, outputPath string, width, height, quality int) error {
+	img, err := imaging.Open(inputPath)
 	if err != nil {
 		return fmt.Errorf("failed to open image: %v", err)
 	}
+	resized := imaging.Resize(img, width, height, imaging.Lanczos)
 
-	resized, err := p.safeImageResize(img, width, height)
-	if err != nil {
-		return fmt.Errorf("failed to resize image: %v", err)
+	var opts []imaging.EncodeOption
+	if quality > 0 {
+		opts = append(opts, imaging.JPEGQuality(quality))
 	}
-
-	return imaging.Save(resized, outputPath)
+	return imaging.Save(resized, outputPath, opts...)
 }
 
-// withConcurrencyControl executes a function with memory-aware concurrency control
-func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() error) error {
-	// check if already processing this image
-	p.mu.Lock()
-	if p.processing[inputPath] {
-		p.mu.Unlock()
-		return fmt.Errorf("image already being processed: %s", inputPath)
-	}
-	p.processing[inputPath] = true
-	p.mu.Unlock()
-
-	defer func() {
-		p.mu.Lock()
-		delete(p.processing, inputPath)
-		p.mu.Unlock()
-	}()
-
+// withConcurrencyControl executes fn (an external resize process) with memory-aware
+// concurrency control
+func (p *ImageProcessor) withConcurrencyControl(fn func() error) error {
 	// try to acquire worker with memory awareness using global monitor
 	memMonitor := GetMemoryMonitor()
 	maxRetries := 50                    // increased from 10
@@ -278,13 +223,12 @@ func (p *ImageProcessor) withConcurrencyControl(inputPath string, fn func() erro
 		}
 	}
 
-	// if we still can't get a worker after retries, fall back to basic semaphore
-	// this ensures we never completely block, but with minimal concurrency
-	select {
-	case p.semaphore <- struct{}{}:
-		defer func() { <-p.semaphore }()
-		return fn()
-	default:
-		return fmt.Errorf("system overloaded - too many concurrent image operations and insufficient memory")
+	// if we still can't get a worker after retries, fall back to the processor's
+	// own concurrency limit, waiting for a slot rather than failing outright
+	release, err := p.acquire()
+	if err != nil {
+		return fmt.Errorf("system overloaded: %v", err)
 	}
+	defer release()
+	return fn()
 }

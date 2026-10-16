@@ -54,6 +54,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"delete-page":         handleDeletePage,
 	"delete-model":        handleDeleteModel,
 	"delete-image":        handleDeleteImage,
+	"purge-cache":         handlePurgeCache,
 	"create-image-folder": handleCreateImageFolder,
 }
 
@@ -745,6 +746,17 @@ func handleDelete(wr *wikiRequest, param string, deleteFunc func(name string) er
 	res := handleWriteFile(wr, func() error {
 		return deleteFunc(name)
 	})
+	json.NewEncoder(wr.w).Encode(res)
+}
+
+func handlePurgeCache(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r) {
+		return
+	}
+	res := map[string]any{"success": true}
+	if err := wr.wi.PurgeCache(); err != nil {
+		res = map[string]any{"success": false, "error": err.Error()}
+	}
 	json.NewEncoder(wr.w).Encode(res)
 }
 

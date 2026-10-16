@@ -149,11 +149,11 @@ function handleInput () {
 
 // EXPORTS
 
-// search expressions for variables
+// search expressions for variables. page options apply to models too
 ae.expressions = {
-    pageTitle:      new RegExp('\\s*^@page\\.title:(.*)$'),
-    keyValueVar:    new RegExp('^\\s*@page\\.(\\w+):(.*?)(;?)\\s*$'),
-    boolVar:        new RegExp('^\\s*@page\\.(\\w+);\\s*$'),
+    pageTitle:      new RegExp('\\s*^@(?:page|model)\\.title:(.*)$'),
+    keyValueVar:    new RegExp('^\\s*@(?:page|model)\\.(\\w+):(.*?)(;?)\\s*$'),
+    boolVar:        new RegExp('^\\s*@(?:page|model)\\.(\\w+);\\s*$'),
     category:       new RegExp('^\\s*@category\\.([\\w\\.]+);\\s*$')
 };
 
@@ -210,7 +210,7 @@ ae.isReadOnly = function () {
     return false;
 };
 
-// returns the page title text, with any escapes accounted for.
+// returns the page title text, with escaped semicolons accounted for.
 // returns nothing if the @page.title can't be found.
 // range is optional
 ae.getPageTitle = function (range) {
@@ -263,86 +263,84 @@ ae.closePopup = function (box, opts) {
     closeCurrentPopup(opts);
 };
 
-// find a page variable matching the provided expression within the given range
-// range is optional, defaults to the whole file
+// find a page variable matching the provided expression.
+// range is optional, defaults to the whole file. the last occurrence within
+// the range is preferred. returns nothing if no match is found; otherwise
+// { name, text, range }, where range covers the value (or the name, for a
+// boolean variable) and text is the value with escaped semicolons unescaped.
 ae.findPageVariable = function (exp, range) {
-    var search = new Search().set({
-        needle: exp,
-        regExp: true,
-        range:  range,
-        backwards: true // prefer the last occurrence
-    });
-    return; // FIXME: search.find() is making editor hang.
-    var found = search.find(editor.session);
-    if (!found)
+
+    // note: this used to use Search.find() with backwards: true, but ace's
+    // backwards search loops forever when the needle is a RegExp object that
+    // lacks the global flag (lastIndex never advances). the expressions are
+    // all single-line anyway, so just match line by line instead.
+    var firstRow = range ? range.start.row : 0,
+        lastRow  = range ? range.end.row   : editor.session.getLength() - 1;
+
+    // a range ending at the start of a line (e.g. from getLineRange())
+    // does not include that line
+    if (range && range.end.row > range.start.row && !range.end.column)
+        lastRow--;
+
+    for (var row = lastRow; row >= firstRow; row--) {
+        var found = parsePageVariable(editor.session.getLine(row), exp, row);
+        if (found)
+            return found;
+    }
+};
+
+// parse a page variable out of a line of text using the provided expression.
+// see ae.findPageVariable for the return value.
+function parsePageVariable (line, exp, row) {
+    var match = line.match(exp);
+    if (!match)
         return;
-    var string = editor.session.getTextRange(found);
-    var escaped    = false,
-        inTitle    = false,     inName    = false,
-        foundText  = '',        foundName = '',
-        startIndex = 0,         endIndex  = 0;
 
-    for (var i = 0; ; i++) {
-        var char = string[i];
+    var string = match[0],
+        offset = match.index;
 
-        // made it to the end without finding unescaped semicolon
-        if (typeOf(char) == 'null') {
-            endIndex = i;
-            break;
+    // the name is whatever follows the first dot
+    var head = string.match(/^(\s*@\w+\.)([\w.]+)/);
+    if (!head)
+        return;
+    var name       = head[2],
+        text       = '',
+        startIndex = head[1].length,
+        endIndex   = startIndex + name.length;
+
+    // key-value variable: the value runs from the colon to the first
+    // unescaped semicolon, or to the end of the match if there is none
+    var colon = string.slice(endIndex).match(/^\s*:/);
+    if (colon) {
+        var valueStart = endIndex + colon[0].length,
+            valueEnd   = string.length;
+        for (var i = valueStart; i < string.length; i++) {
+            if (string[i] == '\\') {
+                i++;
+                continue;
+            }
+            if (string[i] == ';') {
+                valueEnd = i;
+                break;
+            }
         }
 
-        // escapes
-        var escaped = string[i - 1] == '\\';
-        if (char == '\\' && !escaped) {
-            continue;
-        }
+        // ignore surrounding whitespace
+        var value = string.slice(valueStart, valueEnd);
+        startIndex = valueStart + value.match(/^\s*/)[0].length;
+        value      = value.trim();
+        endIndex   = startIndex + value.length;
 
-        // now we're in the title
-        if (!startIndex && char == ':') {
-            inName  = false;
-            inTitle = true;
-            startIndex = i + 1;
-            continue;
-        }
-
-        if (!startIndex && char == '.' && !inName) {
-            inName = true;
-            continue;
-        }
-
-        // if we're in the title but no text has been found,
-        // this is just spacing before the actual title
-        if (inTitle && !foundText.length && char == ' ') {
-            startIndex++;
-            continue;
-        }
-
-        // ending the title
-        if (inTitle && !escaped && char == ';') {
-            endIndex = i;
-            break;
-        }
-
-        // ending a bool var
-        if (inName && char == ';')
-            break;
-
-        if (inTitle)
-            foundText += char;
-        else if (inName)
-            foundName += char;
+        // unescape semicolons; see generatePageOptions in page-options.js
+        text = value.replace(/\\;/g, ';');
     }
 
-    // offset on the line
-    startIndex += found.start.column;
-    endIndex   += found.start.column;
-
     return {
-        name: foundName,
-        text: foundText,
-        range: new Range(found.start.row, startIndex, found.end.row, endIndex)
+        name:   name,
+        text:   text,
+        range:  new Range(row, offset + startIndex, row, offset + endIndex)
     };
-};
+}
 
 // insert a blank line at the current position,
 // unless there is already a blank line there
@@ -365,69 +363,42 @@ ae.insertBlankLineMaybe = function () {
     return false;
 };
 
-// remove extra newlines at the current position
-// returns number of lines removed
-ae.removeExtraNewlines = function () {
-    var oldLength = editor.session.getLength();
-    var oldRange  = editor.selection.getRange();
-
-    // not on a newline currently
-    var i = new Range(
-        oldRange.end.row, 0,
-        oldRange.end.row, Infinity
-    );
-    if (editor.session.getTextRange(i).trim().length)
-        return;
-
-    // remove newlines
-    editor.selection.selectLine();
-    while (editor.selection.getRange().start.row != 0) {
-        var text = editor.getSelectedText();
-
-        // the line has length, so this is the end of it.
-        if (text.trim().length) {
-            editor.insert('\n' + text);
-            break;
-        }
-
-        editor.removeLines();
-        editor.selection.selectLine();
-    }
-
-    // put the cursor back where it was
-    editor.selection.setRange(oldRange);
-    return oldLength - editor.session.getLength();
-};
-
-// remove all lines within the provided ranges
+// remove all lines within the provided ranges.
+// a blank line directly below a removed run of lines is also removed if
+// there is a blank line directly above it, so that removing (and later
+// re-inserting) lines does not leave extra blank lines behind.
 ae.removeLinesInRanges = function (ranges) {
     if (!ranges || !ranges.length)
         return;
+    var doc = editor.session.doc;
 
-    var rows = [], smallest = Infinity, biggest = -1;
+    // unique rows, bottom to top
+    var rows = [];
     ranges.each(function (i) {
-        rows[i.start.row] = true;
-        rows[i.end.row]   = true;
-        biggest  = Math.max(biggest,  i.start.row, i.end.row);
-        smallest = Math.min(smallest, i.start.row, i.end.row);
+        for (var row = i.start.row; row <= i.end.row; row++)
+            rows.include(row);
     });
+    rows.sort(function (a, b) { return b - a; });
 
-    smallest--;
-    var lastLine;
-    for (var i = biggest; i >= smallest; i--) {
-
-        // if the row does not exist, this is the end of a continuous range
-        if (!rows[i]) {
-            if (typeof lastLine != 'undefined') {
-                editor.session.doc.removeFullLines(i + 1, lastLine);
-                lastLine = undefined;
-            }
-            continue;
+    // remove each continuous run of rows
+    var first, last;
+    var removeRun = function () {
+        doc.removeFullLines(first, last);
+        if (first > 0 && first < doc.getLength() &&
+            !doc.getLine(first).trim().length &&
+            !doc.getLine(first - 1).trim().length)
+            doc.removeFullLines(first, first);
+    };
+    rows.each(function (row) {
+        if (typeof last == 'undefined')
+            last = row;
+        else if (row != first - 1) {
+            removeRun();
+            last = row;
         }
-
-        if (typeof lastLine == 'undefined')
-            lastLine = i;
-    }
+        first = row;
+    });
+    removeRun();
 };
 
 // move the cursor to the top left position

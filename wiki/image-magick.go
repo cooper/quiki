@@ -68,7 +68,7 @@ func NewImageMagickProcessor(opts ImageMagickOptions) (*ImageMagickProcessor, er
 
 // ResizeImage resizes an image using ImageMagick convert
 func (p *ImageMagickProcessor) ResizeImage(inputPath, outputPath string, width, height int, quality int) error {
-	return p.withConcurrencyControl(inputPath, func() error {
+	return p.withConcurrencyControl(func() error {
 		// ensure output directory exists
 		outputDir := filepath.Dir(outputPath)
 		if err := os.MkdirAll(outputDir, 0755); err != nil {

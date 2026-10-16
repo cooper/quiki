@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" data-wredirect="login" />
-    <title>{{template "title" .}}</title>
+    <title>{{.Title}}</title>
     <link rel="icon" type="image/png" href="{{.Static}}/image/favicon.png" />
     <link rel="stylesheet" href="{{.SharedStatic}}/auth.css" />
 </head>
@@ -25,12 +25,3 @@
         {{if .Success}}
             <div class="auth-success">{{.Success}}</div>
         {{end}}
-        
-        {{template "form" .}}
-        
-        <div class="auth-links">
-            {{template "links" .}}
-        </div>
-    </div>
-</body>
-</html>

@@ -1,8 +1,5 @@
-{{template "auth-base.tpl" .}}
+{{template "auth-header.tpl" .}}
 
-{{define "title"}}adminifier login{{end}}
-
-{{define "form"}}
 <form action="func/login?redirect={{.Redirect}}" method="post">
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
     <div class="auth-form-group">
@@ -17,7 +14,5 @@
     
     <button type="submit" class="auth-button">Login</button>
 </form>
-{{end}}
 
-{{define "links"}}
-{{end}}
+{{template "auth-footer.tpl" .}}
