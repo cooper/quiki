@@ -51,6 +51,7 @@ var wikiFuncHandlers = map[string]func(*wikiRequest){
 	"create-model":        handleCreateModel,
 	"create-page-folder":  handleCreatePageFolder,
 	"create-model-folder": handleCreateModelFolder,
+	"purge-cache":         handlePurgeCache,
 	"create-image-folder": handleCreateImageFolder,
 }
 
@@ -713,6 +714,17 @@ func handleImage(wr *wikiRequest) {
 	default:
 		http.NotFound(wr.w, wr.r)
 	}
+}
+
+func handlePurgeCache(wr *wikiRequest) {
+	if !parsePost(wr.w, wr.r) {
+		return
+	}
+	res := map[string]any{"success": true}
+	if err := wr.wi.PurgeCache(); err != nil {
+		res = map[string]any{"success": false, "error": err.Error()}
+	}
+	json.NewEncoder(wr.w).Encode(res)
 }
 
 func handlePageRevisions(wr *wikiRequest) {

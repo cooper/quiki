@@ -19,8 +19,22 @@
     {
       "name": "email_link",
       "input": "[[ someone@example.com ]]",
-      "expected": "<a class=\"q-link-internal\" href=\"/someone_example.com\" title=\"someone@example.com\">someone@example.com</a>",
-      "description": "email link (treated as internal)",
+      "expected": "<a class=\"q-link-contact\" href=\"mailto:someone@example.com\" title=\"email someone@example.com\">someone@example.com</a>",
+      "description": "bare email address is a mailto link",
+      "tags": ["links", "email"]
+    },
+    {
+      "name": "email_link_custom_text",
+      "input": "[[ Bob | Bob.Smith+tag@sub.example.co.uk ]]",
+      "expected": "<a class=\"q-link-contact\" href=\"mailto:Bob.Smith+tag@sub.example.co.uk\" title=\"email Bob.Smith+tag@sub.example.co.uk\">Bob</a>",
+      "description": "email link with custom display text, mixed case, plus tag and multi-part domain",
+      "tags": ["links", "email"]
+    },
+    {
+      "name": "at_sign_not_email",
+      "input": "[[ page@name ]]",
+      "expected": "<a class=\"q-link-internal\" href=\"/page_name\" title=\"page@name\">page@name</a>",
+      "description": "an @ without a domain is still an internal page link",
       "tags": ["links", "email"]
     },
     {

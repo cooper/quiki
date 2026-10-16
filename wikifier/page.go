@@ -242,11 +242,13 @@ func (p *Page) checkSectionLinks() {
 
 // HTMLAndCSS generates and returns the HTML code for the page, including CSS.
 func (p *Page) HTMLAndCSS() HTML {
+	// styles are collected while generating the HTML, so that has to come first
+	html := p.HTML()
 	css := p.CSS()
 	if css != "" {
-		return HTML("<style>\n" + css + "\n</style>\n" + string(p.HTML()))
+		return HTML("<style>\n" + css + "\n</style>\n" + string(html))
 	}
-	return p.HTML()
+	return html
 }
 
 // Text generates and returns the rendered plain text for the page.
@@ -357,6 +359,16 @@ func (p *Page) Name() string {
 // It should be used for file operations only.
 func (p *Page) OSName() string {
 	return filepath.FromSlash(p.Name())
+}
+
+// elementIDPrefix returns the prefix for element ids on this page, which become
+// the classes that style{} selectors refer to. models get their own namespace so
+// a page can't share ids with a model it uses.
+func (p *Page) elementIDPrefix() string {
+	if p.model {
+		return "model-" + p.NameNE()
+	}
+	return p.NameNE()
 }
 
 // NameNE returns the resolved page name with No Extension.

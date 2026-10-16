@@ -3,7 +3,10 @@
     data-title="Dashboard"
     data-icon="home"
     data-styles="dashboard"
+    data-scripts="dashboard"
     data-flags="buttons"
+    data-buttons="purge-cache"
+    data-button-purge-cache="{'title': 'Purge cache', 'icon': 'broom', 'func': 'purgeCache'}"
 />
 <!--
     Unimplemented:
