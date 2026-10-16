@@ -473,6 +473,7 @@ type authTemplateData struct {
 	WikiLogo       string
 	Static         string
 	SharedStatic   string
+	Title          string // <title> of the page
 	PageTitle      string
 	Heading        string
 	Error          string
@@ -496,6 +497,7 @@ func (wi *WikiInfo) newAuthTemplateData(pageTitle, heading string, r *http.Reque
 		WikiLogo:      wi.Logo,
 		Static:        wi.template.staticRoot,
 		SharedStatic:  "/shared",
+		Title:         pageTitle + " - " + wi.Name,
 		PageTitle:     pageTitle,
 		Heading:       heading,
 		RegisterURL:   wi.Opt.Root.Wiki + "register",
@@ -614,8 +616,10 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 		// login successful - clear failed attempts and set session
 		clearSuccessfulLogin(r, username)
+		// the session type is what the permission checker and adminifier expect
+		// to find under "user"; it is also the type registered with gob
 		SessMgr.Put(r.Context(), "loggedIn", true)
-		SessMgr.Put(r.Context(), "user", &user)
+		SessMgr.Put(r.Context(), "user", NewSession(&user))
 		SessMgr.Put(r.Context(), "wikiName", wi.Name)
 
 		// regenerate session id after successful login for security

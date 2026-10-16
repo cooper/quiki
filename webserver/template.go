@@ -18,6 +18,9 @@ import (
 )
 
 var templateFses []fs.FS
+
+// templates shared by every theme, such as the auth pages' base layout
+var sharedTemplateFs fs.FS
 var templates = make(map[string]wikiTemplate)
 
 var templateFuncs = map[string]any{
@@ -177,6 +180,14 @@ func loadTemplate(walkPath, name string, fses []fs.FS) (wikiTemplate, error) {
 		// other error
 		if err != nil {
 			return t, err
+		}
+
+		// add the shared templates. these live outside any theme directory,
+		// so the walk above never sees them.
+		if sharedTemplateFs != nil {
+			if _, err := tmpl.ParseFS(sharedTemplateFs, "*.tpl"); err != nil {
+				return t, err
+			}
 		}
 
 		// cache the template

@@ -1,8 +1,5 @@
-{{template "auth-base.tpl" .}}
+{{template "auth-header.tpl" .}}
 
-{{define "title"}}{{.PageTitle}}{{end}}
-
-{{define "form"}}
 <form action="{{.RegisterAction}}" method="post">
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
     <div class="auth-form-group">
@@ -30,9 +27,10 @@
     
     <button type="submit" class="auth-button">create account</button>
 </form>
-{{end}}
 
-{{define "links"}}
-<a href="{{.LoginURL}}">already have an account?</a> |
-<a href="{{.HomeURL}}">back to {{.WikiName}}</a>
-{{end}}
+<div class="auth-links">
+    <a href="{{.LoginURL}}">already have an account?</a> |
+    <a href="{{.HomeURL}}">back to {{.WikiName}}</a>
+</div>
+
+{{template "auth-footer.tpl" .}}
